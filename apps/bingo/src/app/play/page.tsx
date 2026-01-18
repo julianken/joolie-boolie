@@ -1,25 +1,74 @@
 'use client';
 
+import { useCallback } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
+import { useSync } from '@/hooks/use-sync';
 import { BallDisplay, RecentBalls, BallCounter } from '@/components/presenter/BallDisplay';
 import { BingoBoard } from '@/components/presenter/BingoBoard';
 import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
 import { ControlPanel } from '@/components/presenter/ControlPanel';
 import { Toggle } from '@/components/ui/Toggle';
 import { Slider } from '@/components/ui/Slider';
+import { Button } from '@/components/ui/Button';
 
 export default function PlayPage() {
   const game = useGameKeyboard();
+
+  // Initialize sync as presenter role
+  const { isConnected } = useSync({ role: 'presenter' });
+
+  // Open display window
+  const openDisplay = useCallback(() => {
+    const displayUrl = `${window.location.origin}/display`;
+    const displayWindow = window.open(
+      displayUrl,
+      'bingo-display',
+      'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
+    );
+
+    // Focus the display window if it already exists
+    if (displayWindow) {
+      displayWindow.focus();
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-            Beak Bingo
-          </h1>
-          <p className="text-lg text-muted-foreground">Presenter View</p>
+        <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Beak Bingo
+            </h1>
+            <p className="text-lg text-muted-foreground">Presenter View</p>
+          </div>
+
+          {/* Display controls */}
+          <div className="flex items-center gap-4">
+            {/* Connection status */}
+            <div className="flex items-center gap-2">
+              <div
+                className={`
+                  w-3 h-3 rounded-full
+                  ${isConnected ? 'bg-success' : 'bg-muted'}
+                `}
+                title={isConnected ? 'Sync active' : 'Sync not active'}
+              />
+              <span className="text-base text-muted-foreground hidden sm:block">
+                {isConnected ? 'Sync Active' : 'Sync Ready'}
+              </span>
+            </div>
+
+            {/* Open Display button */}
+            <Button
+              onClick={openDisplay}
+              variant="secondary"
+              size="md"
+            >
+              Open Display
+            </Button>
+          </div>
         </header>
 
         {/* Main content grid */}
