@@ -1,0 +1,128 @@
+'use client';
+
+import type { Question } from '@/types';
+
+interface QuestionListProps {
+  questions: Question[];
+  selectedIndex: number;
+  displayIndex: number | null;
+  currentRound: number;
+  totalRounds: number;
+  onSelect: (index: number) => void;
+  onSetDisplay: (index: number | null) => void;
+}
+
+export function QuestionList({
+  questions,
+  selectedIndex,
+  displayIndex: _displayIndex, // Hidden until audience display is implemented
+  currentRound,
+  totalRounds,
+  onSelect,
+  onSetDisplay: _onSetDisplay, // Hidden until audience display is implemented
+}: QuestionListProps) {
+  // Group questions by round
+  const questionsByRound: Question[][] = [];
+  for (let i = 0; i < totalRounds; i++) {
+    questionsByRound[i] = questions.filter(q => q.roundIndex === i);
+  }
+
+  // Get the overall index of a question
+  const getQuestionIndex = (question: Question) => {
+    return questions.findIndex(q => q.id === question.id);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Questions</h2>
+        <span className="text-sm text-muted-foreground">
+          {questions.length} total
+        </span>
+      </div>
+
+      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2
+        [&::-webkit-scrollbar]:w-1.5
+        [&::-webkit-scrollbar-track]:bg-transparent
+        [&::-webkit-scrollbar-thumb]:bg-muted/50
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        hover:[&::-webkit-scrollbar-thumb]:bg-muted">
+        {questionsByRound.map((roundQuestions, roundIndex) => {
+          const isCurrentRound = roundIndex === currentRound;
+          const isPastRound = roundIndex < currentRound;
+
+          return (
+            <div key={roundIndex} className="space-y-2">
+              {/* Round Header */}
+              <div
+                className={`
+                  sticky top-0 z-10 flex items-center justify-between
+                  px-3 py-2 rounded-lg font-medium text-sm
+                  ${isCurrentRound ? 'bg-blue-500/20 text-blue-600' : ''}
+                  ${isPastRound ? 'bg-green-500/10 text-green-600' : ''}
+                  ${!isCurrentRound && !isPastRound ? 'bg-muted/50 text-muted-foreground' : ''}
+                `}
+              >
+                <span>Round {roundIndex + 1}</span>
+                <span className="text-xs">
+                  {roundQuestions.length} questions
+                  {isPastRound && ' (completed)'}
+                </span>
+              </div>
+
+              {/* Round Questions */}
+              <div className="space-y-2 pl-2">
+                {roundQuestions.map((question, qIndex) => {
+                  const globalIndex = getQuestionIndex(question);
+                  const isSelected = globalIndex === selectedIndex;
+                  // const isDisplayed = globalIndex === displayIndex; // Hidden until audience display is implemented
+
+                  return (
+                    <div
+                      key={question.id}
+                      className={`
+                        flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer
+                        transition-colors duration-200
+                        ${
+                          isSelected
+                            ? 'border-blue-500 bg-blue-500/10'
+                            : 'border-border hover:border-muted-foreground/50'
+                        }
+                      `}
+                      onClick={() => onSelect(globalIndex)}
+                    >
+                      {/* Question number within round */}
+                      <span
+                        className={`
+                          flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                          text-sm font-bold
+                          ${isSelected ? 'bg-blue-500 text-white' : 'bg-muted text-muted-foreground'}
+                        `}
+                      >
+                        {qIndex + 1}
+                      </span>
+
+                      {/* Question preview */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-foreground truncate">
+                          {question.text}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {question.type === 'multiple_choice' ? 'MC' : 'T/F'} • {question.category}
+                        </p>
+                      </div>
+
+{/* Display toggle - hidden until audience display is implemented */}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+{/* Hide from display button - hidden until audience display is implemented */}
+    </div>
+  );
+}
