@@ -121,6 +121,10 @@ export default function PlayPage() {
                 question={game.selectedQuestion}
                 peekAnswer={game.peekAnswer}
                 onTogglePeek={() => game.setPeekAnswer(!game.peekAnswer)}
+                onToggleDisplay={() => {
+                  const isCurrentlyOnDisplay = game.displayQuestionIndex === game.selectedQuestionIndex;
+                  game.setDisplayQuestion(isCurrentlyOnDisplay ? null : game.selectedQuestionIndex);
+                }}
                 progress={game.questionInRoundProgress}
                 roundProgress={game.roundProgress}
                 isOnDisplay={game.displayQuestionIndex === game.selectedQuestionIndex}

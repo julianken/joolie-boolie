@@ -6,7 +6,9 @@ interface QuestionDisplayProps {
   question: Question | null;
   peekAnswer: boolean;
   onTogglePeek: () => void;
+  onToggleDisplay: () => void;
   progress: string;
+  roundProgress?: string;
   isOnDisplay: boolean;
 }
 
@@ -14,7 +16,9 @@ export function QuestionDisplay({
   question,
   peekAnswer,
   onTogglePeek,
+  onToggleDisplay,
   progress,
+  roundProgress,
   isOnDisplay,
 }: QuestionDisplayProps) {
   if (!question) {
@@ -33,16 +37,46 @@ export function QuestionDisplay({
     <div className="space-y-4">
       {/* Header with progress and controls */}
       <div className="flex items-center justify-between">
-        <span className="text-lg font-medium text-muted-foreground">
-          {progress}
-        </span>
-        <div className="flex items-center gap-2">
-          {/* Display status indicator */}
-          {isOnDisplay && (
-            <span className="px-2 py-1 text-xs font-medium bg-green-500/20 text-green-600 rounded">
-              On Display
+        <div className="flex flex-col">
+          {roundProgress && (
+            <span className="text-sm font-medium text-muted-foreground/70">
+              {roundProgress}
             </span>
           )}
+          <span className="text-lg font-medium text-muted-foreground">
+            {progress}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Toggle display button */}
+          <button
+            onClick={onToggleDisplay}
+            className={`
+              flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium
+              transition-colors duration-200
+              ${
+                isOnDisplay
+                  ? 'bg-green-600 text-white'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }
+            `}
+            title={isOnDisplay ? 'Hide from display' : 'Show on display'}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+            {isOnDisplay ? 'On Display' : 'Show'}
+          </button>
           {/* Peek answer toggle */}
           <button
             onClick={onTogglePeek}
