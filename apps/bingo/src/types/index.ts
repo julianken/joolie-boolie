@@ -1,0 +1,157 @@
+// Bingo column letters
+export type BingoColumn = 'B' | 'I' | 'N' | 'G' | 'O';
+
+// Ball number range is 1-75
+export type BallNumber = number;
+
+// A bingo ball with its letter and number
+export interface BingoBall {
+  column: BingoColumn;
+  number: BallNumber;
+  label: string; // e.g., "B-1", "O-75"
+}
+
+// Game state
+export type GameStatus = 'idle' | 'playing' | 'paused' | 'ended';
+
+export interface GameState {
+  status: GameStatus;
+  calledBalls: BingoBall[];
+  currentBall: BingoBall | null;
+  previousBall: BingoBall | null;
+  remainingBalls: BingoBall[];
+  pattern: BingoPattern | null;
+  autoCallEnabled: boolean;
+  autoCallSpeed: number; // seconds between calls (5-30)
+  audioEnabled: boolean;
+}
+
+// Pattern definitions
+export interface PatternCell {
+  row: number; // 0-4
+  col: number; // 0-4
+}
+
+export interface BingoPattern {
+  id: string;
+  name: string;
+  category: PatternCategory;
+  cells: PatternCell[]; // Required cells for pattern (free space auto-included)
+  description?: string;
+}
+
+export type PatternCategory =
+  | 'lines'
+  | 'corners'
+  | 'frames'
+  | 'shapes'
+  | 'letters'
+  | 'coverage'
+  | 'combo';
+
+// User profile (extends Supabase auth.users)
+export interface UserProfile {
+  id: string; // UUID
+  facilityName: string | null;
+  logoUrl: string | null;
+  defaultGameTitle: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Saved game template
+export interface GameTemplate {
+  id: string; // UUID
+  userId: string;
+  name: string;
+  patternId: string;
+  autoCallSpeed: number;
+  audioEnabled: boolean;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// API request/response types
+export interface CreateTemplateRequest {
+  name: string;
+  patternId: string;
+  autoCallSpeed: number;
+  audioEnabled: boolean;
+  isDefault?: boolean;
+}
+
+export interface UpdateTemplateRequest {
+  name?: string;
+  patternId?: string;
+  autoCallSpeed?: number;
+  audioEnabled?: boolean;
+  isDefault?: boolean;
+}
+
+export interface UpdateProfileRequest {
+  facilityName?: string;
+  defaultGameTitle?: string;
+}
+
+// Auth types
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  facilityName?: string;
+}
+
+export interface AuthResponse {
+  user: UserProfile | null;
+  error: string | null;
+}
+
+// BroadcastChannel message types for window sync
+export type SyncMessageType =
+  | 'GAME_STATE_UPDATE'
+  | 'BALL_CALLED'
+  | 'GAME_RESET'
+  | 'PATTERN_CHANGED'
+  | 'REQUEST_SYNC';
+
+export interface SyncMessage {
+  type: SyncMessageType;
+  payload: GameState | BingoBall | BingoPattern | null;
+  timestamp: number;
+}
+
+// Audio types
+export interface AudioState {
+  enabled: boolean;
+  volume: number; // 0-1
+  isPlaying: boolean;
+  currentVoice: string;
+}
+
+// Ball deck types
+export interface BallDeck {
+  readonly originalOrder: readonly BingoBall[];
+  remaining: BingoBall[];
+  drawn: BingoBall[];
+}
+
+export interface DrawResult {
+  ball: BingoBall;
+  deck: BallDeck;
+}
+
+// Column ranges for ball generation
+export const COLUMN_RANGES: Record<BingoColumn, [number, number]> = {
+  B: [1, 15],
+  I: [16, 30],
+  N: [31, 45],
+  G: [46, 60],
+  O: [61, 75],
+} as const;
+
+export const COLUMNS: BingoColumn[] = ['B', 'I', 'N', 'G', 'O'];

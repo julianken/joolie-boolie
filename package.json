@@ -1,0 +1,24 @@
+{
+  "name": "beak-gaming-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A unified gaming platform for retirement communities - Bingo, Trivia, and more",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "clean": "turbo clean && rm -rf node_modules",
+    "dev:bingo": "turbo dev --filter=@beak-gaming/bingo",
+    "dev:trivia": "turbo dev --filter=@beak-gaming/trivia",
+    "dev:hub": "turbo dev --filter=@beak-gaming/platform-hub"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

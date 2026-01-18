@@ -1,0 +1,163 @@
+'use client';
+
+import { useGameKeyboard } from '@/hooks/use-game';
+import { BallDisplay, RecentBalls, BallCounter } from '@/components/presenter/BallDisplay';
+import { BingoBoard } from '@/components/presenter/BingoBoard';
+import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
+import { ControlPanel } from '@/components/presenter/ControlPanel';
+import { Toggle } from '@/components/ui/Toggle';
+import { Slider } from '@/components/ui/Slider';
+
+export default function PlayPage() {
+  const game = useGameKeyboard();
+
+  return (
+    <main className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <header className="mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+            Beak Bingo
+          </h1>
+          <p className="text-lg text-muted-foreground">Presenter View</p>
+        </header>
+
+        {/* Main content grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left column: Bingo Board */}
+          <section className="lg:col-span-4 space-y-6">
+            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+              <h2 className="text-xl font-semibold mb-4">Called Numbers</h2>
+              <BingoBoard calledBalls={game.calledBalls} />
+            </div>
+
+            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+              <RecentBalls balls={game.recentBalls} />
+            </div>
+          </section>
+
+          {/* Center column: Current Ball + Controls */}
+          <section className="lg:col-span-4 space-y-6">
+            {/* Current Ball Display */}
+            <div className="bg-background border border-border rounded-xl p-6 shadow-sm flex flex-col items-center gap-4">
+              <h2 className="text-xl font-semibold">Current Ball</h2>
+              <BallDisplay ball={game.currentBall} size="xl" />
+              {game.previousBall && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-base">Previous:</span>
+                  <BallDisplay ball={game.previousBall} size="sm" />
+                </div>
+              )}
+              <BallCounter
+                called={game.ballsCalled}
+                remaining={game.ballsRemaining}
+              />
+            </div>
+
+            {/* Control Panel */}
+            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+              <ControlPanel
+                status={game.status}
+                canCall={game.canCall}
+                canStart={game.canStart}
+                canPause={game.canPause}
+                canResume={game.canResume}
+                canUndo={game.canUndo}
+                onStart={() => game.startGame(game.pattern ?? undefined)}
+                onCallBall={game.callBall}
+                onPause={game.pauseGame}
+                onResume={game.resumeGame}
+                onReset={game.resetGame}
+                onUndo={game.undoCall}
+              />
+            </div>
+          </section>
+
+          {/* Right column: Settings */}
+          <section className="lg:col-span-4 space-y-6">
+            {/* Pattern Selection */}
+            <div className="bg-background border border-border rounded-xl p-4 shadow-sm space-y-4">
+              <PatternSelector
+                selectedPattern={game.pattern}
+                onSelect={game.setPattern}
+                disabled={game.status === 'playing'}
+              />
+              <PatternPreview pattern={game.pattern} />
+            </div>
+
+            {/* Game Settings */}
+            <div className="bg-background border border-border rounded-xl p-4 shadow-sm space-y-6">
+              <h2 className="text-xl font-semibold">Settings</h2>
+
+              {/* Auto-call toggle */}
+              <Toggle
+                checked={game.autoCallEnabled}
+                onChange={game.toggleAutoCall}
+                label="Auto-call"
+              />
+
+              {/* Speed slider */}
+              <Slider
+                value={game.autoCallSpeed}
+                onChange={game.setAutoCallSpeed}
+                min={5}
+                max={30}
+                step={1}
+                label="Call Interval"
+                unit="s"
+                disabled={!game.autoCallEnabled}
+              />
+
+              {/* Audio toggle */}
+              <Toggle
+                checked={game.audioEnabled}
+                onChange={game.toggleAudio}
+                label="Audio Announcements"
+              />
+              <p className="text-sm text-muted-foreground">
+                Press M to toggle audio
+              </p>
+            </div>
+
+            {/* Keyboard shortcuts reference */}
+            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+              <h2 className="text-xl font-semibold mb-3">Keyboard Shortcuts</h2>
+              <ul className="space-y-2 text-base">
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Call ball</span>
+                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-sm">
+                    Space
+                  </kbd>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Pause/Resume</span>
+                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-sm">
+                    P
+                  </kbd>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Undo</span>
+                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-sm">
+                    U
+                  </kbd>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Reset</span>
+                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-sm">
+                    R
+                  </kbd>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Mute/Unmute</span>
+                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-sm">
+                    M
+                  </kbd>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  );
+}

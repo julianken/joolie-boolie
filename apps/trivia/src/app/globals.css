@@ -1,0 +1,21 @@
+@import "@beak-gaming/theme/globals.css";
+
+/* Trivia-specific color extensions */
+:root {
+  /* Team colors for scoring */
+  --team-1: #1e40af;  /* Blue */
+  --team-2: #dc2626;  /* Red */
+  --team-3: #059669;  /* Green */
+  --team-4: #d97706;  /* Orange */
+  --team-5: #7c3aed;  /* Purple */
+  --team-6: #0891b2;  /* Cyan */
+}
+
+@theme inline {
+  --color-team-1: var(--team-1);
+  --color-team-2: var(--team-2);
+  --color-team-3: var(--team-3);
+  --color-team-4: var(--team-4);
+  --color-team-5: var(--team-5);
+  --color-team-6: var(--team-6);
+}

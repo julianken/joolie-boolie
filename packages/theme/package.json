@@ -1,0 +1,18 @@
+{
+  "name": "@beak-gaming/theme",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./globals.css": "./src/globals.css",
+    "./tailwind.preset": "./tailwind.preset.js"
+  },
+  "scripts": {
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
