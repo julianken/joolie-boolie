@@ -332,6 +332,61 @@ describe('use-sync', () => {
     });
   });
 
+  describe('sync loop prevention', () => {
+    it('skips broadcast when state is hydrating', () => {
+      const postMessageSpy = vi.fn();
+      vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+        postMessage = postMessageSpy;
+      });
+
+      renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+      // Clear any initial broadcasts
+      postMessageSpy.mockClear();
+
+      // Set hydrating flag and change state
+      useGameStore.setState({ _isHydrating: true });
+
+      act(() => {
+        // Simulate a state change while hydrating
+        useGameStore.setState({ status: 'playing' });
+      });
+
+      // Should NOT broadcast because _isHydrating is true
+      // Note: The subscription might still fire, but the handler should check the flag
+      const broadcastCalls = postMessageSpy.mock.calls.filter(
+        call => call[0]?.type === 'GAME_STATE_UPDATE'
+      );
+      expect(broadcastCalls).toHaveLength(0);
+
+      // Clean up
+      useGameStore.setState({ _isHydrating: false });
+    });
+
+    it('broadcasts normally when not hydrating', () => {
+      const postMessageSpy = vi.fn();
+      vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+        postMessage = postMessageSpy;
+      });
+
+      renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+      // Clear any initial broadcasts
+      postMessageSpy.mockClear();
+
+      // Change state without hydrating flag
+      act(() => {
+        useGameStore.getState().startGame();
+      });
+
+      // Should broadcast because _isHydrating is false
+      const broadcastCalls = postMessageSpy.mock.calls.filter(
+        call => call[0]?.type === 'GAME_STATE_UPDATE'
+      );
+      expect(broadcastCalls.length).toBeGreaterThan(0);
+    });
+  });
+
   describe('createMessageRouter', () => {
     it('routes GAME_STATE_UPDATE to onStateUpdate', () => {
       const onStateUpdate = vi.fn();

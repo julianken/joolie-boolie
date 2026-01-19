@@ -144,9 +144,79 @@ body {
   outline-offset: 2px;
 }
 
+/* Enhanced focus styles for better visibility */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(30, 64, 175, 0.2);
+}
+
 /* Large click targets for interactive elements */
 button,
 [role="button"] {
   min-height: var(--size-touch);
   min-width: var(--size-touch);
+}
+
+/* Screen reader only utility (matches Tailwind's sr-only) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Allow essential transitions at reduced speed */
+  .motion-reduce\:transition-none {
+    transition: none !important;
+  }
+
+  .motion-reduce\:animate-none {
+    animation: none !important;
+  }
+}
+
+/* Ensure links in skip navigation are visible when focused */
+.skip-link:focus {
+  clip: auto;
+  clip-path: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: #000000;
+    --muted: #4b5563;
+    --muted-foreground: #1f2937;
+  }
+
+  *:focus-visible {
+    outline-width: 4px;
+    outline-offset: 4px;
+  }
 }

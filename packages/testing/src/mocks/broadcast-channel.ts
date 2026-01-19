@@ -1,50 +1,90 @@
 // Mock BroadcastChannel for testing
-// Extracted from apps/bingo/src/test/mocks/broadcast-channel.ts
+// Used for dual-screen synchronization tests
 
 type MessageHandler = (event: MessageEvent) => void;
 
-class MockBroadcastChannel {
+// Store all created channels by name for cross-channel communication
+const channels: Map<string, Set<MockBroadcastChannel>> = new Map();
+
+/**
+ * Mock implementation of BroadcastChannel for testing.
+ * Supports cross-channel communication within tests.
+ */
+export class MockBroadcastChannel {
   name: string;
   onmessage: MessageHandler | null = null;
-  private static channels: Map<string, Set<MockBroadcastChannel>> = new Map();
+  onmessageerror: MessageHandler | null = null;
 
   constructor(name: string) {
     this.name = name;
-    const channels = MockBroadcastChannel.channels.get(name) || new Set();
-    channels.add(this);
-    MockBroadcastChannel.channels.set(name, channels);
+
+    // Register this channel
+    if (!channels.has(name)) {
+      channels.set(name, new Set());
+    }
+    channels.get(name)!.add(this);
   }
 
   postMessage(message: unknown): void {
-    const channels = MockBroadcastChannel.channels.get(this.name);
-    if (!channels) return;
+    const channelSet = channels.get(this.name);
+    if (!channelSet) return;
 
-    channels.forEach((channel) => {
+    // Broadcast to all other channels with the same name
+    for (const channel of channelSet) {
       if (channel !== this && channel.onmessage) {
-        const event = new MessageEvent('message', { data: message });
-        channel.onmessage(event);
-      }
-    });
-  }
-
-  close(): void {
-    const channels = MockBroadcastChannel.channels.get(this.name);
-    if (channels) {
-      channels.delete(this);
-      if (channels.size === 0) {
-        MockBroadcastChannel.channels.delete(this.name);
+        // Simulate async message delivery like the real API
+        setTimeout(() => {
+          channel.onmessage?.({ data: message } as MessageEvent);
+        }, 0);
       }
     }
   }
 
+  close(): void {
+    const channelSet = channels.get(this.name);
+    if (channelSet) {
+      channelSet.delete(this);
+      if (channelSet.size === 0) {
+        channels.delete(this.name);
+      }
+    }
+  }
+
+  /**
+   * Reset all channels. Call in afterEach to clean up between tests.
+   */
   static reset(): void {
-    MockBroadcastChannel.channels.clear();
+    channels.clear();
   }
 }
 
+/**
+ * Set up the global BroadcastChannel mock.
+ * Call in beforeEach.
+ */
 export function mockBroadcastChannel(): void {
   // @ts-expect-error - Mocking global
   global.BroadcastChannel = MockBroadcastChannel;
 }
 
-export { MockBroadcastChannel };
+/**
+ * Reset all mock channels. Call in afterEach.
+ */
+export function resetMockBroadcastChannel(): void {
+  channels.clear();
+}
+
+/**
+ * Helper to simulate receiving a message on all channels with a given name.
+ * Useful for testing audience window behavior.
+ */
+export function simulateMessage(channelName: string, data: unknown): void {
+  const channelSet = channels.get(channelName);
+  if (channelSet) {
+    for (const channel of channelSet) {
+      if (channel.onmessage) {
+        channel.onmessage({ data } as MessageEvent);
+      }
+    }
+  }
+}
