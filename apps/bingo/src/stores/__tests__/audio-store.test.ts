@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { useAudioStore, DEFAULT_VOLUME, DEFAULT_VOICE_PACK, VOICE_PACK_OPTIONS } from '../audio-store';
+import { useAudioStore, DEFAULT_VOLUME, DEFAULT_VOICE_PACK, VOICE_PACK_OPTIONS, cleanupAllPools, getActiveAudioCount } from '../audio-store';
 import { BingoBall, VoicePackId } from '@/types';
 
 describe('audio-store', () => {
@@ -142,8 +142,12 @@ describe('audio-store', () => {
       class MockAudio {
         volume = 1;
         currentTime = 0;
+        src = '';
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
         play = vi.fn(() => {
           playCalled = true;
           return Promise.resolve();
@@ -162,8 +166,12 @@ describe('audio-store', () => {
       class MockAudio {
         volume = 1;
         currentTime = 0;
+        src = '';
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
         play = vi.fn(() => {
           playCalled = true;
           return Promise.resolve();
@@ -220,8 +228,12 @@ describe('audio-store', () => {
       class MockAudio {
         volume = 1;
         currentTime = 0;
+        src = '';
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
         play = vi.fn(() => {
           setTimeout(() => {
             this.onended?.();
@@ -279,8 +291,12 @@ describe('audio-store', () => {
       class MockAudio {
         volume = 1;
         currentTime = 0;
+        src = '';
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
         play = vi.fn(() => {
           setTimeout(() => {
             this.onerror?.();
@@ -338,8 +354,12 @@ describe('audio-store', () => {
       class MockAudio {
         volume = 1;
         currentTime = 0;
+        src = '';
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
         play = vi.fn(() => Promise.reject(new Error('Autoplay blocked')));
       }
       vi.stubGlobal('Audio', MockAudio);
@@ -385,6 +405,255 @@ describe('audio-store', () => {
       expect(VOICE_PACK_OPTIONS.map((v) => v.id)).toContain('standard-hall');
       expect(VOICE_PACK_OPTIONS.map((v) => v.id)).toContain('british');
       expect(VOICE_PACK_OPTIONS.map((v) => v.id)).toContain('british-hall');
+    });
+  });
+
+  describe('memory leak prevention', () => {
+    it('clears audio src after playback ends', async () => {
+      useAudioStore.setState({
+        manifest: {
+          voicePacks: {
+            standard: {
+              id: 'standard',
+              name: 'Standard',
+              description: 'Test',
+              basePath: '/audio/voices/standard',
+              filePattern: '{letter}{number}.mp3',
+            },
+            'standard-hall': {
+              id: 'standard-hall',
+              name: 'Standard Hall',
+              description: 'Test',
+              basePath: '/audio/voices/standard-hall',
+              filePattern: '{letter}{number}.mp3',
+            },
+            british: {
+              id: 'british',
+              name: 'British',
+              description: 'Test',
+              basePath: '/audio/voices/british',
+              filePattern: '{slang}.mp3',
+              slangMappings: {},
+            },
+            'british-hall': {
+              id: 'british-hall',
+              name: 'British Hall',
+              description: 'Test',
+              basePath: '/audio/voices/british-hall',
+              filePattern: '{slang}.mp3',
+              slangMappings: {},
+            },
+          },
+          defaultPack: 'standard',
+        },
+      });
+
+      let audioInstance: MockAudio | null = null;
+
+      class MockAudio {
+        volume = 1;
+        currentTime = 0;
+        src = '';
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
+        play = vi.fn(() => {
+          setTimeout(() => {
+            this.onended?.();
+          }, 0);
+          return Promise.resolve();
+        });
+
+        constructor() {
+          audioInstance = this;
+        }
+      }
+      vi.stubGlobal('Audio', MockAudio);
+
+      const mockBall: BingoBall = { column: 'B', number: 5, label: 'B5' };
+      await useAudioStore.getState().playBallCall(mockBall);
+
+      // After playback, src should be cleared to release media resource
+      expect(audioInstance).not.toBeNull();
+      expect(audioInstance!.src).toBe('');
+    });
+
+    it('clears event handlers after playback', async () => {
+      useAudioStore.setState({
+        manifest: {
+          voicePacks: {
+            standard: {
+              id: 'standard',
+              name: 'Standard',
+              description: 'Test',
+              basePath: '/audio/voices/standard',
+              filePattern: '{letter}{number}.mp3',
+            },
+            'standard-hall': {
+              id: 'standard-hall',
+              name: 'Standard Hall',
+              description: 'Test',
+              basePath: '/audio/voices/standard-hall',
+              filePattern: '{letter}{number}.mp3',
+            },
+            british: {
+              id: 'british',
+              name: 'British',
+              description: 'Test',
+              basePath: '/audio/voices/british',
+              filePattern: '{slang}.mp3',
+              slangMappings: {},
+            },
+            'british-hall': {
+              id: 'british-hall',
+              name: 'British Hall',
+              description: 'Test',
+              basePath: '/audio/voices/british-hall',
+              filePattern: '{slang}.mp3',
+              slangMappings: {},
+            },
+          },
+          defaultPack: 'standard',
+        },
+      });
+
+      let audioInstance: MockAudio | null = null;
+
+      class MockAudio {
+        volume = 1;
+        currentTime = 0;
+        src = '';
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
+        play = vi.fn(() => {
+          setTimeout(() => {
+            this.onended?.();
+          }, 0);
+          return Promise.resolve();
+        });
+
+        constructor() {
+          audioInstance = this;
+        }
+      }
+      vi.stubGlobal('Audio', MockAudio);
+
+      const mockBall: BingoBall = { column: 'B', number: 5, label: 'B5' };
+      await useAudioStore.getState().playBallCall(mockBall);
+
+      // After playback, event handlers should be cleared
+      expect(audioInstance).not.toBeNull();
+      expect(audioInstance!.onended).toBeNull();
+      expect(audioInstance!.onerror).toBeNull();
+    });
+  });
+
+  describe('cleanup', () => {
+    it('cleanup method exists on the store', () => {
+      expect(typeof useAudioStore.getState().cleanup).toBe('function');
+    });
+
+    it('cleanup sets isPlaying to false', () => {
+      // Setup proper Audio mock with all required methods
+      class MockAudio {
+        volume = 1;
+        currentTime = 0;
+        src = '';
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
+        play = vi.fn(() => Promise.resolve());
+      }
+      vi.stubGlobal('Audio', MockAudio);
+
+      useAudioStore.setState({ isPlaying: true });
+      useAudioStore.getState().cleanup();
+      expect(useAudioStore.getState().isPlaying).toBe(false);
+    });
+
+    it('cleanup calls stopPlayback', () => {
+      // Setup proper Audio mock with all required methods
+      class MockAudio {
+        volume = 1;
+        currentTime = 0;
+        src = '';
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
+        play = vi.fn(() => Promise.resolve());
+      }
+      vi.stubGlobal('Audio', MockAudio);
+
+      // Setup mock speechSynthesis
+      const mockCancel = vi.fn();
+      vi.stubGlobal('window', {
+        speechSynthesis: {
+          cancel: mockCancel,
+          speak: vi.fn(),
+          getVoices: vi.fn(() => []),
+        },
+      });
+
+      useAudioStore.setState({ isPlaying: true });
+      useAudioStore.getState().cleanup();
+
+      expect(mockCancel).toHaveBeenCalled();
+    });
+
+    it('cleanupAllPools is exported and callable', () => {
+      // Setup proper Audio mock with all required methods
+      class MockAudio {
+        volume = 1;
+        currentTime = 0;
+        src = '';
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
+        play = vi.fn(() => Promise.resolve());
+      }
+      vi.stubGlobal('Audio', MockAudio);
+
+      expect(typeof cleanupAllPools).toBe('function');
+      // Should not throw
+      cleanupAllPools();
+    });
+
+    it('getActiveAudioCount is exported and returns a number', () => {
+      expect(typeof getActiveAudioCount).toBe('function');
+      const count = getActiveAudioCount();
+      expect(typeof count).toBe('number');
+      expect(count).toBeGreaterThanOrEqual(0);
+    });
+
+    it('cleanup clears all pools', () => {
+      // Setup proper Audio mock with all required methods
+      class MockAudio {
+        volume = 1;
+        currentTime = 0;
+        src = '';
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        oncanplaythrough: (() => void) | null = null;
+        pause = vi.fn();
+        load = vi.fn();
+        play = vi.fn(() => Promise.resolve());
+      }
+      vi.stubGlobal('Audio', MockAudio);
+
+      // After cleanup, active audio count should be 0
+      useAudioStore.getState().cleanup();
+      expect(getActiveAudioCount()).toBe(0);
     });
   });
 });

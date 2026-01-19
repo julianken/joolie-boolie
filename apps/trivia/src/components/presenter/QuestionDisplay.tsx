@@ -51,6 +51,8 @@ export function QuestionDisplay({
           {/* Toggle display button */}
           <button
             onClick={onToggleDisplay}
+            aria-pressed={isOnDisplay}
+            aria-label={isOnDisplay ? 'Hide question from audience display' : 'Show question on audience display'}
             className={`
               flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium
               transition-colors duration-200
@@ -80,6 +82,8 @@ export function QuestionDisplay({
           {/* Peek answer toggle */}
           <button
             onClick={onTogglePeek}
+            aria-pressed={peekAnswer}
+            aria-label={peekAnswer ? 'Hide answer preview' : 'Peek at correct answer (visible only to presenter)'}
             className={`
               flex items-center justify-center gap-2 w-24 py-1.5 rounded-lg text-sm font-medium
               transition-colors duration-200
@@ -127,6 +131,8 @@ export function QuestionDisplay({
 
       {/* Options grid */}
       <div
+        role="list"
+        aria-label="Answer options"
         className={`grid gap-3 ${
           isMultipleChoice ? 'grid-cols-2' : 'grid-cols-2'
         }`}
@@ -138,6 +144,8 @@ export function QuestionDisplay({
           return (
             <div
               key={option}
+              role="listitem"
+              aria-label={`Option ${option}: ${optionText}`}
               className="p-4 rounded-xl border-2 bg-background border-border"
             >
               {isTrueFalse ? (

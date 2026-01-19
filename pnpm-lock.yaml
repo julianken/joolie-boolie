@@ -218,6 +218,9 @@ importers:
         specifier: ^5.0.10
         version: 5.0.10(@types/react@19.2.8)(react@19.2.3)
     devDependencies:
+      '@beak-gaming/testing':
+        specifier: workspace:*
+        version: link:../../packages/testing
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.18

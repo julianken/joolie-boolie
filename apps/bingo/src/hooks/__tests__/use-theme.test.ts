@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useApplyTheme, useDisplayTheme, useResolvedTheme } from '../use-theme';
+import type { ThemeMode } from '@/types';
 
 describe('use-theme', () => {
   let mockMatchMedia: ReturnType<typeof vi.fn>;
@@ -138,13 +139,13 @@ describe('use-theme', () => {
     });
 
     it('updates theme when mode changes', () => {
-      const { rerender } = renderHook(({ mode }) => useApplyTheme(mode), {
-        initialProps: { mode: 'light' as const },
+      const { rerender } = renderHook<void, { mode: ThemeMode }>(({ mode }) => useApplyTheme(mode), {
+        initialProps: { mode: 'light' },
       });
 
       expect(document.documentElement.classList.contains('light')).toBe(true);
 
-      rerender({ mode: 'dark' as const });
+      rerender({ mode: 'dark' });
 
       expect(document.documentElement.classList.contains('dark')).toBe(true);
       expect(document.documentElement.classList.contains('light')).toBe(false);
@@ -227,12 +228,12 @@ describe('use-theme', () => {
         dispatchEvent: vi.fn(),
       }));
 
-      const { rerender } = renderHook(({ mode }) => useApplyTheme(mode), {
-        initialProps: { mode: 'system' as const },
+      const { rerender } = renderHook<void, { mode: ThemeMode }>(({ mode }) => useApplyTheme(mode), {
+        initialProps: { mode: 'system' },
       });
 
       // Switch to explicit mode
-      rerender({ mode: 'light' as const });
+      rerender({ mode: 'light' });
 
       expect(removeEventListenerMock).toHaveBeenCalledWith('change', expect.any(Function));
     });
@@ -274,13 +275,13 @@ describe('use-theme', () => {
     });
 
     it('updates when mode changes', () => {
-      const { result, rerender } = renderHook(({ mode }) => useResolvedTheme(mode), {
-        initialProps: { mode: 'light' as const },
+      const { result, rerender } = renderHook<'light' | 'dark', { mode: ThemeMode }>(({ mode }) => useResolvedTheme(mode), {
+        initialProps: { mode: 'light' },
       });
 
       expect(result.current).toBe('light');
 
-      rerender({ mode: 'dark' as const });
+      rerender({ mode: 'dark' });
 
       expect(result.current).toBe('dark');
     });

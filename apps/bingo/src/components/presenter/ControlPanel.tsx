@@ -33,9 +33,9 @@ export function ControlPanel({
   onUndo,
 }: ControlPanelProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" role="group" aria-label="Game controls">
       {/* Main action button */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" role="group" aria-label="Primary actions">
         {status === 'idle' && (
           <Button
             variant="primary"
@@ -63,7 +63,7 @@ export function ControlPanel({
       </div>
 
       {/* Control buttons */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2" role="group" aria-label="Secondary controls">
         {canPause && (
           <Button variant="secondary" size="md" onClick={onPause}>
             Pause
@@ -95,8 +95,9 @@ export function ControlPanel({
       </div>
 
       {/* Status indicator */}
-      <div className="flex items-center justify-center gap-2 py-2">
+      <div className="flex items-center justify-center gap-2 py-2" role="status" aria-live="polite" aria-label={`Game status: ${status}`}>
         <span
+          aria-hidden="true"
           className={`
             w-3 h-3 rounded-full
             ${status === 'playing' ? 'bg-success animate-pulse' : ''}

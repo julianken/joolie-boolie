@@ -4,5 +4,5 @@ export type { ButtonProps } from './Button';
 export { Toggle } from './Toggle';
 export type { ToggleProps } from './Toggle';
 
-export { Slider } from './Slider';
-export type { SliderProps } from './Slider';
+// Slider is now exported from @beak-gaming/ui shared package
+// Import from '@beak-gaming/ui' instead of this module

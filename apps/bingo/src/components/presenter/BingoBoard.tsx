@@ -42,12 +42,14 @@ export function BingoBoard({ calledBalls }: BingoBoardProps) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1" role="grid" aria-label="Bingo board showing called numbers">
       {/* Column headers */}
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-5 gap-1" role="row">
         {COLUMNS.map((column) => (
           <div
             key={column}
+            role="columnheader"
+            aria-label={`Column ${column}`}
             className={`
               ${columnHeaderColors[column]}
               h-12 flex items-center justify-center
@@ -62,12 +64,14 @@ export function BingoBoard({ calledBalls }: BingoBoardProps) {
       {/* Number grid */}
       <div className="grid grid-cols-5 gap-1">
         {boardData.map(({ column, numbers }) => (
-          <div key={column} className="flex flex-col gap-1">
+          <div key={column} className="flex flex-col gap-1" role="rowgroup" aria-label={`Column ${column} numbers`}>
             {numbers.map((num) => {
               const isCalled = calledNumbers.has(num);
               return (
                 <div
                   key={num}
+                  role="gridcell"
+                  aria-label={`${column}${num}${isCalled ? ', called' : ''}`}
                   className={`
                     h-10 flex items-center justify-center
                     text-lg rounded transition-colors duration-200

@@ -9,7 +9,7 @@ import { BingoBoard } from '@/components/presenter/BingoBoard';
 import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
 import { ControlPanel } from '@/components/presenter/ControlPanel';
 import { Toggle } from '@/components/ui/Toggle';
-import { Slider } from '@/components/ui/Slider';
+import { Slider } from '@beak-gaming/ui';
 import { Button } from '@/components/ui/Button';
 import { VoiceSelector } from '@/components/ui/VoiceSelector';
 import { RollSoundSelector } from '@/components/presenter/RollSoundSelector';

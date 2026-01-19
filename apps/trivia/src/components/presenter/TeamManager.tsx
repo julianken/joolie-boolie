@@ -47,9 +47,9 @@ export function TeamManager({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="region" aria-label="Team management">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Teams</h2>
+        <h2 id="team-manager-heading" className="text-xl font-semibold">Teams</h2>
         {status === 'setup' && (
           <span className="text-sm text-muted-foreground">
             {teams.length}/{MAX_TEAMS}
@@ -59,10 +59,12 @@ export function TeamManager({
 
       {/* Team list */}
       {teams.length > 0 ? (
-        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+        <div className="space-y-2 max-h-[300px] overflow-y-auto" role="list" aria-labelledby="team-manager-heading">
           {teams.map((team) => (
             <div
               key={team.id}
+              role="listitem"
+              aria-label={`Team: ${team.name}`}
               className="flex items-center gap-2 p-2 bg-background border border-border rounded-lg"
             >
               {editingId === team.id ? (
@@ -73,6 +75,7 @@ export function TeamManager({
                   onBlur={handleSaveEdit}
                   onKeyDown={handleKeyDown}
                   autoFocus
+                  aria-label="Edit team name"
                   className="flex-1 px-3 py-2 text-base border border-border rounded-lg
                     focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -83,6 +86,7 @@ export function TeamManager({
                   </span>
                   <button
                     onClick={() => handleStartEdit(team)}
+                    aria-label={`Rename team ${team.name}`}
                     className="px-2 py-1 text-sm text-muted-foreground
                       hover:text-foreground hover:bg-muted rounded-lg
                       transition-colors"
@@ -93,6 +97,7 @@ export function TeamManager({
                   {status === 'setup' && (
                     <button
                       onClick={() => onRemoveTeam(team.id)}
+                      aria-label={`Remove team ${team.name}`}
                       className="px-2 py-1 text-sm text-red-500
                         hover:text-red-600 hover:bg-red-500/10 rounded-lg
                         transition-colors"
