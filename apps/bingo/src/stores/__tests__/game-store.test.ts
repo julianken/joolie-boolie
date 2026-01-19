@@ -236,6 +236,35 @@ describe('game-store', () => {
       useGameStore.getState()._hydrate({ status: 'playing' });
       expect(useGameStore.getState().autoCallSpeed).toBe(originalSpeed);
     });
+
+    it('sets _isHydrating flag during hydration', () => {
+      // Capture hydrating state during the synchronous part
+      let capturedHydrating = false;
+      const unsubscribe = useGameStore.subscribe((state) => {
+        if (state.status === 'playing') {
+          capturedHydrating = state._isHydrating;
+        }
+      });
+
+      useGameStore.getState()._hydrate({ status: 'playing' });
+
+      // During hydration, the flag should have been true
+      expect(capturedHydrating).toBe(true);
+
+      unsubscribe();
+    });
+
+    it('clears _isHydrating flag after hydration completes', async () => {
+      useGameStore.getState()._hydrate({ status: 'playing' });
+
+      // After setTimeout(0), the flag should be cleared
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(useGameStore.getState()._isHydrating).toBe(false);
+    });
+
+    it('has _isHydrating false initially', () => {
+      expect(useGameStore.getState()._isHydrating).toBe(false);
+    });
   });
 
   describe('useGameSelectors', () => {

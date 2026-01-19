@@ -13,6 +13,8 @@ export interface SyncMessage<TPayload = unknown> {
   type: string;
   payload: TPayload | null;
   timestamp: number;
+  /** Unique identifier of the sender instance to prevent echo/loop issues */
+  originId?: string;
 }
 
 /**

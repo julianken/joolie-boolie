@@ -1,19 +1,54 @@
 import { SyncMessage, MessageHandler } from './types';
 
 /**
+ * Generate a unique instance ID for this BroadcastSync instance.
+ * Used to identify the origin of messages and prevent sync loops.
+ */
+function generateInstanceId(): string {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+}
+
+/**
+ * Configuration for deduplication behavior.
+ */
+const DEDUP_CONFIG = {
+  /** Maximum number of recent message timestamps to track */
+  MAX_RECENT_MESSAGES: 100,
+  /** Time window in ms to consider messages as duplicates */
+  DEDUP_WINDOW_MS: 100,
+} as const;
+
+/**
  * BroadcastChannel wrapper for dual-screen synchronization.
  * Handles same-device communication between presenter and audience windows.
  *
  * Generic over TPayload - the type of data being synced.
+ *
+ * Includes protection against sync loops via:
+ * 1. Origin tracking - each instance has a unique ID, messages from self are ignored
+ * 2. Message deduplication - recent messages within a time window are deduplicated
  */
 export class BroadcastSync<TPayload = unknown> {
   private channel: BroadcastChannel | null = null;
   private handlers: Set<MessageHandler<TPayload>> = new Set();
   private isInitialized = false;
   private channelName: string;
+  /** Unique identifier for this instance to prevent processing own messages */
+  private readonly instanceId: string;
+  /** Track recent message timestamps for deduplication */
+  private recentMessageKeys: Set<string> = new Set();
 
   constructor(channelName: string) {
     this.channelName = channelName;
+    this.instanceId = generateInstanceId();
+  }
+
+  /**
+   * Get the unique instance ID for this BroadcastSync.
+   * Useful for testing and debugging.
+   */
+  get origin(): string {
+    return this.instanceId;
   }
 
   /**
@@ -33,13 +68,56 @@ export class BroadcastSync<TPayload = unknown> {
     try {
       this.channel = new BroadcastChannel(this.channelName);
       this.channel.onmessage = (event: MessageEvent<SyncMessage<TPayload>>) => {
-        this.notifyHandlers(event.data);
+        const message = event.data;
+
+        // SYNC LOOP PROTECTION 1: Ignore messages from self
+        if (message.originId === this.instanceId) {
+          return;
+        }
+
+        // SYNC LOOP PROTECTION 2: Deduplicate recent messages
+        if (this.isDuplicateMessage(message)) {
+          return;
+        }
+
+        this.notifyHandlers(message);
       };
       this.isInitialized = true;
       return true;
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Check if a message is a duplicate based on type and timestamp.
+   * This prevents processing the same logical message multiple times
+   * within a short time window (e.g., from rapid state changes).
+   */
+  private isDuplicateMessage(message: SyncMessage<TPayload>): boolean {
+    const key = `${message.type}-${message.timestamp}`;
+
+    if (this.recentMessageKeys.has(key)) {
+      return true;
+    }
+
+    // Add to recent messages
+    this.recentMessageKeys.add(key);
+
+    // Clean up old entries if we have too many
+    if (this.recentMessageKeys.size > DEDUP_CONFIG.MAX_RECENT_MESSAGES) {
+      // Convert to array, remove oldest entries (first half)
+      const keys = Array.from(this.recentMessageKeys);
+      const toRemove = keys.slice(0, Math.floor(keys.length / 2));
+      toRemove.forEach((k) => this.recentMessageKeys.delete(k));
+    }
+
+    // Schedule cleanup for this specific key after the dedup window
+    setTimeout(() => {
+      this.recentMessageKeys.delete(key);
+    }, DEDUP_CONFIG.DEDUP_WINDOW_MS);
+
+    return false;
   }
 
   /**
@@ -55,6 +133,7 @@ export class BroadcastSync<TPayload = unknown> {
 
   /**
    * Send a typed message on the channel.
+   * Includes the instance's originId to enable sync loop prevention.
    */
   send(type: string, payload: TPayload | null): void {
     if (!this.channel) {
@@ -65,6 +144,7 @@ export class BroadcastSync<TPayload = unknown> {
       type,
       payload,
       timestamp: Date.now(),
+      originId: this.instanceId,
     };
 
     try {
@@ -98,6 +178,7 @@ export class BroadcastSync<TPayload = unknown> {
       this.channel = null;
     }
     this.handlers.clear();
+    this.recentMessageKeys.clear();
     this.isInitialized = false;
   }
 
