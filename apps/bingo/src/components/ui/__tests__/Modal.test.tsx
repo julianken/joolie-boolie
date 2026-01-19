@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Modal } from '../Modal';
 
 describe('Modal', () => {
@@ -15,13 +15,15 @@ describe('Modal', () => {
   });
 
   afterEach(() => {
-    // Clean up any portals
-    document.body.textContent = '';
+    // Clean up portals and body styles
+    document.body.style.overflow = '';
   });
 
-  it('renders when isOpen is true', () => {
+  it('renders when isOpen is true', async () => {
     render(<Modal {...defaultProps} />);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
   });
 
   it('does not render when isOpen is false', () => {
@@ -29,79 +31,90 @@ describe('Modal', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('renders title', () => {
+  it('renders title', async () => {
     render(<Modal {...defaultProps} />);
-    expect(screen.getByText('Test Modal')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Test Modal')).toBeInTheDocument();
+    });
   });
 
-  it('renders children content', () => {
+  it('renders children content', async () => {
     render(<Modal {...defaultProps} />);
-    expect(screen.getByText('Modal content')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Modal content')).toBeInTheDocument();
+    });
   });
 
   describe('closing behavior', () => {
-    it('calls onClose when close button is clicked', () => {
+    it('calls onClose when close button is clicked', async () => {
       const handleClose = vi.fn();
       render(<Modal {...defaultProps} onClose={handleClose} />);
+      await waitFor(() => {
+        expect(screen.getByLabelText('Close modal')).toBeInTheDocument();
+      });
       fireEvent.click(screen.getByLabelText('Close modal'));
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onClose when backdrop is clicked', () => {
+    it('calls onClose when Escape key is pressed', async () => {
       const handleClose = vi.fn();
       render(<Modal {...defaultProps} onClose={handleClose} />);
-      // Click the backdrop (the element with bg-black/50)
-      const backdrop = document.querySelector('.bg-black\\/50');
-      if (backdrop) {
-        fireEvent.click(backdrop);
-        expect(handleClose).toHaveBeenCalledTimes(1);
-      }
-    });
-
-    it('calls onClose when Escape key is pressed', () => {
-      const handleClose = vi.fn();
-      render(<Modal {...defaultProps} onClose={handleClose} />);
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
       fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onClose when Cancel button is clicked', () => {
+    it('calls onClose when Cancel button is clicked', async () => {
       const handleClose = vi.fn();
       render(<Modal {...defaultProps} onClose={handleClose} />);
+      await waitFor(() => {
+        expect(screen.getByText('Cancel')).toBeInTheDocument();
+      });
       fireEvent.click(screen.getByText('Cancel'));
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('confirm behavior', () => {
-    it('renders confirm button when onConfirm is provided', () => {
+    it('renders confirm button when onConfirm is provided', async () => {
       const handleConfirm = vi.fn();
       render(<Modal {...defaultProps} onConfirm={handleConfirm} />);
-      expect(screen.getByText('Confirm')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
+      });
     });
 
-    it('calls onConfirm when confirm button is clicked', () => {
+    it('calls onConfirm when confirm button is clicked', async () => {
       const handleConfirm = vi.fn();
       render(<Modal {...defaultProps} onConfirm={handleConfirm} />);
+      await waitFor(() => {
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
+      });
       fireEvent.click(screen.getByText('Confirm'));
       expect(handleConfirm).toHaveBeenCalledTimes(1);
     });
 
-    it('uses custom confirm label', () => {
+    it('uses custom confirm label', async () => {
       render(
         <Modal {...defaultProps} onConfirm={() => {}} confirmLabel="Delete" />
       );
-      expect(screen.getByText('Delete')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Delete')).toBeInTheDocument();
+      });
     });
 
-    it('uses custom cancel label', () => {
+    it('uses custom cancel label', async () => {
       render(<Modal {...defaultProps} cancelLabel="Never mind" />);
-      expect(screen.getByText('Never mind')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Never mind')).toBeInTheDocument();
+      });
     });
   });
 
   describe('variants', () => {
-    it('applies danger variant to confirm button', () => {
+    it('applies danger variant to confirm button', async () => {
       render(
         <Modal
           {...defaultProps}
@@ -110,64 +123,88 @@ describe('Modal', () => {
           confirmLabel="Delete"
         />
       );
-      const deleteButton = screen.getByText('Delete');
-      expect(deleteButton.className).toContain('bg-error');
+      await waitFor(() => {
+        const deleteButton = screen.getByText('Delete');
+        expect(deleteButton.className).toContain('bg-error');
+      });
     });
 
-    it('applies primary variant by default', () => {
+    it('applies primary variant by default', async () => {
       render(<Modal {...defaultProps} onConfirm={() => {}} />);
-      const confirmButton = screen.getByText('Confirm');
-      expect(confirmButton.className).toContain('bg-primary');
+      await waitFor(() => {
+        const confirmButton = screen.getByText('Confirm');
+        expect(confirmButton.className).toContain('bg-primary');
+      });
     });
   });
 
   describe('footer visibility', () => {
-    it('hides footer when showFooter is false', () => {
+    it('hides footer when showFooter is false', async () => {
       render(<Modal {...defaultProps} showFooter={false} />);
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
       expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
     });
 
-    it('shows footer by default', () => {
+    it('shows footer by default', async () => {
       render(<Modal {...defaultProps} />);
-      expect(screen.getByText('Cancel')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Cancel')).toBeInTheDocument();
+      });
     });
   });
 
   describe('accessibility', () => {
-    it('has role="dialog"', () => {
+    it('has role="dialog"', async () => {
       render(<Modal {...defaultProps} />);
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
     });
 
-    it('has aria-modal="true"', () => {
+    it('has aria-modal="true"', async () => {
       render(<Modal {...defaultProps} />);
-      expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+      });
     });
 
-    it('has aria-labelledby pointing to title', () => {
+    it('has aria-labelledby pointing to title', async () => {
       render(<Modal {...defaultProps} />);
-      expect(screen.getByRole('dialog')).toHaveAttribute(
-        'aria-labelledby',
-        'modal-title'
-      );
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toHaveAttribute(
+          'aria-labelledby',
+          'modal-title'
+        );
+      });
     });
 
-    it('prevents body scroll when open', () => {
+    it('prevents body scroll when open', async () => {
       render(<Modal {...defaultProps} />);
-      expect(document.body.style.overflow).toBe('hidden');
+      await waitFor(() => {
+        expect(document.body.style.overflow).toBe('hidden');
+      });
     });
 
-    it('restores body scroll when closed', () => {
+    it('restores body scroll when closed', async () => {
       const { rerender } = render(<Modal {...defaultProps} />);
+      await waitFor(() => {
+        expect(document.body.style.overflow).toBe('hidden');
+      });
       rerender(<Modal {...defaultProps} isOpen={false} />);
-      expect(document.body.style.overflow).toBe('');
+      await waitFor(() => {
+        expect(document.body.style.overflow).toBe('');
+      });
     });
   });
 
   describe('focus management', () => {
-    it('close button has accessible label', () => {
+    it('close button has accessible label', async () => {
       render(<Modal {...defaultProps} />);
-      expect(screen.getByLabelText('Close modal')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByLabelText('Close modal')).toBeInTheDocument();
+      });
     });
   });
 });

@@ -23,14 +23,6 @@ function TestComponent() {
 }
 
 describe('ToastProvider', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('renders children', () => {
     render(
       <ToastProvider>
@@ -67,7 +59,7 @@ describe('Toast functionality', () => {
     vi.useRealTimers();
   });
 
-  it('shows success toast', async () => {
+  it('shows success toast', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -78,7 +70,7 @@ describe('Toast functionality', () => {
     expect(screen.getByText('Success message')).toBeInTheDocument();
   });
 
-  it('shows error toast', async () => {
+  it('shows error toast', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -89,7 +81,7 @@ describe('Toast functionality', () => {
     expect(screen.getByText('Error message')).toBeInTheDocument();
   });
 
-  it('shows info toast', async () => {
+  it('shows info toast', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -100,7 +92,7 @@ describe('Toast functionality', () => {
     expect(screen.getByText('Info message')).toBeInTheDocument();
   });
 
-  it('shows warning toast', async () => {
+  it('shows warning toast', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -113,7 +105,7 @@ describe('Toast functionality', () => {
 
   it('auto-dismisses toast after duration', async () => {
     render(
-      <ToastProvider defaultDuration={3000}>
+      <ToastProvider defaultDuration={1000}>
         <TestComponent />
       </ToastProvider>
     );
@@ -121,18 +113,22 @@ describe('Toast functionality', () => {
     fireEvent.click(screen.getByText('Show Success'));
     expect(screen.getByText('Success message')).toBeInTheDocument();
 
+    // Advance timers to trigger auto-dismiss
     act(() => {
-      vi.advanceTimersByTime(3200); // Duration + animation time
+      vi.advanceTimersByTime(1000);
     });
 
-    await waitFor(() => {
-      expect(screen.queryByText('Success message')).not.toBeInTheDocument();
+    // Advance timers for animation
+    act(() => {
+      vi.advanceTimersByTime(200);
     });
+
+    expect(screen.queryByText('Success message')).not.toBeInTheDocument();
   });
 
-  it('removes toast when dismiss button is clicked', async () => {
+  it('removes toast when dismiss button is clicked', () => {
     render(
-      <ToastProvider>
+      <ToastProvider defaultDuration={0}>
         <TestComponent />
       </ToastProvider>
     );
@@ -143,16 +139,15 @@ describe('Toast functionality', () => {
     const dismissButton = screen.getByLabelText('Dismiss notification');
     fireEvent.click(dismissButton);
 
+    // Advance timers for animation
     act(() => {
-      vi.advanceTimersByTime(300);
+      vi.advanceTimersByTime(200);
     });
 
-    await waitFor(() => {
-      expect(screen.queryByText('Success message')).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText('Success message')).not.toBeInTheDocument();
   });
 
-  it('can display multiple toasts', async () => {
+  it('can display multiple toasts', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -178,7 +173,7 @@ describe('Toast accessibility', () => {
     vi.useRealTimers();
   });
 
-  it('toast has role="alert"', async () => {
+  it('toast has role="alert"', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -189,7 +184,7 @@ describe('Toast accessibility', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  it('toast region has aria-live="polite"', async () => {
+  it('toast region has aria-live="polite"', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -200,7 +195,7 @@ describe('Toast accessibility', () => {
     expect(screen.getByRole('region')).toHaveAttribute('aria-live', 'polite');
   });
 
-  it('toast region has aria-label', async () => {
+  it('toast region has aria-label', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -214,7 +209,7 @@ describe('Toast accessibility', () => {
     );
   });
 
-  it('dismiss button has accessible label', async () => {
+  it('dismiss button has accessible label', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -227,7 +222,15 @@ describe('Toast accessibility', () => {
 });
 
 describe('Toast positioning', () => {
-  it('applies top-right position by default', async () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('applies top-right position by default', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -236,11 +239,10 @@ describe('Toast positioning', () => {
 
     fireEvent.click(screen.getByText('Show Success'));
     const region = screen.getByRole('region');
-    expect(region.className).toContain('top-4');
-    expect(region.className).toContain('right-4');
+    expect(region).toHaveClass('top-4', 'right-4');
   });
 
-  it('applies custom position', async () => {
+  it('applies custom position', () => {
     render(
       <ToastProvider position="bottom-left">
         <TestComponent />
@@ -249,8 +251,7 @@ describe('Toast positioning', () => {
 
     fireEvent.click(screen.getByText('Show Success'));
     const region = screen.getByRole('region');
-    expect(region.className).toContain('bottom-4');
-    expect(region.className).toContain('left-4');
+    expect(region).toHaveClass('bottom-4', 'left-4');
   });
 });
 
@@ -263,7 +264,7 @@ describe('Toast variants', () => {
     vi.useRealTimers();
   });
 
-  it('success toast has success background', async () => {
+  it('success toast has success background', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -272,10 +273,10 @@ describe('Toast variants', () => {
 
     fireEvent.click(screen.getByText('Show Success'));
     const toast = screen.getByRole('alert');
-    expect(toast.className).toContain('bg-success');
+    expect(toast).toHaveClass('bg-success');
   });
 
-  it('error toast has error background', async () => {
+  it('error toast has error background', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -284,10 +285,10 @@ describe('Toast variants', () => {
 
     fireEvent.click(screen.getByText('Show Error'));
     const toast = screen.getByRole('alert');
-    expect(toast.className).toContain('bg-error');
+    expect(toast).toHaveClass('bg-error');
   });
 
-  it('info toast has primary background', async () => {
+  it('info toast has primary background', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -296,10 +297,10 @@ describe('Toast variants', () => {
 
     fireEvent.click(screen.getByText('Show Info'));
     const toast = screen.getByRole('alert');
-    expect(toast.className).toContain('bg-primary');
+    expect(toast).toHaveClass('bg-primary');
   });
 
-  it('warning toast has warning background', async () => {
+  it('warning toast has warning background', () => {
     render(
       <ToastProvider>
         <TestComponent />
@@ -308,7 +309,7 @@ describe('Toast variants', () => {
 
     fireEvent.click(screen.getByText('Show Warning'));
     const toast = screen.getByRole('alert');
-    expect(toast.className).toContain('bg-warning');
+    expect(toast).toHaveClass('bg-warning');
   });
 });
 
@@ -326,7 +327,7 @@ describe('StandaloneToast', () => {
   it('applies variant styles', () => {
     render(<StandaloneToast message="Error!" variant="error" />);
     const toast = screen.getByRole('alert');
-    expect(toast.className).toContain('bg-error');
+    expect(toast).toHaveClass('bg-error');
   });
 
   it('shows dismiss button when onDismiss is provided', () => {
@@ -355,6 +356,6 @@ describe('StandaloneToast', () => {
   it('defaults to info variant', () => {
     render(<StandaloneToast message="Test" />);
     const toast = screen.getByRole('alert');
-    expect(toast.className).toContain('bg-primary');
+    expect(toast).toHaveClass('bg-primary');
   });
 });

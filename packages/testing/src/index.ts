@@ -1,5 +1,15 @@
 // Testing package - Shared test utilities and mocks
-// TODO: Extract from apps/bingo/src/test/
 
-export { mockBroadcastChannel } from './mocks/broadcast-channel';
-export { mockAudio } from './mocks/audio';
+// Mocks
+export {
+  mockBroadcastChannel,
+  MockBroadcastChannel,
+  resetMockBroadcastChannel,
+  simulateMessage,
+} from './mocks/broadcast-channel';
+
+export {
+  mockAudio,
+  MockAudio,
+  createMockAudio,
+} from './mocks/audio';

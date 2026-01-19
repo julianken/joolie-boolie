@@ -33,29 +33,25 @@ describe('Spinner', () => {
     it('applies sm size styles', () => {
       render(<Spinner size="sm" />);
       const svg = screen.getByRole('status').querySelector('svg');
-      expect(svg?.className).toContain('h-5');
-      expect(svg?.className).toContain('w-5');
+      expect(svg).toHaveClass('h-5', 'w-5');
     });
 
     it('applies md size styles by default', () => {
       render(<Spinner />);
       const svg = screen.getByRole('status').querySelector('svg');
-      expect(svg?.className).toContain('h-8');
-      expect(svg?.className).toContain('w-8');
+      expect(svg).toHaveClass('h-8', 'w-8');
     });
 
     it('applies lg size styles', () => {
       render(<Spinner size="lg" />);
       const svg = screen.getByRole('status').querySelector('svg');
-      expect(svg?.className).toContain('h-12');
-      expect(svg?.className).toContain('w-12');
+      expect(svg).toHaveClass('h-12', 'w-12');
     });
 
     it('applies xl size styles', () => {
       render(<Spinner size="xl" />);
       const svg = screen.getByRole('status').querySelector('svg');
-      expect(svg?.className).toContain('h-16');
-      expect(svg?.className).toContain('w-16');
+      expect(svg).toHaveClass('h-16', 'w-16');
     });
   });
 
@@ -67,7 +63,7 @@ describe('Spinner', () => {
   it('has animate-spin class on svg', () => {
     render(<Spinner />);
     const svg = screen.getByRole('status').querySelector('svg');
-    expect(svg?.className).toContain('animate-spin');
+    expect(svg).toHaveClass('animate-spin');
   });
 
   it('svg has aria-hidden="true"', () => {
@@ -106,28 +102,25 @@ describe('SpinnerOverlay', () => {
   it('applies fixed positioning classes', () => {
     render(<SpinnerOverlay />);
     const overlay = screen.getByRole('status');
-    expect(overlay.className).toContain('fixed');
-    expect(overlay.className).toContain('inset-0');
+    expect(overlay).toHaveClass('fixed', 'inset-0');
   });
 
   it('applies backdrop blur', () => {
     render(<SpinnerOverlay />);
     const overlay = screen.getByRole('status');
-    expect(overlay.className).toContain('backdrop-blur-sm');
+    expect(overlay).toHaveClass('backdrop-blur-sm');
   });
 
   it('uses lg size by default', () => {
     render(<SpinnerOverlay />);
     const svg = screen.getByRole('status').querySelector('svg');
-    expect(svg?.className).toContain('h-12');
-    expect(svg?.className).toContain('w-12');
+    expect(svg).toHaveClass('h-12', 'w-12');
   });
 
   it('respects custom size', () => {
     render(<SpinnerOverlay size="xl" />);
     const svg = screen.getByRole('status').querySelector('svg');
-    expect(svg?.className).toContain('h-16');
-    expect(svg?.className).toContain('w-16');
+    expect(svg).toHaveClass('h-16', 'w-16');
   });
 });
 
@@ -140,7 +133,7 @@ describe('InlineSpinner', () => {
   it('has animate-spin class', () => {
     const { container } = render(<InlineSpinner />);
     const svg = container.querySelector('svg');
-    expect(svg?.className).toContain('animate-spin');
+    expect(svg).toHaveClass('animate-spin');
   });
 
   it('has aria-hidden="true"', () => {
@@ -152,13 +145,12 @@ describe('InlineSpinner', () => {
   it('applies custom className', () => {
     const { container } = render(<InlineSpinner className="text-white" />);
     const svg = container.querySelector('svg');
-    expect(svg?.className).toContain('text-white');
+    expect(svg).toHaveClass('text-white');
   });
 
   it('has default size classes', () => {
     const { container } = render(<InlineSpinner />);
     const svg = container.querySelector('svg');
-    expect(svg?.className).toContain('h-5');
-    expect(svg?.className).toContain('w-5');
+    expect(svg).toHaveClass('h-5', 'w-5');
   });
 });

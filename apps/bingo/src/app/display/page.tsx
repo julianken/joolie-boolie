@@ -113,6 +113,14 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
     sessionId,
   });
 
+  // Fullscreen support
+  const { isFullscreen, toggleFullscreen } = useFullscreen();
+
+  // Help modal state
+  const [showHelp, setShowHelp] = useState(false);
+  const toggleHelp = useCallback(() => setShowHelp((prev) => !prev), []);
+  const closeHelp = useCallback(() => setShowHelp(false), []);
+
   // Apply display theme
   const displayTheme = useThemeStore((state) => state.displayTheme);
   useApplyTheme(displayTheme);
@@ -139,6 +147,40 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [requestSync]);
 
+  // Keyboard shortcuts for display page (F=fullscreen, ?=help)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if user is typing in an input
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      // Handle help modal toggle with ? key
+      if (event.key === '?') {
+        event.preventDefault();
+        toggleHelp();
+        return;
+      }
+
+      // Don't process other shortcuts when help modal is open
+      if (showHelp) {
+        return;
+      }
+
+      switch (event.code) {
+        case 'KeyF':
+          toggleFullscreen();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleFullscreen, showHelp, toggleHelp]);
+
   // Format last sync time
   const lastSyncFormatted = lastSyncTimestamp
     ? new Date(lastSyncTimestamp).toLocaleTimeString()
@@ -164,24 +206,111 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
             <p className="text-lg text-muted-foreground">Audience Display</p>
           </div>
 
-          {/* Connection status */}
-          <div
-            className="flex items-center gap-3"
-            role="status"
-            aria-live="polite"
-            aria-label={isConnected ? `Connected to presenter, synced at ${lastSyncFormatted}` : 'Waiting for presenter'}
-          >
+          {/* Status indicators and controls */}
+          <div className="flex items-center gap-4">
+            {/* Fullscreen indicator */}
+            {isFullscreen && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-lg">
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                  />
+                </svg>
+                <span className="text-sm text-primary font-medium hidden sm:inline">Fullscreen</span>
+              </div>
+            )}
+
+            {/* Fullscreen toggle button */}
+            <button
+              onClick={toggleFullscreen}
+              className="p-2 rounded-lg hover:bg-muted/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            >
+              {isFullscreen ? (
+                <svg
+                  className="w-5 h-5 text-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* Help button */}
+            <button
+              onClick={toggleHelp}
+              className="p-2 rounded-lg hover:bg-muted/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              title="Keyboard shortcuts (?)"
+              aria-label="Show keyboard shortcuts"
+            >
+              <svg
+                className="w-5 h-5 text-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </button>
+
+            {/* Connection status */}
             <div
-              className={`
-                w-4 h-4 rounded-full
-                motion-reduce:animate-none
-                ${isConnected ? 'bg-success animate-pulse' : 'bg-error'}
-              `}
-              aria-hidden="true"
-            />
-            <span className="text-base text-muted-foreground hidden md:block">
-              {isConnected ? `Synced at ${lastSyncFormatted}` : 'Waiting for presenter...'}
-            </span>
+              className="flex items-center gap-3"
+              role="status"
+              aria-live="polite"
+              aria-label={isConnected ? `Connected to presenter, synced at ${lastSyncFormatted}` : 'Waiting for presenter'}
+            >
+              <div
+                className={`
+                  w-4 h-4 rounded-full
+                  motion-reduce:animate-none
+                  ${isConnected ? 'bg-success animate-pulse' : 'bg-error'}
+                `}
+                aria-hidden="true"
+              />
+              <span className="text-base text-muted-foreground hidden md:block">
+                {isConnected ? `Synced at ${lastSyncFormatted}` : 'Waiting for presenter...'}
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -277,10 +406,15 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
       {/* Footer */}
       <footer className="bg-muted/10 border-t border-border px-4 py-2">
         <p className="text-center text-base text-muted-foreground">
-          Keep this window visible on the projector or large display
+          Keep this window visible on the projector or large display - Press F for fullscreen, ? for help
         </p>
       </footer>
     </main>
+    <KeyboardShortcutsModal
+      isOpen={showHelp}
+      onClose={closeHelp}
+      shortcuts={displayShortcuts}
+    />
     </>
   );
 }

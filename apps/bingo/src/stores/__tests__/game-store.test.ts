@@ -22,6 +22,7 @@ describe('game-store', () => {
       pattern: null,
       autoCallEnabled: false,
       audioEnabled: true,
+      _isHydrating: false,
     });
   });
 

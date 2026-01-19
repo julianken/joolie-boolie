@@ -102,7 +102,14 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   _hydrate: (newState: Partial<GameState>) => {
+    // Set hydrating flag to prevent broadcast loops
+    set({ _isHydrating: true });
     set((state) => ({ ...state, ...newState }));
+    // Use setTimeout to clear the flag after the current synchronous execution
+    // This ensures any subscribers triggered by the state change see _isHydrating as true
+    setTimeout(() => {
+      set({ _isHydrating: false });
+    }, 0);
   },
 }));
 

@@ -1,2 +1,12 @@
-export { mockBroadcastChannel, MockBroadcastChannel } from './broadcast-channel';
-export { mockAudio, MockAudio } from './audio';
+export {
+  mockBroadcastChannel,
+  MockBroadcastChannel,
+  resetMockBroadcastChannel,
+  simulateMessage,
+} from './broadcast-channel';
+
+export {
+  mockAudio,
+  MockAudio,
+  createMockAudio,
+} from './audio';
