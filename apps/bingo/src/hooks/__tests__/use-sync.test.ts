@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useSync } from '../use-sync';
 import { useSyncStore } from '@/stores/sync-store';
 import { useGameStore } from '@/stores/game-store';
-import { createMessageRouter } from '@/lib/sync/broadcast';
+import { createMessageRouter } from '../use-sync';
 import { SyncMessage, BingoPattern, BingoBall, GameState } from '@/types';
 
 // Test session ID for all tests

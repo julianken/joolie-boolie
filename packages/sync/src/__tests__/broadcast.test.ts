@@ -30,21 +30,21 @@ describe('BroadcastSync', () => {
     });
 
     it('should return false in SSR (no window)', () => {
-      const originalWindow = global.window;
+      const originalWindow = globalThis.window;
       // @ts-expect-error - Testing SSR
-      delete global.window;
+      delete globalThis.window;
 
       const sync = new BroadcastSync('test-channel');
       const result = sync.initialize();
       expect(result).toBe(false);
       expect(sync.connected).toBe(false);
 
-      global.window = originalWindow;
+      globalThis.window = originalWindow;
     });
 
     it('should return false when BroadcastChannel unsupported', () => {
       // @ts-expect-error - Testing unsupported environment
-      delete global.BroadcastChannel;
+      delete globalThis.BroadcastChannel;
 
       const sync = new BroadcastSync('test-channel');
       const result = sync.initialize();

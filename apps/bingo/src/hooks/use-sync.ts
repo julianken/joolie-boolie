@@ -3,9 +3,104 @@
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSyncStore, SyncRole } from '@/stores/sync-store';
 import { useGameStore } from '@/stores/game-store';
-import { createBingoBroadcastSync, createMessageRouter, BroadcastSync } from '@/lib/sync/broadcast';
-import { GameState, BingoBall, BingoPattern, ThemeMode } from '@/types';
+import { BroadcastSync, type SyncMessage } from '@beak-gaming/sync';
+import { getChannelName } from '@/lib/sync/session';
+import { GameState, BingoBall, BingoPattern, ThemeMode, AudioSettingsPayload, ThemePayload } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';
+
+// Bingo-specific payload union type
+type BingoSyncPayload = GameState | BingoBall | BingoPattern | AudioSettingsPayload | ThemePayload | null;
+
+// Bingo message types
+type BingoMessageType =
+  | 'GAME_STATE_UPDATE'
+  | 'BALL_CALLED'
+  | 'GAME_RESET'
+  | 'PATTERN_CHANGED'
+  | 'REQUEST_SYNC'
+  | 'AUDIO_SETTINGS_CHANGED'
+  | 'DISPLAY_THEME_CHANGED';
+
+/**
+ * Extended BroadcastSync with bingo-specific convenience methods.
+ */
+class BingoBroadcastSync extends BroadcastSync<BingoSyncPayload> {
+  /**
+   * Override to use GAME_STATE_UPDATE instead of base class's STATE_UPDATE.
+   */
+  broadcastState(state: BingoSyncPayload): void {
+    this.send('GAME_STATE_UPDATE', state);
+  }
+
+  broadcastBallCalled(ball: BingoBall): void {
+    this.send('BALL_CALLED', ball);
+  }
+
+  broadcastReset(): void {
+    this.send('GAME_RESET', null);
+  }
+
+  broadcastPatternChanged(pattern: BingoPattern): void {
+    this.send('PATTERN_CHANGED', pattern);
+  }
+
+  broadcastAudioSettings(settings: AudioSettingsPayload): void {
+    this.send('AUDIO_SETTINGS_CHANGED', settings);
+  }
+
+  broadcastDisplayTheme(theme: ThemeMode): void {
+    this.send('DISPLAY_THEME_CHANGED', { theme });
+  }
+}
+
+/**
+ * Factory function to create a session-scoped BingoBroadcastSync instance.
+ */
+function createBingoBroadcastSync(sessionId: string): BingoBroadcastSync {
+  const channelName = getChannelName(sessionId);
+  return new BingoBroadcastSync(channelName);
+}
+
+type MessageHandler = (message: SyncMessage<BingoSyncPayload>) => void;
+
+/**
+ * Create a message handler that routes messages by type.
+ */
+export function createMessageRouter(handlers: Partial<{
+  onStateUpdate: (state: GameState) => void;
+  onBallCalled: (ball: BingoBall) => void;
+  onReset: () => void;
+  onPatternChanged: (pattern: BingoPattern) => void;
+  onSyncRequest: () => void;
+  onAudioSettingsChanged: (settings: AudioSettingsPayload) => void;
+  onDisplayThemeChanged: (theme: ThemeMode) => void;
+}>): MessageHandler {
+  return (message: SyncMessage<BingoSyncPayload>) => {
+    switch (message.type as BingoMessageType) {
+      case 'GAME_STATE_UPDATE':
+        handlers.onStateUpdate?.(message.payload as GameState);
+        break;
+      case 'BALL_CALLED':
+        handlers.onBallCalled?.(message.payload as BingoBall);
+        break;
+      case 'GAME_RESET':
+        handlers.onReset?.();
+        break;
+      case 'PATTERN_CHANGED':
+        handlers.onPatternChanged?.(message.payload as BingoPattern);
+        break;
+      case 'REQUEST_SYNC':
+        handlers.onSyncRequest?.();
+        break;
+      case 'AUDIO_SETTINGS_CHANGED':
+        handlers.onAudioSettingsChanged?.(message.payload as AudioSettingsPayload);
+        break;
+      case 'DISPLAY_THEME_CHANGED':
+        handlers.onDisplayThemeChanged?.((message.payload as ThemePayload).theme);
+        break;
+    }
+  };
+}
 
 interface UseSyncOptions {
   role: SyncRole;
@@ -25,7 +120,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
   const isInitializedRef = useRef(false);
 
   // Create a session-scoped BroadcastSync instance
-  const broadcastSyncRef = useRef<BroadcastSync | null>(null);
+  const broadcastSyncRef = useRef<BingoBroadcastSync | null>(null);
   const broadcastSync = useMemo(() => {
     const instance = createBingoBroadcastSync(sessionId);
     broadcastSyncRef.current = instance;

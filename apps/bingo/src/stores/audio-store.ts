@@ -5,7 +5,9 @@ import { BingoBall, VoicePackId, VoiceManifest, VoicePackMetadata, RollSoundType
 export interface AudioStore {
   // Persisted state
   enabled: boolean;
-  volume: number; // 0-1
+  voiceVolume: number; // 0-1, for ball announcements and TTS
+  rollSoundVolume: number; // 0-1, for roll sounds
+  chimeVolume: number; // 0-1, for reveal chimes
   voicePack: VoicePackId;
   useFallbackTTS: boolean;
   rollSoundType: RollSoundType;
@@ -19,7 +21,9 @@ export interface AudioStore {
   // Actions
   setEnabled: (enabled: boolean) => void;
   toggleEnabled: () => void;
-  setVolume: (volume: number) => void;
+  setVoiceVolume: (volume: number) => void;
+  setRollSoundVolume: (volume: number) => void;
+  setChimeVolume: (volume: number) => void;
   setVoicePack: (pack: VoicePackId) => void;
   setUseFallbackTTS: (useFallback: boolean) => void;
   setRollSound: (type: RollSoundType, duration: RollDuration) => void;
@@ -34,10 +38,15 @@ export interface AudioStore {
 
   // Manifest loading
   loadManifest: () => Promise<void>;
+
+  // Resource cleanup
+  cleanup: () => void;
 }
 
 export const DEFAULT_VOICE_PACK: VoicePackId = 'standard';
-export const DEFAULT_VOLUME = 0.8;
+export const DEFAULT_VOICE_VOLUME = 0.7;
+export const DEFAULT_ROLL_SOUND_VOLUME = 0.8;
+export const DEFAULT_CHIME_VOLUME = 0.8;
 export const DEFAULT_ROLL_SOUND_TYPE: RollSoundType = 'metal-cage';
 export const DEFAULT_ROLL_DURATION: RollDuration = '2s';
 export const DEFAULT_REVEAL_CHIME: RevealChimeType = 'none';
@@ -49,6 +58,142 @@ export const VOICE_PACK_OPTIONS: { id: VoicePackId; name: string; description: s
   { id: 'british', name: 'British Slang', description: 'Traditional UK bingo calls' },
   { id: 'british-hall', name: 'British Slang (Hall)', description: 'UK calls with hall reverb' },
 ];
+
+// ============================================================================
+// Audio Pool Management - Prevents memory leaks by reusing audio elements
+// ============================================================================
+
+interface PooledAudio {
+  element: HTMLAudioElement;
+  inUse: boolean;
+}
+
+// Pool for roll sounds (frequently used)
+const rollSoundPool: Map<string, PooledAudio[]> = new Map();
+const ROLL_POOL_SIZE = 2;
+
+// Pool for chime sounds (frequently used)
+const chimeSoundPool: Map<string, PooledAudio[]> = new Map();
+const CHIME_POOL_SIZE = 2;
+
+// Track all active audio elements for cleanup
+const activeAudioElements: Set<HTMLAudioElement> = new Set();
+
+/**
+ * Get or create a pooled audio element for a given sound file.
+ * Returns null if Audio is not available (SSR).
+ */
+function getPooledAudio(
+  pool: Map<string, PooledAudio[]>,
+  soundFile: string,
+  poolSize: number
+): HTMLAudioElement | null {
+  if (typeof Audio === 'undefined') {
+    return null;
+  }
+
+  // Get or create pool for this sound file
+  if (!pool.has(soundFile)) {
+    pool.set(soundFile, []);
+  }
+
+  const soundPool = pool.get(soundFile)!;
+
+  // Find an available element in the pool
+  for (const pooled of soundPool) {
+    if (!pooled.inUse) {
+      pooled.inUse = true;
+      pooled.element.currentTime = 0;
+      activeAudioElements.add(pooled.element);
+      return pooled.element;
+    }
+  }
+
+  // Create new element if pool isn't full
+  if (soundPool.length < poolSize) {
+    const element = new Audio(soundFile);
+    const pooled: PooledAudio = { element, inUse: true };
+    soundPool.push(pooled);
+    activeAudioElements.add(element);
+    return element;
+  }
+
+  // Pool is full and all in use - create a temporary element
+  const tempElement = new Audio(soundFile);
+  activeAudioElements.add(tempElement);
+  return tempElement;
+}
+
+/**
+ * Release a pooled audio element back to the pool.
+ */
+function releasePooledAudio(
+  pool: Map<string, PooledAudio[]>,
+  soundFile: string,
+  element: HTMLAudioElement
+): void {
+  activeAudioElements.delete(element);
+
+  const soundPool = pool.get(soundFile);
+  if (soundPool) {
+    const pooled = soundPool.find(p => p.element === element);
+    if (pooled) {
+      pooled.inUse = false;
+      return;
+    }
+  }
+
+  // Element wasn't from the pool (temporary) - clean it up
+  cleanupAudioElement(element);
+}
+
+/**
+ * Clean up an audio element to release memory.
+ */
+function cleanupAudioElement(audio: HTMLAudioElement): void {
+  audio.pause();
+  audio.onended = null;
+  audio.onerror = null;
+  audio.oncanplaythrough = null;
+  audio.src = ''; // Release media resource
+  audio.load(); // Force release of any buffered data
+  activeAudioElements.delete(audio);
+}
+
+/**
+ * Clean up all pooled audio elements.
+ * Exported for testing purposes.
+ */
+export function cleanupAllPools(): void {
+  // Clean up roll sound pool
+  for (const [, soundPool] of rollSoundPool) {
+    for (const pooled of soundPool) {
+      cleanupAudioElement(pooled.element);
+    }
+  }
+  rollSoundPool.clear();
+
+  // Clean up chime sound pool
+  for (const [, soundPool] of chimeSoundPool) {
+    for (const pooled of soundPool) {
+      cleanupAudioElement(pooled.element);
+    }
+  }
+  chimeSoundPool.clear();
+
+  // Clean up any remaining active elements
+  for (const element of activeAudioElements) {
+    cleanupAudioElement(element);
+  }
+  activeAudioElements.clear();
+}
+
+/**
+ * Get the count of active audio elements (for testing).
+ */
+export function getActiveAudioCount(): number {
+  return activeAudioElements.size;
+}
 
 /**
  * Get the audio file path for a ball based on voice pack settings.
@@ -76,7 +221,7 @@ function getAudioPath(
 /**
  * Play the ball rolling sound effect.
  * Selects clean or hall variant based on voice pack.
- * Errors are caught to ensure voice announcement still plays.
+ * Uses object pooling to prevent memory leaks.
  */
 async function playRollingSound(
   volume: number,
@@ -94,13 +239,15 @@ async function playRollingSound(
   const soundFile = `/audio/sfx/${rollType}/${rollDuration}${suffix}.mp3`;
 
   return new Promise<void>((resolve) => {
-    const audio = new Audio(soundFile);
+    const audio = getPooledAudio(rollSoundPool, soundFile, ROLL_POOL_SIZE);
+    if (!audio) {
+      resolve();
+      return;
+    }
     audio.volume = volume;
 
     const cleanup = () => {
-      audio.onended = null;
-      audio.onerror = null;
-      audio.src = ''; // Release media resource - prevents memory leak
+      releasePooledAudio(rollSoundPool, soundFile, audio);
     };
 
     audio.onended = () => {
@@ -165,7 +312,9 @@ export const useAudioStore = create<AudioStore>()(
     (set, get) => ({
       // Persisted state
       enabled: true,
-      volume: DEFAULT_VOLUME,
+      voiceVolume: DEFAULT_VOICE_VOLUME,
+      rollSoundVolume: DEFAULT_ROLL_SOUND_VOLUME,
+      chimeVolume: DEFAULT_CHIME_VOLUME,
       voicePack: DEFAULT_VOICE_PACK,
       useFallbackTTS: true,
       rollSoundType: DEFAULT_ROLL_SOUND_TYPE,
@@ -185,10 +334,22 @@ export const useAudioStore = create<AudioStore>()(
         set((state) => ({ enabled: !state.enabled }));
       },
 
-      setVolume: (volume: number) => {
+      setVoiceVolume: (volume: number) => {
         // Clamp volume between 0 and 1
         const clampedVolume = Math.max(0, Math.min(1, volume));
-        set({ volume: clampedVolume });
+        set({ voiceVolume: clampedVolume });
+      },
+
+      setRollSoundVolume: (volume: number) => {
+        // Clamp volume between 0 and 1
+        const clampedVolume = Math.max(0, Math.min(1, volume));
+        set({ rollSoundVolume: clampedVolume });
+      },
+
+      setChimeVolume: (volume: number) => {
+        // Clamp volume between 0 and 1
+        const clampedVolume = Math.max(0, Math.min(1, volume));
+        set({ chimeVolume: clampedVolume });
       },
 
       setVoicePack: (pack: VoicePackId) => {
@@ -208,7 +369,7 @@ export const useAudioStore = create<AudioStore>()(
       },
 
       playBallCall: async (ball: BingoBall) => {
-        const { enabled, volume, voicePack, isPlaying, useFallbackTTS, manifest, rollSoundType, rollDuration } = get();
+        const { enabled, voiceVolume, rollSoundVolume, voicePack, isPlaying, useFallbackTTS, manifest, rollSoundType, rollDuration } = get();
 
         if (!enabled || isPlaying) {
           return;
@@ -234,7 +395,7 @@ export const useAudioStore = create<AudioStore>()(
           // Play rolling sound first (non-blocking on error)
           // Uses hall variant automatically if voice pack is hall style
           try {
-            await playRollingSound(volume, voicePack, rollSoundType, rollDuration);
+            await playRollingSound(rollSoundVolume, voicePack, rollSoundType, rollDuration);
           } catch (error) {
             console.warn('Rolling sound failed:', error);
           }
@@ -245,12 +406,27 @@ export const useAudioStore = create<AudioStore>()(
 
             if (audioPath) {
               const audio = new Audio(audioPath);
-              audio.volume = volume;
+              audio.volume = voiceVolume;
 
               await new Promise<void>((resolve) => {
-                audio.onended = () => resolve();
-                audio.onerror = () => resolve();
-                audio.play().catch(() => resolve());
+                const cleanup = () => {
+                  audio.onended = null;
+                  audio.onerror = null;
+                  audio.src = ''; // Release media resource - prevents memory leak
+                };
+
+                audio.onended = () => {
+                  cleanup();
+                  resolve();
+                };
+                audio.onerror = () => {
+                  cleanup();
+                  resolve();
+                };
+                audio.play().catch(() => {
+                  cleanup();
+                  resolve();
+                });
               });
               return;
             }
@@ -258,7 +434,7 @@ export const useAudioStore = create<AudioStore>()(
 
           // Fall back to Web Speech API if enabled
           if (useFallbackTTS) {
-            await speakBallCall(ball, volume);
+            await speakBallCall(ball, voiceVolume);
           }
         } finally {
           set({ isPlaying: false });
@@ -266,13 +442,13 @@ export const useAudioStore = create<AudioStore>()(
       },
 
       playRollSound: async () => {
-        const { enabled, volume, voicePack, rollSoundType, rollDuration } = get();
+        const { enabled, rollSoundVolume, voicePack, rollSoundType, rollDuration } = get();
         if (!enabled || typeof Audio === 'undefined') return;
-        await playRollingSound(volume, voicePack, rollSoundType, rollDuration);
+        await playRollingSound(rollSoundVolume, voicePack, rollSoundType, rollDuration);
       },
 
       playBallVoice: async (ball: BingoBall) => {
-        const { enabled, volume, voicePack, useFallbackTTS, manifest } = get();
+        const { enabled, voiceVolume, voicePack, useFallbackTTS, manifest } = get();
         if (!enabled) return;
 
         // Check if we're in a browser environment
@@ -292,12 +468,27 @@ export const useAudioStore = create<AudioStore>()(
 
           if (audioPath) {
             const audio = new Audio(audioPath);
-            audio.volume = volume;
+            audio.volume = voiceVolume;
 
             await new Promise<void>((resolve) => {
-              audio.onended = () => resolve();
-              audio.onerror = () => resolve();
-              audio.play().catch(() => resolve());
+              const cleanup = () => {
+                audio.onended = null;
+                audio.onerror = null;
+                audio.src = ''; // Release media resource - prevents memory leak
+              };
+
+              audio.onended = () => {
+                cleanup();
+                resolve();
+              };
+              audio.onerror = () => {
+                cleanup();
+                resolve();
+              };
+              audio.play().catch(() => {
+                cleanup();
+                resolve();
+              });
             });
             return;
           }
@@ -305,24 +496,26 @@ export const useAudioStore = create<AudioStore>()(
 
         // Fall back to Web Speech API if enabled
         if (useFallbackTTS) {
-          await speakBallCall(ball, volume);
+          await speakBallCall(ball, voiceVolume);
         }
       },
 
       playRevealChime: async () => {
-        const { enabled, volume, revealChime } = get();
+        const { enabled, chimeVolume, revealChime } = get();
         if (!enabled || revealChime === 'none' || typeof Audio === 'undefined') return;
 
         const soundFile = `/audio/sfx/chimes/${revealChime}.mp3`;
 
         return new Promise<void>((resolve) => {
-          const audio = new Audio(soundFile);
-          audio.volume = volume;
+          const audio = getPooledAudio(chimeSoundPool, soundFile, CHIME_POOL_SIZE);
+          if (!audio) {
+            resolve();
+            return;
+          }
+          audio.volume = chimeVolume;
 
           const cleanup = () => {
-            audio.onended = null;
-            audio.onerror = null;
-            audio.src = ''; // Release media resource
+            releasePooledAudio(chimeSoundPool, soundFile, audio);
           };
 
           audio.onended = () => {
@@ -347,6 +540,13 @@ export const useAudioStore = create<AudioStore>()(
         if (typeof window !== 'undefined' && window.speechSynthesis) {
           window.speechSynthesis.cancel();
         }
+
+        // Pause all active audio elements
+        for (const element of activeAudioElements) {
+          element.pause();
+          element.currentTime = 0;
+        }
+
         set({ isPlaying: false });
       },
 
@@ -363,12 +563,25 @@ export const useAudioStore = create<AudioStore>()(
           console.error('Failed to load voice manifest:', message);
         }
       },
+
+      cleanup: () => {
+        // Stop any ongoing playback
+        get().stopPlayback();
+
+        // Clean up all pooled audio elements and release memory
+        cleanupAllPools();
+
+        // Reset state
+        set({ isPlaying: false });
+      },
     }),
     {
       name: 'beak-bingo-audio',
       partialize: (state) => ({
         enabled: state.enabled,
-        volume: state.volume,
+        voiceVolume: state.voiceVolume,
+        rollSoundVolume: state.rollSoundVolume,
+        chimeVolume: state.chimeVolume,
         voicePack: state.voicePack,
         useFallbackTTS: state.useFallbackTTS,
         rollSoundType: state.rollSoundType,
@@ -376,7 +589,26 @@ export const useAudioStore = create<AudioStore>()(
         revealChime: state.revealChime,
       }),
       merge: (persistedState, currentState) => {
-        const merged = { ...currentState, ...(persistedState as object) };
+        const persisted = persistedState as Record<string, unknown>;
+        const merged = { ...currentState, ...persisted } as Record<string, unknown>;
+
+        // Migration: Convert old single volume to new dual volumes
+        if (persisted.volume !== undefined && persisted.voiceVolume === undefined) {
+          merged.voiceVolume = persisted.volume;
+          merged.rollSoundVolume = persisted.volume;
+          merged.chimeVolume = persisted.volume;
+        }
+        // Clean up old volume property from merged state
+        delete merged.volume;
+
+        // Migration: Convert old sfxVolume to new rollSoundVolume and chimeVolume
+        if (persisted.sfxVolume !== undefined && persisted.rollSoundVolume === undefined) {
+          merged.rollSoundVolume = persisted.sfxVolume;
+          merged.chimeVolume = persisted.sfxVolume;
+        }
+        // Clean up old sfxVolume property from merged state
+        delete merged.sfxVolume;
+
         // Validate rollDuration against valid durations for the sound type
         const rollSoundType = merged.rollSoundType as RollSoundType;
         const rollDuration = merged.rollDuration as RollDuration;
@@ -384,7 +616,7 @@ export const useAudioStore = create<AudioStore>()(
         if (!validDurations.includes(rollDuration)) {
           merged.rollDuration = validDurations[0];
         }
-        return merged as AudioStore;
+        return merged as unknown as AudioStore;
       },
     }
   )

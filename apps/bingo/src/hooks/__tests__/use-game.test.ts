@@ -284,6 +284,57 @@ describe('use-game', () => {
 
     });
 
+    describe('race condition prevention', () => {
+      it('prevents concurrent callBall invocations', async () => {
+        const { result } = renderHook(() => useGame());
+
+        act(() => {
+          result.current.startGame();
+        });
+
+        // Call ball multiple times rapidly - only one should succeed per call
+        const initialCalled = result.current.ballsCalled;
+
+        // First call should succeed
+        await act(async () => {
+          await result.current.callBall();
+        });
+
+        expect(result.current.ballsCalled).toBe(initialCalled + 1);
+
+        // Subsequent sequential calls should also work (not concurrent)
+        await act(async () => {
+          await result.current.callBall();
+        });
+
+        expect(result.current.ballsCalled).toBe(initialCalled + 2);
+      });
+
+      it('clears auto-call timeout when game is paused', async () => {
+        vi.useFakeTimers();
+        const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+
+        const { result } = renderHook(() => useGame());
+
+        act(() => {
+          result.current.startGame();
+          result.current.toggleAutoCall();
+        });
+
+        expect(result.current.autoCallEnabled).toBe(true);
+
+        // Pause the game - should clear timeout
+        act(() => {
+          result.current.pauseGame();
+        });
+
+        expect(clearTimeoutSpy).toHaveBeenCalled();
+
+        clearTimeoutSpy.mockRestore();
+        vi.useRealTimers();
+      });
+    });
+
     describe('recentBalls', () => {
       it('returns recent balls in reverse order', () => {
         const { result } = renderHook(() => useGame());

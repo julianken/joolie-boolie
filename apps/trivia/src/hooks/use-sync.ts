@@ -3,12 +3,46 @@
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSyncStore, SyncRole } from '@/stores/sync-store';
 import { useGameStore } from '@/stores/game-store';
-import {
-  createTriviaBroadcastSync,
-  createMessageRouter,
-  BroadcastSync,
-} from '@/lib/sync/broadcast';
+import { BroadcastSync, type SyncMessage } from '@beak-gaming/sync';
+import { getChannelName } from '@/lib/sync/session';
 import type { TriviaGameState } from '@/types';
+
+// Trivia message types
+type TriviaMessageType = 'STATE_UPDATE' | 'REQUEST_SYNC';
+
+/**
+ * Extended BroadcastSync with trivia-specific types.
+ */
+class TriviaBroadcastSync extends BroadcastSync<TriviaGameState> {}
+
+/**
+ * Factory function to create a session-scoped TriviaBroadcastSync instance.
+ */
+function createTriviaBroadcastSync(sessionId: string): TriviaBroadcastSync {
+  const channelName = getChannelName(sessionId);
+  return new TriviaBroadcastSync(channelName);
+}
+
+type MessageHandler = (message: SyncMessage<TriviaGameState>) => void;
+
+/**
+ * Create a message handler that routes messages by type.
+ */
+function createMessageRouter(handlers: Partial<{
+  onStateUpdate: (state: TriviaGameState) => void;
+  onSyncRequest: () => void;
+}>): MessageHandler {
+  return (message: SyncMessage<TriviaGameState>) => {
+    switch (message.type as TriviaMessageType) {
+      case 'STATE_UPDATE':
+        handlers.onStateUpdate?.(message.payload as TriviaGameState);
+        break;
+      case 'REQUEST_SYNC':
+        handlers.onSyncRequest?.();
+        break;
+    }
+  };
+}
 
 interface UseSyncOptions {
   role: SyncRole;
@@ -28,7 +62,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
   const isInitializedRef = useRef(false);
 
   // Create a session-scoped BroadcastSync instance
-  const broadcastSyncRef = useRef<BroadcastSync | null>(null);
+  const broadcastSyncRef = useRef<TriviaBroadcastSync | null>(null);
   const broadcastSync = useMemo(() => {
     const instance = createTriviaBroadcastSync(sessionId);
     broadcastSyncRef.current = instance;

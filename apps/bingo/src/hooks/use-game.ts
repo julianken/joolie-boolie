@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
 import { useAudioStore } from '@/stores/audio-store';
 import { BingoPattern } from '@/types';
@@ -13,6 +13,11 @@ export function useGame() {
   const gameStore = useGameStore();
   const audioStore = useAudioStore();
   const selectors = useGameSelectors();
+
+  // Ref to track if a ball call is currently processing (prevents race conditions)
+  const isProcessingRef = useRef(false);
+  // Ref to track the auto-call timeout for proper cleanup
+  const autoCallTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get game state
   const {
@@ -36,15 +41,25 @@ export function useGame() {
   );
 
   const callBall = useCallback(async () => {
-    if (audioEnabled) {
-      await audioStore.playRollSound();  // Roll sound plays first
+    // Guard against duplicate calls while processing
+    if (isProcessingRef.current) {
+      return null;
     }
-    const ball = gameStore.callBall();   // Ball appears after roll completes
-    if (ball && audioEnabled) {
-      await audioStore.playRevealChime();  // Reveal chime plays when ball is shown
-      await audioStore.playBallVoice(ball);  // Voice announcement plays
+
+    isProcessingRef.current = true;
+    try {
+      if (audioEnabled) {
+        await audioStore.playRollSound();  // Roll sound plays first
+      }
+      const ball = gameStore.callBall();   // Ball appears after roll completes
+      if (ball && audioEnabled) {
+        await audioStore.playRevealChime();  // Reveal chime plays when ball is shown
+        await audioStore.playBallVoice(ball);  // Voice announcement plays
+      }
+      return ball;
+    } finally {
+      isProcessingRef.current = false;
     }
-    return ball;
   }, [gameStore, audioStore, audioEnabled]);
 
   const undoCall = useCallback(() => {
@@ -91,34 +106,58 @@ export function useGame() {
 
   // Auto-call timeout management (self-scheduling to prevent race conditions)
   useEffect(() => {
+    // Clear any existing timeout when effect re-runs or unmounts
+    const clearAutoCallTimeout = () => {
+      if (autoCallTimeoutRef.current) {
+        clearTimeout(autoCallTimeoutRef.current);
+        autoCallTimeoutRef.current = null;
+      }
+    };
+
     if (status !== 'playing' || !autoCallEnabled) {
+      clearAutoCallTimeout();
       return;
     }
 
-    let timeoutId: NodeJS.Timeout;
-
     const scheduleNextCall = () => {
-      timeoutId = setTimeout(async () => {
+      autoCallTimeoutRef.current = setTimeout(async () => {
+        // Check if already processing (manual call in progress or previous auto-call)
+        if (isProcessingRef.current) {
+          // Retry scheduling after a short delay
+          scheduleNextCall();
+          return;
+        }
+
         const state = useGameStore.getState();
         if (
           state.status === 'playing' &&
           state.autoCallEnabled &&
           state.remainingBalls.length > 0
         ) {
-          const audioStore = useAudioStore.getState();
+          isProcessingRef.current = true;
+          try {
+            const audioStoreState = useAudioStore.getState();
 
-          // Use same audio sequence as manual call
-          if (state.audioEnabled) {
-            await audioStore.playRollSound();  // Roll sound plays first
-          }
-          const ball = state.callBall();       // Ball appears after roll completes
-          if (ball && state.audioEnabled) {
-            await audioStore.playRevealChime();  // Reveal chime plays
-            await audioStore.playBallVoice(ball);  // Voice announcement plays
+            // Use same audio sequence as manual call
+            if (state.audioEnabled) {
+              await audioStoreState.playRollSound();  // Roll sound plays first
+            }
+            const ball = state.callBall();       // Ball appears after roll completes
+            if (ball && state.audioEnabled) {
+              await audioStoreState.playRevealChime();  // Reveal chime plays
+              await audioStoreState.playBallVoice(ball);  // Voice announcement plays
+            }
+          } finally {
+            isProcessingRef.current = false;
           }
 
           // Schedule next call only if game is still active
-          if (state.remainingBalls.length > 1) {
+          const updatedState = useGameStore.getState();
+          if (
+            updatedState.status === 'playing' &&
+            updatedState.autoCallEnabled &&
+            updatedState.remainingBalls.length > 0
+          ) {
             scheduleNextCall();
           }
         }
@@ -127,7 +166,8 @@ export function useGame() {
 
     scheduleNextCall();
 
-    return () => clearTimeout(timeoutId);
+    // Cleanup on unmount or when dependencies change
+    return clearAutoCallTimeout;
   }, [status, autoCallEnabled, autoCallSpeed]);
 
   // Computed values
