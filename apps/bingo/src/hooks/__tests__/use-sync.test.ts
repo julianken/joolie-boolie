@@ -49,6 +49,7 @@ describe('use-sync', () => {
       autoCallEnabled: false,
       autoCallSpeed: 10,
       audioEnabled: true,
+      _isHydrating: false,
     });
 
   });
@@ -333,7 +334,7 @@ describe('use-sync', () => {
   });
 
   describe('sync loop prevention', () => {
-    it('skips broadcast when state is hydrating', () => {
+    it('skips broadcast when state is hydrating via _hydrate', async () => {
       const postMessageSpy = vi.fn();
       vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
         postMessage = postMessageSpy;
@@ -344,23 +345,21 @@ describe('use-sync', () => {
       // Clear any initial broadcasts
       postMessageSpy.mockClear();
 
-      // Set hydrating flag and change state
-      useGameStore.setState({ _isHydrating: true });
-
+      // Use _hydrate which sets _isHydrating flag
       act(() => {
-        // Simulate a state change while hydrating
-        useGameStore.setState({ status: 'playing' });
+        useGameStore.getState()._hydrate({ status: 'playing' });
       });
 
-      // Should NOT broadcast because _isHydrating is true
-      // Note: The subscription might still fire, but the handler should check the flag
+      // The first call sets _isHydrating=true (may broadcast),
+      // The second call sets status='playing' but _isHydrating is true so should NOT broadcast
       const broadcastCalls = postMessageSpy.mock.calls.filter(
-        call => call[0]?.type === 'GAME_STATE_UPDATE'
+        call => call[0]?.type === 'GAME_STATE_UPDATE' && call[0]?.payload?.status === 'playing'
       );
+      // No broadcasts with the actual state change should occur when _isHydrating is true
       expect(broadcastCalls).toHaveLength(0);
 
-      // Clean up
-      useGameStore.setState({ _isHydrating: false });
+      // Wait for the setTimeout to clear the flag
+      await new Promise(resolve => setTimeout(resolve, 10));
     });
 
     it('broadcasts normally when not hydrating', () => {
@@ -374,7 +373,7 @@ describe('use-sync', () => {
       // Clear any initial broadcasts
       postMessageSpy.mockClear();
 
-      // Change state without hydrating flag
+      // Change state without hydrating flag (normal user action)
       act(() => {
         useGameStore.getState().startGame();
       });

@@ -30,6 +30,26 @@ describe('PatternDisplay', () => {
     ],
   };
 
+  // Helper function to count cells by their background class
+  const countCellsByType = (container: HTMLElement) => {
+    const patternGrid = container.querySelector('[role="img"]');
+    if (!patternGrid) return { required: 0, notRequired: 0 };
+
+    const allCells = patternGrid.querySelectorAll('[aria-hidden="true"]');
+    let required = 0;
+    let notRequired = 0;
+
+    allCells.forEach((cell) => {
+      if (cell.className.includes('bg-primary')) {
+        required++;
+      } else if (cell.className.includes('bg-muted')) {
+        notRequired++;
+      }
+    });
+
+    return { required, notRequired };
+  };
+
   describe('renders 5x5 grid with headers', () => {
     it('displays all five column headers (B, I, N, G, O)', () => {
       render(<PatternDisplay pattern={mockPattern} />);
@@ -42,12 +62,10 @@ describe('PatternDisplay', () => {
     });
 
     it('renders 25 cells (5x5 grid)', () => {
-      render(<PatternDisplay pattern={mockPattern} />);
+      const { container } = render(<PatternDisplay pattern={mockPattern} />);
 
-      const requiredCells = screen.getAllByLabelText('Required for pattern');
-      const notRequiredCells = screen.getAllByLabelText('Not required');
-
-      expect(requiredCells.length + notRequiredCells.length).toBe(25);
+      const { required, notRequired } = countCellsByType(container);
+      expect(required + notRequired).toBe(25);
     });
 
     it('displays FREE text in the center cell', () => {
@@ -59,27 +77,27 @@ describe('PatternDisplay', () => {
 
   describe('marks required cells from pattern', () => {
     it('marks cells that are part of the pattern', () => {
-      render(<PatternDisplay pattern={mockPattern} />);
+      const { container } = render(<PatternDisplay pattern={mockPattern} />);
 
       // Horizontal line pattern has 5 cells in row 0
-      const requiredCells = screen.getAllByLabelText('Required for pattern');
-      expect(requiredCells.length).toBe(5);
+      const { required } = countCellsByType(container);
+      expect(required).toBe(5);
     });
 
     it('leaves non-pattern cells unmarked', () => {
-      render(<PatternDisplay pattern={mockPattern} />);
+      const { container } = render(<PatternDisplay pattern={mockPattern} />);
 
       // 25 total cells - 5 pattern cells = 20 unmarked
-      const notRequiredCells = screen.getAllByLabelText('Not required');
-      expect(notRequiredCells.length).toBe(20);
+      const { notRequired } = countCellsByType(container);
+      expect(notRequired).toBe(20);
     });
 
     it('correctly marks corner pattern cells', () => {
-      render(<PatternDisplay pattern={mockPatternWithoutDescription} />);
+      const { container } = render(<PatternDisplay pattern={mockPatternWithoutDescription} />);
 
       // Four corners pattern has 4 cells
-      const requiredCells = screen.getAllByLabelText('Required for pattern');
-      expect(requiredCells.length).toBe(4);
+      const { required } = countCellsByType(container);
+      expect(required).toBe(4);
     });
   });
 
@@ -124,10 +142,10 @@ describe('PatternDisplay', () => {
     });
 
     it('does not render the grid when pattern is null', () => {
-      render(<PatternDisplay pattern={null} />);
+      const { container } = render(<PatternDisplay pattern={null} />);
 
-      expect(screen.queryByLabelText('Required for pattern')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('Not required')).not.toBeInTheDocument();
+      const patternGrid = container.querySelector('[role="img"]');
+      expect(patternGrid).not.toBeInTheDocument();
     });
 
     it('does not render column headers when pattern is null', () => {
@@ -156,10 +174,10 @@ describe('PatternDisplay', () => {
         ],
       };
 
-      render(<PatternDisplay pattern={edgePattern} />);
+      const { container } = render(<PatternDisplay pattern={edgePattern} />);
 
-      const requiredCells = screen.getAllByLabelText('Required for pattern');
-      expect(requiredCells.length).toBe(4);
+      const { required } = countCellsByType(container);
+      expect(required).toBe(4);
     });
 
     it('handles pattern with center cell (free space)', () => {
@@ -172,10 +190,10 @@ describe('PatternDisplay', () => {
         ],
       };
 
-      render(<PatternDisplay pattern={centerPattern} />);
+      const { container } = render(<PatternDisplay pattern={centerPattern} />);
 
-      const requiredCells = screen.getAllByLabelText('Required for pattern');
-      expect(requiredCells.length).toBe(1);
+      const { required } = countCellsByType(container);
+      expect(required).toBe(1);
       // The FREE text should still be visible in the center cell
       expect(screen.getByText('FREE')).toBeInTheDocument();
     });
@@ -188,11 +206,31 @@ describe('PatternDisplay', () => {
         cells: [],
       };
 
-      render(<PatternDisplay pattern={emptyPattern} />);
+      const { container } = render(<PatternDisplay pattern={emptyPattern} />);
 
       // All cells should be unmarked
-      const notRequiredCells = screen.getAllByLabelText('Not required');
-      expect(notRequiredCells.length).toBe(25);
+      const { notRequired } = countCellsByType(container);
+      expect(notRequired).toBe(25);
+    });
+  });
+
+  describe('accessibility', () => {
+    it('has an accessible pattern grid with descriptive aria-label', () => {
+      const { container } = render(<PatternDisplay pattern={mockPattern} />);
+
+      const patternGrid = container.querySelector('[role="img"]');
+      expect(patternGrid).toBeInTheDocument();
+      expect(patternGrid).toHaveAttribute('aria-label');
+      expect(patternGrid?.getAttribute('aria-label')).toContain('Horizontal Line');
+      expect(patternGrid?.getAttribute('aria-label')).toContain('5 required cells');
+    });
+
+    it('marks individual cells as aria-hidden for screen readers', () => {
+      const { container } = render(<PatternDisplay pattern={mockPattern} />);
+
+      const patternGrid = container.querySelector('[role="img"]');
+      const cells = patternGrid?.querySelectorAll('[aria-hidden="true"]');
+      expect(cells?.length).toBe(25);
     });
   });
 });

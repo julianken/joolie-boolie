@@ -76,22 +76,28 @@ describe('Spinner', () => {
 describe('SpinnerOverlay', () => {
   it('renders with default props', () => {
     render(<SpinnerOverlay />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    // SpinnerOverlay has an outer div with role="status" wrapping Spinner
+    const statusElements = screen.getAllByRole('status');
+    expect(statusElements.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('has aria-busy="true"', () => {
-    render(<SpinnerOverlay />);
-    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
+  it('has aria-busy="true" on outer container', () => {
+    const { container } = render(<SpinnerOverlay />);
+    // Get the outer div directly
+    const overlay = container.firstChild as HTMLElement;
+    expect(overlay).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('uses default label', () => {
-    render(<SpinnerOverlay />);
-    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading');
+  it('uses default label on outer container', () => {
+    const { container } = render(<SpinnerOverlay />);
+    const overlay = container.firstChild as HTMLElement;
+    expect(overlay).toHaveAttribute('aria-label', 'Loading');
   });
 
-  it('uses custom label', () => {
-    render(<SpinnerOverlay label="Please wait" />);
-    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Please wait');
+  it('uses custom label on outer container', () => {
+    const { container } = render(<SpinnerOverlay label="Please wait" />);
+    const overlay = container.firstChild as HTMLElement;
+    expect(overlay).toHaveAttribute('aria-label', 'Please wait');
   });
 
   it('displays message when provided', () => {
@@ -100,26 +106,27 @@ describe('SpinnerOverlay', () => {
   });
 
   it('applies fixed positioning classes', () => {
-    render(<SpinnerOverlay />);
-    const overlay = screen.getByRole('status');
+    const { container } = render(<SpinnerOverlay />);
+    const overlay = container.firstChild as HTMLElement;
     expect(overlay).toHaveClass('fixed', 'inset-0');
   });
 
   it('applies backdrop blur', () => {
-    render(<SpinnerOverlay />);
-    const overlay = screen.getByRole('status');
+    const { container } = render(<SpinnerOverlay />);
+    const overlay = container.firstChild as HTMLElement;
     expect(overlay).toHaveClass('backdrop-blur-sm');
   });
 
   it('uses lg size by default', () => {
-    render(<SpinnerOverlay />);
-    const svg = screen.getByRole('status').querySelector('svg');
+    const { container } = render(<SpinnerOverlay />);
+    // The SVG is inside the inner Spinner component
+    const svg = container.querySelector('svg');
     expect(svg).toHaveClass('h-12', 'w-12');
   });
 
   it('respects custom size', () => {
-    render(<SpinnerOverlay size="xl" />);
-    const svg = screen.getByRole('status').querySelector('svg');
+    const { container } = render(<SpinnerOverlay size="xl" />);
+    const svg = container.querySelector('svg');
     expect(svg).toHaveClass('h-16', 'w-16');
   });
 });

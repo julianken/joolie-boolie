@@ -61,34 +61,33 @@ export function BingoBoard({ calledBalls }: BingoBoardProps) {
         ))}
       </div>
 
-      {/* Number grid */}
-      <div className="grid grid-cols-5 gap-1">
-        {boardData.map(({ column, numbers }) => (
-          <div key={column} className="flex flex-col gap-1" role="rowgroup" aria-label={`Column ${column} numbers`}>
-            {numbers.map((num) => {
-              const isCalled = calledNumbers.has(num);
-              return (
-                <div
-                  key={num}
-                  role="gridcell"
-                  aria-label={`${column}${num}${isCalled ? ', called' : ''}`}
-                  className={`
-                    h-10 flex items-center justify-center
-                    text-lg rounded transition-colors duration-200
-                    ${
-                      isCalled
-                        ? columnHighlightColors[column]
-                        : 'bg-background text-muted-foreground border border-border'
-                    }
-                  `}
-                >
-                  {num}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+      {/* Number grid - transposed to display rows correctly */}
+      {Array.from({ length: 15 }, (_, rowIndex) => (
+        <div key={rowIndex} className="grid grid-cols-5 gap-1" role="row">
+          {boardData.map(({ column, numbers }) => {
+            const num = numbers[rowIndex];
+            const isCalled = calledNumbers.has(num);
+            return (
+              <div
+                key={num}
+                role="gridcell"
+                aria-label={`${column}${num}${isCalled ? ', called' : ''}`}
+                className={`
+                  h-10 flex items-center justify-center
+                  text-lg rounded transition-colors duration-200 motion-reduce:transition-none
+                  ${
+                    isCalled
+                      ? columnHighlightColors[column]
+                      : 'bg-background text-muted-foreground border border-border'
+                  }
+                `}
+              >
+                {num}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

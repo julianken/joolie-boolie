@@ -82,7 +82,10 @@ export function Select({
       const highlightedElement = listRef.current.children[
         highlightedIndex
       ] as HTMLElement;
-      highlightedElement?.scrollIntoView({ block: 'nearest' });
+      // scrollIntoView may not be available in test environments (JSDOM)
+      if (highlightedElement?.scrollIntoView) {
+        highlightedElement.scrollIntoView({ block: 'nearest' });
+      }
     }
   }, [highlightedIndex, isOpen]);
 

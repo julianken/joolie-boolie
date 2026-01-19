@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Select } from '../Select';
 
 const defaultOptions = [
@@ -30,28 +30,22 @@ describe('Select', () => {
   });
 
   describe('dropdown behavior', () => {
-    it('opens dropdown on click', async () => {
+    it('opens dropdown on click', () => {
       render(<Select {...defaultProps} />);
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
     });
 
-    it('closes dropdown on second click', async () => {
+    it('closes dropdown on second click', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.click(combobox);
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
       fireEvent.click(combobox);
-      await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-      });
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     });
 
-    it('closes dropdown on outside click', async () => {
+    it('closes dropdown on outside click', () => {
       render(
         <div>
           <Select {...defaultProps} />
@@ -59,38 +53,29 @@ describe('Select', () => {
         </div>
       );
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
       fireEvent.mouseDown(screen.getByText('Outside'));
-      await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-      });
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     });
   });
 
   describe('option selection', () => {
-    it('calls onChange when option is selected', async () => {
+    it('calls onChange when option is selected', () => {
       const handleChange = vi.fn();
       render(<Select {...defaultProps} onChange={handleChange} />);
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
       fireEvent.click(screen.getByText('Banana'));
       expect(handleChange).toHaveBeenCalledWith('banana');
     });
 
-    it('shows checkmark on selected option', async () => {
+    it('shows checkmark on selected option', () => {
       render(<Select {...defaultProps} value="banana" />);
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        const selectedOption = screen.getByRole('option', { name: /Banana/ });
-        expect(selectedOption).toHaveAttribute('aria-selected', 'true');
-      });
+      const selectedOption = screen.getByRole('option', { name: /Banana/ });
+      expect(selectedOption).toHaveAttribute('aria-selected', 'true');
     });
 
-    it('does not select disabled options', async () => {
+    it('does not select disabled options', () => {
       const handleChange = vi.fn();
       const options = [
         { value: 'apple', label: 'Apple' },
@@ -98,62 +83,46 @@ describe('Select', () => {
       ];
       render(<Select options={options} onChange={handleChange} />);
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
       fireEvent.click(screen.getByText('Banana'));
       expect(handleChange).not.toHaveBeenCalled();
     });
   });
 
   describe('keyboard navigation', () => {
-    it('opens dropdown on Enter key', async () => {
+    it('opens dropdown on Enter key', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.keyDown(combobox, { key: 'Enter' });
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
     });
 
-    it('opens dropdown on Space key', async () => {
+    it('opens dropdown on Space key', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.keyDown(combobox, { key: ' ' });
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
     });
 
-    it('opens dropdown on ArrowDown key', async () => {
+    it('opens dropdown on ArrowDown key', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.keyDown(combobox, { key: 'ArrowDown' });
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
     });
 
-    it('closes dropdown on Escape key', async () => {
+    it('closes dropdown on Escape key', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.click(combobox);
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
       fireEvent.keyDown(combobox, { key: 'Escape' });
-      await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-      });
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     });
 
-    it('navigates options with arrow keys', async () => {
+    it('navigates options with arrow keys', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.click(combobox);
-      await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
       fireEvent.keyDown(combobox, { key: 'ArrowDown' });
       fireEvent.keyDown(combobox, { key: 'ArrowDown' });
       fireEvent.keyDown(combobox, { key: 'ArrowUp' });
@@ -163,28 +132,21 @@ describe('Select', () => {
   });
 
   describe('search functionality', () => {
-    it('filters options when searchable', async () => {
+    it('filters options when searchable', () => {
       render(<Select {...defaultProps} searchable />);
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument();
-      });
       const searchInput = screen.getByPlaceholderText('Search...');
       fireEvent.change(searchInput, { target: { value: 'app' } });
-      await waitFor(() => {
-        expect(screen.getByText('Apple')).toBeInTheDocument();
-        expect(screen.queryByText('Banana')).not.toBeInTheDocument();
-      });
+      expect(screen.getByText('Apple')).toBeInTheDocument();
+      expect(screen.queryByText('Banana')).not.toBeInTheDocument();
     });
 
-    it('shows no options message when search has no results', async () => {
+    it('shows no options message when search has no results', () => {
       render(<Select {...defaultProps} searchable />);
       fireEvent.click(screen.getByRole('combobox'));
       const searchInput = screen.getByPlaceholderText('Search...');
       fireEvent.change(searchInput, { target: { value: 'xyz' } });
-      await waitFor(() => {
-        expect(screen.getByText('No options found')).toBeInTheDocument();
-      });
+      expect(screen.getByText('No options found')).toBeInTheDocument();
     });
   });
 
@@ -225,13 +187,11 @@ describe('Select', () => {
       expect(combobox).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('updates aria-expanded when opened', async () => {
+    it('updates aria-expanded when opened', () => {
       render(<Select {...defaultProps} />);
       const combobox = screen.getByRole('combobox');
       fireEvent.click(combobox);
-      await waitFor(() => {
-        expect(combobox).toHaveAttribute('aria-expanded', 'true');
-      });
+      expect(combobox).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('has aria-haspopup="listbox"', () => {
@@ -239,14 +199,12 @@ describe('Select', () => {
       expect(screen.getByRole('combobox')).toHaveAttribute('aria-haspopup', 'listbox');
     });
 
-    it('options have aria-selected attribute', async () => {
+    it('options have aria-selected attribute', () => {
       render(<Select {...defaultProps} value="banana" />);
       fireEvent.click(screen.getByRole('combobox'));
-      await waitFor(() => {
-        const options = screen.getAllByRole('option');
-        expect(options[0]).toHaveAttribute('aria-selected', 'false');
-        expect(options[1]).toHaveAttribute('aria-selected', 'true');
-      });
+      const options = screen.getAllByRole('option');
+      expect(options[0]).toHaveAttribute('aria-selected', 'false');
+      expect(options[1]).toHaveAttribute('aria-selected', 'true');
     });
   });
 });

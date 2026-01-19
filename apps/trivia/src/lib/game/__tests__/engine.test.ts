@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   createInitialState,
+  createDefaultSettings,
   startGame,
   endGame,
   resetGame,
@@ -28,9 +29,26 @@ import {
   getRoundWinners,
   getOverallLeaders,
   getTeamsSortedByScore,
+  // Timer functions
+  tickTimer,
+  resetTimer,
+  startTimer,
+  stopTimer,
+  toggleTimerAutoStart,
+  // Pause functions
+  pauseGame,
+  resumeGame,
+  emergencyPause,
+  // Settings functions
+  updateSettings,
+  // Answer management
+  recordTeamAnswer,
+  amendCorrectAnswers,
+  // Display functions
+  toggleScoreboard,
 } from '../engine';
-import type { TriviaGameState } from '@/types';
-import { MAX_TEAMS, DEFAULT_ROUNDS } from '@/types';
+import type { TriviaGameState, GameSettings } from '@/types';
+import { MAX_TEAMS, DEFAULT_ROUNDS, DEFAULT_TIMER_DURATION, QUESTIONS_PER_ROUND } from '@/types';
 
 // Mock uuid to return predictable but unique values
 const mockUuidCounter = vi.hoisted(() => ({ value: 0 }));
@@ -830,6 +848,562 @@ describe('Trivia Game Engine', () => {
       getTeamsSortedByScore(state);
 
       expect(state.teams.map((t) => t.name)).toEqual(originalOrder);
+    });
+  });
+
+  // ==========================================================================
+  // TIMER FUNCTIONS
+  // ==========================================================================
+  describe('tickTimer', () => {
+    it('should decrement remaining time by 1', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = startTimer(state);
+      const result = tickTimer(state);
+
+      expect(result.timer.remaining).toBe(state.timer.remaining - 1);
+    });
+
+    it('should stop timer when reaching 0', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = {
+        ...state,
+        timer: { ...state.timer, remaining: 1, isRunning: true },
+      };
+      const result = tickTimer(state);
+
+      expect(result.timer.remaining).toBe(0);
+      expect(result.timer.isRunning).toBe(false);
+    });
+
+    it('should return unchanged if timer not running', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = tickTimer(state);
+
+      expect(result).toBe(state);
+    });
+
+    it('should return unchanged if timer already at 0', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = {
+        ...state,
+        timer: { ...state.timer, remaining: 0, isRunning: true },
+      };
+      const result = tickTimer(state);
+
+      expect(result).toBe(state);
+    });
+  });
+
+  describe('resetTimer', () => {
+    it('should reset to settings duration by default', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = {
+        ...state,
+        timer: { ...state.timer, remaining: 5, isRunning: true },
+      };
+      const result = resetTimer(state);
+
+      expect(result.timer.remaining).toBe(state.settings.timerDuration);
+      expect(result.timer.duration).toBe(state.settings.timerDuration);
+      expect(result.timer.isRunning).toBe(false);
+    });
+
+    it('should reset to specified duration', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = resetTimer(state, 60);
+
+      expect(result.timer.remaining).toBe(60);
+      expect(result.timer.duration).toBe(60);
+      expect(result.timer.isRunning).toBe(false);
+    });
+  });
+
+  describe('startTimer', () => {
+    it('should start the timer', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = startTimer(state);
+
+      expect(result.timer.isRunning).toBe(true);
+    });
+
+    it('should not start if remaining is 0', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = { ...state, timer: { ...state.timer, remaining: 0 } };
+      const result = startTimer(state);
+
+      expect(result).toBe(state);
+    });
+  });
+
+  describe('stopTimer', () => {
+    it('should stop the timer', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = startTimer(state);
+      const result = stopTimer(state);
+
+      expect(result.timer.isRunning).toBe(false);
+    });
+
+    it('should preserve remaining time', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = startTimer(state);
+      state = tickTimer(state);
+      state = tickTimer(state);
+      const remainingBefore = state.timer.remaining;
+      const result = stopTimer(state);
+
+      expect(result.timer.remaining).toBe(remainingBefore);
+    });
+  });
+
+  describe('toggleTimerAutoStart', () => {
+    it('should toggle timerAutoStart setting', () => {
+      let state = createInitialState();
+      expect(state.settings.timerAutoStart).toBe(false);
+
+      state = toggleTimerAutoStart(state);
+      expect(state.settings.timerAutoStart).toBe(true);
+
+      state = toggleTimerAutoStart(state);
+      expect(state.settings.timerAutoStart).toBe(false);
+    });
+  });
+
+  // ==========================================================================
+  // PAUSE FUNCTIONS
+  // ==========================================================================
+  describe('pauseGame', () => {
+    it('should transition to paused from playing', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = pauseGame(state);
+
+      expect(result.status).toBe('paused');
+      expect(result.statusBeforePause).toBe('playing');
+    });
+
+    it('should transition to paused from between_rounds', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = completeRound(state);
+      const result = pauseGame(state);
+
+      expect(result.status).toBe('paused');
+      expect(result.statusBeforePause).toBe('between_rounds');
+    });
+
+    it('should stop timer when pausing', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = startTimer(state);
+      const result = pauseGame(state);
+
+      expect(result.timer.isRunning).toBe(false);
+    });
+
+    it('should return unchanged if not playing or between_rounds', () => {
+      const state = createInitialState();
+      const result = pauseGame(state);
+
+      expect(result).toBe(state);
+    });
+
+    it('should return unchanged if already ended', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = endGame(state);
+      const result = pauseGame(state);
+
+      expect(result).toBe(state);
+    });
+  });
+
+  describe('resumeGame', () => {
+    it('should restore previous status from pause', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = pauseGame(state);
+      const result = resumeGame(state);
+
+      expect(result.status).toBe('playing');
+      expect(result.statusBeforePause).toBeNull();
+    });
+
+    it('should restore between_rounds status', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = completeRound(state);
+      state = pauseGame(state);
+      const result = resumeGame(state);
+
+      expect(result.status).toBe('between_rounds');
+    });
+
+    it('should clear emergencyBlank', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = emergencyPause(state);
+      const result = resumeGame(state);
+
+      expect(result.emergencyBlank).toBe(false);
+    });
+
+    it('should return unchanged if not paused', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = resumeGame(state);
+
+      expect(result).toBe(state);
+    });
+
+    it('should return unchanged if no statusBeforePause', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = { ...state, status: 'paused', statusBeforePause: null };
+      const result = resumeGame(state);
+
+      expect(result).toBe(state);
+    });
+  });
+
+  describe('emergencyPause', () => {
+    it('should pause and set emergencyBlank', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = emergencyPause(state);
+
+      expect(result.status).toBe('paused');
+      expect(result.emergencyBlank).toBe(true);
+      expect(result.statusBeforePause).toBe('playing');
+    });
+
+    it('should stop timer', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = startTimer(state);
+      const result = emergencyPause(state);
+
+      expect(result.timer.isRunning).toBe(false);
+    });
+
+    it('should work from between_rounds', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = completeRound(state);
+      const result = emergencyPause(state);
+
+      expect(result.status).toBe('paused');
+      expect(result.emergencyBlank).toBe(true);
+      expect(result.statusBeforePause).toBe('between_rounds');
+    });
+
+    it('should preserve original status when called while already paused', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      state = pauseGame(state);
+      const result = emergencyPause(state);
+
+      expect(result.status).toBe('paused');
+      expect(result.emergencyBlank).toBe(true);
+      expect(result.statusBeforePause).toBe('playing');
+    });
+
+    it('should return unchanged if setup or ended', () => {
+      const setupState = createInitialState();
+      expect(emergencyPause(setupState)).toBe(setupState);
+
+      let endedState = createInitialState();
+      endedState = addTeam(endedState, 'Team A');
+      endedState = startGame(endedState);
+      endedState = endGame(endedState);
+      expect(emergencyPause(endedState)).toBe(endedState);
+    });
+  });
+
+  // ==========================================================================
+  // SETTINGS FUNCTIONS
+  // ==========================================================================
+  describe('updateSettings', () => {
+    it('should update settings during setup', () => {
+      let state = createInitialState();
+      const result = updateSettings(state, {
+        roundsCount: 5,
+        timerDuration: 45,
+      });
+
+      expect(result.settings.roundsCount).toBe(5);
+      expect(result.settings.timerDuration).toBe(45);
+    });
+
+    it('should update totalRounds when roundsCount changes', () => {
+      let state = createInitialState();
+      const result = updateSettings(state, { roundsCount: 6 });
+
+      expect(result.totalRounds).toBe(6);
+    });
+
+    it('should update timer when timerDuration changes', () => {
+      let state = createInitialState();
+      const result = updateSettings(state, { timerDuration: 60 });
+
+      expect(result.timer.duration).toBe(60);
+      expect(result.timer.remaining).toBe(60);
+    });
+
+    it('should allow partial updates', () => {
+      let state = createInitialState();
+      const originalRoundsCount = state.settings.roundsCount;
+      const result = updateSettings(state, { timerAutoStart: true });
+
+      expect(result.settings.timerAutoStart).toBe(true);
+      expect(result.settings.roundsCount).toBe(originalRoundsCount);
+    });
+
+    it('should return unchanged if not in setup', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const result = updateSettings(state, { roundsCount: 10 });
+
+      expect(result).toBe(state);
+    });
+  });
+
+  // ==========================================================================
+  // ANSWER MANAGEMENT
+  // ==========================================================================
+  describe('recordTeamAnswer', () => {
+    it('should record a team answer', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const questionId = state.questions[0].id;
+      const teamId = state.teams[0].id;
+
+      const result = recordTeamAnswer(state, teamId, questionId, 'A', 10);
+
+      expect(result.teamAnswers).toHaveLength(1);
+      expect(result.teamAnswers[0].teamId).toBe(teamId);
+      expect(result.teamAnswers[0].questionId).toBe(questionId);
+      expect(result.teamAnswers[0].answer).toBe('A');
+      expect(result.teamAnswers[0].pointsAwarded).toBe(10);
+    });
+
+    it('should mark correct answers as correct', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const question = state.questions[0];
+      const correctAnswer = question.correctAnswers[0];
+
+      const result = recordTeamAnswer(
+        state,
+        state.teams[0].id,
+        question.id,
+        correctAnswer,
+        10
+      );
+
+      expect(result.teamAnswers[0].isCorrect).toBe(true);
+    });
+
+    it('should mark incorrect answers as incorrect', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const question = state.questions[0];
+      const wrongAnswer = question.options.find(
+        (opt) => !question.correctAnswers.includes(opt)
+      );
+
+      const result = recordTeamAnswer(
+        state,
+        state.teams[0].id,
+        question.id,
+        wrongAnswer!,
+        10
+      );
+
+      expect(result.teamAnswers[0].isCorrect).toBe(false);
+    });
+
+    it('should replace existing answer for same team/question', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const questionId = state.questions[0].id;
+      const teamId = state.teams[0].id;
+
+      state = recordTeamAnswer(state, teamId, questionId, 'A', 10);
+      const result = recordTeamAnswer(state, teamId, questionId, 'B', 15);
+
+      expect(result.teamAnswers).toHaveLength(1);
+      expect(result.teamAnswers[0].answer).toBe('B');
+      expect(result.teamAnswers[0].pointsAwarded).toBe(15);
+    });
+
+    it('should return unchanged for non-existent question', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+
+      const result = recordTeamAnswer(
+        state,
+        state.teams[0].id,
+        'non-existent',
+        'A',
+        10
+      );
+
+      expect(result).toBe(state);
+    });
+  });
+
+  describe('amendCorrectAnswers', () => {
+    it('should update question correct answers', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+
+      const result = amendCorrectAnswers(state, 0, ['B', 'C']);
+
+      expect(result.questions[0].correctAnswers).toEqual(['B', 'C']);
+    });
+
+    it('should recalculate scores when answer becomes correct', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const question = state.questions[0];
+
+      // Record wrong answer with 10 points awarded
+      state = recordTeamAnswer(state, state.teams[0].id, question.id, 'Z', 10);
+      state = adjustTeamScore(state, state.teams[0].id, 0); // Start with 0
+
+      // Amend correct answers to include Z
+      const result = amendCorrectAnswers(state, 0, ['Z']);
+
+      // Team answer should now be marked correct
+      expect(result.teamAnswers[0].isCorrect).toBe(true);
+      // Score should increase by 10 points
+      expect(result.teams[0].roundScores[0]).toBe(10);
+    });
+
+    it('should recalculate scores when answer becomes incorrect', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+      const question = state.questions[0];
+      const originalCorrect = question.correctAnswers[0];
+
+      // Record correct answer and add points
+      state = recordTeamAnswer(
+        state,
+        state.teams[0].id,
+        question.id,
+        originalCorrect,
+        10
+      );
+      state = adjustTeamScore(state, state.teams[0].id, 10);
+
+      // Amend correct answers to exclude original
+      const result = amendCorrectAnswers(state, 0, ['Z']);
+
+      // Team answer should now be marked incorrect
+      expect(result.teamAnswers[0].isCorrect).toBe(false);
+      // Score should decrease by 10 points (clamped to 0)
+      expect(result.teams[0].roundScores[0]).toBe(0);
+    });
+
+    it('should handle multiple teams', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = addTeam(state, 'Team B');
+      state = startGame(state);
+      const question = state.questions[0];
+
+      // Team A answers wrong, Team B answers with what will become correct
+      state = recordTeamAnswer(state, state.teams[0].id, question.id, 'X', 10);
+      state = recordTeamAnswer(state, state.teams[1].id, question.id, 'Y', 10);
+
+      // Amend to make Y correct
+      const result = amendCorrectAnswers(state, 0, ['Y']);
+
+      expect(result.teamAnswers.find((a) => a.teamId === state.teams[0].id)?.isCorrect).toBe(false);
+      expect(result.teamAnswers.find((a) => a.teamId === state.teams[1].id)?.isCorrect).toBe(true);
+    });
+
+    it('should return unchanged for invalid question index', () => {
+      const state = createInitialState();
+
+      expect(amendCorrectAnswers(state, -1, ['A'])).toBe(state);
+      expect(amendCorrectAnswers(state, 999, ['A'])).toBe(state);
+    });
+
+    it('should not affect other questions', () => {
+      let state = createInitialState();
+      state = addTeam(state, 'Team A');
+      state = startGame(state);
+
+      const originalQ1Answers = [...state.questions[1].correctAnswers];
+      const result = amendCorrectAnswers(state, 0, ['X']);
+
+      expect(result.questions[1].correctAnswers).toEqual(originalQ1Answers);
+    });
+  });
+
+  // ==========================================================================
+  // DISPLAY FUNCTIONS
+  // ==========================================================================
+  describe('toggleScoreboard', () => {
+    it('should toggle showScoreboard from true to false', () => {
+      let state = createInitialState();
+      expect(state.showScoreboard).toBe(true);
+
+      const result = toggleScoreboard(state);
+      expect(result.showScoreboard).toBe(false);
+    });
+
+    it('should toggle showScoreboard from false to true', () => {
+      let state = createInitialState();
+      state = toggleScoreboard(state);
+      expect(state.showScoreboard).toBe(false);
+
+      const result = toggleScoreboard(state);
+      expect(result.showScoreboard).toBe(true);
     });
   });
 });

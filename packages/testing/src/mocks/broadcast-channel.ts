@@ -30,12 +30,11 @@ export class MockBroadcastChannel {
     if (!channelSet) return;
 
     // Broadcast to all other channels with the same name
+    // Note: Delivers synchronously in tests for deterministic behavior.
+    // Real BroadcastChannel is async, but sync delivery simplifies testing.
     for (const channel of channelSet) {
       if (channel !== this && channel.onmessage) {
-        // Simulate async message delivery like the real API
-        setTimeout(() => {
-          channel.onmessage?.({ data: message } as MessageEvent);
-        }, 0);
+        channel.onmessage({ data: message } as MessageEvent);
       }
     }
   }

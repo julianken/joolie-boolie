@@ -1,23 +1,42 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { TriviaGameState, Team, Question } from '@/types';
-import { DEFAULT_TEAM_PREFIX, MAX_TEAMS, DEFAULT_ROUNDS } from '@/types';
+import type { TriviaGameState, Team, Question, GameSettings, TeamAnswer } from '@/types';
+import { DEFAULT_TEAM_PREFIX, MAX_TEAMS, DEFAULT_ROUNDS, QUESTIONS_PER_ROUND, DEFAULT_TIMER_DURATION } from '@/types';
 import { SAMPLE_QUESTIONS } from './sample-questions';
 
 // =============================================================================
 // INITIAL STATE
 // =============================================================================
 
+export function createDefaultSettings(): GameSettings {
+  return {
+    roundsCount: DEFAULT_ROUNDS,
+    questionsPerRound: QUESTIONS_PER_ROUND,
+    timerDuration: DEFAULT_TIMER_DURATION,
+    timerAutoStart: false,
+  };
+}
+
 export function createInitialState(): TriviaGameState {
+  const settings = createDefaultSettings();
   return {
     sessionId: uuidv4(),
     status: 'setup',
+    statusBeforePause: null,
     questions: SAMPLE_QUESTIONS,
     selectedQuestionIndex: 0,
     displayQuestionIndex: null,
     currentRound: 0,
-    totalRounds: DEFAULT_ROUNDS,
+    totalRounds: settings.roundsCount,
     teams: [],
+    teamAnswers: [],
+    timer: {
+      duration: settings.timerDuration,
+      remaining: settings.timerDuration,
+      isRunning: false,
+    },
+    settings,
     showScoreboard: true,
+    emergencyBlank: false,
     ttsEnabled: false,
   };
 }
@@ -36,6 +55,7 @@ export function startGame(state: TriviaGameState): TriviaGameState {
   return {
     ...state,
     status: 'playing',
+    statusBeforePause: null,
     currentRound: 0,
     selectedQuestionIndex: firstQuestionIndex >= 0 ? firstQuestionIndex : 0,
     displayQuestionIndex: null,
@@ -44,6 +64,13 @@ export function startGame(state: TriviaGameState): TriviaGameState {
       score: 0,
       roundScores: Array(state.totalRounds).fill(0),
     })),
+    teamAnswers: [],
+    timer: {
+      duration: state.settings.timerDuration,
+      remaining: state.settings.timerDuration,
+      isRunning: state.settings.timerAutoStart,
+    },
+    emergencyBlank: false,
   };
 }
 
@@ -51,7 +78,13 @@ export function endGame(state: TriviaGameState): TriviaGameState {
   return {
     ...state,
     status: 'ended',
+    statusBeforePause: null,
     displayQuestionIndex: null,
+    timer: {
+      ...state.timer,
+      isRunning: false,
+    },
+    emergencyBlank: false,
   };
 }
 
@@ -60,11 +93,19 @@ export function resetGame(state: TriviaGameState): TriviaGameState {
   return {
     ...initial,
     sessionId: state.sessionId, // Keep same session
+    settings: state.settings, // Keep settings
+    totalRounds: state.settings.roundsCount,
+    timer: {
+      duration: state.settings.timerDuration,
+      remaining: state.settings.timerDuration,
+      isRunning: false,
+    },
     teams: state.teams.map((t) => ({
       ...t,
       score: 0,
       roundScores: [], // Reset per-round scores
     })),
+    teamAnswers: [],
   };
 }
 
@@ -394,4 +435,311 @@ export function getOverallLeaders(state: TriviaGameState): Team[] {
  */
 export function getTeamsSortedByScore(state: TriviaGameState): Team[] {
   return [...state.teams].sort((a, b) => b.score - a.score);
+}
+
+// =============================================================================
+// TIMER FUNCTIONS
+// =============================================================================
+
+/**
+ * Decrement timer by 1 second. Stops at 0.
+ */
+export function tickTimer(state: TriviaGameState): TriviaGameState {
+  if (!state.timer.isRunning || state.timer.remaining <= 0) {
+    return state;
+  }
+
+  const newRemaining = Math.max(0, state.timer.remaining - 1);
+
+  return {
+    ...state,
+    timer: {
+      ...state.timer,
+      remaining: newRemaining,
+      isRunning: newRemaining > 0,
+    },
+  };
+}
+
+/**
+ * Reset timer to specified duration (or default if not provided)
+ */
+export function resetTimer(state: TriviaGameState, duration?: number): TriviaGameState {
+  const newDuration = duration ?? state.settings.timerDuration;
+
+  return {
+    ...state,
+    timer: {
+      duration: newDuration,
+      remaining: newDuration,
+      isRunning: false,
+    },
+  };
+}
+
+/**
+ * Start the timer
+ */
+export function startTimer(state: TriviaGameState): TriviaGameState {
+  if (state.timer.remaining <= 0) return state;
+
+  return {
+    ...state,
+    timer: {
+      ...state.timer,
+      isRunning: true,
+    },
+  };
+}
+
+/**
+ * Stop the timer without resetting
+ */
+export function stopTimer(state: TriviaGameState): TriviaGameState {
+  return {
+    ...state,
+    timer: {
+      ...state.timer,
+      isRunning: false,
+    },
+  };
+}
+
+/**
+ * Toggle whether timer auto-starts on new question
+ */
+export function toggleTimerAutoStart(state: TriviaGameState): TriviaGameState {
+  return {
+    ...state,
+    settings: {
+      ...state.settings,
+      timerAutoStart: !state.settings.timerAutoStart,
+    },
+  };
+}
+
+// =============================================================================
+// PAUSE FUNCTIONS
+// =============================================================================
+
+/**
+ * Pause the game - saves current status and pauses timer
+ */
+export function pauseGame(state: TriviaGameState): TriviaGameState {
+  // Can only pause from playing or between_rounds
+  if (state.status !== 'playing' && state.status !== 'between_rounds') {
+    return state;
+  }
+
+  return {
+    ...state,
+    status: 'paused',
+    statusBeforePause: state.status,
+    timer: {
+      ...state.timer,
+      isRunning: false,
+    },
+  };
+}
+
+/**
+ * Resume from paused state - restores previous status
+ */
+export function resumeGame(state: TriviaGameState): TriviaGameState {
+  if (state.status !== 'paused') return state;
+  if (!state.statusBeforePause) return state;
+
+  return {
+    ...state,
+    status: state.statusBeforePause,
+    statusBeforePause: null,
+    emergencyBlank: false,
+  };
+}
+
+/**
+ * Emergency pause - blanks the audience display
+ */
+export function emergencyPause(state: TriviaGameState): TriviaGameState {
+  // Can only emergency pause from playing, paused, or between_rounds
+  if (state.status !== 'playing' && state.status !== 'paused' && state.status !== 'between_rounds') {
+    return state;
+  }
+
+  const statusBeforePause = state.status === 'paused'
+    ? state.statusBeforePause
+    : state.status;
+
+  return {
+    ...state,
+    status: 'paused',
+    statusBeforePause,
+    timer: {
+      ...state.timer,
+      isRunning: false,
+    },
+    emergencyBlank: true,
+  };
+}
+
+// =============================================================================
+// SETTINGS FUNCTIONS
+// =============================================================================
+
+/**
+ * Update game settings. Only allowed in setup status.
+ */
+export function updateSettings(
+  state: TriviaGameState,
+  settings: Partial<GameSettings>
+): TriviaGameState {
+  // Only allow settings changes during setup
+  if (state.status !== 'setup') return state;
+
+  const newSettings = {
+    ...state.settings,
+    ...settings,
+  };
+
+  return {
+    ...state,
+    settings: newSettings,
+    totalRounds: newSettings.roundsCount,
+    timer: {
+      duration: newSettings.timerDuration,
+      remaining: newSettings.timerDuration,
+      isRunning: false,
+    },
+  };
+}
+
+// =============================================================================
+// ANSWER MANAGEMENT
+// =============================================================================
+
+/**
+ * Record a team's answer for a question
+ */
+export function recordTeamAnswer(
+  state: TriviaGameState,
+  teamId: string,
+  questionId: string,
+  answer: string,
+  pointsAwarded: number
+): TriviaGameState {
+  const question = state.questions.find(q => q.id === questionId);
+  if (!question) return state;
+
+  const isCorrect = question.correctAnswers.includes(answer);
+
+  // Remove any existing answer for this team/question combination
+  const filteredAnswers = state.teamAnswers.filter(
+    ta => !(ta.teamId === teamId && ta.questionId === questionId)
+  );
+
+  const newAnswer: TeamAnswer = {
+    teamId,
+    questionId,
+    answer,
+    isCorrect,
+    pointsAwarded,
+  };
+
+  return {
+    ...state,
+    teamAnswers: [...filteredAnswers, newAnswer],
+  };
+}
+
+/**
+ * Amend correct answers for a question and recalculate all affected team scores
+ */
+export function amendCorrectAnswers(
+  state: TriviaGameState,
+  questionIndex: number,
+  newCorrectAnswers: string[]
+): TriviaGameState {
+  if (questionIndex < 0 || questionIndex >= state.questions.length) {
+    return state;
+  }
+
+  const question = state.questions[questionIndex];
+  const questionId = question.id;
+  const roundIndex = question.roundIndex;
+
+  // Update the question's correct answers
+  const updatedQuestions = state.questions.map((q, idx) =>
+    idx === questionIndex ? { ...q, correctAnswers: newCorrectAnswers } : q
+  );
+
+  // Calculate score adjustments per team
+  const scoreAdjustments = new Map<string, number>();
+
+  const updatedTeamAnswers = state.teamAnswers.map(ta => {
+    if (ta.questionId !== questionId) return ta;
+
+    const wasCorrect = ta.isCorrect;
+    const isNowCorrect = newCorrectAnswers.includes(ta.answer);
+
+    if (wasCorrect === isNowCorrect) {
+      // No change
+      return ta;
+    }
+
+    if (!wasCorrect && isNowCorrect) {
+      // Was wrong, now correct - add points
+      const currentAdjustment = scoreAdjustments.get(ta.teamId) || 0;
+      scoreAdjustments.set(ta.teamId, currentAdjustment + ta.pointsAwarded);
+    } else if (wasCorrect && !isNowCorrect) {
+      // Was correct, now wrong - remove points
+      const currentAdjustment = scoreAdjustments.get(ta.teamId) || 0;
+      scoreAdjustments.set(ta.teamId, currentAdjustment - ta.pointsAwarded);
+    }
+
+    return {
+      ...ta,
+      isCorrect: isNowCorrect,
+    };
+  });
+
+  // Apply score adjustments to teams
+  const updatedTeams = state.teams.map(team => {
+    const adjustment = scoreAdjustments.get(team.id);
+    if (!adjustment) return team;
+
+    // Ensure roundScores array is properly sized
+    const roundScores = [...team.roundScores];
+    while (roundScores.length <= roundIndex) {
+      roundScores.push(0);
+    }
+
+    // Apply adjustment to the round score
+    roundScores[roundIndex] = Math.max(0, (roundScores[roundIndex] || 0) + adjustment);
+
+    // Recalculate total score
+    const score = roundScores.reduce((sum, rs) => sum + rs, 0);
+
+    return { ...team, roundScores, score };
+  });
+
+  return {
+    ...state,
+    questions: updatedQuestions,
+    teamAnswers: updatedTeamAnswers,
+    teams: updatedTeams,
+  };
+}
+
+// =============================================================================
+// DISPLAY FUNCTIONS
+// =============================================================================
+
+/**
+ * Toggle scoreboard visibility for audience display
+ */
+export function toggleScoreboard(state: TriviaGameState): TriviaGameState {
+  return {
+    ...state,
+    showScoreboard: !state.showScoreboard,
+  };
 }

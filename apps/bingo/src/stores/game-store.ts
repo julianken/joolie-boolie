@@ -23,6 +23,9 @@ import {
 } from '@/lib/game';
 
 export interface GameStore extends GameState {
+  // Internal flag for sync loop prevention
+  _isHydrating?: boolean;
+
   // Actions
   startGame: (pattern?: BingoPattern) => void;
   callBall: () => BingoBall | null;
@@ -102,11 +105,10 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   _hydrate: (newState: Partial<GameState>) => {
-    // Set hydrating flag to prevent broadcast loops
-    set({ _isHydrating: true });
-    set((state) => ({ ...state, ...newState }));
-    // Use setTimeout to clear the flag after the current synchronous execution
+    // Set hydrating flag AND merge state in a single set call to prevent broadcast loops
     // This ensures any subscribers triggered by the state change see _isHydrating as true
+    set((state) => ({ ...state, ...newState, _isHydrating: true }));
+    // Use setTimeout to clear the flag after the current synchronous execution
     setTimeout(() => {
       set({ _isHydrating: false });
     }, 0);

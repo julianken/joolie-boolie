@@ -65,7 +65,11 @@ export function PatternDisplay({ pattern }: PatternDisplayProps) {
         </div>
 
         {/* Pattern cells */}
-        <div className="grid grid-cols-5 gap-1">
+        <div
+          className="grid grid-cols-5 gap-1"
+          role="img"
+          aria-label={`${pattern.name} pattern grid showing ${pattern.cells.length} required cells`}
+        >
           {grid.map((row, rowIndex) =>
             row.map((isMarked, colIndex) => (
               <div
@@ -73,14 +77,14 @@ export function PatternDisplay({ pattern }: PatternDisplayProps) {
                 className={`
                   w-12 h-12 md:w-14 md:h-14 rounded-lg
                   flex items-center justify-center
-                  transition-colors duration-200
+                  transition-colors duration-200 motion-reduce:transition-none
                   ${
                     isMarked
                       ? 'bg-primary shadow-lg'
                       : 'bg-muted/20 border-2 border-border'
                   }
                 `}
-                aria-label={isMarked ? 'Required for pattern' : 'Not required'}
+                aria-hidden="true"
               >
                 {/* Free space indicator */}
                 {rowIndex === 2 && colIndex === 2 && (

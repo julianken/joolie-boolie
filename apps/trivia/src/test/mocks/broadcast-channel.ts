@@ -2,4 +2,6 @@
 export {
   mockBroadcastChannel,
   MockBroadcastChannel,
+  resetMockBroadcastChannel,
+  simulateMessage,
 } from '@beak-gaming/testing/mocks';
