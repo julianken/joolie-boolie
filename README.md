@@ -69,6 +69,11 @@ beak-gaming-platform/
 └── supabase/            # Database migrations
 ```
 
+## More Documentation
+
+- Apps index: [`apps/README.md`](./apps/README.md)
+- Packages index: [`packages/README.md`](./packages/README.md)
+
 ## Getting Started
 
 ### Prerequisites

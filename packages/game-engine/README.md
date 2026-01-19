@@ -12,6 +12,14 @@ Abstract game state machine for the Beak Gaming Platform. Provides a generic fou
 }
 ```
 
+## Public API
+
+Exports are defined in `src/index.ts`:
+
+- `transition`, `canTransition`
+- Types: `GameStatus`, `BaseGameState`, `GameTransition`
+- Stats utilities (from `stats`)
+
 ## Usage
 
 ### Basic State Transitions
@@ -205,3 +213,7 @@ The game engine follows a **pure function** approach:
 4. **Testable**: Easy to test without mocking
 
 This pattern works well with Zustand, which manages reactivity while the engine handles state logic.
+
+## Related Docs
+
+- Packages index: [`packages/README.md`](../README.md)

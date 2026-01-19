@@ -1,7 +1,7 @@
-# Beak Bingo
+# Trivia Night
 
-75-ball bingo caller with presenter and audience views, audio voice packs,
-patterns, and dual-screen synchronization.
+Team trivia game with presenter and audience views, dual-screen sync, and
+accessibility-first UI.
 
 ## Key Routes
 
@@ -11,7 +11,7 @@ patterns, and dual-screen synchronization.
 ## Local Development
 
 ```bash
-pnpm dev:bingo
+pnpm dev:trivia
 ```
 
 ## Environment

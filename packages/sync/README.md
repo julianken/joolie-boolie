@@ -25,6 +25,16 @@ Already included in the monorepo. Add to your app's dependencies:
 }
 ```
 
+## Public API
+
+Exports are defined in `src/index.ts` and include:
+
+- Broadcast utilities: `BroadcastSync`, `createBroadcastSync`
+- Store helpers: `createSyncStore`
+- Hook: `useSync`
+- Session links: `generateSessionLink`, `parseSessionLink`
+- Session store helpers: `createSession`, `joinSession`, `leaveSession`
+
 ## Usage
 
 ### Basic Setup (Generic)
@@ -319,3 +329,7 @@ The session ID is passed via URL query parameter when opening the display window
 ```typescript
 const displayUrl = `${window.location.origin}/display?session=${sessionId}`;
 ```
+
+## Related Docs
+
+- Packages index: [`packages/README.md`](../README.md)

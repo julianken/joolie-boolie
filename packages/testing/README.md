@@ -16,6 +16,14 @@ Shared test utilities and mocks for the Beak Gaming Platform, including mock imp
 }
 ```
 
+## Public API
+
+Exports are defined in `src/index.ts` and subpaths:
+
+- `@beak-gaming/testing` (mocks and helpers)
+- `@beak-gaming/testing/mocks` (mock classes and factories)
+- `@beak-gaming/testing/setup` (jest-dom setup)
+
 ## Export Paths
 
 The package provides multiple export paths for different use cases:
@@ -271,3 +279,7 @@ Planned utilities:
 - Zustand store test utilities
 - Supabase mock helpers
 - Common fixture generators
+
+## Related Docs
+
+- Packages index: [`packages/README.md`](../README.md)

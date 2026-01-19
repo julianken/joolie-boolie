@@ -28,6 +28,13 @@ Apps copy the shared base tokens and add their own extensions. When the design s
 }
 ```
 
+## Public API
+
+Exports are defined in `src/index.ts` and `globals.css`:
+
+- CSS tokens: `globals.css`
+- TypeScript tokens: `colors`, `fontSizes`, `touchTargets`
+
 ## Usage
 
 ### CSS Variables (Reference)
@@ -177,3 +184,7 @@ export type ColorToken = keyof typeof colors;
 export type FontSizeToken = keyof typeof fontSizes;
 export type TouchTargetSize = keyof typeof touchTargets;
 ```
+
+## Related Docs
+
+- Packages index: [`packages/README.md`](../README.md)

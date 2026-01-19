@@ -12,6 +12,15 @@ Shared UI components for the Beak Gaming Platform. All components are designed w
 }
 ```
 
+## Public API
+
+Exports are defined in `src/index.ts` and include:
+
+- Core components: `Button`, `Toggle`, `Slider`
+- Web vitals: `WebVitals`, `useWebVitals`, `sendToAnalytics`
+- Skeletons: `Skeleton`, `SkeletonCard`, `SkeletonButton`, `SkeletonText`
+- Confetti: `Confetti`, `useConfetti`
+
 ## Components
 
 ### Button
@@ -192,3 +201,7 @@ export { Button, type ButtonProps } from './button';
 export { Toggle, type ToggleProps } from './toggle';
 export { Slider, type SliderProps } from './slider';
 ```
+
+## Related Docs
+
+- Packages index: [`packages/README.md`](../README.md)
