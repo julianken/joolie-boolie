@@ -65,3 +65,28 @@ export interface UseSyncConfig<TState> {
 export type MessageHandler<TPayload = unknown> = (
   message: SyncMessage<TPayload>
 ) => void;
+
+/**
+ * Connection state for the broadcast channel.
+ */
+export type ConnectionState = 'disconnected' | 'connected' | 'error';
+
+/**
+ * Error context provided to error callbacks.
+ */
+export interface BroadcastError {
+  code: 'INIT_FAILED' | 'SEND_FAILED' | 'HANDLER_ERROR' | 'CHANNEL_UNAVAILABLE';
+  message: string;
+  originalError?: unknown;
+  context?: Record<string, unknown>;
+}
+
+/**
+ * Configuration options for BroadcastSync.
+ */
+export interface BroadcastSyncOptions {
+  /** Called when an error occurs. If not provided, errors are logged in debug mode. */
+  onError?: (error: BroadcastError) => void;
+  /** Enable verbose logging of all messages and state changes. */
+  debug?: boolean;
+}

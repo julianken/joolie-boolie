@@ -7,10 +7,18 @@ export type {
   SyncStore,
   UseSyncConfig,
   MessageHandler,
+  ConnectionState,
+  BroadcastError,
+  BroadcastSyncOptions,
 } from './types';
 
 // Broadcast channel
-export { BroadcastSync, createBroadcastSync } from './broadcast';
+export {
+  BroadcastSync,
+  createBroadcastSync,
+  createDebugBroadcastSync,
+  createSyncDebugger,
+} from './broadcast';
 
 // Store
 export { createSyncStore, type UseSyncStore } from './store';

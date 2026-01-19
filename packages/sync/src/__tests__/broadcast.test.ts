@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { BroadcastSync, createBroadcastSync } from '../broadcast';
-import { SyncMessage } from '../types';
+import { BroadcastSync, createBroadcastSync, createDebugBroadcastSync, createSyncDebugger } from '../broadcast';
+import { SyncMessage, BroadcastError } from '../types';
 import { mockBroadcastChannel, MockBroadcastChannel } from '@beak-gaming/testing/mocks';
 
 describe('BroadcastSync', () => {
@@ -259,6 +259,238 @@ describe('BroadcastSync', () => {
       sync.initialize();
       // Type checking at compile time - if this compiles, types work
       sync.broadcastState({ value: 42 });
+    });
+
+    it('should accept options parameter', () => {
+      const onError = vi.fn();
+      const sync = createBroadcastSync('options-channel', { onError, debug: true });
+      expect(sync).toBeInstanceOf(BroadcastSync);
+    });
+  });
+
+  describe('connectionState', () => {
+    it('should be disconnected before initialization', () => {
+      const sync = new BroadcastSync('test-channel');
+      expect(sync.connectionState).toBe('disconnected');
+    });
+
+    it('should be connected after successful initialization', () => {
+      const sync = new BroadcastSync('test-channel');
+      sync.initialize();
+      expect(sync.connectionState).toBe('connected');
+    });
+
+    it('should be disconnected after close', () => {
+      const sync = new BroadcastSync('test-channel');
+      sync.initialize();
+      sync.close();
+      expect(sync.connectionState).toBe('disconnected');
+    });
+
+    it('should be error when BroadcastChannel unavailable', () => {
+      // @ts-expect-error - Testing unsupported environment
+      delete globalThis.BroadcastChannel;
+
+      const sync = new BroadcastSync('test-channel');
+      sync.initialize();
+      expect(sync.connectionState).toBe('error');
+
+      mockBroadcastChannel();
+    });
+  });
+
+  describe('error observability', () => {
+    it('should call onError when send fails on uninitialized channel', () => {
+      const onError = vi.fn();
+      const sync = new BroadcastSync('test-channel', { onError });
+
+      sync.send('TEST', { data: 'test' });
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+        code: 'CHANNEL_UNAVAILABLE',
+        message: expect.stringContaining('channel not initialized'),
+      }));
+    });
+
+    it('should call onError when initialization fails', () => {
+      // @ts-expect-error - Testing unsupported environment
+      delete globalThis.BroadcastChannel;
+
+      const onError = vi.fn();
+      const sync = new BroadcastSync('test-channel', { onError });
+      sync.initialize();
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+        code: 'CHANNEL_UNAVAILABLE',
+        message: expect.stringContaining('not available'),
+      }));
+
+      mockBroadcastChannel();
+    });
+
+    it('should call onError when handler throws', () => {
+      const onError = vi.fn();
+      const sync1 = new BroadcastSync('test-channel');
+      const sync2 = new BroadcastSync('test-channel', { onError });
+      sync1.initialize();
+      sync2.initialize();
+
+      sync2.subscribe(() => {
+        throw new Error('Handler error');
+      });
+
+      sync1.send('TEST', { data: 'test' });
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+        code: 'HANDLER_ERROR',
+        message: expect.stringContaining('handler threw'),
+        originalError: expect.any(Error),
+      }));
+    });
+  });
+
+  describe('debug mode', () => {
+    it('should log messages when debug is enabled', () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      const sync = new BroadcastSync('test-channel', { debug: true });
+      sync.initialize();
+      sync.send('TEST', { data: 'test' });
+
+      // Should have logged initialization and send
+      expect(consoleSpy).toHaveBeenCalled();
+      const calls = consoleSpy.mock.calls.map(call => call.join(' '));
+      expect(calls.some(c => c.includes('Initializing'))).toBe(true);
+      expect(calls.some(c => c.includes('Sending'))).toBe(true);
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should not log when debug is disabled', () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      const sync = new BroadcastSync('test-channel', { debug: false });
+      sync.initialize();
+      sync.send('TEST', { data: 'test' });
+
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should log errors to console.error when debug is enabled and no onError', () => {
+      // @ts-expect-error - Testing unsupported environment
+      delete globalThis.BroadcastChannel;
+
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const sync = new BroadcastSync('test-channel', { debug: true });
+      sync.initialize();
+
+      expect(consoleErrorSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
+      mockBroadcastChannel();
+    });
+  });
+
+  describe('createDebugBroadcastSync factory', () => {
+    it('should create a BroadcastSync with debug enabled', () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      const sync = createDebugBroadcastSync('debug-channel');
+      sync.initialize();
+
+      expect(consoleSpy).toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should use provided onError callback', () => {
+      const onError = vi.fn();
+      const sync = createDebugBroadcastSync('debug-channel', onError);
+
+      // Trigger an error by sending before initialization
+      sync.send('TEST', { data: 'test' });
+
+      expect(onError).toHaveBeenCalled();
+    });
+
+    it('should use default error handler when none provided', () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const sync = createDebugBroadcastSync('debug-channel');
+      sync.send('TEST', { data: 'test' });
+
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[BroadcastSync Debug]',
+        expect.any(String),
+        expect.any(String),
+        expect.any(Object)
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('createSyncDebugger utility', () => {
+    it('should return getState function', () => {
+      const sync = new BroadcastSync('test-channel');
+      const debugger_ = createSyncDebugger(sync);
+
+      expect(typeof debugger_.getState).toBe('function');
+
+      const state = debugger_.getState();
+      expect(state).toEqual({
+        connected: false,
+        connectionState: 'disconnected',
+      });
+    });
+
+    it('should reflect current state after initialization', () => {
+      const sync = new BroadcastSync('test-channel');
+      const debugger_ = createSyncDebugger(sync);
+
+      sync.initialize();
+
+      expect(debugger_.getState()).toEqual({
+        connected: true,
+        connectionState: 'connected',
+      });
+    });
+
+    it('should return logState function', () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      const sync = new BroadcastSync('test-channel');
+      const debugger_ = createSyncDebugger(sync);
+
+      debugger_.logState();
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[BroadcastSync State]',
+        expect.objectContaining({
+          connected: false,
+          connectionState: 'disconnected',
+        })
+      );
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('origin getter', () => {
+    it('should return unique instance ID', () => {
+      const sync1 = new BroadcastSync('test-channel');
+      const sync2 = new BroadcastSync('test-channel');
+
+      expect(typeof sync1.origin).toBe('string');
+      expect(sync1.origin.length).toBeGreaterThan(0);
+      expect(sync1.origin).not.toBe(sync2.origin);
     });
   });
 });

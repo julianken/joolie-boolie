@@ -1,4 +1,4 @@
-import { SyncMessage, MessageHandler } from './types';
+import { SyncMessage, MessageHandler, ConnectionState, BroadcastError, BroadcastSyncOptions } from './types';
 
 /**
  * Generate a unique instance ID for this BroadcastSync instance.
@@ -27,6 +27,11 @@ const DEDUP_CONFIG = {
  * Includes protection against sync loops via:
  * 1. Origin tracking - each instance has a unique ID, messages from self are ignored
  * 2. Message deduplication - recent messages within a time window are deduplicated
+ *
+ * Error observability:
+ * - Provides configurable error callbacks via options.onError
+ * - Supports debug mode with verbose logging via options.debug
+ * - Tracks connection state (disconnected, connected, error)
  */
 export class BroadcastSync<TPayload = unknown> {
   private channel: BroadcastChannel | null = null;
@@ -37,10 +42,58 @@ export class BroadcastSync<TPayload = unknown> {
   private readonly instanceId: string;
   /** Track recent message timestamps for deduplication */
   private recentMessageKeys: Set<string> = new Set();
+  /** Configuration options for error handling and debugging */
+  private readonly options: BroadcastSyncOptions;
+  /** Current connection state */
+  private _connectionState: ConnectionState = 'disconnected';
 
-  constructor(channelName: string) {
+  constructor(channelName: string, options: BroadcastSyncOptions = {}) {
     this.channelName = channelName;
     this.instanceId = generateInstanceId();
+    this.options = options;
+  }
+
+  /**
+   * Get the current connection state.
+   */
+  get connectionState(): ConnectionState {
+    return this._connectionState;
+  }
+
+  /**
+   * Update connection state and log if in debug mode.
+   */
+  private setConnectionState(state: ConnectionState): void {
+    const previousState = this._connectionState;
+    this._connectionState = state;
+    this.log(`Connection state changed: ${previousState} -> ${state}`);
+  }
+
+  /**
+   * Log a message if debug mode is enabled.
+   */
+  private log(message: string, data?: unknown): void {
+    if (this.options.debug) {
+      const timestamp = new Date().toISOString();
+      const prefix = `[BroadcastSync:${this.channelName}]`;
+      if (data !== undefined) {
+        console.log(`${timestamp} ${prefix} ${message}`, data);
+      } else {
+        console.log(`${timestamp} ${prefix} ${message}`);
+      }
+    }
+  }
+
+  /**
+   * Handle an error by calling the error callback or logging in debug mode.
+   */
+  private handleError(error: BroadcastError): void {
+    this.log(`Error: ${error.code} - ${error.message}`, error.context);
+    if (this.options.onError) {
+      this.options.onError(error);
+    } else if (this.options.debug) {
+      console.error(`[BroadcastSync:${this.channelName}] ${error.code}:`, error.message, error.originalError);
+    }
   }
 
   /**
@@ -57,34 +110,59 @@ export class BroadcastSync<TPayload = unknown> {
    */
   initialize(): boolean {
     if (this.isInitialized) {
+      this.log('Already initialized, skipping');
       return true;
     }
 
     // Check if BroadcastChannel is available (not available in SSR)
     if (typeof window === 'undefined' || typeof BroadcastChannel === 'undefined') {
+      this.handleError({
+        code: 'CHANNEL_UNAVAILABLE',
+        message: 'BroadcastChannel API is not available (SSR or unsupported browser)',
+      });
+      this.setConnectionState('error');
       return false;
     }
 
     try {
+      this.log('Initializing channel');
       this.channel = new BroadcastChannel(this.channelName);
       this.channel.onmessage = (event: MessageEvent<SyncMessage<TPayload>>) => {
         const message = event.data;
+        this.log('Message received', { type: message.type, timestamp: message.timestamp });
 
         // SYNC LOOP PROTECTION 1: Ignore messages from self
         if (message.originId === this.instanceId) {
+          this.log('Ignoring message from self');
           return;
         }
 
         // SYNC LOOP PROTECTION 2: Deduplicate recent messages
         if (this.isDuplicateMessage(message)) {
+          this.log('Ignoring duplicate message');
           return;
         }
 
         this.notifyHandlers(message);
       };
+      this.channel.onmessageerror = (event: MessageEvent) => {
+        this.handleError({
+          code: 'HANDLER_ERROR',
+          message: 'Failed to deserialize incoming message',
+          originalError: event,
+        });
+      };
       this.isInitialized = true;
+      this.setConnectionState('connected');
       return true;
-    } catch {
+    } catch (err) {
+      this.handleError({
+        code: 'INIT_FAILED',
+        message: 'Failed to create BroadcastChannel',
+        originalError: err,
+        context: { channelName: this.channelName },
+      });
+      this.setConnectionState('error');
       return false;
     }
   }
@@ -126,8 +204,10 @@ export class BroadcastSync<TPayload = unknown> {
    */
   subscribe(handler: MessageHandler<TPayload>): () => void {
     this.handlers.add(handler);
+    this.log('Handler subscribed', { totalHandlers: this.handlers.size });
     return () => {
       this.handlers.delete(handler);
+      this.log('Handler unsubscribed', { totalHandlers: this.handlers.size });
     };
   }
 
@@ -137,6 +217,11 @@ export class BroadcastSync<TPayload = unknown> {
    */
   send(type: string, payload: TPayload | null): void {
     if (!this.channel) {
+      this.handleError({
+        code: 'CHANNEL_UNAVAILABLE',
+        message: 'Cannot send message: channel not initialized',
+        context: { messageType: type },
+      });
       return;
     }
 
@@ -148,9 +233,15 @@ export class BroadcastSync<TPayload = unknown> {
     };
 
     try {
+      this.log('Sending message', { type, timestamp: message.timestamp });
       this.channel.postMessage(message);
-    } catch {
-      // Silently fail - could add error callback in future
+    } catch (err) {
+      this.handleError({
+        code: 'SEND_FAILED',
+        message: `Failed to send message of type ${type}`,
+        originalError: err,
+        context: { messageType: type },
+      });
     }
   }
 
@@ -173,6 +264,7 @@ export class BroadcastSync<TPayload = unknown> {
    * Close the broadcast channel and clean up.
    */
   close(): void {
+    this.log('Closing channel');
     if (this.channel) {
       this.channel.close();
       this.channel = null;
@@ -180,6 +272,7 @@ export class BroadcastSync<TPayload = unknown> {
     this.handlers.clear();
     this.recentMessageKeys.clear();
     this.isInitialized = false;
+    this.setConnectionState('disconnected');
   }
 
   /**
@@ -196,8 +289,13 @@ export class BroadcastSync<TPayload = unknown> {
     for (const handler of this.handlers) {
       try {
         handler(message);
-      } catch {
-        // Silently fail - could add error callback in future
+      } catch (err) {
+        this.handleError({
+          code: 'HANDLER_ERROR',
+          message: 'Message handler threw an exception',
+          originalError: err,
+          context: { messageType: message.type },
+        });
       }
     }
   }
@@ -207,7 +305,45 @@ export class BroadcastSync<TPayload = unknown> {
  * Create a BroadcastSync instance for a specific channel.
  */
 export function createBroadcastSync<TPayload = unknown>(
-  channelName: string
+  channelName: string,
+  options?: BroadcastSyncOptions
 ): BroadcastSync<TPayload> {
-  return new BroadcastSync<TPayload>(channelName);
+  return new BroadcastSync<TPayload>(channelName, options);
+}
+
+/**
+ * Create a BroadcastSync instance with debug mode enabled.
+ * Useful for development and troubleshooting.
+ */
+export function createDebugBroadcastSync<TPayload = unknown>(
+  channelName: string,
+  onError?: (error: BroadcastError) => void
+): BroadcastSync<TPayload> {
+  return createBroadcastSync<TPayload>(channelName, {
+    debug: true,
+    onError: onError ?? ((error) => {
+      console.error('[BroadcastSync Debug]', error.code, error.message, error);
+    }),
+  });
+}
+
+/**
+ * Utility to inspect current sync state for debugging.
+ */
+export function createSyncDebugger<TPayload>(sync: BroadcastSync<TPayload>): {
+  getState: () => { connected: boolean; connectionState: ConnectionState };
+  logState: () => void;
+} {
+  return {
+    getState: () => ({
+      connected: sync.connected,
+      connectionState: sync.connectionState,
+    }),
+    logState: () => {
+      console.log('[BroadcastSync State]', {
+        connected: sync.connected,
+        connectionState: sync.connectionState,
+      });
+    },
+  };
 }

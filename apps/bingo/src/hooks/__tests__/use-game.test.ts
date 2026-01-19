@@ -282,6 +282,60 @@ describe('use-game', () => {
         vi.useRealTimers();
       });
 
+      it('auto-calls the last remaining ball (off-by-one bug test)', async () => {
+        vi.useFakeTimers();
+
+        // Create a state with only 3 balls remaining
+        const threeBalls = [
+          { column: 'B' as const, number: 1, label: 'B-1' },
+          { column: 'I' as const, number: 16, label: 'I-16' },
+          { column: 'N' as const, number: 31, label: 'N-31' },
+        ];
+
+        useGameStore.setState({
+          status: 'playing',
+          calledBalls: [],
+          currentBall: null,
+          previousBall: null,
+          remainingBalls: threeBalls,
+          pattern: null,
+          autoCallEnabled: true,
+          autoCallSpeed: 5,
+          audioEnabled: false, // Disable audio to speed up tests
+        });
+
+        const { result } = renderHook(() => useGame());
+
+        expect(result.current.ballsRemaining).toBe(3);
+        expect(result.current.autoCallEnabled).toBe(true);
+
+        // Call first ball automatically
+        await act(async () => {
+          vi.advanceTimersByTime(5000);
+          await Promise.resolve();
+        });
+        expect(result.current.ballsRemaining).toBe(2);
+
+        // Call second ball automatically
+        await act(async () => {
+          vi.advanceTimersByTime(5000);
+          await Promise.resolve();
+        });
+        expect(result.current.ballsRemaining).toBe(1);
+
+        // Call the LAST ball automatically - this is where the bug was reported
+        await act(async () => {
+          vi.advanceTimersByTime(5000);
+          await Promise.resolve();
+        });
+
+        // BUG: Last ball should be called but was reported as not being called
+        expect(result.current.ballsRemaining).toBe(0);
+        expect(result.current.ballsCalled).toBe(3);
+
+        vi.useRealTimers();
+      });
+
     });
 
     describe('race condition prevention', () => {
