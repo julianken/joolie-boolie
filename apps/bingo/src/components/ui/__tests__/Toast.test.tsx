@@ -1,0 +1,360 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { ToastProvider, useToast, StandaloneToast } from '../Toast';
+
+// Test component that uses the toast hook
+function TestComponent() {
+  const { success, error, info, warning, toasts, removeToast } = useToast();
+
+  return (
+    <div>
+      <button onClick={() => success('Success message')}>Show Success</button>
+      <button onClick={() => error('Error message')}>Show Error</button>
+      <button onClick={() => info('Info message')}>Show Info</button>
+      <button onClick={() => warning('Warning message')}>Show Warning</button>
+      <div data-testid="toast-count">{toasts.length}</div>
+      {toasts.map((toast) => (
+        <button key={toast.id} onClick={() => removeToast(toast.id)}>
+          Remove {toast.id}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+describe('ToastProvider', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders children', () => {
+    render(
+      <ToastProvider>
+        <div>Test content</div>
+      </ToastProvider>
+    );
+    expect(screen.getByText('Test content')).toBeInTheDocument();
+  });
+
+  it('provides toast context', () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+    expect(screen.getByText('Show Success')).toBeInTheDocument();
+  });
+
+  it('throws error when useToast is used outside provider', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<TestComponent />)).toThrow(
+      'useToast must be used within a ToastProvider'
+    );
+    consoleError.mockRestore();
+  });
+});
+
+describe('Toast functionality', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('shows success toast', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByText('Success message')).toBeInTheDocument();
+  });
+
+  it('shows error toast', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Error'));
+    expect(screen.getByText('Error message')).toBeInTheDocument();
+  });
+
+  it('shows info toast', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Info'));
+    expect(screen.getByText('Info message')).toBeInTheDocument();
+  });
+
+  it('shows warning toast', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Warning'));
+    expect(screen.getByText('Warning message')).toBeInTheDocument();
+  });
+
+  it('auto-dismisses toast after duration', async () => {
+    render(
+      <ToastProvider defaultDuration={3000}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByText('Success message')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(3200); // Duration + animation time
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Success message')).not.toBeInTheDocument();
+    });
+  });
+
+  it('removes toast when dismiss button is clicked', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByText('Success message')).toBeInTheDocument();
+
+    const dismissButton = screen.getByLabelText('Dismiss notification');
+    fireEvent.click(dismissButton);
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Success message')).not.toBeInTheDocument();
+    });
+  });
+
+  it('can display multiple toasts', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    fireEvent.click(screen.getByText('Show Error'));
+    fireEvent.click(screen.getByText('Show Info'));
+
+    expect(screen.getByText('Success message')).toBeInTheDocument();
+    expect(screen.getByText('Error message')).toBeInTheDocument();
+    expect(screen.getByText('Info message')).toBeInTheDocument();
+  });
+});
+
+describe('Toast accessibility', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('toast has role="alert"', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('toast region has aria-live="polite"', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByRole('region')).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('toast region has aria-label', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByRole('region')).toHaveAttribute(
+      'aria-label',
+      'Notifications'
+    );
+  });
+
+  it('dismiss button has accessible label', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    expect(screen.getByLabelText('Dismiss notification')).toBeInTheDocument();
+  });
+});
+
+describe('Toast positioning', () => {
+  it('applies top-right position by default', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    const region = screen.getByRole('region');
+    expect(region.className).toContain('top-4');
+    expect(region.className).toContain('right-4');
+  });
+
+  it('applies custom position', async () => {
+    render(
+      <ToastProvider position="bottom-left">
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    const region = screen.getByRole('region');
+    expect(region.className).toContain('bottom-4');
+    expect(region.className).toContain('left-4');
+  });
+});
+
+describe('Toast variants', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('success toast has success background', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Success'));
+    const toast = screen.getByRole('alert');
+    expect(toast.className).toContain('bg-success');
+  });
+
+  it('error toast has error background', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Error'));
+    const toast = screen.getByRole('alert');
+    expect(toast.className).toContain('bg-error');
+  });
+
+  it('info toast has primary background', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Info'));
+    const toast = screen.getByRole('alert');
+    expect(toast.className).toContain('bg-primary');
+  });
+
+  it('warning toast has warning background', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show Warning'));
+    const toast = screen.getByRole('alert');
+    expect(toast.className).toContain('bg-warning');
+  });
+});
+
+describe('StandaloneToast', () => {
+  it('renders message', () => {
+    render(<StandaloneToast message="Test message" />);
+    expect(screen.getByText('Test message')).toBeInTheDocument();
+  });
+
+  it('has role="alert"', () => {
+    render(<StandaloneToast message="Test" />);
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('applies variant styles', () => {
+    render(<StandaloneToast message="Error!" variant="error" />);
+    const toast = screen.getByRole('alert');
+    expect(toast.className).toContain('bg-error');
+  });
+
+  it('shows dismiss button when onDismiss is provided', () => {
+    const handleDismiss = vi.fn();
+    render(<StandaloneToast message="Test" onDismiss={handleDismiss} />);
+    expect(screen.getByLabelText('Dismiss notification')).toBeInTheDocument();
+  });
+
+  it('hides dismiss button when onDismiss is not provided', () => {
+    render(<StandaloneToast message="Test" />);
+    expect(screen.queryByLabelText('Dismiss notification')).not.toBeInTheDocument();
+  });
+
+  it('calls onDismiss when dismiss button is clicked', () => {
+    const handleDismiss = vi.fn();
+    render(<StandaloneToast message="Test" onDismiss={handleDismiss} />);
+    fireEvent.click(screen.getByLabelText('Dismiss notification'));
+    expect(handleDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies custom className', () => {
+    render(<StandaloneToast message="Test" className="custom-class" />);
+    expect(screen.getByRole('alert')).toHaveClass('custom-class');
+  });
+
+  it('defaults to info variant', () => {
+    render(<StandaloneToast message="Test" />);
+    const toast = screen.getByRole('alert');
+    expect(toast.className).toContain('bg-primary');
+  });
+});
