@@ -6,26 +6,40 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./client": "./src/client.ts",
     "./server": "./src/server.ts",
-    "./client": "./src/client.ts"
+    "./middleware": "./src/middleware.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./components": "./src/components/index.ts"
   },
   "scripts": {
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
-    "test": "vitest --passWithNoTests",
-    "test:run": "vitest run --passWithNoTests",
-    "test:coverage": "vitest run --coverage --passWithNoTests"
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.90.1"
   },
   "peerDependencies": {
+    "next": ">=14.0.0",
     "react": "^19.0.0"
   },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@beak-gaming/testing": "workspace:*",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@vitest/coverage-v8": "^4.0.17",
+    "jsdom": "^27.4.0",
     "typescript": "^5",
     "vitest": "^4.0.17"
   }

@@ -1,15 +1,43 @@
-// Auth package - Supabase authentication wrappers
-// TODO: Extract from apps/bingo/src/lib/supabase/
+// Types
+export type {
+  AuthUser,
+  AuthSession,
+  AuthError,
+  AuthErrorCode,
+  AuthState,
+  AuthContextValue,
+  SignInCredentials,
+  SignUpCredentials,
+  OAuthProvider,
+  AuthConfig,
+  ProtectedRouteConfig,
+  CookieOptions,
+  CookieStore,
+} from './types';
 
-export const AUTH_PLACEHOLDER = true;
+// Client utilities
+export {
+  createClient,
+  getClient,
+  resetClient,
+  type SupabaseClient,
+} from './client';
 
-// Re-export types that will be implemented
-export interface AuthUser {
-  id: string;
-  email: string;
-}
+// Hooks
+export { useAuth } from './hooks/use-auth';
+export { useSession, type UseSessionResult } from './hooks/use-session';
+export { useUser, type UseUserResult } from './hooks/use-user';
 
-export interface AuthSession {
-  user: AuthUser | null;
-  accessToken: string | null;
-}
+// Components
+export {
+  AuthProvider,
+  AuthContext,
+  type AuthProviderProps,
+} from './components/auth-provider';
+export {
+  ProtectedRoute,
+  withAuth,
+  GuestOnly,
+  type ProtectedRouteProps,
+  type GuestOnlyProps,
+} from './components/protected-route';
