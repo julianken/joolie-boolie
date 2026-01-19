@@ -25,3 +25,56 @@ export { createSyncStore, type UseSyncStore } from './store';
 
 // Hook
 export { useSync } from './use-sync';
+
+// Session link utilities
+export type {
+  GameType,
+  SessionLinkData,
+  GenerateSessionLinkOptions,
+  ParseSessionLinkResult,
+} from './session-link';
+
+export {
+  SESSION_LINK_PARAMS,
+  GAME_PATHS,
+  VALID_GAME_TYPES,
+  VALID_ROLES,
+  generateSessionId,
+  isValidSessionId,
+  isValidGameType,
+  isValidRole,
+  generateSessionLink,
+  parseSessionLink,
+  parseCurrentUrlSession,
+  hasSessionParams,
+  getSessionIdFromUrl,
+  getRoleFromUrl,
+  createChannelName,
+} from './session-link';
+
+// Session store
+export type {
+  SessionParticipant,
+  SessionState,
+  RecentSession,
+} from './session-store';
+
+export {
+  getSessionState,
+  saveSessionState,
+  clearSessionState,
+  createSession,
+  joinSession,
+  leaveSession,
+  isInSession,
+  updateActivity,
+  addParticipant,
+  removeParticipant,
+  updateParticipant,
+  getParticipantCounts,
+  getRecentSessions,
+  addToRecentSessions,
+  updateRecentSessionActivity,
+  clearRecentSessions,
+  removeFromRecentSessions,
+} from './session-store';

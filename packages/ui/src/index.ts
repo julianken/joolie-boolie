@@ -6,3 +6,22 @@ export { Toggle, type ToggleProps } from './toggle';
 
 // Slider
 export { Slider, type SliderProps } from './slider';
+
+// WebVitals
+export {
+  WebVitals,
+  useWebVitals,
+  sendToAnalytics,
+  type WebVitalsConfig,
+  type WebVitalsMetric,
+} from './web-vitals';
+
+// Skeleton components
+export { Skeleton, type SkeletonProps } from './skeleton';
+export { SkeletonCard, type SkeletonCardProps } from './skeleton-card';
+export { SkeletonButton, type SkeletonButtonProps } from './skeleton-button';
+export { SkeletonText, type SkeletonTextProps } from './skeleton-text';
+
+// Confetti
+export { Confetti, type ConfettiProps, type ConfettiOptions } from './confetti';
+export { useConfetti, type UseConfettiOptions, type UseConfettiReturn } from './hooks/use-confetti';

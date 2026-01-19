@@ -1,0 +1,54 @@
+import { test, expect } from '@playwright/test';
+import { waitForHydration } from '../utils/helpers';
+
+test.describe('Trivia Home Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await waitForHydration(page);
+  });
+
+  test('displays the main title', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: /trivia night/i })).toBeVisible();
+  });
+
+  test('shows description text', async ({ page }) => {
+    await expect(page.getByText(/trivia system|retirement communities/i)).toBeVisible();
+  });
+
+  test('has Start Trivia button that links to presenter view', async ({ page }) => {
+    const startButton = page.getByRole('link', { name: /start trivia/i });
+    await expect(startButton).toBeVisible();
+    await expect(startButton).toHaveAttribute('href', '/play');
+  });
+
+  test('has Open Display button', async ({ page }) => {
+    const displayButton = page.getByRole('link', { name: /open display/i });
+    await expect(displayButton).toBeVisible();
+    await expect(displayButton).toHaveAttribute('href', '/display');
+  });
+
+  test('navigates to presenter view when Start Trivia is clicked', async ({ page }) => {
+    await page.getByRole('link', { name: /start trivia/i }).click();
+    await expect(page).toHaveURL('/play');
+    await expect(page.getByText(/presenter view/i)).toBeVisible();
+  });
+
+  test('has accessible structure', async ({ page }) => {
+    // Check for main heading
+    const h1 = page.getByRole('heading', { level: 1 });
+    await expect(h1).toHaveCount(1);
+
+    // Check for main landmark
+    const main = page.locator('main');
+    await expect(main).toBeVisible();
+  });
+
+  test('buttons have senior-friendly sizes', async ({ page }) => {
+    const startButton = page.getByRole('link', { name: /start trivia/i });
+    const box = await startButton.boundingBox();
+
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  });
+});

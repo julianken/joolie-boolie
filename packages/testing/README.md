@@ -1,6 +1,6 @@
 # @beak-gaming/testing
 
-Shared test utilities and mocks for the Beak Gaming Platform.
+Shared test utilities and mocks for the Beak Gaming Platform, including mock implementations for BroadcastChannel, Audio, and Supabase, plus jest-dom matchers support.
 
 ## Installation
 
@@ -10,9 +10,28 @@ Shared test utilities and mocks for the Beak Gaming Platform.
     "@beak-gaming/testing": "workspace:*"
   },
   "peerDependencies": {
+    "@testing-library/react": "^15.0.0",
     "vitest": "^4.0.0"
   }
 }
+```
+
+## Export Paths
+
+The package provides multiple export paths for different use cases:
+
+```typescript
+// Main export - includes mocks and helpers
+import { mockBroadcastChannel, createMockSupabaseClient } from '@beak-gaming/testing';
+
+// Mocks only
+import { mockAudio, MockBroadcastChannel } from '@beak-gaming/testing/mocks';
+
+// Jest-dom setup (add to vitest setupFiles)
+import '@beak-gaming/testing/setup';
+
+// Helpers (for future expansion)
+import { HELPERS_PLACEHOLDER } from '@beak-gaming/testing/helpers';
 ```
 
 ## Available Mocks
@@ -54,7 +73,7 @@ test('syncs state between windows', () => {
 Mock for the HTML5 Audio API used in sound playback.
 
 ```typescript
-import { mockAudio, MockAudio } from '@beak-gaming/testing/mocks';
+import { mockAudio, MockAudio, createMockAudio } from '@beak-gaming/testing/mocks';
 
 // In your test setup
 beforeEach(() => {
@@ -68,15 +87,76 @@ test('plays audio', async () => {
 
   expect(audio.paused).toBe(false);
 });
+
+// Or create instances directly for testing
+test('tracks audio behavior', () => {
+  const audio = createMockAudio();
+  audio.volume = 0.5;
+  expect(audio.volume).toBe(0.5);
+});
+```
+
+### Supabase Mock
+
+Mock for Supabase client and authentication.
+
+```typescript
+import { createMockSupabaseClient, createMockUser, createMockSession } from '@beak-gaming/testing/mocks';
+
+// Create mock users
+test('creates users', () => {
+  const user = createMockUser({
+    email: 'user@example.com',
+    user_metadata: { firstName: 'John' },
+  });
+  expect(user.email).toBe('user@example.com');
+});
+
+// Create mock sessions
+test('creates sessions', () => {
+  const session = createMockSession({}, { expires_in: 7200 });
+  expect(session.expires_in).toBe(7200);
+  expect(session.user).toBeDefined();
+});
+
+// Create a mock Supabase client
+test('mocks Supabase auth', async () => {
+  const mockClient = createMockSupabaseClient();
+  const { data: { session } } = await mockClient.auth.getSession();
+  expect(session).toBeNull();
+
+  // Simulate sign in
+  mockClient.__helpers.simulateAuthChange('SIGNED_IN', createMockSession());
+
+  // Use getState to inspect current auth state
+  const state = mockClient.__helpers.getState();
+  expect(state.user).toBeDefined();
+});
+```
+
+## Setup for jest-dom Matchers
+
+To use jest-dom matchers like `toBeInTheDocument()`, `toBeVisible()`, etc., add the setup file to your vitest config:
+
+```typescript
+// vitest.config.ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['@beak-gaming/testing/setup'],
+  },
+});
 ```
 
 ## Test Setup Example
 
-Create a shared test setup file:
+Create app-specific test setup files if needed:
 
 ```typescript
-// src/test/setup.ts
-import '@testing-library/jest-dom/vitest';
+// apps/my-game/src/test/setup.ts
 import { mockBroadcastChannel, MockBroadcastChannel, mockAudio } from '@beak-gaming/testing/mocks';
 
 beforeEach(() => {
@@ -89,7 +169,7 @@ afterEach(() => {
 });
 ```
 
-Configure in your vitest config:
+Then configure in your vitest config:
 
 ```typescript
 // vitest.config.ts
@@ -98,7 +178,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    globals: true,
+    setupFiles: [
+      '@beak-gaming/testing/setup',
+      './src/test/setup.ts',  // Optional: app-specific setup
+    ],
   },
 });
 ```

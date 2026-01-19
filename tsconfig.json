@@ -15,7 +15,8 @@
     "incremental": true,
     "declaration": true,
     "declarationMap": true,
-    "composite": false
+    "composite": false,
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "exclude": ["node_modules"]
 }

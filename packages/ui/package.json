@@ -30,6 +30,7 @@
     "vitest": "^4.0.17"
   },
   "dependencies": {
-    "react-aria-components": "^1.14.0"
+    "react-aria-components": "^1.14.0",
+    "web-vitals": "^5.1.0"
   }
 }

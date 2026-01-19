@@ -55,3 +55,6 @@ export function canTransition(current: GameStatus, action: GameTransition): bool
       return false;
   }
 }
+
+// Export statistics module
+export * from './stats';

@@ -7,16 +7,25 @@
   "exports": {
     ".": "./src/index.ts",
     "./mocks": "./src/mocks/index.ts",
-    "./helpers": "./src/helpers/index.ts"
+    "./helpers": "./src/helpers/index.ts",
+    "./setup": "./src/setup.ts"
   },
   "scripts": {
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@testing-library/jest-dom": "^6.6.3"
+  },
   "peerDependencies": {
-    "vitest": "^4.0.0"
+    "@testing-library/react": "^15.0.0 || ^16.0.0",
+    "vitest": "^4.0.0",
+    "vitest-axe": "^0.1.0"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22",
+    "typescript": "^5",
+    "vitest": "^4.0.17"
   }
 }

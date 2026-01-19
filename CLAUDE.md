@@ -6,6 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Beak Gaming Platform** - A unified gaming platform for retirement communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
 
+## Current State
+
+| App/Package | Status | Notes |
+|-------------|--------|-------|
+| `apps/bingo` | **Functional** | Full 75-ball bingo with audio, patterns, themes, dual-screen sync, PWA |
+| `apps/trivia` | **Functional** | Team trivia with rounds, scoring, TTS, themes, dual-screen sync, PWA |
+| `apps/platform-hub` | Scaffolded | Game selection UI only; auth not implemented |
+| `packages/sync` | **Complete** | BroadcastChannel sync, Zustand store, React hook |
+| `packages/ui` | **Complete** | Button, Toggle, Slider components |
+| `packages/theme` | **Complete** | Design tokens (colors, font sizes, touch targets) |
+| `packages/game-engine` | Partial | Base GameStatus type and transition function |
+| `packages/auth` | Placeholder | Types only; not implemented |
+| `packages/database` | Placeholder | Types only; not implemented |
+| `packages/testing` | **Complete** | BroadcastChannel and Audio mocks |
+
 ## Monorepo Structure
 
 ```
@@ -106,7 +121,28 @@ src/
 
 - **Senior-friendly:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
 - **Audience display:** Optimized for projector/large TV, readable from back of room
-- **Keyboard shortcuts:** Space=roll, P=pause, R=reset, U=undo, M=mute
+- **Keyboard shortcuts:** See app-specific CLAUDE.md files for keyboard shortcuts
+
+## Keyboard Shortcuts
+
+### Bingo
+| Key | Action |
+|-----|--------|
+| Space | Roll next ball |
+| P | Pause/Resume |
+| R | Reset game |
+| U | Undo last call |
+| M | Mute audio |
+
+### Trivia
+| Key | Action |
+|-----|--------|
+| Arrow Up/Down | Navigate questions |
+| Space | Peek answer (local only) |
+| D | Toggle display question |
+| P | Pause/Resume |
+| E | Emergency pause |
+| R | Reset game |
 
 ## Environment Variables
 
