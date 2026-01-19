@@ -33,20 +33,19 @@ export async function createClient() {
   const { url, anonKey } = validateEnvVariables()
 
   return createServerClient(url, anonKey, {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Called from Server Component - ignore
-          }
-        },
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
       },
-    }
-  )
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // Called from Server Component - ignore
+        }
+      },
+    },
+  })
 }

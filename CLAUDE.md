@@ -10,15 +10,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | App/Package | Status | Notes |
 |-------------|--------|-------|
-| `apps/bingo` | **Functional** | Full 75-ball bingo with audio, patterns, themes, dual-screen sync, PWA |
-| `apps/trivia` | **Functional** | Team trivia with rounds, scoring, TTS, themes, dual-screen sync, PWA |
+| `apps/bingo` | **Functional** | Full 75-ball bingo with audio, 29 patterns, themes, dual-screen sync, PWA |
+| `apps/trivia` | **Functional (95%)** | Team trivia with rounds, scoring, TTS, themes, dual-screen sync, PWA. Has 15 sample questions (needs 5 more for 4 rounds) |
 | `apps/platform-hub` | Scaffolded | Game selection UI only; auth not implemented |
 | `packages/sync` | **Complete** | BroadcastChannel sync, Zustand store, React hook |
 | `packages/ui` | **Complete** | Button, Toggle, Slider components |
 | `packages/theme` | **Complete** | Design tokens (colors, font sizes, touch targets) |
-| `packages/game-engine` | Partial | Base GameStatus type and transition function |
-| `packages/auth` | Placeholder | Types only; not implemented |
-| `packages/database` | Placeholder | Types only; not implemented |
+| `packages/game-engine` | Partial | Base GameStatus type, transition functions, and statistics module |
+| `packages/auth` | **Complete** | 40+ auth utilities, hooks (useAuth, useSession, useUser), components (AuthProvider, ProtectedRoute), server/client wrappers |
+| `packages/database` | **Complete** | 150+ database utilities including type-safe client, query builders, pagination, filters, sorting, CRUD helpers, table-specific functions, and React hooks |
 | `packages/testing` | **Complete** | BroadcastChannel and Audio mocks |
 
 ## Monorepo Structure
@@ -33,9 +33,9 @@ beak-gaming-platform/
 │   ├── sync/            # Dual-screen synchronization (BroadcastChannel)
 │   ├── ui/              # Shared UI components (Button, Toggle, Slider)
 │   ├── theme/           # Senior-friendly design tokens and CSS
-│   ├── auth/            # Supabase authentication wrappers
+│   ├── auth/            # Supabase authentication wrappers (40+ exports)
 │   ├── game-engine/     # Abstract game state machine
-│   ├── database/        # Supabase database utilities
+│   ├── database/        # Supabase database utilities (150+ exports)
 │   └── testing/         # Shared test utilities and mocks
 └── supabase/            # Database migrations and functions
 ```
@@ -155,6 +155,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ## App-Specific Context
 
 Each app has its own CLAUDE.md with detailed context:
-- `apps/bingo/CLAUDE.md` - 75-ball bingo, patterns, game mechanics
-- `apps/trivia/CLAUDE.md` - Team trivia, rounds, scoring
+- `apps/bingo/CLAUDE.md` - 75-ball bingo, 29 patterns, game mechanics
+- `apps/trivia/CLAUDE.md` - Team trivia, rounds, scoring (15 sample questions)
 - `apps/platform-hub/CLAUDE.md` - Auth, game selector, dashboard

@@ -241,4 +241,78 @@ export const SAMPLE_QUESTIONS: Question[] = [
       'Sinatra won Best Supporting Actor for "From Here to Eternity" (1953).',
     roundIndex: 2,
   },
+
+  // =============================================================================
+  // ROUND 4 - World Knowledge
+  // =============================================================================
+
+  // Q16: Geography - Multiple Choice
+  {
+    id: 'r4-q1-geography',
+    text: 'What is the capital city of France?',
+    type: 'multiple_choice',
+    options: ['A', 'B', 'C', 'D'],
+    optionTexts: ['Lyon', 'Marseille', 'Paris', 'Nice'],
+    correctAnswers: ['C'],
+    category: 'geography',
+    explanation:
+      'Paris has been the capital of France since 508 AD and is known as the "City of Light."',
+    roundIndex: 3,
+  },
+
+  // Q17: Science - Multiple Choice
+  {
+    id: 'r4-q2-science',
+    text: 'How many planets are in our solar system?',
+    type: 'multiple_choice',
+    options: ['A', 'B', 'C', 'D'],
+    optionTexts: ['7', '8', '9', '10'],
+    correctAnswers: ['B'],
+    category: 'science',
+    explanation:
+      'There are 8 planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Pluto was reclassified as a dwarf planet in 2006.',
+    roundIndex: 3,
+  },
+
+  // Q18: General Knowledge - Multiple Choice
+  {
+    id: 'r4-q3-general',
+    text: 'What is the national bird of the United States?',
+    type: 'multiple_choice',
+    options: ['A', 'B', 'C', 'D'],
+    optionTexts: ['Golden Eagle', 'Bald Eagle', 'American Robin', 'Red-tailed Hawk'],
+    correctAnswers: ['B'],
+    category: 'general_knowledge',
+    explanation:
+      'The Bald Eagle was chosen as the national bird in 1782 for its majestic appearance and long lifespan.',
+    roundIndex: 3,
+  },
+
+  // Q19: History - True/False
+  {
+    id: 'r4-q4-history',
+    text: 'The Titanic sank on its maiden voyage in 1912.',
+    type: 'true_false',
+    options: ['True', 'False'],
+    optionTexts: ['True', 'False'],
+    correctAnswers: ['True'],
+    category: 'history',
+    explanation:
+      'The Titanic struck an iceberg and sank on April 15, 1912, during its first voyage from Southampton to New York City.',
+    roundIndex: 3,
+  },
+
+  // Q20: Movies - True/False
+  {
+    id: 'r4-q5-movies',
+    text: 'Alfred Hitchcock won an Academy Award for Best Director.',
+    type: 'true_false',
+    options: ['True', 'False'],
+    optionTexts: ['True', 'False'],
+    correctAnswers: ['False'],
+    category: 'movies',
+    explanation:
+      'Despite five nominations and being one of cinema\'s greatest directors, Hitchcock never won a competitive Oscar for Best Director.',
+    roundIndex: 3,
+  },
 ];

@@ -195,6 +195,10 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
 
     // Subscribe to game store changes
     const unsubscribe = useGameStore.subscribe((state, prevState) => {
+      // SYNC LOOP PROTECTION: Skip broadcast if state is being hydrated
+      if (state._isHydrating) {
+        return;
+      }
       // Broadcast on any state change
       if (state !== prevState) {
         broadcastSync.broadcastState({

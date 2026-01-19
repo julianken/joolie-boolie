@@ -17,6 +17,7 @@ export interface SettingsState {
   timerDuration: number; // default 30, range 10-120
   timerAutoStart: boolean; // default true
   timerVisible: boolean; // default true
+  timerAutoReveal: boolean; // default true - auto-reveal answer when timer reaches 0
   ttsEnabled: boolean; // default false
 
   // Team persistence
@@ -45,6 +46,7 @@ export const SETTINGS_DEFAULTS: SettingsState = {
   timerDuration: 30,
   timerAutoStart: true,
   timerVisible: true,
+  timerAutoReveal: true,
   ttsEnabled: false,
   lastTeamSetup: null,
 };

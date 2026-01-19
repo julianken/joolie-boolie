@@ -1,9 +1,8 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createBrowserClient } from '@supabase/ssr'
 
 /**
  * Validates that all required Supabase environment variables are set.
- * Throws descriptive errors if any are missing.
+ * Throws descriptive errors at module load time if any are missing.
  */
 function validateEnvVariables(): { url: string; anonKey: string } {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -28,25 +27,9 @@ function validateEnvVariables(): { url: string; anonKey: string } {
   return { url, anonKey }
 }
 
-export async function createClient() {
-  const cookieStore = await cookies()
-  const { url, anonKey } = validateEnvVariables()
+// Validate at module load time - fail fast if ENV variables are missing
+const { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = validateEnvVariables()
 
-  return createServerClient(url, anonKey, {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Called from Server Component - ignore
-          }
-        },
-      },
-    }
-  )
+export function createClient() {
+  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 }

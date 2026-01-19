@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Header, Footer } from '@/components';
 import { ErrorBoundaryProvider } from '@/components/providers/ErrorBoundaryProvider';
+import { AuthProvider } from '@beak-gaming/auth';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,11 +37,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <ErrorBoundaryProvider>
-          <Header />
-          <div className="flex-1 flex flex-col">
-            {children}
-          </div>
-          <Footer />
+          <AuthProvider>
+            <Header />
+            <div className="flex-1 flex flex-col">
+              {children}
+            </div>
+            <Footer />
+          </AuthProvider>
         </ErrorBoundaryProvider>
       </body>
     </html>

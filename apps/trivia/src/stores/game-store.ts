@@ -39,6 +39,7 @@ import {
 import type { GameSettings } from '@/types';
 
 export interface GameStore extends TriviaGameState {
+  _isHydrating: boolean; // Flag to prevent sync loops during hydration
   // Actions
   startGame: () => void;
   endGame: () => void;
@@ -75,6 +76,7 @@ export interface GameStore extends TriviaGameState {
 export const useGameStore = create<GameStore>()((set) => ({
   // Initial state
   ...createInitialState(),
+  _isHydrating: false,
 
   // Actions
   startGame: () => {
@@ -156,7 +158,12 @@ export const useGameStore = create<GameStore>()((set) => ({
   },
 
   _hydrate: (newState: Partial<TriviaGameState>) => {
+    set((state) => ({ ...state, _isHydrating: true }));
     set((state) => ({ ...state, ...newState }));
+    // Use setTimeout to ensure all subscriptions see the hydrating flag before clearing it
+    setTimeout(() => {
+      set((state) => ({ ...state, _isHydrating: false }));
+    }, 0);
   },
 
   // Settings actions
