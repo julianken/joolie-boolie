@@ -5,19 +5,42 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./types": "./src/types.ts",
+    "./errors": "./src/errors.ts",
+    "./pagination": "./src/pagination.ts",
+    "./filters": "./src/filters.ts",
+    "./queries": "./src/queries.ts",
+    "./tables": "./src/tables/index.ts",
+    "./hooks": "./src/hooks/index.ts"
   },
   "scripts": {
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'No tests yet'",
-    "test:run": "echo 'No tests yet'",
-    "test:coverage": "echo 'No tests yet'"
+    "test": "vitest --passWithNoTests",
+    "test:run": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@supabase/postgrest-js": "^1.19.4",
     "@supabase/supabase-js": "^2.90.1"
   },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "typescript": "^5"
+    "@beak-gaming/testing": "workspace:*",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@vitest/coverage-v8": "^4.0.17",
+    "jsdom": "^27.4.0",
+    "typescript": "^5",
+    "vitest": "^4.0.17"
   }
 }
