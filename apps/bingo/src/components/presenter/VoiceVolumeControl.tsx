@@ -61,16 +61,13 @@ export function VoiceVolumeControl({ disabled = false }: VoiceVolumeControlProps
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">Voice Volume</h3>
-
-      {/* Voice Volume Slider */}
       <Slider
         value={voiceVolumePercent}
         onChange={handleVoiceVolumeChange}
         min={0}
         max={100}
         step={5}
-        label="Volume"
+        label="Voice Volume"
         unit="%"
         disabled={disabled}
       />

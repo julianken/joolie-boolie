@@ -128,7 +128,7 @@ export function RevealChimeSelector({ disabled = false }: RevealChimeSelectorPro
           min={0}
           max={100}
           step={5}
-          label="Volume"
+          label="Chime Volume"
           unit="%"
           disabled={disabled}
         />

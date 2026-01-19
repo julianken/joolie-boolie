@@ -28,5 +28,8 @@
     "jsdom": "^27.4.0",
     "typescript": "^5",
     "vitest": "^4.0.17"
+  },
+  "dependencies": {
+    "react-aria-components": "^1.14.0"
   }
 }

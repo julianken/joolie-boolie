@@ -178,7 +178,7 @@ export function RollSoundSelector({ disabled = false }: RollSoundSelectorProps) 
         min={0}
         max={100}
         step={5}
-        label="Volume"
+        label="Roll Volume"
         unit="%"
         disabled={disabled}
       />
