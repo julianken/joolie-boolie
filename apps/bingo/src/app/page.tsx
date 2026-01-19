@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { StatsDisplay } from '@/components/stats';
 
 export default function Home() {
   return (
@@ -196,6 +197,9 @@ export default function Home() {
           </ol>
         </div>
       </section>
+
+      {/* Statistics Section */}
+      <StatsDisplay />
 
       {/* Footer */}
       <footer className="bg-muted/10 border-t border-border py-8">

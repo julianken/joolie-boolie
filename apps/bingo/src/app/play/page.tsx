@@ -94,29 +94,17 @@ export default function PlayPage() {
           </div>
         </header>
 
-        {/* Main content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left column: Bingo Board */}
-          <section className="lg:col-span-4 space-y-6">
-            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
-              <h2 className="text-xl font-semibold mb-4">Called Numbers</h2>
-              <BingoBoard calledBalls={game.calledBalls} />
-            </div>
-
-            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
-              <RecentBalls balls={game.recentBalls} />
-            </div>
-          </section>
-
-          {/* Center column: Current Ball + Controls */}
-          <section className="lg:col-span-4 space-y-6">
+        {/* Main content grid - Mobile first: stack vertically, then 2 cols on tablet, 3 cols on desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-6">
+          {/* Center column on mobile (moved up for better UX): Current Ball + Controls */}
+          <section className="md:col-span-2 lg:col-span-4 lg:order-2 space-y-4 md:space-y-6">
             {/* Current Ball Display */}
-            <div className="bg-background border border-border rounded-xl p-6 shadow-sm flex flex-col items-center gap-4">
-              <h2 className="text-xl font-semibold">Current Ball</h2>
+            <div className="bg-background border border-border rounded-xl p-4 md:p-6 shadow-sm flex flex-col items-center gap-3 md:gap-4">
+              <h2 className="text-lg md:text-xl font-semibold">Current Ball</h2>
               <BallDisplay ball={game.currentBall} size="xl" />
               {game.previousBall && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-base">Previous:</span>
+                  <span className="text-sm md:text-base">Previous:</span>
                   <BallDisplay ball={game.previousBall} size="sm" />
                 </div>
               )}
@@ -127,7 +115,7 @@ export default function PlayPage() {
             </div>
 
             {/* Control Panel */}
-            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
               <ControlPanel
                 status={game.status}
                 canCall={game.canCall}
@@ -145,10 +133,29 @@ export default function PlayPage() {
             </div>
           </section>
 
+          {/* Left column: Bingo Board - hidden on small mobile, shown on larger screens */}
+          <section className="hidden sm:block md:col-span-1 lg:col-span-4 lg:order-1 space-y-4 md:space-y-6">
+            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
+              <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Called Numbers</h2>
+              <BingoBoard calledBalls={game.calledBalls} />
+            </div>
+
+            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
+              <RecentBalls balls={game.recentBalls} />
+            </div>
+          </section>
+
+          {/* Mobile-only recent balls (shown when board is hidden) */}
+          <section className="sm:hidden space-y-4">
+            <div className="bg-background border border-border rounded-xl p-3 shadow-sm">
+              <RecentBalls balls={game.recentBalls} />
+            </div>
+          </section>
+
           {/* Right column: Settings */}
-          <section className="lg:col-span-4 space-y-6">
+          <section className="md:col-span-1 lg:col-span-4 lg:order-3 space-y-4 md:space-y-6">
             {/* Pattern Selection */}
-            <div className="bg-background border border-border rounded-xl p-4 shadow-sm space-y-4">
+            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm space-y-3 md:space-y-4">
               <PatternSelector
                 selectedPattern={game.pattern}
                 onSelect={game.setPattern}
@@ -158,8 +165,8 @@ export default function PlayPage() {
             </div>
 
             {/* Game Settings */}
-            <div className="bg-background border border-border rounded-xl p-4 shadow-sm space-y-6">
-              <h2 className="text-xl font-semibold">Settings</h2>
+            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm space-y-4 md:space-y-6">
+              <h2 className="text-lg md:text-xl font-semibold">Settings</h2>
 
               {/* Auto-call toggle */}
               <Toggle
@@ -186,7 +193,7 @@ export default function PlayPage() {
                 onChange={game.toggleAudio}
                 label="Audio Announcements"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Press M to toggle audio
               </p>
 
@@ -210,8 +217,8 @@ export default function PlayPage() {
               <ThemeSelector />
             </div>
 
-            {/* Keyboard shortcuts reference */}
-            <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+            {/* Keyboard shortcuts reference - hidden on mobile (not relevant for touch) */}
+            <div className="hidden md:block bg-background border border-border rounded-xl p-4 shadow-sm">
               <h2 className="text-xl font-semibold mb-3">Keyboard Shortcuts</h2>
               <ul className="space-y-2 text-base">
                 <li className="flex justify-between">

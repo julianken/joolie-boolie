@@ -47,7 +47,8 @@ export type PatternCategory =
   | 'shapes'
   | 'letters'
   | 'coverage'
-  | 'combo';
+  | 'combo'
+  | 'custom';
 
 // User profile (extends Supabase auth.users)
 export interface UserProfile {
@@ -217,3 +218,100 @@ export const REVEAL_CHIME_OPTIONS: Record<RevealChimeType, { name: string }> = {
   'positive-notification': { name: 'Positive Notification' },
   'gold-coin-prize': { name: 'Gold Coin Prize' },
 };
+
+// =============================================================================
+// GAME SESSION TYPES (API)
+// =============================================================================
+
+export type BingoGameSessionStatus = 'idle' | 'playing' | 'paused' | 'ended';
+
+export interface BingoGameSession {
+  id: string;
+  name: string;
+  status: BingoGameSessionStatus;
+  patternId: string | null;
+  calledBalls: BingoBall[];
+  currentBall: BingoBall | null;
+  autoCallEnabled: boolean;
+  autoCallSpeed: number;
+  audioEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBingoGameRequest {
+  name: string;
+  patternId?: string;
+  autoCallSpeed?: number;
+  audioEnabled?: boolean;
+}
+
+export interface UpdateBingoGameRequest {
+  name?: string;
+  status?: BingoGameSessionStatus;
+  patternId?: string;
+  calledBalls?: BingoBall[];
+  currentBall?: BingoBall | null;
+  autoCallEnabled?: boolean;
+  autoCallSpeed?: number;
+  audioEnabled?: boolean;
+}
+
+// =============================================================================
+// SESSION HISTORY TYPES (API)
+// =============================================================================
+
+/**
+ * Winner information for a completed bingo game session
+ */
+export interface BingoSessionWinner {
+  name: string;
+  cardNumber?: string;
+  verifiedAt: string;
+}
+
+/**
+ * A completed or in-progress game session record for history tracking
+ */
+export interface BingoSession {
+  id: string;
+  userId: string | null; // For future auth integration
+  patternId: string;
+  patternName: string;
+  calledBalls: BingoBall[];
+  totalBallsCalled: number;
+  winner: BingoSessionWinner | null;
+  startedAt: string;
+  endedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBingoSessionRequest {
+  patternId: string;
+  patternName: string;
+  userId?: string;
+}
+
+export interface UpdateBingoSessionRequest {
+  calledBalls?: BingoBall[];
+  winner?: BingoSessionWinner | null;
+  endedAt?: string | null;
+}
+
+// =============================================================================
+// API RESPONSE TYPES
+// =============================================================================
+
+export interface ApiResponse<T> {
+  data: T | null;
+  error: string | null;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  error: string | null;
+}

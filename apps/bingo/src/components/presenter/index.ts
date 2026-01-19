@@ -9,3 +9,9 @@ export type { PatternSelectorProps, PatternPreviewProps } from './PatternSelecto
 
 export { ControlPanel } from './ControlPanel';
 export type { ControlPanelProps } from './ControlPanel';
+
+export { VoicePackSelector } from './VoicePackSelector';
+export type { VoicePackSelectorProps } from './VoicePackSelector';
+
+export { VoicePackPreview } from './VoicePackPreview';
+export type { VoicePackPreviewProps } from './VoicePackPreview';

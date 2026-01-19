@@ -18,6 +18,7 @@ const categoryLabels: Record<PatternCategory, string> = {
   letters: 'Letters',
   coverage: 'Coverage',
   combo: 'Combinations',
+  custom: 'Custom',
 };
 
 const categoryOrder: PatternCategory[] = [
@@ -28,6 +29,7 @@ const categoryOrder: PatternCategory[] = [
   'letters',
   'coverage',
   'combo',
+  'custom',
 ];
 
 export function PatternSelector({
