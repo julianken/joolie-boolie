@@ -15,7 +15,7 @@ vi.mock('@beak-gaming/database/tables', () => ({
 }));
 
 describe('GET /api/sessions/room/[roomCode]', () => {
-  const mockClient = {} as any;
+  const mockClient = {} as ReturnType<typeof supabaseServer.createClient> extends Promise<infer T> ? T : never;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -26,12 +26,21 @@ describe('GET /api/sessions/room/[roomCode]', () => {
     const mockSession = {
       session_id: 'test-session-123',
       room_code: 'ABC123',
-      game_type: 'bingo',
-      status: 'active',
+      game_type: 'bingo' as const,
+      status: 'active' as const,
       game_state: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      expires_at: new Date().toISOString(),
+      pin_hash: 'hash',
+      pin_salt: 'salt',
+      failed_pin_attempts: 0,
+      last_failed_attempt_at: null,
+      last_sync_at: null,
+      sequence_number: null,
     };
 
-    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/ABC123');
     const params = Promise.resolve({ roomCode: 'ABC123' });
@@ -81,12 +90,21 @@ describe('GET /api/sessions/room/[roomCode]', () => {
     const mockSession = {
       session_id: 'trivia-session-456',
       room_code: 'XYZ789',
-      game_type: 'trivia',
-      status: 'active',
+      game_type: 'trivia' as const,
+      status: 'active' as const,
       game_state: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      expires_at: new Date().toISOString(),
+      pin_hash: 'hash',
+      pin_salt: 'salt',
+      failed_pin_attempts: 0,
+      last_failed_attempt_at: null,
+      last_sync_at: null,
+      sequence_number: null,
     };
 
-    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/XYZ789');
     const params = Promise.resolve({ roomCode: 'XYZ789' });
@@ -102,12 +120,21 @@ describe('GET /api/sessions/room/[roomCode]', () => {
     const mockSession = {
       session_id: 'completed-session',
       room_code: 'DONE99',
-      game_type: 'bingo',
-      status: 'completed',
+      game_type: 'bingo' as const,
+      status: 'completed' as const,
       game_state: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      expires_at: new Date().toISOString(),
+      pin_hash: 'hash',
+      pin_salt: 'salt',
+      failed_pin_attempts: 0,
+      last_failed_attempt_at: null,
+      last_sync_at: null,
+      sequence_number: null,
     };
 
-    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/DONE99');
     const params = Promise.resolve({ roomCode: 'DONE99' });
