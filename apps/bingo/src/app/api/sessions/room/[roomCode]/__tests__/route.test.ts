@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { GET } from '../route';
 import * as supabaseServer from '@/lib/supabase/server';
-import * as database from '@beak-gaming/database';
+import * as tables from '@beak-gaming/database/tables';
 
 // Mock the Supabase client
 vi.mock('@/lib/supabase/server', () => ({
@@ -10,7 +10,7 @@ vi.mock('@/lib/supabase/server', () => ({
 }));
 
 // Mock the database functions
-vi.mock('@beak-gaming/database', () => ({
+vi.mock('@beak-gaming/database/tables', () => ({
   getGameSessionByRoomCode: vi.fn(),
 }));
 
@@ -31,7 +31,7 @@ describe('GET /api/sessions/room/[roomCode]', () => {
       game_state: {},
     };
 
-    vi.mocked(database.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/ABC123');
     const params = Promise.resolve({ roomCode: 'ABC123' });
@@ -46,11 +46,11 @@ describe('GET /api/sessions/room/[roomCode]', () => {
       gameType: 'bingo',
       status: 'active',
     });
-    expect(database.getGameSessionByRoomCode).toHaveBeenCalledWith(mockClient, 'ABC123');
+    expect(tables.getGameSessionByRoomCode).toHaveBeenCalledWith(mockClient, 'ABC123');
   });
 
   it('returns 404 when session not found', async () => {
-    vi.mocked(database.getGameSessionByRoomCode).mockResolvedValue(null);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/INVALID');
     const params = Promise.resolve({ roomCode: 'INVALID' });
@@ -63,7 +63,7 @@ describe('GET /api/sessions/room/[roomCode]', () => {
   });
 
   it('returns 500 on database error', async () => {
-    vi.mocked(database.getGameSessionByRoomCode).mockRejectedValue(
+    vi.mocked(tables.getGameSessionByRoomCode).mockRejectedValue(
       new Error('Database error')
     );
 
@@ -86,7 +86,7 @@ describe('GET /api/sessions/room/[roomCode]', () => {
       game_state: {},
     };
 
-    vi.mocked(database.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/XYZ789');
     const params = Promise.resolve({ roomCode: 'XYZ789' });
@@ -107,7 +107,7 @@ describe('GET /api/sessions/room/[roomCode]', () => {
       game_state: {},
     };
 
-    vi.mocked(database.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
+    vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession as any);
 
     const request = new NextRequest('http://localhost:3000/api/sessions/room/DONE99');
     const params = Promise.resolve({ roomCode: 'DONE99' });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getGameSessionByRoomCode } from '@beak-gaming/database';
+import { getGameSessionByRoomCode } from '@beak-gaming/database/tables';
 
 /**
  * GET /api/sessions/room/[roomCode] - Get session ID by room code
