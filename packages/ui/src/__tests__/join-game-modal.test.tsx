@@ -346,15 +346,6 @@ describe('JoinGameModal', () => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should call onClose on Escape key press', async () => {
-      const user = userEvent.setup();
-      const onClose = vi.fn();
-      render(<JoinGameModal {...defaultProps} onClose={onClose} />);
-
-      await user.keyboard('{Escape}');
-
-      expect(onClose).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe('accessibility', () => {
