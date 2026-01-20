@@ -40,6 +40,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isTestEnv = process.env.CI || process.env.NODE_ENV === 'test';
+
   return (
     <html lang="en">
       <head>
@@ -48,9 +50,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ErrorBoundaryProvider>
-          {children}
-        </ErrorBoundaryProvider>
+        {isTestEnv ? (
+          children
+        ) : (
+          <ErrorBoundaryProvider>
+            {children}
+          </ErrorBoundaryProvider>
+        )}
         <ServiceWorkerRegistration />
       </body>
     </html>

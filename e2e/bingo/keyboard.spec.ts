@@ -8,6 +8,10 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('Space key calls a ball', async ({ page }) => {
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
     // Get initial ball count
     const initialCount = await page.getByText(/(\d+)\s*called/i).first().textContent();
     const initialNum = parseInt(initialCount?.match(/(\d+)/)?.[1] || '0');
@@ -26,7 +30,11 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('P key toggles pause', async ({ page }) => {
-    // Start a game first
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
+    // Call a ball to ensure game is in playing state
     await page.keyboard.press('Space');
     await page.waitForTimeout(2000);
 
@@ -50,6 +58,10 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('U key undoes last call', async ({ page }) => {
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
     // Call two balls
     await page.keyboard.press('Space');
     await page.waitForTimeout(2000);
@@ -70,6 +82,10 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('R key resets the game', async ({ page }) => {
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
     // Call some balls first
     await page.keyboard.press('Space');
     await page.waitForTimeout(2000);
@@ -97,6 +113,10 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('M key toggles audio', async ({ page }) => {
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
     // Find audio toggle state
     const audioToggle = page.getByRole('switch').filter({ hasText: /audio/i }).or(
       page.locator('[aria-label*="audio"]')
@@ -126,6 +146,10 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('keyboard shortcuts do not work when typing in input', async ({ page }) => {
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
     // Find any input field (if present)
     const input = page.locator('input').first();
 
@@ -202,6 +226,10 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   });
 
   test('multiple rapid key presses are handled correctly', async ({ page }) => {
+    // Start the game first
+    await page.getByRole('button', { name: /start game/i }).click();
+    await page.waitForTimeout(500);
+
     // Get initial count
     const initialCount = await page.getByText(/(\d+)\s*called/i).first().textContent();
     const initialNum = parseInt(initialCount?.match(/(\d+)/)?.[1] || '0');
