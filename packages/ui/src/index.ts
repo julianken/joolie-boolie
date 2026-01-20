@@ -35,3 +35,10 @@ export { Input, type InputProps } from './input';
 // Session Management
 export { CreateGameModal, type CreateGameModalProps } from './create-game-modal';
 export { RoomCodeDisplay, type RoomCodeDisplayProps } from './room-code-display';
+
+// SyncStatusIndicator
+export {
+  SyncStatusIndicator,
+  type SyncStatusIndicatorProps,
+  type SyncStatus,
+} from './sync-status-indicator';
