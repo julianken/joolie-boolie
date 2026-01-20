@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { AppError, type TrackedError } from '../types/errors';
+import { describe, it, expect } from 'vitest';
+import { AppError } from '../types/errors';
 
 describe('AppError', () => {
   describe('constructor', () => {

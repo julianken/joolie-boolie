@@ -22,9 +22,12 @@ export function useStatistics() {
 
   // Load stats from localStorage on mount
   useEffect(() => {
-    const loadedStats = loadBingoStats();
-    setStats(loadedStats);
-    setIsLoaded(true);
+    const timer = setTimeout(() => {
+      const loadedStats = loadBingoStats();
+      setStats(loadedStats);
+      setIsLoaded(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   /**
@@ -145,12 +148,14 @@ export function useSessionTracking() {
   /**
    * Check if a session is currently active.
    */
-  const isSessionActive = sessionRef.current !== null;
+  const getIsSessionActive = useCallback(() => {
+    return sessionRef.current !== null;
+  }, []);
 
   return {
     startSession,
     endSession,
     cancelSession,
-    isSessionActive,
+    getIsSessionActive,
   };
 }

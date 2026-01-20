@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonButton, SkeletonCard } from '@beak-gaming/ui';
+import { Skeleton, SkeletonButton } from '@beak-gaming/ui';
 
 /**
  * Loading skeleton for the Dashboard page.

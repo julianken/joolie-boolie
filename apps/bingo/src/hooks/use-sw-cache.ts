@@ -32,10 +32,14 @@ interface UseSWCacheResult {
  * Provides cache status, preloading, and cache management.
  */
 export function useSWCache(): UseSWCacheResult {
-  const [isSupported] = useState(() => isServiceWorkerSupported());
+  const [isSupported, setIsSupported] = useState(false);
   const [status, setStatus] = useState<CacheStatus>({ cachedPacks: [], totalFiles: 0 });
   const [isPreloading, setIsPreloading] = useState(false);
   const [preloadProgress, setPreloadProgress] = useState(0);
+
+  useEffect(() => {
+    setIsSupported(isServiceWorkerSupported());
+  }, []);
 
   const refresh = useCallback(async () => {
     if (!isSupported) return;

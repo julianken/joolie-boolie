@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ErrorBoundary, type ErrorBoundaryProps, type ErrorBoundaryState } from '../components/ErrorBoundary';
+import { render, screen } from '@testing-library/react';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { resetLoggerConfig, configureErrorLogger, normalizeError } from '../utils/logger';
 import type { TrackedError } from '../types/errors';
 
@@ -167,7 +167,7 @@ describe('ErrorBoundary', () => {
     });
 
     it('should call fallback function with error and reset when provided', () => {
-      const fallbackFn = vi.fn((error, reset) => <div>Error: {error.message}</div>);
+      const fallbackFn = vi.fn((_error, _reset) => <div>Error: {_error.message}</div>);
       const boundary = new ErrorBoundary({
         children: <div>Child</div>,
         fallback: fallbackFn,
@@ -218,7 +218,7 @@ describe('ErrorBoundary', () => {
     });
 
     it('should accept custom fallback as function', () => {
-      const fallbackFn = (error: TrackedError, reset: () => void) => <div>Error</div>;
+      const fallbackFn = (_error: TrackedError, _reset: () => void) => <div>Error</div>;
       const boundary = new ErrorBoundary({
         children: <div>Child</div>,
         fallback: fallbackFn,

@@ -131,9 +131,13 @@ export function PatternLibrary({
   // File input ref for import
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load patterns on mount
+  // Load patterns on mount using lazy initialization
   useEffect(() => {
-    setPatterns(loadPatterns());
+    // Defer to next tick to load patterns asynchronously
+    const timer = setTimeout(() => {
+      setPatterns(loadPatterns());
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Save patterns whenever they change

@@ -122,13 +122,13 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should color-code option badges', () => {
-      const { _container } = render(<AudienceQuestionDisplay {...defaultProps} />);
+      const { container } = render(<AudienceQuestionDisplay {...defaultProps} />);
 
       // Check for color classes on option badges
-      expect(_container.querySelector('.bg-blue-600')).toBeInTheDocument(); // A
-      expect(_container.querySelector('.bg-red-600')).toBeInTheDocument(); // B
-      expect(_container.querySelector('.bg-green-600')).toBeInTheDocument(); // C
-      expect(_container.querySelector('.bg-orange-500')).toBeInTheDocument(); // D
+      expect(container.querySelector('.bg-blue-600')).toBeInTheDocument(); // A
+      expect(container.querySelector('.bg-red-600')).toBeInTheDocument(); // B
+      expect(container.querySelector('.bg-green-600')).toBeInTheDocument(); // C
+      expect(container.querySelector('.bg-orange-500')).toBeInTheDocument(); // D
     });
 
     it('should have large readable option text', () => {

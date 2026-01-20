@@ -412,7 +412,7 @@ describe('engine', () => {
       });
 
       it('returns false when no balls remaining', () => {
-        let state: GameState = { ...createInitialState(), status: 'playing', remainingBalls: [] };
+        const state: GameState = { ...createInitialState(), status: 'playing', remainingBalls: [] };
         expect(canCallBall(state)).toBe(false);
       });
     });

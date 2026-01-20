@@ -29,7 +29,6 @@ import type {
 
 import {
   captureError,
-  normalizeError,
   addBreadcrumb as addGlobalBreadcrumb,
   createScopedLogger,
 } from './client';

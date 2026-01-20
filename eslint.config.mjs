@@ -71,6 +71,7 @@ export default [
       "**/coverage/**",
       "**/out/**",
       "**/build/**",
+      "**/lighthouserc.js",
     ],
   },
 

@@ -4,7 +4,7 @@
 
 import type { TypedSupabaseClient } from '../client';
 import type { BingoTemplate, BingoTemplateInsert, BingoTemplateUpdate } from '../types';
-import { NotFoundError, ValidationError, withErrorHandling } from '../errors';
+import { ValidationError, withErrorHandling } from '../errors';
 import {
   getById,
   getOne,

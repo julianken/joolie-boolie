@@ -11,7 +11,6 @@ export function StatsDisplay() {
     isLoaded,
     gamesPlayed,
     averageTeamScore,
-    _overallAccuracy,
     highestTeamScore,
     mostPopularCategories,
     formattedPlayTime,
