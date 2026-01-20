@@ -26,3 +26,14 @@ export {
   type UpdateVariables,
   type OptimisticMutationOptions,
 } from './use-mutation';
+
+export {
+  useGameSession,
+  useCreateGameSession,
+  useUpdateGameSessionState,
+  useMarkSessionCompleted,
+  useVerifyPin,
+  type VerifyPinVariables,
+  type VerifyPinResult,
+  type UpdateGameStateVariables,
+} from './use-game-session';

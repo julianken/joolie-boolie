@@ -126,7 +126,7 @@ function logMetric(metric: WebVitalsMetric): void {
  * Default analytics reporter that can be extended
  * This is a no-op by default, ready for integration with analytics services
  */
-export function sendToAnalytics(metric: WebVitalsMetric): void {
+export function sendToAnalytics(_metric: WebVitalsMetric): void {
   // Example implementation for common analytics services:
   //
   // Google Analytics 4:
