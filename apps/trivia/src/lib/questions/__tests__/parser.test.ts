@@ -257,7 +257,7 @@ Test?,A,B,C,D,A,0`;
   });
 
   it('should error on unsupported format', () => {
-    const result = parseQuestions('content', 'xml' as any);
+    const result = parseQuestions('content', 'xml' as 'json' | 'csv');
 
     expect(result.success).toBe(false);
     expect(result.errors[0].message).toContain('Unsupported format');

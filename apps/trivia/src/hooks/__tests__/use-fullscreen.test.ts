@@ -25,8 +25,8 @@ describe('useFullscreen', () => {
     mockExitFullscreen = vi.fn().mockResolvedValue(undefined);
     mockRequestFullscreen = vi.fn().mockResolvedValue(undefined);
 
-    document.exitFullscreen = mockExitFullscreen;
-    Element.prototype.requestFullscreen = mockRequestFullscreen;
+    document.exitFullscreen = mockExitFullscreen as unknown as () => Promise<void>;
+    Element.prototype.requestFullscreen = mockRequestFullscreen as unknown as (options?: FullscreenOptions) => Promise<void>;
   });
 
   afterEach(() => {

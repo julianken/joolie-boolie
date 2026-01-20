@@ -11,12 +11,10 @@ import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
 import {
   WaitingDisplay,
-  AudienceQuestionDisplay,
   AudienceScoreboard,
   GameEndDisplay,
   PauseOverlay,
   AudienceQuestion,
-  AudienceTimer,
 } from '@/components/audience';
 
 /**

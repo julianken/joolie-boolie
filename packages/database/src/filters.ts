@@ -64,7 +64,7 @@ type QueryBuilder = any;
 /**
  * Applies a single filter condition to a query builder
  */
-export function applyFilter<T extends QueryBuilder>(query: T, filter: FilterCondition): T {
+export function applyFilter(query: QueryBuilder, filter: FilterCondition): QueryBuilder {
   const { column, operator, value } = filter;
 
   switch (operator) {
@@ -104,14 +104,14 @@ export function applyFilter<T extends QueryBuilder>(query: T, filter: FilterCond
 /**
  * Applies multiple filter conditions to a query builder
  */
-export function applyFilters<T extends QueryBuilder>(query: T, filters: FilterCondition[]): T {
+export function applyFilters(query: QueryBuilder, filters: FilterCondition[]): QueryBuilder {
   return filters.reduce((q, filter) => applyFilter(q, filter), query);
 }
 
 /**
  * Applies a single sort condition to a query builder
  */
-export function applySort<T extends QueryBuilder>(query: T, sort: SortCondition): T {
+export function applySort(query: QueryBuilder, sort: SortCondition): QueryBuilder {
   return query.order(sort.column, {
     ascending: sort.ascending ?? true,
     nullsFirst: sort.nullsFirst ?? false,
@@ -122,7 +122,7 @@ export function applySort<T extends QueryBuilder>(query: T, sort: SortCondition)
 /**
  * Applies multiple sort conditions to a query builder
  */
-export function applySorts<T extends QueryBuilder>(query: T, sorts: SortCondition[]): T {
+export function applySorts(query: QueryBuilder, sorts: SortCondition[]): QueryBuilder {
   return sorts.reduce((q, sort) => applySort(q, sort), query);
 }
 
@@ -149,11 +149,11 @@ export function createTextSearchFilter(query: string, columns: string[]): string
 /**
  * Applies text search across multiple columns using OR logic
  */
-export function applyTextSearch<T extends QueryBuilder>(
-  query: T,
+export function applyTextSearch(
+  query: QueryBuilder,
   searchQuery: string,
   columns: string[]
-): T {
+): QueryBuilder {
   if (!searchQuery.trim() || columns.length === 0) {
     return query;
   }

@@ -528,13 +528,15 @@ describe('audio-store', () => {
         pause = vi.fn();
         load = vi.fn();
         play = vi.fn(() => {
+          const self = audioInstance;
           setTimeout(() => {
-            this.onended?.();
+            self?.onended?.();
           }, 0);
           return Promise.resolve();
         });
 
         constructor() {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
           audioInstance = this;
         }
       }
@@ -599,13 +601,15 @@ describe('audio-store', () => {
         pause = vi.fn();
         load = vi.fn();
         play = vi.fn(() => {
+          const self = audioInstance;
           setTimeout(() => {
-            this.onended?.();
+            self?.onended?.();
           }, 0);
           return Promise.resolve();
         });
 
         constructor() {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
           audioInstance = this;
         }
       }

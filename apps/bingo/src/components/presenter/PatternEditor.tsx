@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useId } from 'react';
+import { useState, useCallback, useId, useEffect } from 'react';
 import { BingoPattern, PatternCell } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -67,6 +67,21 @@ export function PatternEditor({
 
   // Validation state
   const [nameError, setNameError] = useState<string | null>(null);
+
+  // Update state when initialPattern changes
+  // This is a valid pattern to sync state with props per React docs
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setName(initialPattern?.name ?? '');
+    setDescription(initialPattern?.description ?? '');
+    setCells(
+      initialPattern
+        ? initialPattern.cells.filter((c) => !isFreeSpace(c.row, c.col))
+        : []
+    );
+    setNameError(null);
+  }, [initialPattern]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   /**
    * Toggle a cell on/off
@@ -239,7 +254,6 @@ export function PatternEditor({
                     type="button"
                     role="gridcell"
                     aria-label={cellLabel}
-                    aria-pressed={isMarked || isFree}
                     disabled={isFree}
                     onClick={() => toggleCell(rowIndex, colIndex)}
                     onKeyDown={(e) => handleCellKeyDown(e, rowIndex, colIndex)}

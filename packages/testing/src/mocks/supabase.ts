@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 
 /**
  * Mock Supabase user
@@ -73,9 +73,39 @@ export interface MockAuthState {
 }
 
 /**
+ * Type for mock Supabase client helpers
+ */
+export interface MockSupabaseClientHelpers {
+  simulateAuthChange: (event: string, session: MockSession | null) => void;
+  setState: (state: MockAuthState) => void;
+  getState: () => MockAuthState;
+  getListenerCount: () => number;
+}
+
+/**
+ * Type for mock Supabase client
+ */
+export interface MockSupabaseClient {
+  auth: {
+    getSession: Mock;
+    getUser: Mock;
+    signInWithPassword: Mock;
+    signUp: Mock;
+    signOut: Mock;
+    resetPasswordForEmail: Mock;
+    updateUser: Mock;
+    refreshSession: Mock;
+    onAuthStateChange: Mock;
+  };
+  __helpers: MockSupabaseClientHelpers;
+}
+
+/**
  * Creates a mock Supabase client for testing
  */
-export function createMockSupabaseClient(initialState: MockAuthState = { user: null, session: null }) {
+export function createMockSupabaseClient(
+  initialState: MockAuthState = { user: null, session: null }
+): MockSupabaseClient {
   let currentState = { ...initialState };
   const authChangeListeners: Array<(event: string, session: MockSession | null) => void> = [];
 
@@ -182,14 +212,9 @@ export function createMockSupabaseClient(initialState: MockAuthState = { user: n
 }
 
 /**
- * Type for mock Supabase client
- */
-export type MockSupabaseClient = ReturnType<typeof createMockSupabaseClient>;
-
-/**
  * Mock createBrowserClient from @supabase/ssr
  */
-export function mockSupabaseSsr() {
+export function mockSupabaseSsr(): MockSupabaseClient {
   const mockClient = createMockSupabaseClient();
 
   vi.mock('@supabase/ssr', () => ({

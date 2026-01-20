@@ -24,16 +24,6 @@ interface FullscreenElement extends Element {
 export function useFullscreen() {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Check current fullscreen state
-  const checkFullscreen = useCallback(() => {
-    const doc = document as FullscreenDocument;
-    const isCurrentlyFullscreen = !!(
-      document.fullscreenElement || doc.webkitFullscreenElement
-    );
-    setIsFullscreen(isCurrentlyFullscreen);
-    return isCurrentlyFullscreen;
-  }, []);
-
   // Toggle fullscreen mode
   const toggleFullscreen = useCallback(async () => {
     const doc = document as FullscreenDocument;
@@ -102,20 +92,24 @@ export function useFullscreen() {
   // Listen for fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      checkFullscreen();
+      const doc = document as FullscreenDocument;
+      const isCurrentlyFullscreen = !!(
+        document.fullscreenElement || doc.webkitFullscreenElement
+      );
+      setIsFullscreen(isCurrentlyFullscreen);
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
     // Initial check
-    checkFullscreen();
+    handleFullscreenChange();
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
     };
-  }, [checkFullscreen]);
+  }, []);
 
   return {
     isFullscreen,

@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonCard, SkeletonButton, SkeletonText } from '@beak-gaming/ui';
+import { Skeleton, SkeletonButton } from '@beak-gaming/ui';
 
 /**
  * Loading skeleton for the Bingo presenter page.

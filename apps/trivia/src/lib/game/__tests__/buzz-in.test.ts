@@ -198,7 +198,7 @@ describe('buzz-in', () => {
     it('should return to initial state', () => {
       let state = createInitialBuzzInState();
       state = activateBuzzIn(state);
-      const { state: buzzedState } = recordBuzz(state, 'team-1', 1000);
+      const { state: _buzzedState } = recordBuzz(state, 'team-1', 1000);
       const clearedState = clearBuzzIn();
 
       expect(clearedState).toEqual(createInitialBuzzInState());

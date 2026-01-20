@@ -154,7 +154,7 @@ export default function Home() {
               <div>
                 <h3 className="text-2xl font-semibold mb-1">Open the Presenter View</h3>
                 <p className="text-lg text-muted-foreground">
-                  Click "Play Now" on your computer to access the game controls.
+                  Click &quot;Play Now&quot; on your computer to access the game controls.
                 </p>
               </div>
             </li>
@@ -166,7 +166,7 @@ export default function Home() {
               <div>
                 <h3 className="text-2xl font-semibold mb-1">Open the Audience Display</h3>
                 <p className="text-lg text-muted-foreground">
-                  Click "Open Display" and move the window to your projector or TV.
+                  Click &quot;Open Display&quot; and move the window to your projector or TV.
                 </p>
               </div>
             </li>
@@ -188,7 +188,7 @@ export default function Home() {
                 4
               </span>
               <div>
-                <h3 className="text-2xl font-semibold mb-1">Call "Bingo!"</h3>
+                <h3 className="text-2xl font-semibold mb-1">Call &quot;Bingo!&quot;</h3>
                 <p className="text-lg text-muted-foreground">
                   When someone wins, verify their card matches the pattern. Reset to play again!
                 </p>

@@ -229,7 +229,7 @@ describe('useSettingsStore', () => {
 
       // Check if localStorage was called - Zustand persist may batch writes
       const calls = localStorageMock.setItem.mock.calls;
-      const settingsCall = calls.find((call: [string, string]) => call[0] === 'trivia-settings');
+      const _settingsCall = calls.find((call: [string, string]) => call[0] === 'trivia-settings');
       // The persist middleware uses 'trivia-settings' as the key
       // Just verify the store has the persist config correctly set up
       expect(useSettingsStore.persist).toBeDefined();

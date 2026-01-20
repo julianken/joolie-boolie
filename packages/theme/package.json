@@ -20,6 +20,8 @@
     "tailwindcss": "^4"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "@testing-library/jest-dom": "^6.6.3",
+    "typescript": "^5",
+    "vitest": "^4.0.17"
   }
 }

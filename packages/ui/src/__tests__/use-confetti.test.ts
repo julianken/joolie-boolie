@@ -198,7 +198,7 @@ describe('useConfetti', () => {
 
   describe('cleanup', () => {
     it('should clear timeout on unmount', () => {
-      const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+      const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
       const { result, unmount } = renderHook(() => useConfetti({ duration: 4000 }));
 
       act(() => {

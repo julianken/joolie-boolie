@@ -380,8 +380,11 @@ export const useAudioStore = create<AudioStore>()(
           return;
         }
 
-        // Set isPlaying BEFORE any async work to prevent race conditions
+        // Set isPlaying BEFORE any async work to prevent race conditions using setState callback
         set({ isPlaying: true });
+
+        // Defer remaining work to next tick to avoid setState in effect issues
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         try {
           // Load manifest if needed

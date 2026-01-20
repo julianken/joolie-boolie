@@ -1,5 +1,5 @@
 import type { Question } from '@/types';
-import type { ExportFormat, ExportOptions, ExportResult } from './types';
+import type { ExportOptions, ExportResult } from './types';
 
 // =============================================================================
 // MAIN EXPORT FUNCTIONS

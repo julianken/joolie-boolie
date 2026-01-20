@@ -5,14 +5,13 @@ import { useOnlineStatus, useConnectionInfo } from '../use-online-status';
 describe('use-online-status', () => {
   let onlineListeners: Set<() => void>;
   let offlineListeners: Set<() => void>;
-  let originalNavigator: Navigator;
 
   beforeEach(() => {
     onlineListeners = new Set();
     offlineListeners = new Set();
 
-    // Save original navigator
-    originalNavigator = window.navigator;
+    // Save original navigator for potential restoration
+    // originalNavigator = window.navigator;
 
     // Mock navigator.onLine
     Object.defineProperty(navigator, 'onLine', {
@@ -243,32 +242,54 @@ describe('use-online-status', () => {
         connectionListeners.clear();
       });
 
-      it('returns connectionType when API is available', () => {
+      it('returns connectionType when API is available', async () => {
+        vi.useFakeTimers();
         const { result } = renderHook(() => useConnectionInfo());
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0);
+        });
 
         expect(result.current.connectionType).toBe('wifi');
+        vi.useRealTimers();
       });
 
-      it('returns effectiveType when API is available', () => {
+      it('returns effectiveType when API is available', async () => {
+        vi.useFakeTimers();
         const { result } = renderHook(() => useConnectionInfo());
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0);
+        });
 
         expect(result.current.effectiveType).toBe('4g');
+        vi.useRealTimers();
       });
 
-      it('returns isSlowConnection as true for slow-2g', () => {
+      it('returns isSlowConnection as true for slow-2g', async () => {
         mockConnection.effectiveType = 'slow-2g';
-
+        vi.useFakeTimers();
         const { result } = renderHook(() => useConnectionInfo());
 
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0);
+        });
+
         expect(result.current.isSlowConnection).toBe(true);
+        vi.useRealTimers();
       });
 
-      it('returns isSlowConnection as true for 2g', () => {
+      it('returns isSlowConnection as true for 2g', async () => {
         mockConnection.effectiveType = '2g';
-
+        vi.useFakeTimers();
         const { result } = renderHook(() => useConnectionInfo());
 
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0);
+        });
+
         expect(result.current.isSlowConnection).toBe(true);
+        vi.useRealTimers();
       });
 
       it('returns isSlowConnection as false for 3g', () => {
@@ -293,8 +314,14 @@ describe('use-online-status', () => {
         expect(mockConnection.removeEventListener).toHaveBeenCalledWith('change', expect.any(Function));
       });
 
-      it('updates values on connection change', () => {
+      it('updates values on connection change', async () => {
+        vi.useFakeTimers();
         const { result } = renderHook(() => useConnectionInfo());
+
+        // Wait for initial setTimeout to complete
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0);
+        });
 
         expect(result.current.effectiveType).toBe('4g');
 
@@ -306,6 +333,7 @@ describe('use-online-status', () => {
 
         expect(result.current.connectionType).toBe('cellular');
         expect(result.current.effectiveType).toBe('3g');
+        vi.useRealTimers();
       });
     });
 

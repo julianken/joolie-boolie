@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
 const withSerwist = withSerwistInit({
   swSrc: 'src/sw.ts',
   swDest: 'public/sw.js',
+  // Disable in development to avoid Turbopack incompatibility warnings
   disable: process.env.NODE_ENV === 'development',
 });
 

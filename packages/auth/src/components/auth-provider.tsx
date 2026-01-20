@@ -9,7 +9,6 @@ import type {
   AuthError,
   AuthErrorCode,
   AuthState,
-  AuthUser,
 } from '../types';
 
 /**

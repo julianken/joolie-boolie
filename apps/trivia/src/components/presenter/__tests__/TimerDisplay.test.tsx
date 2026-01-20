@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TimerDisplay } from '../TimerDisplay';
 import { useGameStore } from '@/stores/game-store';
 import { useSettingsStore } from '@/stores/settings-store';
-import { createInitialState } from '@/lib/game/engine';
 
 // Mock the stores
 vi.mock('@/stores/game-store', async () => {

@@ -120,11 +120,8 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
   const isInitializedRef = useRef(false);
 
   // Create a session-scoped BroadcastSync instance
-  const broadcastSyncRef = useRef<BingoBroadcastSync | null>(null);
   const broadcastSync = useMemo(() => {
-    const instance = createBingoBroadcastSync(sessionId);
-    broadcastSyncRef.current = instance;
-    return instance;
+    return createBingoBroadcastSync(sessionId);
   }, [sessionId]);
 
   // Get current game state for broadcasting
@@ -161,6 +158,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
   );
 
   const handleBallCalled = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_ball: BingoBall) => {
       if (role !== 'audience') return;
       // Ball called events are handled via state updates

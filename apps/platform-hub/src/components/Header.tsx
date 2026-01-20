@@ -1,6 +1,7 @@
 'use client';
 
 import { HTMLAttributes, forwardRef } from 'react';
+import Link from 'next/link';
 
 export interface HeaderProps extends HTMLAttributes<HTMLElement> {
   /** Optional logo URL */
@@ -12,7 +13,7 @@ export interface HeaderProps extends HTMLAttributes<HTMLElement> {
  * Simple, clean header designed for senior users.
  */
 export const Header = forwardRef<HTMLElement, HeaderProps>(
-  ({ logoUrl, className = '', ...props }, ref) => {
+  ({ logoUrl: _logoUrl, className = '', ...props }, ref) => {
     return (
       <header
         ref={ref}
@@ -27,7 +28,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo and Brand */}
-          <a
+          <Link
             href="/"
             className="flex items-center gap-4 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 rounded-lg p-2 -m-2"
             aria-label="Beak Gaming Platform - Home"
@@ -51,13 +52,13 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
                 Fun for Everyone
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Navigation placeholder - Auth links will go here later */}
           <nav aria-label="Main navigation">
             <ul className="flex items-center gap-4">
               <li>
-                <a
+                <Link
                   href="/"
                   className="
                     inline-flex items-center justify-center
@@ -70,7 +71,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
                   "
                 >
                   Games
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>

@@ -1,9 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGameStore, useGameSelectors } from '../game-store';
-import { createInitialState } from '@/lib/game/engine';
 import { renderHook, act } from '@testing-library/react';
 import { resetGameStore } from '@/test/helpers/store';
-import { DEFAULT_ROUNDS } from '@/types';
 
 // Mock uuid for predictable but unique values
 const mockUuidCounter = vi.hoisted(() => ({ value: 0 }));

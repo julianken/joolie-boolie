@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { TrackedError, ErrorCategory } from '../types/errors';
+import { TrackedError } from '../types/errors';
 
 export interface ErrorDisplayProps {
   /** Error to display (optional - uses default message if not provided) */

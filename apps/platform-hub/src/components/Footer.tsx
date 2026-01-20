@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, forwardRef } from 'react';
 
-export interface FooterProps extends HTMLAttributes<HTMLElement> {}
+export type FooterProps = HTMLAttributes<HTMLElement>;
 
 /**
  * Footer - Simple platform footer.

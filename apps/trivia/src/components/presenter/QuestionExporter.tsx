@@ -17,7 +17,7 @@ export function QuestionExporter({ questions }: QuestionExporterProps) {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const stats = getExportStats(questions);
-  const questionsByRound = groupQuestionsByRound(questions);
+  const _questionsByRound = groupQuestionsByRound(questions);
 
   const handleExport = () => {
     if (questions.length === 0) return;

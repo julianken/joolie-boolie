@@ -54,9 +54,16 @@ export function useConnectionInfo() {
       setEffectiveType(connection.effectiveType ?? null);
     };
 
-    updateConnection();
+    // Only update if component is mounted
+    const timeoutId = setTimeout(() => {
+      updateConnection();
+    }, 0);
+
     connection.addEventListener('change', updateConnection);
-    return () => connection.removeEventListener('change', updateConnection);
+    return () => {
+      clearTimeout(timeoutId);
+      connection.removeEventListener('change', updateConnection);
+    };
   }, []);
 
   return {

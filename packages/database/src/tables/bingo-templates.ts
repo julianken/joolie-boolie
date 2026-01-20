@@ -4,7 +4,7 @@
 
 import type { TypedSupabaseClient } from '../client';
 import type { BingoTemplate, BingoTemplateInsert, BingoTemplateUpdate } from '../types';
-import { NotFoundError, ValidationError, withErrorHandling } from '../errors';
+import { ValidationError, withErrorHandling } from '../errors';
 import {
   getById,
   getOne,
@@ -169,9 +169,10 @@ async function unsetDefaultBingoTemplate(
   client: TypedSupabaseClient,
   userId: string
 ): Promise<void> {
-  await client
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (client as any)
     .from('bingo_templates')
-    .update({ is_default: false } as BingoTemplateUpdate)
+    .update({ is_default: false })
     .eq('user_id', userId)
     .eq('is_default', true);
 }

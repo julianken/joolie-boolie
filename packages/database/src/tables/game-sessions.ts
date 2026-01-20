@@ -247,7 +247,7 @@ export function updateSessionMetadata<T extends Record<string, unknown>>(
  */
 export function getBingoMetadata(session: GameSession): BingoSessionMetadata | null {
   if (session.game_type !== 'bingo') return null;
-  return session.metadata as BingoSessionMetadata;
+  return session.metadata as unknown as BingoSessionMetadata;
 }
 
 /**
@@ -255,7 +255,7 @@ export function getBingoMetadata(session: GameSession): BingoSessionMetadata | n
  */
 export function getTriviaMetadata(session: GameSession): TriviaSessionMetadata | null {
   if (session.game_type !== 'trivia') return null;
-  return session.metadata as TriviaSessionMetadata;
+  return session.metadata as unknown as TriviaSessionMetadata;
 }
 
 // =============================================================================

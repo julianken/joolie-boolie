@@ -95,7 +95,7 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should show category in a badge', () => {
-      const { container } = render(<AudienceQuestionDisplay {...defaultProps} />);
+      render(<AudienceQuestionDisplay {...defaultProps} />);
 
       const badge = screen.getByText('history').closest('div');
       expect(badge).toHaveClass('rounded-full');
@@ -150,7 +150,7 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should style TRUE option with green', () => {
-      const { container } = render(
+      render(
         <AudienceQuestionDisplay {...defaultProps} question={mockTrueFalseQuestion} />
       );
 
@@ -159,7 +159,7 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should style FALSE option with red', () => {
-      const { container } = render(
+      render(
         <AudienceQuestionDisplay {...defaultProps} question={mockTrueFalseQuestion} />
       );
 

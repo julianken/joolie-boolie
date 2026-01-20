@@ -85,21 +85,32 @@ export function useDisplayTheme(): {
  * Useful for UI that needs to show the current effective theme.
  */
 export function useResolvedTheme(mode: ThemeMode): 'light' | 'dark' {
+  // Compute initial resolved theme, re-run when mode changes
   const [resolved, setResolved] = useState<'light' | 'dark'>(() => resolveTheme(mode));
 
+  // Update resolved theme when mode changes
+  // This effect synchronizes React state with external system (OS theme preference)
+  // which is a valid use case per React docs
   useEffect(() => {
-    setResolved(resolveTheme(mode));
+    const newResolved = resolveTheme(mode);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setResolved(newResolved);
+  }, [mode]);
 
-    if (mode === 'system' && typeof window !== 'undefined') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-      const handleChange = (e: MediaQueryListEvent) => {
-        setResolved(e.matches ? 'dark' : 'light');
-      };
-
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
+  // Subscribe to media query changes for system mode only
+  useEffect(() => {
+    if (mode !== 'system' || typeof window === 'undefined') {
+      return;
     }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setResolved(e.matches ? 'dark' : 'light');
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, [mode]);
 
   return resolved;
