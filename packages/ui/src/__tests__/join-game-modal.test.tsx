@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { JoinGameModal } from '../join-game-modal';
 
@@ -110,7 +110,6 @@ describe('JoinGameModal', () => {
     });
 
     it('should show error when PIN is empty on submit', async () => {
-      const user = userEvent.setup();
       render(<JoinGameModal {...defaultProps} />);
       const submitButton = screen.getByRole('button', { name: 'Join as Presenter' });
 
@@ -250,7 +249,6 @@ describe('JoinGameModal', () => {
       const onSubmit = vi.fn();
       render(<JoinGameModal {...defaultProps} isLoading={true} onSubmit={onSubmit} />);
 
-      const input = screen.getByLabelText('Presenter PIN');
       await user.keyboard('{Enter}');
 
       expect(onSubmit).not.toHaveBeenCalled();
