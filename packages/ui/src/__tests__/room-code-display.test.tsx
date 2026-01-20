@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { RoomCodeDisplay } from '../room-code-display';
 
 // Ensure navigator.clipboard exists with a mock writeText function
-const originalClipboard = navigator.clipboard;
 Object.defineProperty(navigator, 'clipboard', {
   value: {
     writeText: async () => {},  // Placeholder function to spy on
