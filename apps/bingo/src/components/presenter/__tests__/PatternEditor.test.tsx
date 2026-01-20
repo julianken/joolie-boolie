@@ -91,10 +91,11 @@ describe('PatternEditor', () => {
       render(<PatternEditor {...defaultProps} />);
       // Find a cell (not free space)
       const cell = screen.getByRole('gridcell', { name: /B1/ });
-      expect(cell).toHaveAttribute('aria-pressed', 'false');
+      expect(cell.getAttribute('aria-label')).toMatch(/not marked/);
 
       fireEvent.click(cell);
-      expect(cell).toHaveAttribute('aria-pressed', 'true');
+      expect(cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(cell.getAttribute('aria-label')).not.toMatch(/not marked/);
     });
 
     it('toggles cell off when clicked again', () => {
@@ -102,10 +103,11 @@ describe('PatternEditor', () => {
       const cell = screen.getByRole('gridcell', { name: /B1/ });
 
       fireEvent.click(cell);
-      expect(cell).toHaveAttribute('aria-pressed', 'true');
+      expect(cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(cell.getAttribute('aria-label')).not.toMatch(/not marked/);
 
       fireEvent.click(cell);
-      expect(cell).toHaveAttribute('aria-pressed', 'false');
+      expect(cell.getAttribute('aria-label')).toMatch(/not marked/);
     });
 
     it('does not toggle free space cell', () => {
@@ -122,7 +124,8 @@ describe('PatternEditor', () => {
       const cell = screen.getByRole('gridcell', { name: /B1/ });
 
       fireEvent.keyDown(cell, { key: 'Enter' });
-      expect(cell).toHaveAttribute('aria-pressed', 'true');
+      expect(cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(cell.getAttribute('aria-label')).not.toMatch(/not marked/);
     });
 
     it('toggles cell with Space key', () => {
@@ -130,7 +133,8 @@ describe('PatternEditor', () => {
       const cell = screen.getByRole('gridcell', { name: /B1/ });
 
       fireEvent.keyDown(cell, { key: ' ' });
-      expect(cell).toHaveAttribute('aria-pressed', 'true');
+      expect(cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(cell.getAttribute('aria-label')).not.toMatch(/not marked/);
     });
   });
 
@@ -143,15 +147,19 @@ describe('PatternEditor', () => {
       fireEvent.click(screen.getByRole('gridcell', { name: /O5/ }));
 
       // Verify they are marked
-      expect(screen.getByRole('gridcell', { name: /B1/ })).toHaveAttribute('aria-pressed', 'true');
-      expect(screen.getByRole('gridcell', { name: /O5/ })).toHaveAttribute('aria-pressed', 'true');
+      const b1Cell = screen.getByRole('gridcell', { name: /B1/ });
+      const o5Cell = screen.getByRole('gridcell', { name: /O5/ });
+      expect(b1Cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(b1Cell.getAttribute('aria-label')).not.toMatch(/not marked/);
+      expect(o5Cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(o5Cell.getAttribute('aria-label')).not.toMatch(/not marked/);
 
       // Clear all
       fireEvent.click(screen.getByRole('button', { name: 'Clear All' }));
 
       // Verify all (except free space) are unmarked
-      expect(screen.getByRole('gridcell', { name: /B1/ })).toHaveAttribute('aria-pressed', 'false');
-      expect(screen.getByRole('gridcell', { name: /O5/ })).toHaveAttribute('aria-pressed', 'false');
+      expect(b1Cell.getAttribute('aria-label')).toMatch(/not marked/);
+      expect(o5Cell.getAttribute('aria-label')).toMatch(/not marked/);
     });
 
     it('Fill All marks all cells', () => {
@@ -160,10 +168,12 @@ describe('PatternEditor', () => {
       // Fill all
       fireEvent.click(screen.getByRole('button', { name: 'Fill All' }));
 
-      // Verify all cells are marked
+      // Verify all cells are marked or disabled (free space)
       const cells = screen.getAllByRole('gridcell');
       cells.forEach((cell) => {
-        expect(cell).toHaveAttribute('aria-pressed', 'true');
+        const label = cell.getAttribute('aria-label');
+        // Either marked or it's the free space (which is always marked)
+        expect(label).toMatch(/marked/);
       });
     });
   });
@@ -331,8 +341,12 @@ describe('PatternEditor', () => {
       };
       render(<PatternEditor {...defaultProps} initialPattern={initialPattern} />);
 
-      expect(screen.getByRole('gridcell', { name: /B1/ })).toHaveAttribute('aria-pressed', 'true');
-      expect(screen.getByRole('gridcell', { name: /O5/ })).toHaveAttribute('aria-pressed', 'true');
+      const b1Cell = screen.getByRole('gridcell', { name: /B1/ });
+      const o5Cell = screen.getByRole('gridcell', { name: /O5/ });
+      expect(b1Cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(b1Cell.getAttribute('aria-label')).not.toMatch(/not marked/);
+      expect(o5Cell.getAttribute('aria-label')).toMatch(/marked/);
+      expect(o5Cell.getAttribute('aria-label')).not.toMatch(/not marked/);
     });
   });
 
@@ -363,12 +377,15 @@ describe('PatternEditor', () => {
       expect(screen.getByRole('grid', { name: /pattern editor grid/i })).toBeInTheDocument();
     });
 
-    it('cells have proper aria-pressed states', () => {
+    it('cells have proper aria-label with marked state', () => {
       render(<PatternEditor {...defaultProps} />);
       const cells = screen.getAllByRole('gridcell');
 
       cells.forEach((cell) => {
-        expect(cell).toHaveAttribute('aria-pressed');
+        const label = cell.getAttribute('aria-label');
+        expect(label).toBeTruthy();
+        // Each cell should have either "marked" or "not marked" in its label
+        expect(label).toMatch(/marked/);
       });
     });
 
