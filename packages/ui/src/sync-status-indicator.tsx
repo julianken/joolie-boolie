@@ -129,16 +129,6 @@ export function SyncStatusIndicator({
 
       case 'saved': {
         const relativeTime = lastSavedAt ? formatDistanceToNow(lastSavedAt) : '';
-        const displayTime = relativeTime === 'just now'
-          ? 'Saved just now'
-          : relativeTime
-            ? `Saved ${relativeTime} ago`
-            : 'Saved';
-        const ariaTime = relativeTime === 'just now'
-          ? 'just now'
-          : relativeTime
-            ? `${relativeTime} ago`
-            : 'successfully';
         return {
           icon: (
             <svg
@@ -157,10 +147,14 @@ export function SyncStatusIndicator({
               />
             </svg>
           ),
-          text: displayTime,
+          text: relativeTime
+            ? relativeTime === 'just now'
+              ? 'Saved just now'
+              : `Saved ${relativeTime} ago`
+            : 'Saved',
           color: 'text-green-600 dark:text-green-400',
           bgColor: 'bg-green-50 dark:bg-green-950',
-          ariaLabel: `Game state saved ${ariaTime}`,
+          ariaLabel: `Game state saved ${relativeTime ? (relativeTime === 'just now' ? 'just now' : `${relativeTime} ago`) : 'successfully'}`,
         };
       }
 
@@ -203,7 +197,7 @@ export function SyncStatusIndicator({
   if (compact) {
     return (
       <div
-        className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] ${className}`.trim()}
+        className={`inline-flex items-center justify-center ${className}`.trim()}
         role="status"
         aria-label={statusContent.ariaLabel}
         aria-live="polite"
@@ -218,7 +212,7 @@ export function SyncStatusIndicator({
       className={`
         inline-flex items-center gap-2
         px-3 py-1.5 rounded-md
-        text-lg font-medium
+        text-sm font-medium
         ${statusContent.color}
         ${statusContent.bgColor}
         ${className}

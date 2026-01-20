@@ -23,7 +23,7 @@ export {
 // Store
 export { createSyncStore, type UseSyncStore } from './store';
 
-// Hook
+// Hooks
 export { useSync } from './use-sync';
 
 // Session link utilities

@@ -337,21 +337,3 @@ export {
   MAX_ATTEMPTS,
   LOCKOUT_DURATION_MS,
 } from './pin-security';
-
-// =============================================================================
-// HMAC Token Security
-// =============================================================================
-
-export {
-  signToken,
-  verifyAndDecodeToken,
-} from './hmac-tokens';
-
-// =============================================================================
-// API Route Factories
-// =============================================================================
-
-export {
-  createSessionRoutes,
-  type SessionRouteConfig,
-} from './api';

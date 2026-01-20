@@ -288,10 +288,10 @@ describe('SyncStatusIndicator', () => {
   });
 
   describe('visual design', () => {
-    it('should use senior-friendly text size (text-lg, 18px minimum)', () => {
+    it('should be small and unobtrusive (text-sm)', () => {
       const { container } = render(<SyncStatusIndicator status="saved" />);
       const statusElement = container.querySelector('[role="status"]');
-      expect(statusElement?.className).toContain('text-lg');
+      expect(statusElement?.className).toContain('text-sm');
     });
 
     it('should have appropriate padding', () => {
