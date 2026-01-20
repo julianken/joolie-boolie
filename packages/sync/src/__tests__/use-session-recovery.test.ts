@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useSessionRecovery } from '../use-session-recovery';
 import type { SessionRecoveryHookOptions } from '../use-session-recovery';
 
 describe('useSessionRecovery', () => {
   let mockLocalStorage: Record<string, string>;
-  let mockFetchGameState: ReturnType<typeof vi.fn>;
-  let mockHydrateStore: ReturnType<typeof vi.fn>;
-  let mockGetRoomCodeFromUrl: ReturnType<typeof vi.fn>;
+  let mockFetchGameState: ReturnType<typeof vi.fn<(roomCode: string, token: string) => Promise<any>>>;
+  let mockHydrateStore: ReturnType<typeof vi.fn<(state: any) => void>>;
+  let mockGetRoomCodeFromUrl: ReturnType<typeof vi.fn<() => string | null>>;
 
   beforeEach(() => {
     // Mock localStorage
     mockLocalStorage = {};
-    global.localStorage = {
+    (globalThis as any).localStorage = {
       getItem: vi.fn((key: string) => mockLocalStorage[key] ?? null),
       setItem: vi.fn((key: string, value: string) => {
         mockLocalStorage[key] = value;
@@ -28,9 +28,9 @@ describe('useSessionRecovery', () => {
     } as any;
 
     // Mock fetch callback
-    mockFetchGameState = vi.fn();
-    mockHydrateStore = vi.fn();
-    mockGetRoomCodeFromUrl = vi.fn();
+    mockFetchGameState = vi.fn<(roomCode: string, token: string) => Promise<any>>();
+    mockHydrateStore = vi.fn<(state: any) => void>();
+    mockGetRoomCodeFromUrl = vi.fn<() => string | null>();
 
     // Reset console.error to avoid noise
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -432,7 +432,9 @@ describe('useSessionRecovery', () => {
       });
 
       // Now resolve the promise
-      resolvePromise?.({ state: 'test' });
+      act(() => {
+        resolvePromise?.({ state: 'test' });
+      });
 
       await waitFor(() => {
         expect(result.current.isRecovering).toBe(false);
@@ -482,7 +484,9 @@ describe('useSessionRecovery', () => {
 
       // Now trigger manual recovery with success
       mockFetchGameState.mockResolvedValue({ state: 'test' });
-      await result.current.recover();
+      await act(async () => {
+        await result.current.recover();
+      });
 
       await waitFor(() => {
         expect(result.current.error).toBeNull();
@@ -559,7 +563,7 @@ describe('useSessionRecovery', () => {
 
     it('should handle localStorage errors gracefully', async () => {
       // Mock localStorage to throw errors
-      global.localStorage.getItem = vi.fn(() => {
+      (globalThis as any).localStorage.getItem = vi.fn(() => {
         throw new Error('Storage quota exceeded');
       });
 
@@ -596,7 +600,9 @@ describe('useSessionRecovery', () => {
       mockHydrateStore.mockClear();
 
       // Manually trigger another recovery
-      await result.current.recover();
+      await act(async () => {
+        await result.current.recover();
+      });
 
       // Should have called API again
       expect(mockFetchGameState).toHaveBeenCalled();
@@ -616,7 +622,9 @@ describe('useSessionRecovery', () => {
       mockLocalStorage.session_token = validToken;
       mockFetchGameState.mockResolvedValue({ state: 'test' });
 
-      await result.current.recover();
+      await act(async () => {
+        await result.current.recover();
+      });
 
       await waitFor(() => {
         expect(result.current.requiresPin).toBe(false);

@@ -11,11 +11,11 @@ interface TestState {
 }
 
 describe('useAutoSync', () => {
-  let mockSyncFn: ReturnType<typeof vi.fn>;
+  let mockSyncFn: ReturnType<typeof vi.fn<(state: TestState) => Promise<void>>>;
 
   beforeEach(() => {
     vi.useFakeTimers();
-    mockSyncFn = vi.fn().mockResolvedValue(undefined);
+    mockSyncFn = vi.fn<(state: TestState) => Promise<void>>().mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -27,7 +27,7 @@ describe('useAutoSync', () => {
     it('should batch rapid state changes within 2s window', async () => {
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // First render establishes initial state
@@ -63,7 +63,7 @@ describe('useAutoSync', () => {
     it('should sync after debounce period expires', async () => {
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -82,7 +82,7 @@ describe('useAutoSync', () => {
     it('should reset debounce timer on each change', async () => {
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // Change 1
@@ -125,12 +125,12 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // Trigger critical event
       await act(async () => {
-        rerender({ state: { count: 0, calledBalls: [1], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1] as number[], pattern: 'X', status: 'idle' } as TestState });
         await Promise.resolve();
       });
 
@@ -151,19 +151,19 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // First critical event - syncs immediately
       await act(async () => {
-        rerender({ state: { count: 0, calledBalls: [1], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1] as number[], pattern: 'X', status: 'idle' } as TestState });
         await Promise.resolve();
       });
       expect(mockSyncFn).toHaveBeenCalledTimes(1);
 
       // Second critical event within throttle window
       act(() => {
-        rerender({ state: { count: 0, calledBalls: [1, 2], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1, 2] as number[], pattern: 'X', status: 'idle' } as TestState });
       });
 
       // Should not sync immediately
@@ -183,19 +183,19 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // First critical event
       await act(async () => {
-        rerender({ state: { count: 0, calledBalls: [1], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1] as number[], pattern: 'X', status: 'idle' } as TestState });
         await Promise.resolve();
       });
       expect(mockSyncFn).toHaveBeenCalledTimes(1);
 
       // Second critical event within throttle window
       act(() => {
-        rerender({ state: { count: 0, calledBalls: [1, 2], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1, 2] as number[], pattern: 'X', status: 'idle' } as TestState });
       });
 
       // Wait for throttle period
@@ -223,11 +223,11 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       await act(async () => {
-        rerender({ state: { count: 0, calledBalls: [5], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [5] as number[], pattern: 'X', status: 'idle' } as TestState });
         await Promise.resolve();
       });
 
@@ -247,7 +247,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       await act(async () => {
@@ -270,7 +270,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       await act(async () => {
@@ -294,7 +294,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // Non-critical change (starts debounce)
@@ -305,7 +305,7 @@ describe('useAutoSync', () => {
 
       // Critical change before debounce expires
       await act(async () => {
-        rerender({ state: { count: 1, calledBalls: [5], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 1, calledBalls: [5] as number[], pattern: 'X', status: 'idle' } as TestState });
         await Promise.resolve();
       });
 
@@ -397,7 +397,7 @@ describe('useAutoSync', () => {
     it('should bypass debounce when manually triggered', async () => {
       const { result, rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // Trigger a debounced change
@@ -427,7 +427,7 @@ describe('useAutoSync', () => {
     it('should clear debounce timer on unmount', async () => {
       const { rerender, unmount } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -460,19 +460,19 @@ describe('useAutoSync', () => {
 
       const { rerender, unmount } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // First critical event
       await act(async () => {
-        rerender({ state: { count: 0, calledBalls: [1], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1] as number[], pattern: 'X', status: 'idle' } as TestState });
         await Promise.resolve();
       });
       expect(mockSyncFn).toHaveBeenCalledTimes(1);
 
       // Second critical event (throttled)
       act(() => {
-        rerender({ state: { count: 0, calledBalls: [1, 2], pattern: 'X', status: 'idle' } });
+        rerender({ state: { count: 0, calledBalls: [1, 2] as number[], pattern: 'X', status: 'idle' } as TestState });
       });
 
       // Unmount before throttle expires
@@ -506,11 +506,11 @@ describe('useAutoSync', () => {
   describe('error handling', () => {
     it('should set error state when sync fails', async () => {
       const testError = new Error('Sync failed');
-      const failingSyncFn = vi.fn().mockRejectedValue(testError);
+      const failingSyncFn = vi.fn<(state: TestState) => Promise<void>>().mockRejectedValue(testError);
 
       const { result, rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, failingSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -526,7 +526,7 @@ describe('useAutoSync', () => {
 
     it('should call onSyncError callback', async () => {
       const testError = new Error('Sync failed');
-      const failingSyncFn = vi.fn().mockRejectedValue(testError);
+      const failingSyncFn = vi.fn<(state: TestState) => Promise<void>>().mockRejectedValue(testError);
       const onSyncError = vi.fn();
 
       const config: AutoSyncConfig<TestState> = {
@@ -535,7 +535,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, failingSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -551,13 +551,13 @@ describe('useAutoSync', () => {
 
     it('should continue syncing after error', async () => {
       const testError = new Error('Sync failed');
-      const failingSyncFn = vi.fn()
+      const failingSyncFn = vi.fn<(state: TestState) => Promise<void>>()
         .mockRejectedValueOnce(testError)
         .mockResolvedValueOnce(undefined);
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, failingSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       // First change - fails
@@ -591,7 +591,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -613,7 +613,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -641,7 +641,7 @@ describe('useAutoSync', () => {
 
       const { rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn, config),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       act(() => {
@@ -675,13 +675,13 @@ describe('useAutoSync', () => {
   describe('sync status', () => {
     it('should set isSyncing to true during sync', async () => {
       let resolveFn: (() => void) | null = null;
-      const slowSyncFn = vi.fn().mockImplementation(
+      const slowSyncFn = vi.fn<(state: TestState) => Promise<void>>().mockImplementation(
         () => new Promise<void>(resolve => { resolveFn = resolve; })
       );
 
       const { result, rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, slowSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       expect(result.current.isSyncing).toBe(false);
@@ -707,7 +707,7 @@ describe('useAutoSync', () => {
     it('should update lastSyncTime on successful sync', async () => {
       const { result, rerender } = renderHook(
         ({ state }: { state: TestState }) => useAutoSync(state, mockSyncFn),
-        { initialProps: { state: { count: 0, calledBalls: [], pattern: 'X', status: 'idle' } } }
+        { initialProps: { state: { count: 0, calledBalls: [] as number[], pattern: 'X', status: 'idle' } as TestState } }
       );
 
       expect(result.current.lastSyncTime).toBeNull();

@@ -25,7 +25,6 @@ export { createSyncStore, type UseSyncStore } from './store';
 
 // Hooks
 export { useSync } from './use-sync';
-export { useAutoSync, type AutoSyncConfig, type UseAutoSyncReturn } from './use-auto-sync';
 
 // Session link utilities
 export type {
