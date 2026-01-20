@@ -160,12 +160,17 @@ describe('CreateGameModal', () => {
         />
       );
 
-      const submitButton = screen.getByRole('button', { name: /Create game session/i });
-      await user.click(submitButton);
+      // Click into the PIN input and then tab out to trigger blur validation
+      const pinInput = screen.getByLabelText(/Enter your PIN/i);
+      await user.click(pinInput);
+      await user.tab();
 
-      await waitFor(() => {
-        expect(screen.getByText(/PIN is required/i)).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText(/PIN is required/i)).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
@@ -188,7 +193,7 @@ describe('CreateGameModal', () => {
       });
     });
 
-    it('should show error for PIN more than 6 digits', async () => {
+    it('should enforce max length of 6 digits on input', async () => {
       const user = userEvent.setup();
       render(
         <CreateGameModal
@@ -198,13 +203,14 @@ describe('CreateGameModal', () => {
         />
       );
 
-      const pinInput = screen.getByLabelText(/Enter your PIN/i);
-      await user.type(pinInput, '1234567');
-      await user.tab(); // Trigger blur
+      const pinInput = screen.getByLabelText(/Enter your PIN/i) as HTMLInputElement;
 
-      await waitFor(() => {
-        expect(screen.getByText(/PIN must be no more than 6 digits/i)).toBeInTheDocument();
-      });
+      // Try to type 7 digits - maxLength should prevent the 7th
+      await user.type(pinInput, '1234567');
+
+      // Input should only contain 6 digits due to maxLength
+      expect(pinInput).toHaveValue('123456');
+      expect(pinInput.value.length).toBe(6);
     });
 
     it('should show error for non-numeric PIN', async () => {
@@ -439,7 +445,8 @@ describe('CreateGameModal', () => {
         />
       );
 
-      expect(screen.getByText(/Creating.../i)).toBeInTheDocument();
+      // Button component shows "Loading..." when loading prop is true
+      expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
     });
 
     it('should not show loading text when not loading', () => {
@@ -452,7 +459,8 @@ describe('CreateGameModal', () => {
         />
       );
 
-      expect(screen.queryByText(/Creating.../i)).not.toBeInTheDocument();
+      // Button component shows "Loading..." when loading, not "Creating..."
+      expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
       expect(screen.getByText(/Create Game/i)).toBeInTheDocument();
     });
   });

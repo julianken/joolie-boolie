@@ -88,19 +88,23 @@ describe('useAutoSync', () => {
       // Change 1
       act(() => {
         rerender({ state: { count: 1, calledBalls: [], pattern: 'X', status: 'idle' } });
+      });
+      act(() => {
         vi.advanceTimersByTime(1500);
       });
 
       // Change 2 - resets timer
       act(() => {
         rerender({ state: { count: 2, calledBalls: [], pattern: 'X', status: 'idle' } });
+      });
+      act(() => {
         vi.advanceTimersByTime(1500);
       });
 
       // Still should not have synced
       expect(mockSyncFn).not.toHaveBeenCalled();
 
-      // Wait remaining 500ms
+      // Wait remaining 500ms to complete the 2s debounce from change 2
       await act(async () => {
         vi.advanceTimersByTime(500);
         await Promise.resolve();
