@@ -86,3 +86,7 @@ export {
   isValidRoomCode,
   parseRoomCode,
 } from './room-code';
+
+// Auto-sync hook
+export type { AutoSyncConfig, UseAutoSyncReturn } from './use-auto-sync';
+export { useAutoSync } from './use-auto-sync';
