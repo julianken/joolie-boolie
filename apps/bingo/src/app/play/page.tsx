@@ -3,13 +3,14 @@
 import { useCallback, useState } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
 import { useSync } from '@/hooks/use-sync';
+import { useSessionRecovery, useAutoSync } from '@beak-gaming/sync';
 import { generateSessionId } from '@/lib/sync/session';
 import { BallDisplay, RecentBalls, BallCounter } from '@/components/presenter/BallDisplay';
 import { BingoBoard } from '@/components/presenter/BingoBoard';
 import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
 import { ControlPanel } from '@/components/presenter/ControlPanel';
 import { Toggle } from '@/components/ui/Toggle';
-import { Slider } from '@beak-gaming/ui';
+import { Slider, CreateGameModal, JoinGameModal, RoomCodeDisplay } from '@beak-gaming/ui';
 import { Button } from '@/components/ui/Button';
 import { VoiceSelector } from '@/components/ui/VoiceSelector';
 import { RollSoundSelector } from '@/components/presenter/RollSoundSelector';
@@ -19,11 +20,23 @@ import { useAudioPreload, useAudio } from '@/hooks/use-audio';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
 import { OfflineBanner, InstallPrompt } from '@/components/pwa';
+import { serializeBingoState, deserializeBingoState } from '@/lib/session/serializer';
+import { useGameStore } from '@/stores/game-store';
 
 export default function PlayPage() {
   const game = useGameKeyboard();
 
-  // Generate a unique session ID for this presenter window
+  // Session state
+  const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [joinRoomCode, setJoinRoomCode] = useState<string>('');
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [isJoiningSession, setIsJoiningSession] = useState(false);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+
+  // Generate a unique session ID for this presenter window (for BroadcastChannel)
   const [sessionId] = useState(() => generateSessionId());
 
   // Initialize sync as presenter role with session-scoped channel
@@ -37,12 +50,117 @@ export default function PlayPage() {
   const presenterTheme = useThemeStore((state) => state.presenterTheme);
   useApplyTheme(presenterTheme);
 
-  // Open display window with session ID in URL
+  // Session recovery on mount
+  const { isRecovering, error: recoveryError, recover, clearToken, storeToken } = useSessionRecovery({
+    gameType: 'bingo',
+    fetchGameState: async (roomCode: string, token: string) => {
+      const response = await fetch(`/api/sessions/${roomCode}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw response;
+      const data = await response.json();
+      return data.gameState;
+    },
+    hydrateStore: (state: unknown) => {
+      const partialState = deserializeBingoState(state);
+      useGameStore.setState(partialState);
+    },
+    enabled: true,
+  });
+
+  // Auto-sync game state to database
+  const gameState = useGameStore();
+  const { isSyncing, lastSyncTime } = useAutoSync(
+    gameState,
+    async (state) => {
+      if (!roomCode || !sessionToken) return;
+      const serialized = serializeBingoState(state);
+      const response = await fetch(`/api/sessions/${roomCode}/state`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify({ state: serialized }),
+      });
+      if (!response.ok) throw new Error('Failed to sync state');
+    },
+    {
+      debounceMs: 2000,
+      enabled: !!roomCode && !!sessionToken,
+      isCriticalChange: (prev, next) => {
+        if (prev?.calledBalls?.length !== next?.calledBalls?.length) {
+          return 'BALL_CALLED';
+        }
+        if (prev?.pattern?.id !== next?.pattern?.id) {
+          return 'PATTERN_CHANGED';
+        }
+        if (prev?.status !== next?.status) {
+          return 'STATUS_CHANGED';
+        }
+        return null;
+      },
+    }
+  );
+
+  // Session handlers
+  const handleCreateSession = useCallback(async (pin: string) => {
+    setIsCreatingSession(true);
+    setSessionError(null);
+    try {
+      const initialState = serializeBingoState(gameState);
+      const response = await fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, gameState: initialState }),
+      });
+      if (!response.ok) throw new Error('Failed to create session');
+      const data = await response.json();
+      setRoomCode(data.roomCode);
+      setSessionToken(data.token);
+      storeToken(data.token);
+      setShowCreateModal(false);
+    } catch (error) {
+      setSessionError(error instanceof Error ? error.message : 'Failed to create session');
+    } finally {
+      setIsCreatingSession(false);
+    }
+  }, [gameState, storeToken]);
+
+  const handleJoinSession = useCallback(async (roomCode: string, pin: string) => {
+    setIsJoiningSession(true);
+    setSessionError(null);
+    try {
+      const response = await fetch(`/api/sessions/${roomCode}/verify-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
+      if (!response.ok) throw new Error('Invalid PIN');
+      const data = await response.json();
+      setRoomCode(roomCode);
+      setSessionToken(data.token);
+      storeToken(data.token);
+      setShowJoinModal(false);
+      // Trigger recovery to load game state
+      await recover();
+    } catch (error) {
+      setSessionError(error instanceof Error ? error.message : 'Failed to join session');
+    } finally {
+      setIsJoiningSession(false);
+    }
+  }, [recover, storeToken]);
+
+  // Open display window with room code in URL
   const openDisplay = useCallback(() => {
-    const displayUrl = `${window.location.origin}/display?session=${sessionId}`;
+    if (!roomCode) {
+      setShowCreateModal(true);
+      return;
+    }
+    const displayUrl = `${window.location.origin}/display?room=${roomCode}`;
     const displayWindow = window.open(
       displayUrl,
-      `bingo-display-${sessionId}`,
+      `bingo-display-${roomCode}`,
       'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
     );
 
@@ -50,7 +168,7 @@ export default function PlayPage() {
     if (displayWindow) {
       displayWindow.focus();
     }
-  }, [sessionId]);
+  }, [roomCode]);
 
   return (
     <>
@@ -253,6 +371,32 @@ export default function PlayPage() {
         </div>
       </div>
       </main>
+
+      {/* Room code display */}
+      {roomCode && (
+        <div className="fixed bottom-4 left-4 z-40">
+          <RoomCodeDisplay
+            roomCode={roomCode}
+            showSyncStatus={false}
+          />
+        </div>
+      )}
+
+      {/* Session modals */}
+      <CreateGameModal
+        isOpen={showCreateModal}
+        onClose={() => {
+          setShowCreateModal(false);
+          setSessionError(null);
+        }}
+        onSubmit={handleCreateSession}
+        isLoading={isCreatingSession}
+        error={sessionError ?? undefined}
+      />
+
+      {/* Note: JoinGameModal is not yet updated to support room code input */}
+      {/* For now, session joining is disabled until the UI component is updated */}
+
       <InstallPrompt />
     </>
   );
