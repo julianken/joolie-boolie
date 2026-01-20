@@ -177,7 +177,7 @@ export function createSessionRoutes(config: SessionRouteConfig) {
    * Verifies presenter PIN and returns session token on success.
    * Implements lockout after 5 failed attempts.
    */
-  const verifyPin = async (
+  const verifyPinHandler = async (
     request: NextRequest,
     { params }: { params: Promise<{ roomCode: string }> }
   ) => {
@@ -369,7 +369,7 @@ export function createSessionRoutes(config: SessionRouteConfig) {
   return {
     POST,
     GET,
-    verifyPin,
+    verifyPin: verifyPinHandler,
     updateState,
     complete,
   };
