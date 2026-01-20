@@ -24,20 +24,23 @@ describe('GET /api/sessions/room/[roomCode]', () => {
 
   it('returns session data for valid room code', async () => {
     const mockSession = {
+      id: 'uuid-1',
       session_id: 'test-session-123',
       room_code: 'ABC123',
       game_type: 'bingo' as const,
       status: 'active' as const,
       game_state: {},
+      template_id: null,
+      user_id: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       expires_at: new Date().toISOString(),
       pin_hash: 'hash',
       pin_salt: 'salt',
       failed_pin_attempts: 0,
-      last_failed_attempt_at: null,
-      last_sync_at: null,
-      sequence_number: null,
+      last_failed_attempt_at: new Date().toISOString(),
+      last_sync_at: new Date().toISOString(),
+      sequence_number: 0,
     };
 
     vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession);
@@ -88,20 +91,23 @@ describe('GET /api/sessions/room/[roomCode]', () => {
 
   it('handles different game types', async () => {
     const mockSession = {
+      id: 'uuid-2',
       session_id: 'trivia-session-456',
       room_code: 'XYZ789',
       game_type: 'trivia' as const,
       status: 'active' as const,
       game_state: {},
+      template_id: null,
+      user_id: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       expires_at: new Date().toISOString(),
       pin_hash: 'hash',
       pin_salt: 'salt',
       failed_pin_attempts: 0,
-      last_failed_attempt_at: null,
-      last_sync_at: null,
-      sequence_number: null,
+      last_failed_attempt_at: new Date().toISOString(),
+      last_sync_at: new Date().toISOString(),
+      sequence_number: 0,
     };
 
     vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession);
@@ -118,20 +124,23 @@ describe('GET /api/sessions/room/[roomCode]', () => {
 
   it('handles completed session status', async () => {
     const mockSession = {
+      id: 'uuid-3',
       session_id: 'completed-session',
       room_code: 'DONE99',
       game_type: 'bingo' as const,
       status: 'completed' as const,
       game_state: {},
+      template_id: null,
+      user_id: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       expires_at: new Date().toISOString(),
       pin_hash: 'hash',
       pin_salt: 'salt',
       failed_pin_attempts: 0,
-      last_failed_attempt_at: null,
-      last_sync_at: null,
-      sequence_number: null,
+      last_failed_attempt_at: new Date().toISOString(),
+      last_sync_at: new Date().toISOString(),
+      sequence_number: 0,
     };
 
     vi.mocked(tables.getGameSessionByRoomCode).mockResolvedValue(mockSession);
