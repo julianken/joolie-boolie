@@ -51,10 +51,16 @@ export {
   type TriviaTemplateUpdate,
   type TriviaQuestion,
 
+  // Game session types (persistent)
+  type GameSession,
+  type GameSessionInsert,
+  type GameSessionUpdate,
+
   // Type guards
   isProfile,
   isBingoTemplate,
   isTriviaTemplate,
+  isGameSession,
 } from './types';
 
 // =============================================================================
@@ -220,7 +226,7 @@ export {
   TIMER_DURATION_MIN,
   TIMER_DURATION_MAX,
 
-  // Game Sessions
+  // Game Sessions (Local/In-Memory)
   generateSessionId,
   createLocalSession,
   getLocalSession,
@@ -243,11 +249,18 @@ export {
   getSessionHistory,
   type GameType,
   type SessionStatus,
-  type GameSession,
-  type GameSessionInsert,
-  type GameSessionUpdate,
   type BingoSessionMetadata,
   type TriviaSessionMetadata,
+
+  // Persistent Game Sessions (Database-backed)
+  createGameSession,
+  getGameSessionByRoomCode,
+  getGameSessionBySessionId,
+  updateGameSessionState,
+  incrementFailedPinAttempt,
+  resetFailedPinAttempts,
+  markSessionCompleted,
+  cleanupExpiredSessions,
 } from './tables';
 
 // =============================================================================
@@ -267,6 +280,13 @@ export {
   useDeleteMutation,
   useOptimisticMutation,
 
+  // Game session hooks
+  useGameSession,
+  useCreateGameSession,
+  useUpdateGameSessionState,
+  useMarkSessionCompleted,
+  useVerifyPin,
+
   // Query types
   type QueryStatus,
   type QueryState,
@@ -281,6 +301,11 @@ export {
   type MutationResult,
   type UpdateVariables,
   type OptimisticMutationOptions,
+
+  // Game session hook types
+  type VerifyPinVariables,
+  type VerifyPinResult,
+  type UpdateGameStateVariables,
 } from './hooks';
 
 // Session Tokens
