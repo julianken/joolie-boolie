@@ -79,9 +79,8 @@ export default function PlayPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionToken}`,
         },
-        body: JSON.stringify({ state: serialized }),
+        body: JSON.stringify({ sessionToken, state: serialized }),
       });
       if (!response.ok) throw new Error('Failed to sync state');
     },
