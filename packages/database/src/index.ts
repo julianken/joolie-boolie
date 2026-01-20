@@ -320,3 +320,12 @@ export {
   signToken,
   verifyAndDecodeToken,
 } from './hmac-tokens';
+
+// =============================================================================
+// API Route Factories
+// =============================================================================
+
+export {
+  createSessionRoutes,
+  type SessionRouteConfig,
+} from './api';
