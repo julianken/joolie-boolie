@@ -86,3 +86,11 @@ export {
   isValidRoomCode,
   parseRoomCode,
 } from './room-code';
+
+// Session recovery hook
+export type {
+  SessionToken,
+  SessionRecoveryHookOptions,
+  SessionRecoveryState,
+} from './use-session-recovery';
+export { useSessionRecovery } from './use-session-recovery';
