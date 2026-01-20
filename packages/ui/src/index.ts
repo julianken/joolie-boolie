@@ -25,3 +25,6 @@ export { SkeletonText, type SkeletonTextProps } from './skeleton-text';
 // Confetti
 export { Confetti, type ConfettiProps, type ConfettiOptions } from './confetti';
 export { useConfetti, type UseConfettiOptions, type UseConfettiReturn } from './hooks/use-confetti';
+
+// RoomCodeDisplay
+export { RoomCodeDisplay, type RoomCodeDisplayProps } from './room-code-display';
