@@ -152,6 +152,21 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
+## Pull Request Template
+
+**IMPORTANT:** All pull requests MUST use the template at `.github/PULL_REQUEST_TEMPLATE.md`.
+
+When creating PRs:
+1. Read the template file first: `.github/PULL_REQUEST_TEMPLATE.md`
+2. Fill in all required sections (Five-Level Explanation is mandatory)
+3. Complete the Testing checklist
+4. Add diagrams/screenshots if relevant
+
+The template includes:
+- Human Summary (2-4 bullets)
+- Five-Level Explanation (required: non-technical → deep technical)
+- Changes, Testing, Risk/Impact, Notes for Reviewers
+
 ## App-Specific Context
 
 Each app has its own CLAUDE.md with detailed context:
