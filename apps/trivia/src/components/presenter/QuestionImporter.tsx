@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { GameStatus, Question } from '@/types';
-import type { ImportResult, ImportFormat, ValidationError } from '@/lib/questions/types';
+import type { ImportResult, _ImportFormat, _ValidationError } from '@/lib/questions/types';
 import { parseQuestions, detectFormat, readFileContent } from '@/lib/questions/parser';
 
 interface QuestionImporterProps {

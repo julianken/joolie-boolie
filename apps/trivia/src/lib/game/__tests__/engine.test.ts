@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   createInitialState,
-  createDefaultSettings,
   startGame,
   endGame,
   resetGame,
@@ -54,8 +53,7 @@ import {
   removeQuestion,
   updateQuestion,
 } from '../engine';
-import type { TriviaGameState, GameSettings } from '@/types';
-import { MAX_TEAMS, DEFAULT_ROUNDS, DEFAULT_TIMER_DURATION, QUESTIONS_PER_ROUND } from '@/types';
+import { MAX_TEAMS, DEFAULT_ROUNDS } from '@/types';
 
 // Mock uuid to return predictable but unique values
 const mockUuidCounter = vi.hoisted(() => ({ value: 0 }));

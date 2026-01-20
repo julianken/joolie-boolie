@@ -330,7 +330,7 @@ describe('useGameKeyboard', () => {
 
   describe('M key - toggle TTS', () => {
     it('should toggle TTS enabled state', () => {
-      const { result } = renderHook(() => useGameKeyboard());
+      const { _result } = renderHook(() => useGameKeyboard());
 
       const initialTtsState = useGameStore.getState().ttsEnabled;
 
@@ -350,7 +350,7 @@ describe('useGameKeyboard', () => {
 
   describe('T key - toggle scoreboard', () => {
     it('should toggle scoreboard visibility', () => {
-      const { result } = renderHook(() => useGameKeyboard());
+      const { _result } = renderHook(() => useGameKeyboard());
 
       const initialShowScoreboard = useGameStore.getState().showScoreboard;
 

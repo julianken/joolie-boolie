@@ -27,7 +27,7 @@ export interface BuzzInDisplayProps {
 // =============================================================================
 
 export function BuzzInDisplay({
-  buzzInState,
+  _buzzInState,
   teams,
   firstBuzzTeam,
   buzzOrder,

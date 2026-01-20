@@ -62,6 +62,7 @@ export default function PlayPage() {
       });
     }
   }, [
+    game,
     game.status,
     roundsCount,
     questionsPerRound,

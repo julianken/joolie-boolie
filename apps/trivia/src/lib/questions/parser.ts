@@ -4,7 +4,6 @@ import type {
   ImportResult,
   RawJsonQuestion,
   RawCsvQuestion,
-  CSV_REQUIRED_COLUMNS,
 } from './types';
 import { validateJsonQuestions, validateCsvQuestions } from './validator';
 

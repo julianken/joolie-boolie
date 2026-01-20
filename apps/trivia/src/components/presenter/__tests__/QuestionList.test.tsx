@@ -186,7 +186,7 @@ describe('QuestionList', () => {
 
   describe('current round highlighting', () => {
     it('should highlight current round header', () => {
-      const { container } = render(
+      const { _container } = render(
         <QuestionList {...defaultProps} currentRound={1} />
       );
 
@@ -196,7 +196,7 @@ describe('QuestionList', () => {
     });
 
     it('should show past rounds with different styling', () => {
-      const { container } = render(
+      const { _container } = render(
         <QuestionList {...defaultProps} currentRound={2} />
       );
 
@@ -206,7 +206,7 @@ describe('QuestionList', () => {
     });
 
     it('should show future rounds with muted styling', () => {
-      const { container } = render(
+      const { _container } = render(
         <QuestionList {...defaultProps} currentRound={0} />
       );
 

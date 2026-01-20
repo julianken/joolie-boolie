@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { _useState, _useEffect } from 'react';
 import { Toggle, Slider } from '@beak-gaming/ui';
 import { useAudioStore } from '@/stores/audio-store';
 import {

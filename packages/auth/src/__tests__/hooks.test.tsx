@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { AuthProvider } from '../components/auth-provider';
 import { useAuth } from '../hooks/use-auth';
 import { useSession } from '../hooks/use-session';
@@ -25,7 +26,7 @@ describe('Auth hooks', () => {
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <AuthProvider supabaseClient={mockClient as any}>{children}</AuthProvider>
+    <AuthProvider supabaseClient={mockClient as unknown as SupabaseClient}>{children}</AuthProvider>
   );
 
   describe('useAuth', () => {

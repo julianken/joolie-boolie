@@ -38,7 +38,7 @@ export interface BuzzInPanelProps {
 // =============================================================================
 
 export function BuzzInPanel({
-  buzzInState,
+  _buzzInState,
   teams,
   firstBuzzTeam,
   buzzOrder,

@@ -11,6 +11,7 @@ import { ExpirationPlugin } from 'serwist';
 import { CacheableResponsePlugin } from 'serwist';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface WorkerGlobalScope extends SerwistGlobalConfig {}
 }
 

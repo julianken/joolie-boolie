@@ -95,7 +95,7 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should show category in a badge', () => {
-      const { container } = render(<AudienceQuestionDisplay {...defaultProps} />);
+      const { _container } = render(<AudienceQuestionDisplay {...defaultProps} />);
 
       const badge = screen.getByText('history').closest('div');
       expect(badge).toHaveClass('rounded-full');
@@ -122,13 +122,13 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should color-code option badges', () => {
-      const { container } = render(<AudienceQuestionDisplay {...defaultProps} />);
+      const { _container } = render(<AudienceQuestionDisplay {...defaultProps} />);
 
       // Check for color classes on option badges
-      expect(container.querySelector('.bg-blue-600')).toBeInTheDocument(); // A
-      expect(container.querySelector('.bg-red-600')).toBeInTheDocument(); // B
-      expect(container.querySelector('.bg-green-600')).toBeInTheDocument(); // C
-      expect(container.querySelector('.bg-orange-500')).toBeInTheDocument(); // D
+      expect(_container.querySelector('.bg-blue-600')).toBeInTheDocument(); // A
+      expect(_container.querySelector('.bg-red-600')).toBeInTheDocument(); // B
+      expect(_container.querySelector('.bg-green-600')).toBeInTheDocument(); // C
+      expect(_container.querySelector('.bg-orange-500')).toBeInTheDocument(); // D
     });
 
     it('should have large readable option text', () => {
@@ -150,7 +150,7 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should style TRUE option with green', () => {
-      const { container } = render(
+      const { _container } = render(
         <AudienceQuestionDisplay {...defaultProps} question={mockTrueFalseQuestion} />
       );
 
@@ -159,7 +159,7 @@ describe('AudienceQuestionDisplay', () => {
     });
 
     it('should style FALSE option with red', () => {
-      const { container } = render(
+      const { _container } = render(
         <AudienceQuestionDisplay {...defaultProps} question={mockTrueFalseQuestion} />
       );
 

@@ -68,9 +68,9 @@ export interface UseBuzzInReturn {
 
 export function useBuzzIn(options: UseBuzzInOptions = {}): UseBuzzInReturn {
   const {
-    startTimerOnBuzz = false,
-    onFirstBuzz,
-    onBuzz,
+    startTimerOnBuzz: _startTimerOnBuzz = false,
+    onFirstBuzz: _onFirstBuzz,
+    onBuzz: _onBuzz,
     isPresenter = true,
   } = options;
 
