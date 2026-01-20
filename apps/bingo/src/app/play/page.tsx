@@ -112,13 +112,13 @@ export default function PlayPage() {
       const response = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin, gameState: initialState }),
+        body: JSON.stringify({ pin, initialState }),
       });
       if (!response.ok) throw new Error('Failed to create session');
       const data = await response.json();
-      setRoomCode(data.roomCode);
-      setSessionToken(data.token);
-      storeToken(data.token);
+      setRoomCode(data.data.session.roomCode);
+      setSessionToken(data.data.sessionToken);
+      storeToken(data.data.sessionToken);
       setShowCreateModal(false);
     } catch (error) {
       setSessionError(error instanceof Error ? error.message : 'Failed to create session');

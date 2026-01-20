@@ -1,11 +1,9 @@
-import { createSessionRoutes } from '@beak-gaming/database/api/session-routes';
+import { createSessionRoutes } from '@beak-gaming/database/api';
 import { createClient } from '@/lib/supabase/server';
-import { serializeBingoState } from '@/lib/session/serializer';
 
 const routes = createSessionRoutes({
   gameType: 'bingo',
   createClient,
-  validateGameState: serializeBingoState,
 });
 
 export const GET = routes.GET;

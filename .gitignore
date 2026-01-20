@@ -45,3 +45,4 @@ pnpm-debug.log*
 .worktrees
 .env*.local
 .env.vercel
+test-results/
