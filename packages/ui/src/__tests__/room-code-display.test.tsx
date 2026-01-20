@@ -187,7 +187,7 @@ describe('RoomCodeDisplay', () => {
 
     it('should show QR icon on button', () => {
       const mockShowQR = vi.fn();
-      const { container } = render(
+      const { container: _container } = render(
         <RoomCodeDisplay roomCode="SWAN-42" onShowQR={mockShowQR} />
       );
 
@@ -213,11 +213,11 @@ describe('RoomCodeDisplay', () => {
     });
 
     it('should show spinner icon when saving', () => {
-      const { container } = render(
+      const { container: _container } = render(
         <RoomCodeDisplay roomCode="SWAN-42" isSaving={true} />
       );
 
-      const spinner = container.querySelector('.animate-spin');
+      const spinner = _container.querySelector('.animate-spin');
       expect(spinner).toBeInTheDocument();
     });
 
@@ -272,7 +272,7 @@ describe('RoomCodeDisplay', () => {
     it('should show checkmark icon when saved', () => {
       const now = new Date();
       const oneMinuteAgo = new Date(now.getTime() - 60000);
-      const { container } = render(
+      const { container: _container } = render(
         <RoomCodeDisplay roomCode="SWAN-42" lastSavedAt={oneMinuteAgo} />
       );
 
@@ -395,9 +395,9 @@ describe('RoomCodeDisplay', () => {
     });
 
     it('should mark decorative icons as aria-hidden', () => {
-      const { container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
+      const { container: _container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
 
-      const icons = container.querySelectorAll('svg');
+      const icons = _container.querySelectorAll('svg');
       icons.forEach((icon) => {
         expect(icon).toHaveAttribute('aria-hidden', 'true');
       });
@@ -406,20 +406,20 @@ describe('RoomCodeDisplay', () => {
 
   describe('custom className', () => {
     it('should apply custom className', () => {
-      const { container } = render(
+      const { container: _container } = render(
         <RoomCodeDisplay roomCode="SWAN-42" className="custom-class" />
       );
 
-      const regionElement = container.querySelector('[role="region"]');
+      const regionElement = _container.querySelector('[role="region"]');
       expect(regionElement).toHaveClass('custom-class');
     });
 
     it('should preserve built-in classes with custom className', () => {
-      const { container } = render(
+      const { container: _container } = render(
         <RoomCodeDisplay roomCode="SWAN-42" className="my-4" />
       );
 
-      const regionElement = container.querySelector('[role="region"]');
+      const regionElement = _container.querySelector('[role="region"]');
       expect(regionElement).toHaveClass('my-4');
       expect(regionElement?.className).toContain('bg-white');
       expect(regionElement?.className).toContain('rounded-lg');
@@ -428,28 +428,28 @@ describe('RoomCodeDisplay', () => {
 
   describe('visual design', () => {
     it('should have large font size for room code (text-5xl)', () => {
-      const { container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
+      const { container: _container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
 
       const roomCodeElement = screen.getByText('SWAN-42');
       expect(roomCodeElement.className).toContain('text-5xl');
     });
 
     it('should have bold font weight on room code', () => {
-      const { container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
+      const { container: _container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
 
       const roomCodeElement = screen.getByText('SWAN-42');
       expect(roomCodeElement.className).toContain('font-bold');
     });
 
     it('should have high contrast colors', () => {
-      const { container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
+      const { container: _container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
 
       const roomCodeElement = screen.getByText('SWAN-42');
       expect(roomCodeElement.className).toContain('text-blue-900');
     });
 
     it('should have dark mode support', () => {
-      const { container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
+      const { container: _container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
 
       const roomCodeElement = screen.getByText('SWAN-42');
       expect(roomCodeElement.className).toContain('dark:text-blue-100');
@@ -458,7 +458,7 @@ describe('RoomCodeDisplay', () => {
 
   describe('button layout', () => {
     it('should have flex layout for buttons', () => {
-      const { container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
+      const { container: _container } = render(<RoomCodeDisplay roomCode="SWAN-42" />);
 
       const buttonsContainer = screen.getByRole('group');
       expect(buttonsContainer.className).toContain('flex');
@@ -466,7 +466,7 @@ describe('RoomCodeDisplay', () => {
 
     it('should have gap between buttons', () => {
       const mockShowQR = vi.fn();
-      const { container } = render(
+      const { container: _container } = render(
         <RoomCodeDisplay roomCode="SWAN-42" onShowQR={mockShowQR} />
       );
 
