@@ -124,8 +124,8 @@ export function useAutoSync<TState extends { _isHydrating?: boolean }>(
   const [error, setError] = useState<Error | null>(null);
 
   // Refs for timers and tracking
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const throttleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastThrottledSyncRef = useRef<number>(0);
   const prevStateRef = useRef<TState | null>(null);
   const isMountedRef = useRef(true);
