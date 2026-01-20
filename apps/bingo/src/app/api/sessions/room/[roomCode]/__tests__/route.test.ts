@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '../route';
 import { NextRequest } from 'next/server';
+import type { TypedSupabaseClient } from '@beak-gaming/database/client';
 
 // Mock dependencies
 vi.mock('@/lib/supabase/server', () => ({
@@ -23,7 +24,7 @@ describe('/api/sessions/room/[roomCode] endpoint', () => {
   });
 
   it('returns session data when room code exists', async () => {
-    const mockSupabase = {} as any;
+    const mockSupabase = {} as unknown as TypedSupabaseClient;
     const mockSession = {
       session_id: 'session-123',
       room_code: 'SWAN-42',
@@ -53,7 +54,7 @@ describe('/api/sessions/room/[roomCode] endpoint', () => {
   });
 
   it('returns 404 when session not found', async () => {
-    const mockSupabase = {} as any;
+    const mockSupabase = {} as unknown as TypedSupabaseClient;
 
     mockCreateClient.mockResolvedValue(mockSupabase);
     mockGetGameSessionByRoomCode.mockResolvedValue(null);
@@ -70,7 +71,7 @@ describe('/api/sessions/room/[roomCode] endpoint', () => {
   });
 
   it('returns 500 when database query fails', async () => {
-    const mockSupabase = {} as any;
+    const mockSupabase = {} as unknown as TypedSupabaseClient;
 
     mockCreateClient.mockResolvedValue(mockSupabase);
     mockGetGameSessionByRoomCode.mockRejectedValue(new Error('Database connection failed'));
@@ -99,7 +100,7 @@ describe('/api/sessions/room/[roomCode] endpoint', () => {
   });
 
   it('handles different room code formats', async () => {
-    const mockSupabase = {} as any;
+    const mockSupabase = {} as unknown as TypedSupabaseClient;
     const mockSession = {
       session_id: 'session-789',
       room_code: 'DUCK-01',
