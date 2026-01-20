@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import type { TypedSupabaseClient } from '../client.js';
+import type { TypedSupabaseClient } from '../client';
 import {
   createGameSession,
   getGameSessionByRoomCode,
@@ -7,20 +7,20 @@ import {
   incrementFailedPinAttempt,
   resetFailedPinAttempts,
   markSessionCompleted,
-} from '../tables/persistent-sessions.js';
+} from '../tables/persistent-sessions';
 import {
   createPinHash,
   verifyPin,
   isValidPin,
   isLockedOut,
   MAX_ATTEMPTS,
-} from '../pin-security.js';
+} from '../pin-security';
 import {
   createSessionToken,
   isTokenExpired,
-} from '../session-token.js';
-import { signToken, verifyAndDecodeToken } from '../hmac-tokens.js';
-import { generateSessionId } from '../tables/game-sessions.js';
+} from '../session-token';
+import { signToken, verifyAndDecodeToken } from '../hmac-tokens';
+import { generateSessionId } from '../tables/game-sessions';
 
 /**
  * Configuration for session route handlers
