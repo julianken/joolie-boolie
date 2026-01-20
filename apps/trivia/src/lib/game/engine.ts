@@ -30,8 +30,8 @@ function deepFreeze<T>(obj: T): T {
 
   // Recursively freeze all properties
   Object.getOwnPropertyNames(obj).forEach((prop) => {
-    const value = (obj as any)[prop];
-    if (value !== null && typeof value === 'object') {
+    const value = (obj as Record<string, unknown>)[prop];
+    if (value !== null && typeof value === 'object' && typeof value !== 'function') {
       deepFreeze(value);
     }
   });

@@ -254,7 +254,6 @@ export function PatternEditor({
                     type="button"
                     role="gridcell"
                     aria-label={cellLabel}
-                    aria-pressed={isFree || isMarked}
                     disabled={isFree}
                     onClick={() => toggleCell(rowIndex, colIndex)}
                     onKeyDown={(e) => handleCellKeyDown(e, rowIndex, colIndex)}

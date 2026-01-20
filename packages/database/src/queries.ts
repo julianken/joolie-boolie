@@ -3,7 +3,7 @@
  */
 
 import type { TypedSupabaseClient } from './client';
-import type { Database, TableName, TableRow, TableInsert, TableUpdate } from './types';
+import type { TableName, TableRow, TableInsert, TableUpdate } from './types';
 import { NotFoundError, withErrorHandling } from './errors';
 import {
   type PaginationParams,
@@ -56,7 +56,8 @@ export async function getById<T extends TableName>(
   options: Pick<QueryOptions, 'select'> = {}
 ): Promise<TableRow<T>> {
   return withErrorHandling(async () => {
-    const { data, error } = await client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (client as any)
       .from(table)
       .select(options.select ?? '*')
       .eq('id', id)
@@ -82,7 +83,8 @@ export async function getOne<T extends TableName>(
   options: QueryOptions = {}
 ): Promise<TableRow<T> | null> {
   return withErrorHandling(async () => {
-    let query = client.from(table).select(options.select ?? '*');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (client as any).from(table).select(options.select ?? '*');
 
     if (options.filters) {
       query = applyFilters(query, options.filters);
@@ -111,7 +113,8 @@ export async function list<T extends TableName>(
     const [rangeStart, rangeEnd] = calculateRange(options);
 
     // Build query with count if requested
-    let query = client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (client as any)
       .from(table)
       .select(options.select ?? '*', { count: options.count ? 'exact' : undefined });
 
@@ -159,7 +162,8 @@ export async function listAll<T extends TableName>(
   options: QueryOptions = {}
 ): Promise<TableRow<T>[]> {
   return withErrorHandling(async () => {
-    let query = client.from(table).select(options.select ?? '*');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (client as any).from(table).select(options.select ?? '*');
 
     if (options.filters) {
       query = applyFilters(query, options.filters);
@@ -191,9 +195,10 @@ export async function create<T extends TableName>(
   options: Pick<QueryOptions, 'select'> = {}
 ): Promise<TableRow<T>> {
   return withErrorHandling(async () => {
-    const { data: created, error } = await client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: created, error } = await (client as any)
       .from(table)
-      .insert(data as Database['public']['Tables'][T]['Insert'])
+      .insert(data)
       .select(options.select ?? '*')
       .single();
 
@@ -215,9 +220,10 @@ export async function createMany<T extends TableName>(
   options: Pick<QueryOptions, 'select'> = {}
 ): Promise<TableRow<T>[]> {
   return withErrorHandling(async () => {
-    const { data: created, error } = await client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: created, error } = await (client as any)
       .from(table)
-      .insert(data as Database['public']['Tables'][T]['Insert'][])
+      .insert(data)
       .select(options.select ?? '*');
 
     if (error) {
@@ -239,9 +245,10 @@ export async function update<T extends TableName>(
   options: Pick<QueryOptions, 'select'> = {}
 ): Promise<TableRow<T>> {
   return withErrorHandling(async () => {
-    const { data: updated, error } = await client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: updated, error } = await (client as any)
       .from(table)
-      .update(data as Database['public']['Tables'][T]['Update'])
+      .update(data)
       .eq('id', id)
       .select(options.select ?? '*')
       .single();
@@ -268,7 +275,8 @@ export async function updateMany<T extends TableName>(
   options: Pick<QueryOptions, 'select'> = {}
 ): Promise<TableRow<T>[]> {
   return withErrorHandling(async () => {
-    let query = client.from(table).update(data as Database['public']['Tables'][T]['Update']);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (client as any).from(table).update(data);
 
     query = applyFilters(query, filterConditions);
 
@@ -291,7 +299,8 @@ export async function remove<T extends TableName>(
   id: string
 ): Promise<void> {
   return withErrorHandling(async () => {
-    const { error } = await client.from(table).delete().eq('id', id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (client as any).from(table).delete().eq('id', id);
 
     if (error) {
       throw error;
@@ -366,9 +375,10 @@ export async function upsert<T extends TableName>(
   options: Pick<QueryOptions, 'select'> & { onConflict?: string } = {}
 ): Promise<TableRow<T>> {
   return withErrorHandling(async () => {
-    const { data: upserted, error } = await client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: upserted, error } = await (client as any)
       .from(table)
-      .upsert(data as Database['public']['Tables'][T]['Insert'], {
+      .upsert(data, {
         onConflict: options.onConflict,
       })
       .select(options.select ?? '*')

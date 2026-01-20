@@ -243,7 +243,7 @@ describe('game-store', () => {
       let capturedHydrating = false;
       const unsubscribe = useGameStore.subscribe((state) => {
         if (state.status === 'playing') {
-          capturedHydrating = state._isHydrating;
+          capturedHydrating = state._isHydrating!;
         }
       });
 

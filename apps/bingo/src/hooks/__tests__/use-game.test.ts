@@ -52,7 +52,9 @@ describe('use-game', () => {
 
     useAudioStore.setState({
       enabled: true,
-      volume: 0.8,
+      voiceVolume: 0.8,
+      rollSoundVolume: 0.8,
+      chimeVolume: 0.8,
       isPlaying: false,
       voicePack: 'standard',
       useFallbackTTS: true,

@@ -226,9 +226,10 @@ async function unsetDefaultTriviaTemplate(
   client: TypedSupabaseClient,
   userId: string
 ): Promise<void> {
-  await client
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (client as any)
     .from('trivia_templates')
-    .update({ is_default: false } as TriviaTemplateUpdate)
+    .update({ is_default: false })
     .eq('user_id', userId)
     .eq('is_default', true);
 }

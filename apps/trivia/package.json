@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "SERWIST_SUPPRESS_TURBOPACK_WARNING=1 next build",
     "start": "next start --port 3001",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest --passWithNoTests",
     "test:run": "vitest run --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true SERWIST_SUPPRESS_TURBOPACK_WARNING=1 next build"
   },
   "dependencies": {
     "@beak-gaming/auth": "workspace:*",

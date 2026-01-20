@@ -196,7 +196,7 @@ describe('exportQuestions', () => {
   });
 
   it('should error on unsupported format', () => {
-    const result = exportQuestions(sampleQuestions, { format: 'xml' as any });
+    const result = exportQuestions(sampleQuestions, { format: 'xml' as 'json' | 'csv' });
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('Unsupported');

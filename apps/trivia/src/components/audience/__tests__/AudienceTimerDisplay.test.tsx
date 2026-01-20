@@ -205,7 +205,7 @@ describe('AudienceTimerDisplay', () => {
 
     it('should have animate-pulse class for TIME! indicator', () => {
       const timer = createMockTimer(0, 30);
-      const { _container } = render(<AudienceTimerDisplay timer={timer} />);
+      render(<AudienceTimerDisplay timer={timer} />);
 
       const timeUpElement = screen.getByText('TIME!');
       expect(timeUpElement).toHaveClass('motion-safe:animate-pulse');

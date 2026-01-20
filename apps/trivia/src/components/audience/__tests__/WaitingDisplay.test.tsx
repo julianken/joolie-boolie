@@ -29,7 +29,7 @@ describe('WaitingDisplay', () => {
 
   describe('text size for readability', () => {
     it('should have large text for the message', () => {
-      const { _container } = render(
+      render(
         <WaitingDisplay message="Large readable message" />
       );
 
@@ -39,7 +39,7 @@ describe('WaitingDisplay', () => {
     });
 
     it('should have readable text for the helper', () => {
-      const { _container } = render(<WaitingDisplay message="Test" />);
+      render(<WaitingDisplay message="Test" />);
 
       const helperElement = screen.getByText(
         'The game will appear here when the presenter is ready.'

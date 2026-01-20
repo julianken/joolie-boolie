@@ -169,9 +169,10 @@ async function unsetDefaultBingoTemplate(
   client: TypedSupabaseClient,
   userId: string
 ): Promise<void> {
-  await client
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (client as any)
     .from('bingo_templates')
-    .update({ is_default: false } as BingoTemplateUpdate)
+    .update({ is_default: false })
     .eq('user_id', userId)
     .eq('is_default', true);
 }
