@@ -1,8 +1,46 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Variables
+
+Before running the development server, you need to set up your environment variables. Copy `.env.example` to `.env.local` and fill in the required values:
+
+```bash
+cp .env.example .env.local
+```
+
+### Required Variables
+
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Session Token Secret
+# Used for HMAC-signing session tokens to provide cryptographic security
+# for session management. Generate with: openssl rand -base64 32
+SESSION_TOKEN_SECRET=your-secret-here
+```
+
+**Generating SESSION_TOKEN_SECRET:**
+
+The `SESSION_TOKEN_SECRET` is a cryptographic key used to sign session tokens. You can generate a secure random string using:
+
+```bash
+openssl rand -base64 32
+```
+
+Copy the output and paste it as the value for `SESSION_TOKEN_SECRET` in your `.env.local` file.
+
+### Optional Variables
+
+See `.env.example` for additional optional variables like `SUPABASE_SERVICE_ROLE_KEY` for admin operations.
+
 ## Getting Started
 
-First, run the development server:
+After setting up your environment variables, run the development server:
 
 ```bash
 npm run dev
