@@ -14,7 +14,3 @@
 - Presenter components should be interactive and stateful.
 - Audience components should be read-only and high-contrast.
 - Export public components from each folder's `index.ts`.
-
-## Related Docs
-
-- Source map: [`src/README.md`](../README.md)

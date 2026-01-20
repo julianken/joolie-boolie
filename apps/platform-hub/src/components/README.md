@@ -10,7 +10,3 @@
 
 - Keep layout components lean and prefer composition.
 - Export public components from `components/index.ts`.
-
-## Related Docs
-
-- Source map: [`src/README.md`](../README.md)

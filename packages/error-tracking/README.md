@@ -24,14 +24,6 @@ This package is included in the monorepo. Add it to your app's dependencies:
 }
 ```
 
-## Public API
-
-Exports are defined in `src/index.ts` and subpaths:
-
-- `@beak-gaming/error-tracking` (client + shared)
-- `@beak-gaming/error-tracking/react` (React components and hooks)
-- `@beak-gaming/error-tracking/server` (server helpers)
-
 ## Quick Start
 
 ### Client-Side (Browser)
@@ -343,7 +335,3 @@ pnpm test:coverage
 - `@beak-gaming/sync` - Dual-screen synchronization
 - `@beak-gaming/auth` - Authentication
 - `@beak-gaming/ui` - Shared UI components
-
-## Related Docs
-
-- Packages index: [`packages/README.md`](../README.md)

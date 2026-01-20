@@ -22,7 +22,3 @@ All exports are defined in `src/index.ts`.
 ```typescript
 import type { GameSession } from '@beak-gaming/types';
 ```
-
-## Related Docs
-
-- Packages index: [`packages/README.md`](../README.md)

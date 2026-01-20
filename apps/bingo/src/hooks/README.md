@@ -7,7 +7,3 @@ cross-cutting concerns and keep pure logic in `lib/`.
 
 - Clean up event listeners and timers in `useEffect` cleanup.
 - Avoid importing React state into `lib/` modules.
-
-## Related Docs
-
-- Source map: [`src/README.md`](../README.md)

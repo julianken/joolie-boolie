@@ -29,8 +29,3 @@ pnpm test:run
 - App structure: [`src/README.md`](./src/README.md)
 - Presenter components: [`src/components/presenter`](./src/components/presenter)
 - Audience components: [`src/components/audience`](./src/components/audience)
-
-## Related Docs
-
-- Apps index: [`apps/README.md`](../README.md)
-- Root overview: [`README.md`](../../README.md)

@@ -30,8 +30,3 @@ pnpm test:run
 
 - App structure: [`src/README.md`](./src/README.md)
 - Shared UI: [`src/components`](./src/components)
-
-## Related Docs
-
-- Apps index: [`apps/README.md`](../README.md)
-- Root overview: [`README.md`](../../README.md)
