@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@beak-gaming/auth": "workspace:*",
+    "@beak-gaming/database": "workspace:*",
     "@beak-gaming/error-tracking": "workspace:*",
     "@beak-gaming/game-engine": "workspace:*",
     "@beak-gaming/sync": "workspace:*",

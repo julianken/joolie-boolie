@@ -23,7 +23,7 @@ import {
  * Invalid Session Error Component
  * Displayed when the session ID or room code is missing or invalid.
  */
-function InvalidSessionError({ type }: { type: 'room' | 'session' }) {
+function InvalidSessionError({ type: _type }: { type: 'room' | 'session' }) {
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center p-8" role="main">
       <div className="max-w-lg text-center space-y-6" role="alert">

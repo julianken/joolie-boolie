@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     '@beak-gaming/ui',
     '@beak-gaming/theme',
     '@beak-gaming/auth',
+    '@beak-gaming/database',
   ],
   // Required for Next.js 16 + Serwist: Serwist adds webpack config,
   // but Turbopack is the default. This silences the warning.
