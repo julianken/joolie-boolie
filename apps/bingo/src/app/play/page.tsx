@@ -148,6 +148,30 @@ export default function PlayPage() {
     }
   }, [recover, storeToken]);
 
+  // Create new game handler - clears all session data and shows room setup modal
+  const handleCreateNewGame = useCallback(() => {
+    // Show confirmation if game is active
+    if (game.status !== 'idle' && game.status !== 'ended') {
+      const confirmed = window.confirm(
+        'This will end the current game and create a new one. Are you sure?'
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    // Clear all session data
+    clearToken();
+    setRoomCode(null);
+    setSessionToken(null);
+
+    // Reset game state to initial
+    game.resetGame();
+
+    // Show modal for new room setup
+    setShowCreateModal(true);
+  }, [game, clearToken]);
+
   // Open display window with room code in URL
   const openDisplay = useCallback(() => {
     if (!roomCode) {
@@ -369,15 +393,23 @@ export default function PlayPage() {
       </div>
       </main>
 
-      {/* Room code display */}
-      {roomCode && (
-        <div className="fixed bottom-4 left-4 z-40">
+      {/* Admin controls - Room code display and Create New Game button */}
+      <div className="fixed bottom-4 left-4 z-40 flex flex-col gap-3">
+        {roomCode && (
           <RoomCodeDisplay
             roomCode={roomCode}
             showSyncStatus={false}
           />
-        </div>
-      )}
+        )}
+        <Button
+          onClick={handleCreateNewGame}
+          variant="secondary"
+          size="md"
+          className="shadow-lg"
+        >
+          Create New Game
+        </Button>
+      </div>
 
       {/* Session modals */}
       <CreateGameModal
