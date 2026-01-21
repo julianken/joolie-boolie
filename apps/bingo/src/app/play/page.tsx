@@ -4,7 +4,6 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
 import { useSync } from '@/hooks/use-sync';
 import { useSessionRecovery, useAutoSync } from '@beak-gaming/sync';
-import { generateSessionId } from '@/lib/sync/session';
 import {
   generateSecurePin,
   generateShortSessionId,
@@ -20,7 +19,8 @@ import { BingoBoard } from '@/components/presenter/BingoBoard';
 import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
 import { ControlPanel } from '@/components/presenter/ControlPanel';
 import { Toggle } from '@/components/ui/Toggle';
-import { Slider, CreateGameModal, JoinGameModal, RoomCodeDisplay } from '@beak-gaming/ui';
+import { Slider, RoomCodeDisplay } from '@beak-gaming/ui';
+import { RoomSetupModal } from '@/components/presenter/RoomSetupModal';
 import { Button } from '@/components/ui/Button';
 import { VoiceSelector } from '@/components/ui/VoiceSelector';
 import { RollSoundSelector } from '@/components/presenter/RollSoundSelector';
@@ -41,10 +41,7 @@ export default function PlayPage() {
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [joinRoomCode, setJoinRoomCode] = useState<string>('');
   const [isCreatingSession, setIsCreatingSession] = useState(false);
-  const [isJoiningSession, setIsJoiningSession] = useState(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
 
   // Recovery state tracking
@@ -324,7 +321,7 @@ export default function PlayPage() {
   }, [gameState, storeToken]);
 
   const handleJoinSession = useCallback(async (roomCode: string, pin: string) => {
-    setIsJoiningSession(true);
+    setIsCreatingSession(true);
     setSessionError(null);
     try {
       const response = await fetch(`/api/sessions/${roomCode}/verify-pin`, {
@@ -339,13 +336,14 @@ export default function PlayPage() {
       storeToken(data.token);
       // Store the PIN for session recovery
       storePin(pin);
-      setShowJoinModal(false);
+      setCurrentPin(pin);
+      setShowCreateModal(false);
       // Trigger recovery to load game state
       await recover();
     } catch (error) {
       setSessionError(error instanceof Error ? error.message : 'Failed to join session');
     } finally {
-      setIsJoiningSession(false);
+      setIsCreatingSession(false);
     }
   }, [recover, storeToken]);
 
@@ -374,6 +372,26 @@ export default function PlayPage() {
     // Show modal for new room setup
     setShowCreateModal(true);
   }, [game, clearToken]);
+
+  // Room Setup Modal handlers
+  const handleModalCreateRoom = useCallback(() => {
+    // Use the current PIN or generate a new one
+    const pin = currentPin || generateSecurePin();
+    if (!currentPin) {
+      setCurrentPin(pin);
+      storePin(pin);
+    }
+    handleCreateSession(pin);
+  }, [currentPin, handleCreateSession]);
+
+  const handleModalJoinRoom = useCallback((roomCode: string, pin: string) => {
+    handleJoinSession(roomCode, pin);
+  }, [handleJoinSession]);
+
+  const handleModalPlayOffline = useCallback(() => {
+    handlePlayOffline();
+    setShowCreateModal(false);
+  }, [handlePlayOffline]);
 
   // Open display window with room code or offline session ID in URL
   const openDisplay = useCallback(() => {
@@ -657,20 +675,17 @@ export default function PlayPage() {
       </div>
 
       {/* Session modals */}
-      <CreateGameModal
+      <RoomSetupModal
         isOpen={shouldShowModal}
         onClose={() => {
           setShowCreateModal(false);
           setSessionError(null);
           setDismissedRecoveryError(true);
         }}
-        onSubmit={handleCreateSession}
-        isLoading={isCreatingSession}
-        error={dismissedRecoveryError ? sessionError ?? undefined : recoveryError ?? sessionError ?? undefined}
+        onCreateRoom={handleModalCreateRoom}
+        onJoinRoom={handleModalJoinRoom}
+        onPlayOffline={handleModalPlayOffline}
       />
-
-      {/* Note: JoinGameModal is not yet updated to support room code input */}
-      {/* For now, session joining is disabled until the UI component is updated */}
 
       <InstallPrompt />
     </>

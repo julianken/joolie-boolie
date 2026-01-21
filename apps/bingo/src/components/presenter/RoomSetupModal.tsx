@@ -9,7 +9,7 @@ export interface RoomSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateRoom: () => void;
-  onJoinRoom: (pin: string) => void;
+  onJoinRoom: (roomCode: string, pin: string) => void;
   onPlayOffline: () => void;
 }
 
@@ -20,16 +20,20 @@ export function RoomSetupModal({
   onJoinRoom,
   onPlayOffline,
 }: RoomSetupModalProps) {
+  const [joinRoomCode, setJoinRoomCode] = useState('');
   const [joinPin, setJoinPin] = useState('');
   const [showJoinForm, setShowJoinForm] = useState(false);
+  const [roomCodeError, setRoomCodeError] = useState('');
   const [pinError, setPinError] = useState('');
 
   // Reset state when modal closes
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen) {
+      setJoinRoomCode('');
       setJoinPin('');
       setShowJoinForm(false);
+      setRoomCodeError('');
       setPinError('');
     }
   }, [isOpen]);
@@ -38,14 +42,30 @@ export function RoomSetupModal({
   const handleJoinSubmit = (e: FormEvent) => {
     e.preventDefault();
 
+    // Validate room code: must not be empty
+    if (!joinRoomCode.trim()) {
+      setRoomCodeError('Room code is required');
+      return;
+    }
+
     // Validate PIN: must be exactly 4 digits
     if (!/^\d{4}$/.test(joinPin)) {
       setPinError('PIN must be exactly 4 digits');
       return;
     }
 
+    setRoomCodeError('');
     setPinError('');
-    onJoinRoom(joinPin);
+    onJoinRoom(joinRoomCode.trim().toUpperCase(), joinPin);
+  };
+
+  const handleRoomCodeChange = (value: string) => {
+    // Convert to uppercase and remove non-alphanumeric chars except hyphen
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+    setJoinRoomCode(cleaned);
+    if (roomCodeError) {
+      setRoomCodeError('');
+    }
   };
 
   const handleJoinPinChange = (value: string) => {
@@ -59,7 +79,9 @@ export function RoomSetupModal({
 
   const toggleJoinForm = () => {
     setShowJoinForm(!showJoinForm);
+    setRoomCodeError('');
     setPinError('');
+    setJoinRoomCode('');
     setJoinPin('');
   };
 
@@ -139,13 +161,28 @@ export function RoomSetupModal({
             <div className="flex-1">
               <h3 className="text-xl font-semibold mb-1">Join Existing Game</h3>
               <p className="text-base text-muted">
-                Enter a 4-digit PIN to join a game in progress
+                Enter room code and PIN to join a game in progress
               </p>
             </div>
           </div>
 
           {showJoinForm ? (
             <form onSubmit={handleJoinSubmit} className="flex flex-col gap-3">
+              <Input
+                type="text"
+                value={joinRoomCode}
+                onChange={(e) => handleRoomCodeChange(e.target.value)}
+                placeholder="e.g., SWAN-42"
+                error={roomCodeError}
+                label="Room Code"
+                size="lg"
+                autoFocus
+                aria-label="Enter room code"
+                aria-describedby="room-code-help"
+              />
+              <p id="room-code-help" className="text-base text-muted-foreground sr-only">
+                Enter the room code displayed on the host's screen
+              </p>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -157,7 +194,6 @@ export function RoomSetupModal({
                 error={pinError}
                 label="Room PIN"
                 size="lg"
-                autoFocus
                 aria-label="Enter room PIN"
                 aria-describedby="pin-help"
               />
@@ -178,7 +214,7 @@ export function RoomSetupModal({
                   type="submit"
                   variant="primary"
                   size="lg"
-                  disabled={joinPin.length !== 4}
+                  disabled={!joinRoomCode.trim() || joinPin.length !== 4}
                   className="flex-1"
                 >
                   Join Game
@@ -193,7 +229,7 @@ export function RoomSetupModal({
               className="w-full"
               aria-label="Show form to join existing game"
             >
-              Join with PIN
+              Join with Room Code
             </Button>
           )}
         </div>
