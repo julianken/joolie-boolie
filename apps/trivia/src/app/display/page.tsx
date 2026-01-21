@@ -123,6 +123,7 @@ function AudienceDisplay({
   // State for database polling
   const [dbSessionId, setDbSessionId] = useState<string | null>(sessionId || null);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [isResolvingRoomCode, setIsResolvingRoomCode] = useState(false);
 
   // Poll database for session ID when using room code
   useEffect(() => {
@@ -133,6 +134,7 @@ function AudienceDisplay({
 
     const fetchSessionId = async () => {
       try {
+        setIsResolvingRoomCode(true);
         const response = await fetch(`/api/sessions/room/${roomCode}`);
 
         if (!response.ok) {
@@ -147,6 +149,7 @@ function AudienceDisplay({
         if (isMounted && data.sessionId) {
           setDbSessionId(data.sessionId);
           setDbError(null);
+          setIsResolvingRoomCode(false);
         }
       } catch (error) {
         // Graceful failure - log but don't show error to user
@@ -233,7 +236,7 @@ function AudienceDisplay({
 
     // 1. Not connected - waiting for presenter
     if (!isConnected && !displayQuestionIndex && teams.length === 0) {
-      return <WaitingDisplay message="Waiting for presenter..." />;
+      return <WaitingDisplay message={isResolvingRoomCode ? "Connecting to room..." : "Waiting for presenter..."} />;
     }
 
     // 2. Game ended - show final results
