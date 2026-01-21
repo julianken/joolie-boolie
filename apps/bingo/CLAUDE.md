@@ -76,6 +76,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Fullscreen toggle for audience display
 - Keyboard shortcut support
 
+### Room Creation Flow
+- **Online Mode:** Create room with Supabase session, generates 4-digit PIN (1000-9999)
+- **Offline Mode:** Local-only session with 6-character session ID (no ambiguous chars: 0, O, 1, I)
+- **Join Room:** Enter room code and 4-digit PIN to join existing session
+- **Session Recovery:** Automatic recovery from localStorage on page refresh
+- **Create New Game:** Clear current session and start fresh (with confirmation if game active)
+
+#### PIN Generation
+- Uses `crypto.getRandomValues()` for cryptographic security (no `Math.random()`)
+- 4-digit PINs: Range 1000-9999 (9000 possible values)
+- Stored in localStorage key: `bingo_pin`
+- Persists across page refreshes for session recovery
+
+#### Offline Session IDs
+- 6-character alphanumeric IDs (uppercase)
+- Character set: `23456789ABCDEFGHJKLMNPQRSTUVWXYZ` (32 chars, excludes 0/O/1/I)
+- Stored in localStorage key: `bingo_offline_session_id`
+- Session data stored in key: `bingo_offline_session_{sessionId}`
+- Total possibilities: 32^6 = 1,073,741,824
+
+#### localStorage Schema
+```typescript
+// PIN storage
+localStorage.setItem('bingo_pin', '1234');
+
+// Offline session ID
+localStorage.setItem('bingo_offline_session_id', 'A3B7K9');
+
+// Offline session data
+localStorage.setItem('bingo_offline_session_A3B7K9', JSON.stringify({
+  sessionId: 'A3B7K9',
+  isOffline: true,
+  gameState: { /* serialized game state */ },
+  createdAt: '2024-01-20T12:00:00.000Z',
+  lastUpdated: '2024-01-20T12:30:00.000Z',
+}));
+```
+
 ## Architecture
 
 Frontend never talks directly to Supabase. All requests go through API routes (BFF pattern).
@@ -132,7 +170,9 @@ src/
 │   ├── use-online-status.ts
 │   └── use-sw-cache.ts
 ├── lib/
-│   └── game/          # engine.ts, patterns.ts, state-machine.ts, ball-deck.ts
+│   ├── game/          # engine.ts, patterns.ts, state-machine.ts, ball-deck.ts
+│   ├── session/       # secure-generation.ts (PIN/session ID), serializer.ts
+│   └── sync/          # broadcast.ts (BroadcastChannel), session.ts, offline-session.ts
 ├── stores/
 │   ├── game-store.ts  # Zustand game state
 │   ├── audio-store.ts # Zustand audio state (persisted)
