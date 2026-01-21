@@ -10,16 +10,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | App/Package | Status | Notes |
 |-------------|--------|-------|
-| `apps/bingo` | **Functional** | Full 75-ball bingo with audio, 29 patterns, themes, dual-screen sync, PWA, offline mode with session recovery |
-| `apps/trivia` | **Functional (95%)** | Team trivia with rounds, scoring, TTS, themes, dual-screen sync, PWA. Has 15 sample questions (needs 5 more for 4 rounds) |
-| `apps/platform-hub` | Scaffolded | Game selection UI only; auth not implemented |
-| `packages/sync` | **Complete** | BroadcastChannel sync, Zustand store, React hook |
-| `packages/ui` | **Complete** | Button, Toggle, Slider components |
-| `packages/theme` | **Complete** | Design tokens (colors, font sizes, touch targets) |
-| `packages/game-engine` | Partial | Base GameStatus type, transition functions, and statistics module |
-| `packages/auth` | **Complete** | 40+ auth utilities, hooks (useAuth, useSession, useUser), components (AuthProvider, ProtectedRoute), server/client wrappers |
-| `packages/database` | **Complete** | 150+ database utilities including type-safe client, query builders, pagination, filters, sorting, CRUD helpers, table-specific functions, and React hooks |
-| `packages/testing` | **Complete** | BroadcastChannel and Audio mocks |
+| `apps/bingo` | **✅ Production Ready (85%)** | Full 75-ball bingo with 29 patterns, audio, themes, dual-screen, PWA. Missing: auth integration, templates |
+| `apps/trivia` | **✅ Production Ready (95%)** | Full trivia with 20 questions, rounds, scoring, TTS, themes, dual-screen, PWA. Missing: auth integration, question import |
+| `apps/platform-hub` | **⚠️ Scaffolded (10%)** | Game selector UI complete. Missing: all API routes, auth backend, profile/template management |
+| `packages/sync` | **✅ Complete (100%)** | BroadcastChannel sync, Zustand store, React hook. Actively used in Bingo/Trivia |
+| `packages/ui` | **✅ Complete (100%)** | Button, Toggle, Slider, Card, Modal, Toast components |
+| `packages/theme` | **✅ Complete (100%)** | Design tokens (10+ themes, typography, spacing, touch targets) |
+| `packages/game-engine` | **⚠️ Partial (40%)** | Base GameStatus type, transition functions, statistics module |
+| `packages/auth` | **✅ Complete (95%)** | 40+ exports: AuthProvider, hooks (useAuth, useSession, useUser), ProtectedRoute, client wrappers. Not yet integrated in apps |
+| `packages/database` | **✅ Complete (98%)** | 150+ exports: type-safe client, CRUD, pagination, filters, React hooks, session tokens, PIN security, API factories. Used in Bingo/Trivia |
+| `packages/testing` | **✅ Complete (100%)** | BroadcastChannel and Audio mocks for tests |
+| `packages/types` | **✅ Complete** | Shared TypeScript type definitions |
+| `packages/error-tracking` | **Complete** | Error logging and tracking utilities |
 
 ## Monorepo Structure
 
@@ -36,6 +38,8 @@ beak-gaming-platform/
 │   ├── auth/            # Supabase authentication wrappers (40+ exports)
 │   ├── game-engine/     # Abstract game state machine
 │   ├── database/        # Supabase database utilities (150+ exports)
+│   ├── types/           # Shared TypeScript type definitions
+│   ├── error-tracking/  # Error logging and tracking utilities
 │   └── testing/         # Shared test utilities and mocks
 └── supabase/            # Database migrations and functions
 ```
@@ -194,6 +198,11 @@ Create `.env.local` in each app:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Session Token Secret (for HMAC-signed JWT tokens)
+# Generate with: openssl rand -hex 32
+SESSION_TOKEN_SECRET=your-64-character-hex-string
 ```
 
 ## Pull Request Template
