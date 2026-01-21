@@ -6,13 +6,6 @@ import {
   Timer,
   GameSettings,
   GameStatus,
-  QuestionType,
-  QuestionCategory,
-} from '@/types';
-import {
-  DEFAULT_ROUNDS,
-  QUESTIONS_PER_ROUND,
-  DEFAULT_TIMER_DURATION
 } from '@/types';
 
 /**

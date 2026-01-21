@@ -244,6 +244,9 @@ importers:
       '@beak-gaming/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@beak-gaming/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@beak-gaming/error-tracking':
         specifier: workspace:*
         version: link:../../packages/error-tracking
