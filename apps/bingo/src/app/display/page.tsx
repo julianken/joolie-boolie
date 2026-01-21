@@ -131,6 +131,7 @@ function AudienceDisplay({
   // State for database polling
   const [dbSessionId, setDbSessionId] = useState<string | null>(sessionId || null);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [isResolvingRoomCode, setIsResolvingRoomCode] = useState(false);
 
   // Poll database for session ID when using room code
   useEffect(() => {
@@ -138,9 +139,14 @@ function AudienceDisplay({
 
     let isMounted = true;
     let timeoutId: NodeJS.Timeout;
+    let isFirstFetch = true;
 
     const fetchSessionId = async () => {
       try {
+        if (isFirstFetch) {
+          setIsResolvingRoomCode(true);
+          isFirstFetch = false;
+        }
         const response = await fetch(`/api/sessions/room/${roomCode}`);
 
         if (!response.ok) {
@@ -155,13 +161,15 @@ function AudienceDisplay({
         if (isMounted && data.sessionId) {
           setDbSessionId(data.sessionId);
           setDbError(null);
+          setIsResolvingRoomCode(false);
         }
       } catch (error) {
         // Graceful failure - log but don't show error to user
         console.warn('Error fetching session ID:', error);
+        setIsResolvingRoomCode(false);
       } finally {
-        // Schedule next poll
-        if (isMounted) {
+        // Schedule next poll - stop after session ID is resolved
+        if (isMounted && !dbSessionId) {
           timeoutId = setTimeout(fetchSessionId, 5000);
         }
       }
@@ -174,7 +182,7 @@ function AudienceDisplay({
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [roomCode]);
+  }, [roomCode, dbSessionId]);
 
   // Determine which session ID to use
   const effectiveSessionId = dbSessionId || sessionId;
@@ -421,10 +429,12 @@ function AudienceDisplay({
                 aria-hidden="true"
               />
               <p className="text-3xl md:text-4xl text-muted-foreground">
-                Waiting for presenter...
+                {isResolvingRoomCode ? 'Connecting to room...' : 'Waiting for presenter...'}
               </p>
               <p className="text-xl text-muted">
-                Open the presenter view in another window to start the game.
+                {isResolvingRoomCode
+                  ? 'Establishing connection with the game session.'
+                  : 'Open the presenter view in another window to start the game.'}
               </p>
             </div>
           )}

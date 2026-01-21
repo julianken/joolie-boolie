@@ -123,6 +123,7 @@ function AudienceDisplay({
   // State for database polling
   const [dbSessionId, setDbSessionId] = useState<string | null>(sessionId || null);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [isResolvingRoomCode, setIsResolvingRoomCode] = useState(false);
 
   // Poll database for session ID when using room code
   useEffect(() => {
@@ -130,9 +131,14 @@ function AudienceDisplay({
 
     let isMounted = true;
     let timeoutId: NodeJS.Timeout;
+    let isFirstFetch = true;
 
     const fetchSessionId = async () => {
       try {
+        if (isFirstFetch) {
+          setIsResolvingRoomCode(true);
+          isFirstFetch = false;
+        }
         const response = await fetch(`/api/sessions/room/${roomCode}`);
 
         if (!response.ok) {
@@ -147,13 +153,15 @@ function AudienceDisplay({
         if (isMounted && data.sessionId) {
           setDbSessionId(data.sessionId);
           setDbError(null);
+          setIsResolvingRoomCode(false);
         }
       } catch (error) {
         // Graceful failure - log but don't show error to user
         console.warn('Error fetching session ID:', error);
+        setIsResolvingRoomCode(false);
       } finally {
-        // Schedule next poll
-        if (isMounted) {
+        // Schedule next poll - stop after session ID is resolved
+        if (isMounted && !dbSessionId) {
           timeoutId = setTimeout(fetchSessionId, 5000);
         }
       }
@@ -166,7 +174,7 @@ function AudienceDisplay({
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [roomCode]);
+  }, [roomCode, dbSessionId]);
 
   // Determine which session ID to use
   const effectiveSessionId = dbSessionId || sessionId;
@@ -233,7 +241,7 @@ function AudienceDisplay({
 
     // 1. Not connected - waiting for presenter
     if (!isConnected && !displayQuestionIndex && teams.length === 0) {
-      return <WaitingDisplay message="Waiting for presenter..." />;
+      return <WaitingDisplay message={isResolvingRoomCode ? "Connecting to room..." : "Waiting for presenter..."} />;
     }
 
     // 2. Game ended - show final results

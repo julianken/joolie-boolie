@@ -1093,6 +1093,7 @@ export default function PlayPage() {
       onJoinRoom={handleModalJoinRoom}
       onPlayOffline={handleModalPlayOffline}
       error={sessionError}
+      isLoading={isCreatingSession}
     />
     </>
   );
