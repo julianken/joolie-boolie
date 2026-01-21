@@ -349,6 +349,32 @@ export default function PlayPage() {
     }
   }, [recover, storeToken]);
 
+  // Create new game handler - clears all session data and shows room setup modal
+  const handleCreateNewGame = useCallback(() => {
+    // Show confirmation if game is active
+    if (game.status !== 'idle' && game.status !== 'ended') {
+      const confirmed = window.confirm(
+        'This will end the current game and create a new one. Are you sure?'
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    // Clear all session data
+    // clearToken() removes persisted token from localStorage (prevents recovery on refresh)
+    // Local state must be cleared separately for immediate effect in current session
+    clearToken();
+    setRoomCode(null);
+    setSessionToken(null);
+
+    // Reset game state to initial
+    game.resetGame();
+
+    // Show modal for new room setup
+    setShowCreateModal(true);
+  }, [game, clearToken]);
+
   // Open display window with room code or offline session ID in URL
   const openDisplay = useCallback(() => {
     if (isOfflineMode && offlineSessionId) {
@@ -592,35 +618,43 @@ export default function PlayPage() {
       </div>
       </main>
 
-      {/* Room code and PIN display */}
-      {roomCode && !isOfflineMode && (
-        <div className="fixed bottom-4 left-4 z-40 flex flex-col gap-3">
-          <RoomCodeDisplay
-            roomCode={roomCode}
-            showSyncStatus={false}
-          />
-          <PinDisplay
-            pin={currentPin}
-            offlineSessionId={null}
-          />
-        </div>
-      )}
-
-      {/* Offline session display */}
-      {isOfflineMode && offlineSessionId && (
-        <div className="fixed bottom-4 left-4 z-40 flex flex-col gap-3">
-          <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-            <div className="text-sm text-muted-foreground mb-1">Offline Session</div>
-            <div className="text-2xl font-mono font-bold tracking-wider">
-              {offlineSessionId}
+      {/* Admin controls - Room code, PIN display, and Create New Game button */}
+      <div className="fixed bottom-4 left-4 z-40 flex flex-col gap-3">
+        {roomCode && !isOfflineMode && (
+          <>
+            <RoomCodeDisplay
+              roomCode={roomCode}
+              showSyncStatus={false}
+            />
+            <PinDisplay
+              pin={currentPin}
+              offlineSessionId={null}
+            />
+          </>
+        )}
+        {isOfflineMode && offlineSessionId && (
+          <>
+            <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+              <div className="text-sm text-muted-foreground mb-1">Offline Session</div>
+              <div className="text-2xl font-mono font-bold tracking-wider">
+                {offlineSessionId}
+              </div>
             </div>
-          </div>
-          <PinDisplay
-            pin={null}
-            offlineSessionId={offlineSessionId}
-          />
-        </div>
-      )}
+            <PinDisplay
+              pin={null}
+              offlineSessionId={offlineSessionId}
+            />
+          </>
+        )}
+        <Button
+          onClick={handleCreateNewGame}
+          variant="secondary"
+          size="md"
+          className="shadow-lg"
+        >
+          Create New Game
+        </Button>
+      </div>
 
       {/* Session modals */}
       <CreateGameModal
