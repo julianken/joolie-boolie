@@ -121,7 +121,7 @@ describe('PIN Persistence Logic', () => {
       vi.spyOn(secureGeneration, 'generateSecurePin').mockReturnValue(generatedPin);
       vi.spyOn(secureGeneration, 'getStoredPin').mockReturnValue(null);
 
-      (mockFetch as unknown as vi.Mock).mockResolvedValueOnce({
+      vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -272,7 +272,7 @@ describe('PIN Persistence Logic', () => {
         localStorage.removeItem('bingo_pin');
       });
 
-      (mockFetch as unknown as vi.Mock).mockResolvedValueOnce({
+      vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: false,
         statusText: 'Internal Server Error',
       });
@@ -310,7 +310,7 @@ describe('PIN Persistence Logic', () => {
       vi.spyOn(secureGeneration, 'generateSecurePin').mockReturnValue(pin);
       const clearSpy = vi.spyOn(secureGeneration, 'clearStoredPin');
 
-      (mockFetch as unknown as vi.Mock).mockResolvedValueOnce({
+      vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -359,7 +359,7 @@ describe('PIN Persistence Logic', () => {
       });
 
       // First attempt fails
-      (mockFetch as unknown as vi.Mock).mockResolvedValueOnce({
+      vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: false,
         statusText: 'Error',
       });
@@ -393,7 +393,7 @@ describe('PIN Persistence Logic', () => {
       });
 
       // Second attempt
-      (mockFetch as unknown as vi.Mock).mockResolvedValueOnce({
+      vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
