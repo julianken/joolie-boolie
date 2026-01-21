@@ -45,6 +45,7 @@ export default function PlayPage() {
   const [sessionError, setSessionError] = useState<string | null>(null);
 
   // Recovery state tracking
+  const [hasRecoveryStarted, setHasRecoveryStarted] = useState(false);
   const [recoveryAttempted, setRecoveryAttempted] = useState(false);
   const [recoveryErrorMessage, setRecoveryErrorMessage] = useState<string | null>(null);
   const [dismissedRecoveryError, setDismissedRecoveryError] = useState(false);
@@ -125,9 +126,16 @@ export default function PlayPage() {
     enabled: !isOfflineMode,
   });
 
+  // Track when recovery starts
+  useEffect(() => {
+    if (isRecovering) {
+      setHasRecoveryStarted(true);
+    }
+  }, [isRecovering]);
+
   // Track when recovery completes and capture errors
   useEffect(() => {
-    if (!isRecovering) {
+    if (hasRecoveryStarted && !isRecovering) {
       setRecoveryAttempted(true);
 
       // Capture recovery error if present
@@ -141,7 +149,7 @@ export default function PlayPage() {
         setRecoveryErrorMessage(null);
       }
     }
-  }, [isRecovering, recoveryError]);
+  }, [hasRecoveryStarted, isRecovering, recoveryError]);
 
   // Sync recovered room code to local state
   useEffect(() => {
