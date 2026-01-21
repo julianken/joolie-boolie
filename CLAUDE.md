@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | App/Package | Status | Notes |
 |-------------|--------|-------|
-| `apps/bingo` | **Functional** | Full 75-ball bingo with audio, 29 patterns, themes, dual-screen sync, PWA |
+| `apps/bingo` | **Functional** | Full 75-ball bingo with audio, 29 patterns, themes, dual-screen sync, PWA, offline mode with session recovery |
 | `apps/trivia` | **Functional (95%)** | Team trivia with rounds, scoring, TTS, themes, dual-screen sync, PWA. Has 15 sample questions (needs 5 more for 4 rounds) |
 | `apps/platform-hub` | Scaffolded | Game selection UI only; auth not implemented |
 | `packages/sync` | **Complete** | BroadcastChannel sync, Zustand store, React hook |
