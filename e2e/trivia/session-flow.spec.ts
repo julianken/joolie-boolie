@@ -424,6 +424,7 @@ test.describe('Trivia Session Flow', () => {
 
       const sessionIdText = await sessionIdDisplay.textContent();
       expect(sessionIdText).toMatch(/^[A-Z0-9]{6}$/);
+      expect(sessionIdText).not.toMatch(/[0O1I]/);
     });
 
     test('should persist offline session in localStorage', async ({ page }) => {
