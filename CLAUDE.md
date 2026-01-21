@@ -6,6 +6,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Beak Gaming Platform** - A unified gaming platform for retirement communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
 
+## ⚠️ CRITICAL: Development Model
+
+**This project is developed EXCLUSIVELY with AI agents (Claude Code).**
+
+**NEVER include:**
+- ❌ Time estimates (weeks, days, hours, sprints)
+- ❌ Effort estimates (man-hours, engineer-days)
+- ❌ Team size assumptions (number of developers)
+- ❌ Timeline projections ("Week 1-2", "Phase 1: 3 weeks")
+- ❌ Resource planning ("1 frontend dev + 1 backend dev")
+
+**Why:** All work is done by AI agents, not human developers on schedules. Time-based planning is meaningless in this context.
+
+**Instead, focus on:**
+- ✅ Dependencies (what blocks what)
+- ✅ Complexity (simple, medium, complex)
+- ✅ Scope (number of tasks)
+- ✅ Critical path (order of execution)
+- ✅ Completion status (done vs. remaining)
+
 ## Current State
 
 | App/Package | Status | Notes |
