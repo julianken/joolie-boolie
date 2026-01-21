@@ -44,20 +44,29 @@ export function RoomSetupModal({
   const handleJoinSubmit = (e: FormEvent) => {
     e.preventDefault();
 
+    let hasErrors = false;
+
     // Validate room code: must not be empty
     if (!joinRoomCode.trim()) {
       setRoomCodeError('Room code is required');
-      return;
+      hasErrors = true;
+    } else {
+      setRoomCodeError('');
     }
 
     // Validate PIN: must be exactly 4 digits
     if (!/^\d{4}$/.test(joinPin)) {
       setPinError('PIN must be exactly 4 digits');
+      hasErrors = true;
+    } else {
+      setPinError('');
+    }
+
+    // Don't submit if there are errors
+    if (hasErrors) {
       return;
     }
 
-    setRoomCodeError('');
-    setPinError('');
     onJoinRoom(joinRoomCode.trim().toUpperCase(), joinPin);
   };
 

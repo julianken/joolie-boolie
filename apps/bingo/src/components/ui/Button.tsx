@@ -41,6 +41,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={isDisabled}
+        aria-busy={loading}
+        aria-live={loading ? 'polite' : undefined}
         className={`
           inline-flex items-center justify-center
           font-semibold rounded-lg
