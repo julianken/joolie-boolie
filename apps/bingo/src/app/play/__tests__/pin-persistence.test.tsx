@@ -129,7 +129,7 @@ describe('PIN Persistence Logic', () => {
             sessionToken: 'test-token',
           },
         }),
-      });
+      } as unknown as Response);
 
       const { result } = renderHook(() => usePinPersistence());
 
@@ -275,7 +275,7 @@ describe('PIN Persistence Logic', () => {
       vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: false,
         statusText: 'Internal Server Error',
-      });
+      } as unknown as Response);
 
       const { result } = renderHook(() => usePinPersistence());
 
@@ -318,7 +318,7 @@ describe('PIN Persistence Logic', () => {
             sessionToken: 'valid-token',
           },
         }),
-      });
+      } as unknown as Response);
 
       const { result } = renderHook(() => usePinPersistence());
 
@@ -362,7 +362,7 @@ describe('PIN Persistence Logic', () => {
       vi.mocked(mockFetch).mockResolvedValueOnce({
         ok: false,
         statusText: 'Error',
-      });
+      } as unknown as Response);
 
       const { result } = renderHook(() => usePinPersistence());
 
@@ -401,7 +401,7 @@ describe('PIN Persistence Logic', () => {
             sessionToken: 'retry-token',
           },
         }),
-      });
+      } as unknown as Response);
 
       // Reopen modal (should generate new PIN)
       act(() => {
