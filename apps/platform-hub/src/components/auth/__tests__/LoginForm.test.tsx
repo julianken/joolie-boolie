@@ -35,7 +35,7 @@ describe('LoginForm Redirect Logic', () => {
 
     it('should default to /dashboard when redirect is missing', () => {
       const result = buildRedirectUrl(undefined, 'abc123');
-      expect(result).toBe('/dashboard');
+      expect(result).toBe('/dashboard?authorization_id=abc123');
     });
 
     it('should return redirect without query params when authorization_id is missing', () => {
