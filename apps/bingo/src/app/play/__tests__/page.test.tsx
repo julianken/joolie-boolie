@@ -112,11 +112,11 @@ describe('PlayPage - Modal Timing and Recovery Error Handling', () => {
     });
 
     // Setup UI mocks to render based on props
-    mockCreateGameModal.mockImplementation((props: any) => {
+    mockCreateGameModal.mockImplementation((props: React.ComponentProps<typeof CreateGameModal>) => {
       return props.isOpen ? <div data-testid="create-game-modal">Create Game Modal</div> : null;
     });
 
-    mockRoomCodeDisplay.mockImplementation((props: any) => {
+    mockRoomCodeDisplay.mockImplementation((props: React.ComponentProps<typeof RoomCodeDisplay>) => {
       return <div data-testid="room-code-display">{props.roomCode}</div>;
     });
   });
