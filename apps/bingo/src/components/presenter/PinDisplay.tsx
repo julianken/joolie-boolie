@@ -113,6 +113,13 @@ export function PinDisplay({ pin, offlineSessionId, className = '' }: PinDisplay
           )}
         </Button>
 
+        {/* Screen reader announcement for copy state */}
+        {copied && (
+          <div className="sr-only" role="status" aria-live="polite">
+            PIN copied to clipboard successfully
+          </div>
+        )}
+
         <p className="text-sm text-muted-foreground">
           Share this PIN with players to join your game
         </p>
