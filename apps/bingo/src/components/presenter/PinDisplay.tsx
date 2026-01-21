@@ -99,7 +99,6 @@ export function PinDisplay({ pin, offlineSessionId, className = '' }: PinDisplay
           size="md"
           className="w-full"
           aria-label={copied ? 'PIN copied to clipboard' : 'Copy PIN to clipboard'}
-          aria-live="polite"
         >
           {copied ? (
             <>
