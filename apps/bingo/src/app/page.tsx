@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { StatsDisplay } from '@/components/stats';
+import { LoginButton } from '@/components/auth/LoginButton';
 
 export default function Home() {
   return (
@@ -29,6 +30,7 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+              <LoginButton />
               <Link
                 href="/play"
                 className="
