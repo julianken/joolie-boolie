@@ -31,6 +31,7 @@ import {
   clearState,
   storeTokens,
 } from '@/lib/auth/token-storage';
+import { constantTimeCompare } from '@/lib/auth/crypto-utils';
 
 function CallbackContent() {
   const router = useRouter();
@@ -71,11 +72,15 @@ function CallbackContent() {
         const returnedState = searchParams.get('state');
         const storedState = getState();
 
-        if (!returnedState || !storedState || returnedState !== storedState) {
+        if (
+          !returnedState ||
+          !storedState ||
+          !constantTimeCompare(returnedState, storedState)
+        ) {
           console.error('Invalid state parameter');
           setError('Invalid state parameter');
 
-          // Clean up
+          // Clean up sensitive data
           clearState();
           clearCodeVerifier();
 
@@ -109,6 +114,7 @@ function CallbackContent() {
           console.error('Failed to store tokens');
           setError('Failed to store tokens');
 
+          // Clear sensitive data on error
           clearCodeVerifier();
 
           setTimeout(() => {
@@ -117,7 +123,7 @@ function CallbackContent() {
           return;
         }
 
-        // Clean up PKCE code_verifier
+        // Clean up PKCE code_verifier (success path)
         clearCodeVerifier();
 
         // Redirect to /play
@@ -128,7 +134,8 @@ function CallbackContent() {
           err instanceof Error ? err.message : 'Authentication failed'
         );
 
-        // Clean up
+        // CRITICAL: Always clear sensitive data on ANY error
+        // Prevents PKCE replay attacks and state reuse
         clearCodeVerifier();
         clearState();
 
@@ -136,6 +143,11 @@ function CallbackContent() {
         setTimeout(() => {
           router.push('/?error=callback_failed');
         }, 2000);
+      } finally {
+        // DEFENSIVE: Ensure sensitive data is cleared even if we forgot above
+        // This is a safety net for any edge cases
+        clearCodeVerifier();
+        clearState();
       }
     }
 
