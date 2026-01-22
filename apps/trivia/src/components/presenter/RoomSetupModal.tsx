@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect } from 'react';
 import { Modal, Input, Button } from '@beak-gaming/ui';
+import { TemplateSelector } from './TemplateSelector';
 
 export interface RoomSetupModalProps {
   isOpen: boolean;
@@ -101,6 +102,14 @@ export function RoomSetupModal({
       title="Room Setup"
     >
       <div className="flex flex-col gap-6">
+        {/* Template Selector */}
+        <div className="mb-2">
+          <TemplateSelector disabled={isLoading} />
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
         {/* Error message display */}
         {error && (
           <div

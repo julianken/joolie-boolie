@@ -28,6 +28,7 @@ import { ThemeSelector } from '@/components/presenter/ThemeSelector';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
 import { KeyboardShortcutsModal } from '@/components/ui/KeyboardShortcutsModal';
 import { RoomSetupModal } from '@/components/presenter/RoomSetupModal';
+import { SaveTemplateModal } from '@/components/presenter/SaveTemplateModal';
 import { Button } from '@beak-gaming/ui';
 import { serializeTriviaState, deserializeTriviaState } from '@/lib/state/serializer';
 
@@ -263,6 +264,9 @@ export default function PlayPage() {
 
   // Settings panel state
   const [showSettings, setShowSettings] = useState(false);
+
+  // Save template modal state
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
 
   // Get settings from settings store
   const {
@@ -882,21 +886,39 @@ export default function PlayPage() {
                     : `${game.teams.length} team${game.teams.length === 1 ? '' : 's'} ready`}
                 </p>
               </div>
-              <button
-                onClick={game.startGame}
-                disabled={!game.canStart}
-                className={`
-                  w-full sm:w-auto px-6 py-3 rounded-xl text-base md:text-lg font-semibold
-                  transition-colors duration-200 min-h-[48px]
-                  ${
-                    game.canStart
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }
-                `}
-              >
-                Start Game
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                <button
+                  onClick={() => setShowSaveTemplateModal(true)}
+                  disabled={game.questions.length === 0}
+                  className={`
+                    w-full sm:w-auto px-4 py-3 rounded-xl text-base font-medium
+                    transition-colors duration-200 min-h-[48px]
+                    ${
+                      game.questions.length > 0
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }
+                  `}
+                  title="Save current questions as a template"
+                >
+                  Save Question Set
+                </button>
+                <button
+                  onClick={game.startGame}
+                  disabled={!game.canStart}
+                  className={`
+                    w-full sm:w-auto px-6 py-3 rounded-xl text-base md:text-lg font-semibold
+                    transition-colors duration-200 min-h-[48px]
+                    ${
+                      game.canStart
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  Start Game
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1094,6 +1116,12 @@ export default function PlayPage() {
       onPlayOffline={handleModalPlayOffline}
       error={sessionError}
       isLoading={isCreatingSession}
+    />
+
+    {/* Save Template Modal */}
+    <SaveTemplateModal
+      isOpen={showSaveTemplateModal}
+      onClose={() => setShowSaveTemplateModal(false)}
     />
     </>
   );
