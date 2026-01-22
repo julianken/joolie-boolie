@@ -12,8 +12,9 @@ export async function generatePKCE(): Promise<{
   codeVerifier: string;
   codeChallenge: string;
 }> {
-  // Generate 32-byte random code_verifier (256 bits)
-  const array = new Uint8Array(32);
+  // Generate 48-byte random code_verifier (384 bits)
+  // RFC 7636 requires 43-128 characters. 48 bytes → 64 chars base64url (industry best practice)
+  const array = new Uint8Array(48);
   crypto.getRandomValues(array);
   const codeVerifier = base64URLEncode(array);
 
@@ -33,7 +34,13 @@ export async function generatePKCE(): Promise<{
  * @returns Base64url-encoded string (no padding, URL-safe characters)
  */
 function base64URLEncode(buffer: Uint8Array): string {
-  return btoa(String.fromCharCode(...buffer))
+  // Convert Uint8Array to binary string safely (avoids spread operator call stack limits)
+  let binary = '';
+  for (let i = 0; i < buffer.length; i++) {
+    binary += String.fromCharCode(buffer[i]);
+  }
+
+  return btoa(binary)
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, '');
