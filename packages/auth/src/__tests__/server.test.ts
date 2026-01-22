@@ -102,14 +102,24 @@ describe('server', () => {
       expect(mockCookieStore.getAll).toHaveBeenCalled();
       expect(cookies).toEqual([{ name: 'test', value: 'value' }]);
 
-      // Test setAll
+      // Test setAll - verify secure cookie options are merged
       cookiesArg.setAll([
         { name: 'cookie1', value: 'val1', options: { path: '/' } },
         { name: 'cookie2', value: 'val2', options: { secure: true } },
       ]);
       expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
-      expect(mockCookieStore.set).toHaveBeenCalledWith('cookie1', 'val1', { path: '/' });
-      expect(mockCookieStore.set).toHaveBeenCalledWith('cookie2', 'val2', { secure: true });
+      expect(mockCookieStore.set).toHaveBeenCalledWith('cookie1', 'val1', {
+        path: '/',
+        httpOnly: true,
+        secure: false, // false in test environment (NODE_ENV !== 'production')
+        sameSite: 'lax',
+      });
+      expect(mockCookieStore.set).toHaveBeenCalledWith('cookie2', 'val2', {
+        path: '/',
+        httpOnly: true,
+        secure: false, // false in test environment (NODE_ENV !== 'production')
+        sameSite: 'lax',
+      });
     });
 
     it('should handle setAll errors gracefully (Server Component context)', async () => {

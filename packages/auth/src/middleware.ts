@@ -84,10 +84,25 @@ export async function updateSession(
         supabaseResponse = NextResponse.next({
           request,
         });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options)
-        );
+        cookiesToSet.forEach(({ name, value, options }) => {
+          // Merge secure cookie options with Supabase defaults
+          const secureOptions = {
+            ...options,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax' as const,
+            path: options?.path ?? '/',
+          };
+          supabaseResponse.cookies.set(name, value, secureOptions);
+        });
       },
+    },
+    cookieOptions: {
+      // Global cookie defaults for all Supabase auth cookies
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
     },
   });
 
@@ -154,10 +169,25 @@ export function createAuthMiddleware(config: MiddlewareConfig = {}) {
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Merge secure cookie options with Supabase defaults
+            const secureOptions = {
+              ...options,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax' as const,
+              path: options?.path ?? '/',
+            };
+            supabaseResponse.cookies.set(name, value, secureOptions);
+          });
         },
+      },
+      cookieOptions: {
+        // Global cookie defaults for all Supabase auth cookies
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
       },
     });
 
