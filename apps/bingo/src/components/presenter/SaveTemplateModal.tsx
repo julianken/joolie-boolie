@@ -59,7 +59,7 @@ export function SaveTemplateModal({
           pattern_id: pattern.id,
           voice_pack: voicePack,
           auto_call_enabled: autoCallEnabled,
-          auto_call_interval: autoCallSpeed,
+          auto_call_interval: autoCallSpeed * 1000, // Convert seconds to milliseconds
           is_default: isDefault,
         }),
       });

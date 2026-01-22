@@ -78,7 +78,7 @@ export function TemplateSelector({ disabled = false }: TemplateSelectorProps) {
       if (template.auto_call_enabled !== currentAutoCall) {
         setAutoCallEnabled();
       }
-      setAutoCallSpeed(template.auto_call_interval);
+      setAutoCallSpeed(template.auto_call_interval / 1000); // Convert milliseconds to seconds
 
       // 3. Load voice pack
       setVoicePack(template.voice_pack as VoicePackId);
