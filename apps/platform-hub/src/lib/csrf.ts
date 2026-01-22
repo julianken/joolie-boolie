@@ -74,11 +74,25 @@ export async function validateCsrfToken(token: string | null | undefined): Promi
     return false;
   }
 
-  // Timing-safe comparison to prevent timing attacks
-  return crypto.timingSafeEqual(
-    Buffer.from(token, 'base64'),
-    Buffer.from(storedToken, 'base64')
-  );
+  try {
+    // Create buffers from base64 tokens
+    const tokenBuffer = Buffer.from(token, 'base64');
+    const storedBuffer = Buffer.from(storedToken, 'base64');
+
+    // SECURITY: Validate buffer lengths before timingSafeEqual
+    // crypto.timingSafeEqual() throws RangeError if lengths don't match
+    // This prevents timing leaks and unexpected exceptions
+    if (tokenBuffer.length !== storedBuffer.length) {
+      return false;
+    }
+
+    // Timing-safe comparison to prevent timing attacks
+    return crypto.timingSafeEqual(tokenBuffer, storedBuffer);
+  } catch (error) {
+    // Handle malformed base64 or other buffer creation errors
+    console.error('CSRF validation error:', error);
+    return false;
+  }
 }
 
 /**

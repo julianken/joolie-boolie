@@ -179,6 +179,101 @@ describe('CSRF Token Library', () => {
       await validateCsrfToken(token);
 
       expect(timingSafeEqualSpy).toHaveBeenCalled();
+
+      timingSafeEqualSpy.mockRestore();
+    });
+
+    // SECURITY: Edge case tests for buffer length validation
+    it('should return false for different length tokens', async () => {
+      // Create tokens with different byte lengths
+      const shortToken = Buffer.from('short', 'utf-8').toString('base64');
+      const longToken = Buffer.from('much longer token string', 'utf-8').toString('base64');
+
+      await setCsrfToken(shortToken);
+
+      // Attempt to validate with different length token
+      const isValid = await validateCsrfToken(longToken);
+
+      expect(isValid).toBe(false);
+    });
+
+    it('should return false for malformed base64', async () => {
+      const validToken = generateCsrfToken();
+      await setCsrfToken(validToken);
+
+      // Test with invalid base64 strings
+      const malformedTokens = [
+        'not-valid-base64!!!',
+        'invalid@#$%^&*()',
+        'incomplete==',
+      ];
+
+      for (const malformed of malformedTokens) {
+        const isValid = await validateCsrfToken(malformed);
+        expect(isValid).toBe(false);
+      }
+    });
+
+    it('should return false for empty strings', async () => {
+      const validToken = generateCsrfToken();
+      await setCsrfToken(validToken);
+
+      // Empty string should fail validation
+      const isValid = await validateCsrfToken('');
+
+      expect(isValid).toBe(false);
+    });
+
+    it('should handle buffer creation errors gracefully', async () => {
+      // Store a valid token
+      const validToken = generateCsrfToken();
+      await setCsrfToken(validToken);
+
+      // Mock console.error to verify error logging
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // Test with various invalid inputs that might cause buffer errors
+      const invalidInputs = [
+        'not-base64',
+        '!!!invalid!!!',
+        'spaces in token',
+      ];
+
+      for (const invalid of invalidInputs) {
+        const isValid = await validateCsrfToken(invalid);
+        expect(isValid).toBe(false);
+      }
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should prevent timing attacks with different length buffers', async () => {
+      // This test ensures timingSafeEqual is never called with different length buffers
+      // Use tokens with clearly different byte lengths
+      const shortToken = Buffer.from('short', 'utf-8').toString('base64');
+      const longToken = Buffer.from('this is a much longer token', 'utf-8').toString('base64');
+
+      // Verify they actually have different buffer lengths
+      const shortBuffer = Buffer.from(shortToken, 'base64');
+      const longBuffer = Buffer.from(longToken, 'base64');
+      expect(shortBuffer.length).not.toBe(longBuffer.length);
+
+      // Clear any previous state
+      mockCookies.clear();
+
+      await setCsrfToken(shortToken);
+
+      const timingSafeEqualSpy = vi.spyOn(crypto, 'timingSafeEqual');
+
+      const result = await validateCsrfToken(longToken);
+
+      // Should return false
+      expect(result).toBe(false);
+
+      // timingSafeEqual should NOT be called because buffer lengths differ
+      expect(timingSafeEqualSpy).not.toHaveBeenCalled();
+
+      timingSafeEqualSpy.mockRestore();
     });
   });
 
