@@ -28,14 +28,25 @@ export async function startOAuthFlow(): Promise<void> {
   // Generate PKCE parameters
   const { codeVerifier, codeChallenge } = await generatePKCE();
 
-  // Store code_verifier in sessionStorage for callback
-  sessionStorage.setItem('trivia_pkce_verifier', codeVerifier);
+  // Generate CSRF state token (32 bytes = 43 chars base64url)
+  const stateArray = new Uint8Array(32);
+  crypto.getRandomValues(stateArray);
+  const state = btoa(String.fromCharCode(...stateArray))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
 
-  // Build authorization URL
+  // Store code_verifier and state in sessionStorage for callback
+  // Use state-specific keys to prevent collisions in multi-tab scenarios
+  sessionStorage.setItem(`trivia_pkce_verifier_${state}`, codeVerifier);
+  sessionStorage.setItem(`trivia_oauth_state_${state}`, state);
+
+  // Build authorization URL with CSRF state parameter
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
     redirect_uri: REDIRECT_URI,
     scope: 'openid',
+    state: state,
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
     response_type: 'code',
