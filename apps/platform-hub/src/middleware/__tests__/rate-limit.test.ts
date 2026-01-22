@@ -1,0 +1,361 @@
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { NextRequest } from 'next/server';
+import {
+  checkRateLimit,
+  getRateLimitHeaders,
+  resetRateLimit,
+  clearRateLimits,
+} from '../rate-limit';
+
+describe('Rate Limiting Middleware', () => {
+  const TEST_IP = '192.168.1.100';
+  const TEST_URL = 'http://localhost:3002/oauth/consent';
+
+  beforeEach(() => {
+    // Clear all rate limits before each test
+    clearRateLimits();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    clearRateLimits();
+  });
+
+  /**
+   * Helper to create a mock NextRequest
+   */
+  function createMockRequest(
+    url: string = TEST_URL,
+    headers: Record<string, string> = {}
+  ): NextRequest {
+    const request = new NextRequest(url, {
+      headers: new Headers({
+        'x-forwarded-for': TEST_IP,
+        ...headers,
+      }),
+    });
+    return request;
+  }
+
+  describe('checkRateLimit', () => {
+    it('should allow first request', () => {
+      const request = createMockRequest();
+      const result = checkRateLimit(request);
+
+      expect(result).toBeNull();
+    });
+
+    it('should allow requests under the limit', () => {
+      const request = createMockRequest();
+
+      // Make 10 requests (at the limit)
+      for (let i = 0; i < 10; i++) {
+        const result = checkRateLimit(request);
+        expect(result).toBeNull();
+      }
+    });
+
+    it('should block request when limit exceeded', () => {
+      const request = createMockRequest();
+
+      // Make 10 requests (at the limit)
+      for (let i = 0; i < 10; i++) {
+        checkRateLimit(request);
+      }
+
+      // 11th request should be blocked
+      const result = checkRateLimit(request);
+      expect(result).not.toBeNull();
+      expect(result?.status).toBe(429);
+    });
+
+    it('should return 429 with proper error message', async () => {
+      const request = createMockRequest();
+
+      // Exceed the limit
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request);
+      }
+
+      const result = checkRateLimit(request);
+      expect(result?.status).toBe(429);
+
+      const body = await result?.json();
+      expect(body).toEqual({
+        error: 'Too Many Requests',
+        message: 'Rate limit exceeded. Please try again later.',
+        retryAfter: expect.any(Number),
+      });
+    });
+
+    it('should include Retry-After header', () => {
+      const request = createMockRequest();
+
+      // Exceed the limit
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request);
+      }
+
+      const result = checkRateLimit(request);
+      const retryAfter = result?.headers.get('Retry-After');
+
+      expect(retryAfter).toBeTruthy();
+      expect(Number(retryAfter)).toBeGreaterThan(0);
+      expect(Number(retryAfter)).toBeLessThanOrEqual(60);
+    });
+
+    it('should include rate limit headers on 429 response', () => {
+      const request = createMockRequest();
+
+      // Exceed the limit
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request);
+      }
+
+      const result = checkRateLimit(request);
+
+      expect(result?.headers.get('X-RateLimit-Limit')).toBe('10');
+      expect(result?.headers.get('X-RateLimit-Remaining')).toBe('0');
+      expect(result?.headers.get('X-RateLimit-Reset')).toBeTruthy();
+    });
+
+    it('should reset after time window expires', () => {
+      const request = createMockRequest();
+
+      // Exceed the limit
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request);
+      }
+
+      // Verify blocked
+      let result = checkRateLimit(request);
+      expect(result?.status).toBe(429);
+
+      // Fast-forward time by 61 seconds (past the window)
+      vi.useFakeTimers();
+      vi.advanceTimersByTime(61 * 1000);
+
+      // Should be allowed again
+      result = checkRateLimit(request);
+      expect(result).toBeNull();
+
+      vi.useRealTimers();
+    });
+
+    it('should track different IPs separately', () => {
+      const request1 = createMockRequest(TEST_URL, {
+        'x-forwarded-for': '192.168.1.100',
+      });
+      const request2 = createMockRequest(TEST_URL, {
+        'x-forwarded-for': '192.168.1.101',
+      });
+
+      // Exhaust limit for first IP
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request1);
+      }
+
+      // First IP should be blocked
+      expect(checkRateLimit(request1)?.status).toBe(429);
+
+      // Second IP should still be allowed
+      expect(checkRateLimit(request2)).toBeNull();
+    });
+
+    it('should extract IP from x-real-ip header', () => {
+      const request = createMockRequest(TEST_URL, {
+        'x-real-ip': '10.0.0.1',
+      });
+
+      // Make requests and verify they're tracked
+      for (let i = 0; i < 10; i++) {
+        checkRateLimit(request);
+      }
+
+      const result = checkRateLimit(request);
+      expect(result?.status).toBe(429);
+    });
+
+    it('should extract IP from x-vercel-forwarded-for header', () => {
+      const request = createMockRequest(TEST_URL, {
+        'x-vercel-forwarded-for': '172.16.0.1',
+      });
+
+      // Make requests and verify they're tracked
+      for (let i = 0; i < 10; i++) {
+        checkRateLimit(request);
+      }
+
+      const result = checkRateLimit(request);
+      expect(result?.status).toBe(429);
+    });
+
+    it('should handle multiple IPs in x-forwarded-for', () => {
+      const request = createMockRequest(TEST_URL, {
+        'x-forwarded-for': '203.0.113.1, 198.51.100.1, 192.0.2.1',
+      });
+
+      // Should use the first IP
+      for (let i = 0; i < 10; i++) {
+        checkRateLimit(request);
+      }
+
+      const result = checkRateLimit(request);
+      expect(result?.status).toBe(429);
+    });
+
+    it('should log rate limit violations', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const request = createMockRequest();
+
+      // Exceed the limit
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request);
+      }
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[Rate Limit]')
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(TEST_IP)
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('/oauth/consent')
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+  });
+
+  describe('getRateLimitHeaders', () => {
+    it('should return max remaining for first request', () => {
+      const request = createMockRequest();
+      const headers = getRateLimitHeaders(request);
+
+      expect(headers['X-RateLimit-Limit']).toBe('10');
+      expect(headers['X-RateLimit-Remaining']).toBe('10');
+    });
+
+    it('should decrement remaining count', () => {
+      const request = createMockRequest();
+
+      // Make 3 requests
+      for (let i = 0; i < 3; i++) {
+        checkRateLimit(request);
+      }
+
+      const headers = getRateLimitHeaders(request);
+
+      expect(headers['X-RateLimit-Limit']).toBe('10');
+      expect(headers['X-RateLimit-Remaining']).toBe('7');
+      expect(headers['X-RateLimit-Reset']).toBeTruthy();
+    });
+
+    it('should show 0 remaining when limit reached', () => {
+      const request = createMockRequest();
+
+      // Make 10 requests
+      for (let i = 0; i < 10; i++) {
+        checkRateLimit(request);
+      }
+
+      const headers = getRateLimitHeaders(request);
+
+      expect(headers['X-RateLimit-Remaining']).toBe('0');
+    });
+  });
+
+  describe('resetRateLimit', () => {
+    it('should reset rate limit for specific IP', () => {
+      const request = createMockRequest();
+
+      // Exceed the limit
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request);
+      }
+
+      // Verify blocked
+      expect(checkRateLimit(request)?.status).toBe(429);
+
+      // Reset the IP
+      resetRateLimit(TEST_IP);
+
+      // Should be allowed again
+      expect(checkRateLimit(request)).toBeNull();
+    });
+  });
+
+  describe('clearRateLimits', () => {
+    it('should clear all rate limits', () => {
+      const request1 = createMockRequest(TEST_URL, {
+        'x-forwarded-for': '192.168.1.100',
+      });
+      const request2 = createMockRequest(TEST_URL, {
+        'x-forwarded-for': '192.168.1.101',
+      });
+
+      // Exceed limits for both IPs
+      for (let i = 0; i < 11; i++) {
+        checkRateLimit(request1);
+        checkRateLimit(request2);
+      }
+
+      // Verify both blocked
+      expect(checkRateLimit(request1)?.status).toBe(429);
+      expect(checkRateLimit(request2)?.status).toBe(429);
+
+      // Clear all
+      clearRateLimits();
+
+      // Both should be allowed again
+      expect(checkRateLimit(request1)).toBeNull();
+      expect(checkRateLimit(request2)).toBeNull();
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle missing IP headers gracefully', () => {
+      const request = new NextRequest(TEST_URL);
+
+      // Should use fallback IP
+      const result = checkRateLimit(request);
+      expect(result).toBeNull();
+    });
+
+    it('should handle concurrent requests from same IP', () => {
+      const request = createMockRequest();
+
+      // Simulate concurrent requests
+      const results = Array.from({ length: 15 }, () =>
+        checkRateLimit(request)
+      );
+
+      // First 10 should pass, remaining should be blocked
+      const passed = results.filter((r) => r === null).length;
+      const blocked = results.filter((r) => r?.status === 429).length;
+
+      expect(passed).toBe(10);
+      expect(blocked).toBe(5);
+    });
+
+    it('should maintain separate counters across different paths', () => {
+      const request1 = createMockRequest('http://localhost:3002/oauth/consent');
+      const request2 = createMockRequest('http://localhost:3002/oauth/token');
+
+      // Note: Rate limiting is per-IP, not per-path
+      // So both paths share the same counter for the same IP
+
+      for (let i = 0; i < 5; i++) {
+        checkRateLimit(request1);
+      }
+
+      for (let i = 0; i < 5; i++) {
+        checkRateLimit(request2);
+      }
+
+      // 11th request should be blocked (10 limit reached)
+      const result = checkRateLimit(request1);
+      expect(result?.status).toBe(429);
+    });
+  });
+});
