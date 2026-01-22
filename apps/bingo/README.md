@@ -169,6 +169,63 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SESSION_TOKEN_SECRET=vGOwoWTO69KP5QXIcNYjyHGonXJZh3nFH3oq3XOCSwY=
 ```
 
+### OAuth Client Mode (Optional)
+
+Bingo includes a full OAuth 2.1 client implementation with PKCE for "Sign in with Beak Gaming" functionality.
+
+#### Setup
+
+1. **Register Bingo as an OAuth client in Platform Hub**
+   - Navigate to Platform Hub's OAuth client registration
+   - Register a new client with redirect URI: `http://localhost:3000/auth/callback`
+   - Copy the generated client ID
+
+2. **Configure environment variables** in `.env.local`:
+   ```bash
+   NEXT_PUBLIC_OAUTH_CLIENT_ID=your-client-id-from-platform-hub
+   NEXT_PUBLIC_OAUTH_REDIRECT_URI=http://localhost:3000/auth/callback
+   NEXT_PUBLIC_OAUTH_CONSENT_URL=http://localhost:3002/oauth/consent
+   ```
+
+3. **Start Platform Hub** (port 3002) before starting Bingo
+   ```bash
+   # From monorepo root
+   pnpm dev:hub
+   ```
+
+4. **Test OAuth flow**
+   - Navigate to Bingo's login page
+   - Click "Sign in with Beak Gaming"
+   - Complete authentication flow in Platform Hub
+   - You'll be redirected back to Bingo with tokens stored
+
+#### Security Notes
+
+The OAuth client implementation stores tokens in **plaintext in browser localStorage**. This is a trade-off for simplicity in the initial implementation:
+
+**Current approach:**
+- Access tokens: JWT, 1-hour expiration, stored in localStorage
+- Refresh tokens: Opaque UUID, 30-day expiration, stored in localStorage
+- Vulnerable to XSS attacks if malicious scripts access localStorage
+- Tokens automatically refreshed when expired
+
+**Future improvement:**
+- Move to httpOnly cookies via BFF API routes
+- Prevents client-side JavaScript from accessing tokens
+- Better XSS protection, same CSRF protection
+
+**Always use HTTPS in production** to prevent token interception.
+
+#### OAuth Implementation Details
+
+For detailed OAuth documentation, see [`src/lib/auth/README.md`](./src/lib/auth/README.md), which covers:
+- Authorization Code Flow with PKCE (RFC 7636)
+- Token exchange and refresh
+- CSRF protection with state parameter
+- Code examples for login, protected routes, API calls
+- Security features and compliance with OAuth 2.1
+
+
 ## Development Workflow
 
 ### Running Tests
