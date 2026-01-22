@@ -8,25 +8,26 @@ vi.mock('@/lib/supabase/server', () => ({
 }));
 
 // Mock the database functions
-vi.mock('@beak-gaming/database', async () => {
-  const actual = await vi.importActual('@beak-gaming/database');
-  return {
-    ...actual,
-    getBingoTemplate: vi.fn(),
-    updateBingoTemplate: vi.fn(),
-    deleteBingoTemplate: vi.fn(),
-    isDatabaseError: vi.fn(),
-  };
-});
+vi.mock('@beak-gaming/database/tables', () => ({
+  getBingoTemplate: vi.fn(),
+  updateBingoTemplate: vi.fn(),
+  deleteBingoTemplate: vi.fn(),
+  AUTO_CALL_INTERVAL_MIN: 1000,
+  AUTO_CALL_INTERVAL_MAX: 30000,
+}));
+
+vi.mock('@beak-gaming/database/errors', () => ({
+  isDatabaseError: vi.fn(),
+}));
 
 import { createClient } from '@/lib/supabase/server';
 import {
   getBingoTemplate,
   updateBingoTemplate,
   deleteBingoTemplate,
-  isDatabaseError,
-  type BingoTemplate,
-} from '@beak-gaming/database';
+} from '@beak-gaming/database/tables';
+import { isDatabaseError } from '@beak-gaming/database/errors';
+import type { BingoTemplate } from '@beak-gaming/database/types';
 
 describe('GET /api/templates/[id]', () => {
   const mockCreateClient = createClient as ReturnType<typeof vi.fn>;
@@ -68,7 +69,7 @@ describe('GET /api/templates/[id]', () => {
 
     const notFoundError = { message: 'bingo_templates with id \'template-1\' not found', statusCode: 404 };
     mockGet.mockRejectedValue(notFoundError);
-    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(true);
 
     const request = new NextRequest('http://localhost/api/templates/template-1');
     const response = await GET(request, {
@@ -114,6 +115,30 @@ describe('GET /api/templates/[id]', () => {
     expect(response.status).toBe(200);
     expect(data.template).toEqual(mockTemplate);
     expect(mockGet).toHaveBeenCalledWith(expect.anything(), 'template-1');
+  });
+
+  it('handles non-database errors with 500', async () => {
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: 'user-123' } },
+          error: null,
+        }),
+      },
+    });
+
+    const genericError = new Error('Unexpected runtime error');
+    mockGet.mockRejectedValue(genericError);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(false);
+
+    const request = new NextRequest('http://localhost/api/templates/template-1');
+    const response = await GET(request, {
+      params: Promise.resolve({ id: 'template-1' }),
+    });
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Internal server error');
   });
 });
 
@@ -185,7 +210,7 @@ describe('PATCH /api/templates/[id]', () => {
 
     const notFoundError = { message: 'bingo_templates with id \'template-1\' not found', statusCode: 404 };
     mockUpdate.mockRejectedValue(notFoundError);
-    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(true);
 
     const request = new NextRequest('http://localhost/api/templates/template-1', {
       method: 'PATCH',
@@ -301,6 +326,34 @@ describe('PATCH /api/templates/[id]', () => {
       { name: 'Partial Update' }
     );
   });
+
+  it('handles non-database errors with 500', async () => {
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: 'user-123' } },
+          error: null,
+        }),
+      },
+    });
+
+    const genericError = new Error('Unexpected runtime error');
+    mockUpdate.mockRejectedValue(genericError);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(false);
+
+    const request = new NextRequest('http://localhost/api/templates/template-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ name: 'Test' }),
+    });
+
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: 'template-1' }),
+    });
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Internal server error');
+  });
 });
 
 describe('DELETE /api/templates/[id]', () => {
@@ -372,7 +425,7 @@ describe('DELETE /api/templates/[id]', () => {
 
     const dbError = { message: 'Cannot delete default template', statusCode: 400 };
     mockDelete.mockRejectedValue(dbError);
-    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(true);
 
     const request = new NextRequest('http://localhost/api/templates/template-1', {
       method: 'DELETE',

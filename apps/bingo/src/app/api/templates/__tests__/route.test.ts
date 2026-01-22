@@ -8,23 +8,24 @@ vi.mock('@/lib/supabase/server', () => ({
 }));
 
 // Mock the database functions
-vi.mock('@beak-gaming/database', async () => {
-  const actual = await vi.importActual('@beak-gaming/database');
-  return {
-    ...actual,
-    listAllBingoTemplates: vi.fn(),
-    createBingoTemplate: vi.fn(),
-    isDatabaseError: vi.fn(),
-  };
-});
+vi.mock('@beak-gaming/database/tables', () => ({
+  listAllBingoTemplates: vi.fn(),
+  createBingoTemplate: vi.fn(),
+  AUTO_CALL_INTERVAL_MIN: 1000,
+  AUTO_CALL_INTERVAL_MAX: 30000,
+}));
+
+vi.mock('@beak-gaming/database/errors', () => ({
+  isDatabaseError: vi.fn(),
+}));
 
 import { createClient } from '@/lib/supabase/server';
 import {
   listAllBingoTemplates,
   createBingoTemplate,
-  isDatabaseError,
-  type BingoTemplate,
-} from '@beak-gaming/database';
+} from '@beak-gaming/database/tables';
+import { isDatabaseError } from '@beak-gaming/database/errors';
+import type { BingoTemplate } from '@beak-gaming/database/types';
 
 describe('GET /api/templates', () => {
   const mockCreateClient = createClient as ReturnType<typeof vi.fn>;
@@ -98,7 +99,7 @@ describe('GET /api/templates', () => {
 
     const dbError = { message: 'Database error', statusCode: 503 };
     mockListAll.mockRejectedValue(dbError);
-    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(true);
 
     const response = await GET();
     const data = await response.json();
@@ -322,7 +323,7 @@ describe('POST /api/templates', () => {
 
     const dbError = { message: 'Duplicate template name', statusCode: 409 };
     mockCreate.mockRejectedValue(dbError);
-    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (isDatabaseError as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce(true);
 
     const request = new NextRequest('http://localhost/api/templates', {
       method: 'POST',
