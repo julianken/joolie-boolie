@@ -38,7 +38,7 @@ export interface AuthorizationDetails {
  * Returned by approve/denyAuthorization()
  */
 export interface ConsentResponse {
-  redirect_to: string;
+  redirect_url: string;
 }
 
 /**

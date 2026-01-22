@@ -130,9 +130,9 @@ export default function ConsentPage({ searchParams }: ConsentPageProps) {
 
       if (approveError) {
         setError(`Failed to approve authorization: ${approveError.message}`);
-      } else if (data?.redirect_to) {
+      } else if (data?.redirect_url) {
         // Redirect back to client app with authorization code
-        window.location.href = data.redirect_to;
+        window.location.href = data.redirect_url;
       } else {
         setError('Authorization approved but no redirect URL was provided.');
       }
@@ -155,9 +155,9 @@ export default function ConsentPage({ searchParams }: ConsentPageProps) {
 
       if (denyError) {
         setError(`Failed to deny authorization: ${denyError.message}`);
-      } else if (data?.redirect_to) {
+      } else if (data?.redirect_url) {
         // Redirect back to client app with error
-        window.location.href = data.redirect_to;
+        window.location.href = data.redirect_url;
       } else {
         // If no redirect URL, go to dashboard
         router.push('/');

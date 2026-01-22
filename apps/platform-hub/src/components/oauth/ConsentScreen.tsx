@@ -107,7 +107,7 @@ export function ConsentScreen({
             <Button
               onClick={() => (window.location.href = '/')}
               size="lg"
-              variant="outline"
+              variant="secondary"
             >
               Return to Home
             </Button>
@@ -184,7 +184,7 @@ export function ConsentScreen({
               loading={isDenying}
               disabled={isApproving || isDenying}
               size="lg"
-              variant="outline"
+              variant="secondary"
               className="w-full"
               aria-label="Deny access"
             >

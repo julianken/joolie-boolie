@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { categorizeScopes } from '@/lib/oauth/scopes';
 
 export interface ScopesListProps {

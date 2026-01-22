@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
     // Return redirect URL (or indicate success)
     return NextResponse.json({
-      redirect_url: denialData?.redirect_to || '/dashboard',
+      redirect_url: denialData?.redirect_url || '/dashboard',
     });
   } catch (error) {
     console.error('Error in OAuth denial:', error);

@@ -83,14 +83,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { client, scopes } = authDetails;
+    const { client } = authDetails;
+    // Note: scopes may not be available in Supabase SDK response type
+    const scopes = (authDetails as any).scopes || [];
 
     // Approve authorization via Supabase OAuth SDK
     const { data: approvalData, error: approvalError } = await supabase.auth.oauth.approveAuthorization(
       authorization_id
     );
 
-    if (approvalError || !approvalData?.redirect_to) {
+    if (approvalError || !approvalData?.redirect_url) {
       // Log error to audit log
       await auditAuthorizationError(
         request,
@@ -118,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     // Return redirect URL
     return NextResponse.json({
-      redirect_url: approvalData.redirect_to,
+      redirect_url: approvalData.redirect_url,
     });
   } catch (error) {
     console.error('Error in OAuth approval:', error);
