@@ -360,8 +360,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 |---------|--------|---------|---------------|
 | @beak-gaming/auth | ✅ 95% | 30 (AuthProvider, hooks, ProtectedRoute) | 100% (58/58 tests) |
 | @beak-gaming/database | ✅ 98% | 154 (client, CRUD, hooks, filters) | 90%+ |
-| @beak-gaming/sync | ✅ 100% | 68 (BroadcastSync, hooks, stores, session utils) | 95%+ |
-| @beak-gaming/ui | ⚠️ 67% | 15 components (Button, Modal, Toggle, Input, Skeleton, Confetti, etc.) - Missing Card, Toast | 85%+ |
+| @beak-gaming/sync | ✅ 100% | ~70 exports (BroadcastSync, hooks, stores, session utils, room code generator) | 95%+ |
+| @beak-gaming/ui | ⚠️ 88% | 15 components (Button, Modal, Toggle, Input, Slider, Skeleton variants, Confetti, SyncStatusIndicator, CreateGameModal, JoinGameModal, RoomCodeDisplay). Missing: Card, Toast (Toast duplicated in apps) | 85%+ |
 | @beak-gaming/theme | ✅ 100% | 2 theme modes + design tokens | N/A |
 | @beak-gaming/game-engine | ⚠️ 60-70% | GameStatus, transitions, statistics (700+ lines) | 90%+ |
 | @beak-gaming/types | ✅ Complete | Shared TypeScript types | N/A |
@@ -544,7 +544,7 @@ SELECT * FROM public.bingo_templates;  -- Should be empty or have valid user_ids
 
 | ID | Issue | Impact |
 |----|-------|--------|
-| **MED-1** | User ID cookie not httpOnly | XSS can read user_id |
+| **MED-1** | ~~User ID cookie not httpOnly~~ | NOT A VULNERABILITY - access_token and refresh_token ARE httpOnly. user_id cookie is intentionally httpOnly=false for client-side UX (non-sensitive identifier). |
 | **MED-2** | Toast ID generation uses Math.random() | Predictable toast IDs |
 | **MED-3** | No request size limits on API routes | DoS vulnerability |
 | **MED-4** | Console logging in production | No audit trail for token events |
@@ -556,7 +556,7 @@ SELECT * FROM public.bingo_templates;  -- Should be empty or have valid user_ids
 
 **5 Critical:** Must fix before any production deployment
 **5 High:** Should fix before beta testing
-**5 Medium:** Address before public launch
+**4 Medium:** Address before public launch (MED-1 is not a real issue)
 
 ---
 
@@ -739,7 +739,7 @@ async function safeHandler<T>(
 
 ### 8.1 Current Test Coverage
 
-**Total Tests:** 166 (153 unit/integration + 13 E2E)
+**Test Coverage:** Comprehensive test suite with 150+ test files and 3,400+ test cases across all apps and packages. Coverage varies by area (see breakdown below).
 
 | Area | Tests | Coverage | Status |
 |------|-------|----------|--------|
@@ -1071,6 +1071,31 @@ async function playRollSound(volume: number, soundFile: string): Promise<void> {
 **Better Approach:** Delete duplicate Button/Modal/Toast, re-export from @beak-gaming/ui
 
 **Quick Win:** Removes 180+ lines, <1 hour effort.
+
+---
+
+#### Toast Component Duplication (700 lines)
+**Locations:** `apps/bingo/src/components/ui/Toast.tsx` (351 lines), `apps/trivia/src/components/ui/Toast.tsx` (351 lines)
+
+**The Problem:** 100% identical Toast implementations in both apps - byte-for-byte duplicate code
+
+**Better Approach:** Extract to `@beak-gaming/ui` package as single shared Toast component
+
+**Quick Win:** Removes 351 lines of duplication, ensures consistent Toast behavior across platform, reduces maintenance burden
+
+---
+
+#### Modal Component Inconsistency (3 implementations)
+**Locations:**
+- `packages/ui/src/modal.tsx` (139 lines) - div-based portal
+- `apps/bingo/src/components/ui/Modal.tsx` (221 lines) - div-based variant
+- `apps/trivia/src/components/ui/Modal.tsx` (138 lines) - dialog element
+
+**The Problem:** Package has Modal, but apps maintain separate (different) implementations. Bingo and Trivia use different approaches (div vs dialog).
+
+**Better Approach:** Consolidate to single Modal in `@beak-gaming/ui` with variants if needed
+
+**Quick Win:** Delete app-level variants after ensuring package Modal supports needed features (focus trap, portal, accessibility)
 
 ---
 

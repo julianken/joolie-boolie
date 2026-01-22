@@ -30,8 +30,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | App/Package | Status | Notes |
 |-------------|--------|-------|
-| `apps/bingo` | **✅ Production Ready (85%)** | Full 75-ball bingo with 29 patterns, audio, themes, dual-screen, PWA. Missing: auth integration, templates |
-| `apps/trivia` | **✅ Production Ready (95%)** | Full trivia with 20 questions, rounds, scoring, TTS, themes, dual-screen, PWA. Missing: auth integration, question import |
+| `apps/bingo` | **✅ Production Ready (85%)** | Full 75-ball bingo with 29 patterns, audio, themes, dual-screen, PWA, OAuth auth, template CRUD API |
+| `apps/trivia` | **✅ Production Ready (95%)** | Full trivia with 20 questions, rounds, scoring, TTS, themes, dual-screen, PWA, OAuth auth, CSV import |
 | `apps/platform-hub` | **⚠️ Backend Complete (45%)** | OAuth 2.1 server complete (3,479 lines). Game selector UI complete. Missing: user dashboard, profile/template management UI |
 | `packages/sync` | **✅ Complete (100%)** | BroadcastChannel sync, Zustand store, React hook. Actively used in Bingo/Trivia |
 | `packages/ui` | **⚠️ Partial (88%)** | 15 components (Button, Toggle, Slider, Modal, Input, Skeleton variants, Confetti, etc.). Missing: Card, Toast |
