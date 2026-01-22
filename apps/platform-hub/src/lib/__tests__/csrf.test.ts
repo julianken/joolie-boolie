@@ -89,8 +89,7 @@ describe('CSRF Token Library', () => {
     });
 
     it('should set secure flag in production', async () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('NODE_ENV', 'production');
 
       const token = generateCsrfToken();
       await setCsrfToken(token);
@@ -98,12 +97,11 @@ describe('CSRF Token Library', () => {
       const stored = mockCookies.get('oauth_csrf_token');
       expect(stored?.options.secure).toBe(true);
 
-      process.env.NODE_ENV = originalEnv;
+      vi.unstubAllEnvs();
     });
 
     it('should not set secure flag in development', async () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
 
       const token = generateCsrfToken();
       await setCsrfToken(token);
@@ -111,7 +109,7 @@ describe('CSRF Token Library', () => {
       const stored = mockCookies.get('oauth_csrf_token');
       expect(stored?.options.secure).toBe(false);
 
-      process.env.NODE_ENV = originalEnv;
+      vi.unstubAllEnvs();
     });
   });
 
