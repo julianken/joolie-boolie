@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { StatsDisplay } from '@/components/stats';
+import { LoginButton } from '@/components/auth/LoginButton';
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4">
+        <LoginButton />
         <Link
           href="/play"
           className="inline-flex items-center justify-center min-h-[56px] px-8 py-4 text-xl font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
