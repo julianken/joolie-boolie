@@ -1,6 +1,6 @@
 # Wave 2 Execution Dashboard
 
-**Last Updated**: 2026-01-23 04:45 UTC
+**Last Updated**: 2026-01-23 05:53 UTC
 **Coordinating Lead**: Main Session
 **Target**: Complete all Wave 2 tickets for MVP readiness
 
@@ -12,9 +12,9 @@
 |-------|-------|-------------|-----------|------|---------|
 | **2A: Critical** | 6 | 0 | 0 | 6 | 0 |
 | **2B: Security** | 5 | 0 | 0 | 5 | 0 |
-| **2C: Consolidation** | 3 | 0 | 0 | 0 | 0 |
+| **2C: Consolidation** | 4 | 4 | 0 | 0 | 0 |
 | **2D: Infrastructure** | 3 | 0 | 0 | 0 | 0 |
-| **TOTAL** | 17 | 0 | 0 | 6 | 0 |
+| **TOTAL** | 18 | 4 | 0 | 11 | 0 |
 
 ---
 
@@ -116,19 +116,47 @@
 
 ---
 
-## Wave 2C: Code Consolidation (QUEUED)
+## Wave 2C: Code Consolidation 🚀 IN PROGRESS
 
-### BEA-306: Consolidate OAuth clients (-802 lines)
-- **Status**: ⏸️ Queued
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-306
+### 🔄 BEA-312: Fix PBKDF2 timing attack vulnerability
+- **Status**: 🔄 IN PROGRESS
+- **Started**: 2026-01-23 05:53 UTC
+- **Agent**: afa912e
+- **Worktree**: `.worktrees/wt-BEA-312-timing-attack`
+- **Branch**: `wave2c/BEA-312-timing-attack`
+- **Linear**: https://linear.app/beak-gaming/issue/BEA-312
+- **Scope**: Replace `===` with `crypto.timingSafeEqual()` in PIN verification
+- **Impact**: Eliminates timing side-channel attack (security fix)
 
-### BEA-307: Consolidate Toast components (-702 lines)
-- **Status**: ⏸️ Queued
+### 🔄 BEA-307: Consolidate Toast components (-700 lines)
+- **Status**: 🔄 IN PROGRESS
+- **Started**: 2026-01-23 05:53 UTC
+- **Agent**: a9dee0b
+- **Worktree**: `.worktrees/wt-BEA-307-toast`
+- **Branch**: `wave2c/BEA-307-toast`
 - **Linear**: https://linear.app/beak-gaming/issue/BEA-307
+- **Scope**: Move byte-for-byte identical Toast to @beak-gaming/ui
+- **Impact**: Removes 700 lines of duplication
 
-### BEA-308: Consolidate Button/Modal components (-500 lines)
-- **Status**: ⏸️ Queued
+### 🔄 BEA-306: Implement Cross-App SSO + Consolidate OAuth (-936 lines)
+- **Status**: 🔄 IN PROGRESS (⚠️ MVP BLOCKER)
+- **Started**: 2026-01-23 05:53 UTC
+- **Agent**: a775206
+- **Worktree**: `.worktrees/wt-BEA-306-sso-oauth`
+- **Branch**: `wave2c/BEA-306-sso-oauth`
+- **Linear**: https://linear.app/beak-gaming/issue/BEA-306
+- **Scope**: SSO cookie domain + OAuth client consolidation
+- **Impact**: True single sign-on + removes 936 lines duplication
+
+### 🔄 BEA-308: Consolidate Button/Modal components (-400 lines)
+- **Status**: 🔄 IN PROGRESS
+- **Started**: 2026-01-23 05:53 UTC
+- **Agent**: aead5ec
+- **Worktree**: `.worktrees/wt-BEA-308-button-modal`
+- **Branch**: `wave2c/BEA-308-button-modal`
 - **Linear**: https://linear.app/beak-gaming/issue/BEA-308
+- **Scope**: Add aria-busy to Button, standardize Modal implementation
+- **Impact**: Removes 400 lines duplication, consistent UI components
 
 ---
 
@@ -222,12 +250,27 @@
 - **01:22 UTC**: PR #176 merged (BEA-298: crypto.randomUUID())
 - **01:30 UTC**: **Wave 2A COMPLETE** ✅
 
-### Next Actions
+### Wave 2C Execution (Started 2026-01-23 05:53 UTC)
 
-**Wave 2A + 2B are complete.** Ready to proceed with Wave 2C: Code Consolidation (3 tasks):
+**All 4 tasks dispatched in parallel:**
 
-1. BEA-306: Consolidate OAuth clients to @beak-gaming/auth (-802 lines)
-2. BEA-307: Consolidate Toast components to @beak-gaming/ui (-702 lines)
-3. BEA-308: Consolidate Button/Modal components to @beak-gaming/ui (-500 lines)
+1. ✅ Worktrees created with isolated branches
+2. ✅ Permissions bootstrapped (git + pnpm allowed per worktree)
+3. ✅ Linear issues updated to "In Progress"
+4. 🔄 Agent afa912e → BEA-312 (timing attack fix)
+5. 🔄 Agent a9dee0b → BEA-307 (Toast consolidation)
+6. 🔄 Agent a775206 → BEA-306 (SSO + OAuth - MVP BLOCKER)
+7. 🔄 Agent aead5ec → BEA-308 (Button/Modal consolidation)
 
-All Wave 2C tasks are now unblocked and ready for dispatch.
+**Expected outcomes:**
+- 4 PRs created (one per task)
+- 2,036 lines removed (700 + 936 + 400 = 2,036)
+- 1 security fix (timing attack)
+- Cross-app SSO enabled (MVP requirement)
+- Consistent UI components across platform
+
+**Next actions:**
+- Monitor agents for PR creation
+- Dispatch reviewers when PRs open
+- Address CI failures immediately
+- Merge continuously as PRs pass review
