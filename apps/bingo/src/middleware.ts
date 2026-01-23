@@ -72,14 +72,9 @@ export async function middleware(request: NextRequest) {
   if (!isValid) {
     // Invalid token - clear cookies and redirect to login
     const response = NextResponse.redirect(new URL('/', request.url));
-    const cookieOptions = {
-      path: '/',
-      domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
-      maxAge: 0,
-    };
-    response.cookies.set('beak_access_token', '', cookieOptions);
-    response.cookies.set('beak_refresh_token', '', cookieOptions);
-    response.cookies.set('beak_user_id', '', cookieOptions);
+    response.cookies.delete('beak_access_token');
+    response.cookies.delete('beak_refresh_token');
+    response.cookies.delete('beak_user_id');
     return response;
   }
 
