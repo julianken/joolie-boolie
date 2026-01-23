@@ -62,8 +62,23 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Show error if token is invalid or user is not authenticated
-  if (tokenError || !user) {
+  // Verify that the URL still contains the recovery hash to prevent session hijacking
+  // If a user with a normal session navigates to /reset-password without a valid
+  // recovery token, this check will catch it even if they have an active session
+  const isRecoverySession = () => {
+    if (typeof window === 'undefined') return false;
+    const hash = window.location.hash;
+    if (!hash) return false;
+    const params = new URLSearchParams(hash.substring(1));
+    return params.get('type') === 'recovery' && !!params.get('access_token');
+  };
+
+  // Show error if token is invalid, user is not authenticated, or not a recovery session
+  if (tokenError || !user || !isRecoverySession()) {
+    const errorMessage = tokenError ||
+      (!isRecoverySession() ? 'Please use the password reset link from your email' :
+       'This password reset link is invalid or has expired.');
+
     return (
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
@@ -109,7 +124,7 @@ export default function ResetPasswordPage() {
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">Invalid Reset Link</h2>
                 <p className="text-lg text-muted-foreground mb-4">
-                  {tokenError || 'This password reset link is invalid or has expired.'}
+                  {errorMessage}
                 </p>
               </div>
               <Link
