@@ -77,7 +77,16 @@ export function Modal({
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
 
       // Focus the modal container after a short delay to allow render
+      // Check if any element has autofocus attribute first
       setTimeout(() => {
+        if (!modalRef.current) return;
+
+        const autofocusElement = modalRef.current.querySelector<HTMLElement>('[autofocus]');
+        if (autofocusElement) {
+          autofocusElement.focus();
+          return;
+        }
+
         const focusableElements = getFocusableElements();
         if (focusableElements.length > 0) {
           focusableElements[0].focus();

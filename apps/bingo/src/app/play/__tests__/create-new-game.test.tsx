@@ -115,6 +115,21 @@ vi.mock('@/lib/sync/session', () => ({
 }));
 
 vi.mock('@beak-gaming/ui', () => ({
+  Button: ({ children, onClick, variant = 'primary', size = 'md', className = '', ...props }: any) => {
+    const variantClasses = variant === 'secondary' ? 'bg-secondary' : 'bg-primary';
+    const sizeClasses = size === 'md' ? 'min-h-[56px]' : 'min-h-[64px]';
+    return (
+      <button
+        onClick={onClick}
+        className={`${variantClasses} ${sizeClasses} shadow-lg ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  },
+  Modal: ({ isOpen, onClose, children }: any) =>
+    isOpen ? <div role="dialog" onClick={onClose}>{children}</div> : null,
   Slider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   CreateGameModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? <div role="dialog" onClick={onClose}>Create Game Modal</div> : null,
