@@ -4,6 +4,10 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default function NotFound() {
+  // Get game URLs from environment variables with fallback to localhost
+  const bingoUrl = process.env.NEXT_PUBLIC_BINGO_URL || 'http://localhost:3000';
+  const triviaUrl = process.env.NEXT_PUBLIC_TRIVIA_URL || 'http://localhost:3001';
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-50"
@@ -66,7 +70,7 @@ export default function NotFound() {
           <ul className="flex flex-col gap-2">
             <li>
               <a
-                href="http://localhost:3000"
+                href={bingoUrl}
                 className="text-lg text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1"
               >
                 Beak Bingo
@@ -74,7 +78,7 @@ export default function NotFound() {
             </li>
             <li>
               <a
-                href="http://localhost:3001"
+                href={triviaUrl}
                 className="text-lg text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1"
               >
                 Trivia Night

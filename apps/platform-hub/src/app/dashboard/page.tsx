@@ -55,10 +55,9 @@ const games = [
     title: 'Beak Bingo',
     description:
       'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers.',
-    href:
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000/play'
-        : '/bingo/play',
+    href: process.env.NEXT_PUBLIC_BINGO_URL
+      ? `${process.env.NEXT_PUBLIC_BINGO_URL}/play`
+      : 'http://localhost:3000/play',
     icon: <BingoIcon />,
     colorClass: 'bg-blue-50 dark:bg-blue-950/30',
     lastPlayed: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
@@ -69,10 +68,9 @@ const games = [
     title: 'Trivia Night',
     description:
       'Team-based trivia with presenter controls. Great for group entertainment with customizable categories.',
-    href:
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3001/play'
-        : '/trivia/play',
+    href: process.env.NEXT_PUBLIC_TRIVIA_URL
+      ? `${process.env.NEXT_PUBLIC_TRIVIA_URL}/play`
+      : 'http://localhost:3001/play',
     icon: <TriviaIcon />,
     colorClass: 'bg-emerald-50 dark:bg-emerald-950/30',
     lastPlayed: new Date(Date.now() - 1000 * 60 * 60 * 26), // Yesterday
