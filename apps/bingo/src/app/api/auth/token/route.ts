@@ -72,32 +72,35 @@ export async function POST(request: NextRequest) {
     const cookieStore = await cookies();
 
     // Access token cookie (expires with token)
-    cookieStore.set('bingo_access_token', tokens.access_token, {
+    cookieStore.set('beak_access_token', tokens.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: tokens.expires_in,
       path: '/',
+      domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
     });
 
     // Refresh token cookie (long-lived, typically 30 days)
     if (tokens.refresh_token) {
-      cookieStore.set('bingo_refresh_token', tokens.refresh_token, {
+      cookieStore.set('beak_refresh_token', tokens.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60, // 30 days
         path: '/',
+        domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
       });
     }
 
     // User ID cookie (for client-side access)
-    cookieStore.set('bingo_user_id', tokens.user.id, {
+    cookieStore.set('beak_user_id', tokens.user.id, {
       httpOnly: false, // Allow client-side access
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: tokens.expires_in,
       path: '/',
+      domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
     });
 
     return NextResponse.json({

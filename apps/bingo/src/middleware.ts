@@ -57,8 +57,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for access token in httpOnly cookie
-  const accessToken = request.cookies.get('bingo_access_token')?.value;
+  // Check for access token in httpOnly cookie (using cross-app SSO cookie name)
+  const accessToken = request.cookies.get('beak_access_token')?.value;
 
   if (!accessToken) {
     // No token - redirect to login
@@ -72,9 +72,9 @@ export async function middleware(request: NextRequest) {
   if (!isValid) {
     // Invalid token - clear cookies and redirect to login
     const response = NextResponse.redirect(new URL('/', request.url));
-    response.cookies.delete('bingo_access_token');
-    response.cookies.delete('bingo_refresh_token');
-    response.cookies.delete('bingo_user_id');
+    response.cookies.delete('beak_access_token');
+    response.cookies.delete('beak_refresh_token');
+    response.cookies.delete('beak_user_id');
     return response;
   }
 
