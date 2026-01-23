@@ -5,10 +5,6 @@ import Link from 'next/link';
 import { Button } from '@beak-gaming/ui';
 import { useAuth } from '@beak-gaming/auth';
 
-export interface ForgotPasswordFormProps {
-  // No props needed - form is self-contained
-}
-
 interface FormErrors {
   email?: string;
   general?: string;
@@ -23,9 +19,8 @@ interface FormErrors {
  * - Success state with helpful next steps
  * - Loading states during submission
  */
-export function ForgotPasswordForm({}: ForgotPasswordFormProps) {
+export function ForgotPasswordForm() {
   const { resetPassword, isLoading, error: authError } = useAuth();
-
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSuccess, setIsSuccess] = useState(false);
@@ -52,14 +47,16 @@ export function ForgotPasswordForm({}: ForgotPasswordFormProps) {
       return;
     }
 
-    // Call resetPassword from useAuth hook
-    const { error } = await resetPassword(email);
-
-    if (!error) {
-      // Success - show success state
-      setIsSuccess(true);
+    try {
+      // Use resetPassword from auth package
+      const { error } = await resetPassword(email);
+      if (!error) {
+        setIsSuccess(true);
+      }
+      // Error handling is automatic via authError state
+    } catch {
+      setErrors({ general: 'An unexpected error occurred. Please try again.' });
     }
-    // Error handling is automatic via authError state
   };
 
   // Success state
