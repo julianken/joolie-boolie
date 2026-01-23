@@ -4,6 +4,11 @@ import './globals.css';
 import { Header, Footer } from '@/components';
 import { ErrorBoundaryProvider } from '@/components/providers/ErrorBoundaryProvider';
 import { AuthProvider } from '@beak-gaming/auth';
+import { validateEnvironment } from '@/lib/env-validation';
+
+// Validate environment variables at startup
+// This will throw and prevent the app from starting if configuration is invalid
+validateEnvironment();
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
