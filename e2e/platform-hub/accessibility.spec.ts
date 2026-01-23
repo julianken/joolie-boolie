@@ -14,7 +14,12 @@ test.describe('Platform Hub Accessibility @high', () => {
   test.describe('Login Page Accessibility', () => {
     test('login page has basic accessibility @high', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
-      await checkBasicA11y(page);
+      const results = await checkBasicA11y(page);
+
+      expect(results.hasMainLandmark).toBe(true);
+      expect(results.hasHeadings).toBe(true);
+      expect(results.imagesHaveAlt).toBe(true);
+      expect(results.buttonsHaveAccessibleNames).toBe(true);
     });
 
     test('login page keyboard navigation works @high', async ({ page }) => {
@@ -72,7 +77,12 @@ test.describe('Platform Hub Accessibility @high', () => {
   test.describe('Signup Page Accessibility', () => {
     test('signup page has basic accessibility @high', async ({ page }) => {
       await page.goto(`${BASE_URL}/signup`);
-      await checkBasicA11y(page);
+      const results = await checkBasicA11y(page);
+
+      expect(results.hasMainLandmark).toBe(true);
+      expect(results.hasHeadings).toBe(true);
+      expect(results.imagesHaveAlt).toBe(true);
+      expect(results.buttonsHaveAccessibleNames).toBe(true);
     });
 
     test('signup form keyboard navigation works @high', async ({ page }) => {
@@ -95,7 +105,12 @@ test.describe('Platform Hub Accessibility @high', () => {
   test.describe('Home Page Accessibility', () => {
     test('home page has basic accessibility @high', async ({ page }) => {
       await page.goto(BASE_URL);
-      await checkBasicA11y(page);
+      const results = await checkBasicA11y(page);
+
+      expect(results.hasMainLandmark).toBe(true);
+      expect(results.hasHeadings).toBe(true);
+      expect(results.imagesHaveAlt).toBe(true);
+      expect(results.buttonsHaveAccessibleNames).toBe(true);
     });
 
     test('home page keyboard navigation works @medium', async ({ page }) => {
