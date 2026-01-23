@@ -208,7 +208,6 @@ export function checkRateLimit(request: NextRequest): NextResponse | null {
   // Try Redis first, fall back to in-memory
   const redisClient = getRedisClient();
   let entry: RateLimitEntry;
-  let usedRedis = false;
 
   if (redisClient) {
     // Redis is available, but we need to handle this synchronously
