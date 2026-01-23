@@ -17,6 +17,7 @@ const STORAGE_KEY_PREFIX = 'bingo_offline_session';
  * Generate a random 6-character alphanumeric session ID for offline play.
  * Format: ABC123 (uppercase letters and digits only)
  *
+ * Uses crypto.getRandomValues() for cryptographically secure random generation.
  * Provides 36^6 = ~2.1 billion possible combinations, which is sufficient
  * for preventing collisions in a single-device, short-lived session context.
  *
@@ -29,9 +30,14 @@ const STORAGE_KEY_PREFIX = 'bingo_offline_session';
  * ```
  */
 export function generateOfflineSessionId(): string {
+  // Generate 6 random values using cryptographically secure random generation
+  const randomValues = new Uint32Array(SESSION_ID_LENGTH);
+  crypto.getRandomValues(randomValues);
+
+  // Map each random value to a character in our allowed set
   let result = '';
   for (let i = 0; i < SESSION_ID_LENGTH; i++) {
-    const randomIndex = Math.floor(Math.random() * ALPHANUMERIC.length);
+    const randomIndex = randomValues[i] % ALPHANUMERIC.length;
     result += ALPHANUMERIC[randomIndex];
   }
   return result;
