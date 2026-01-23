@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TemplateSelector } from '../TemplateSelector';
-import { ToastProvider } from '@/components/ui/Toast';
+import { ToastProvider } from '../../../components/ui/Toast';
 
 // Mock the game store
 vi.mock('@/stores/game-store', () => ({
