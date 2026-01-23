@@ -93,8 +93,27 @@ src/
 
 ## Future Work (TODO)
 
-- [ ] User profile management (real data integration)
-- [ ] Template management UI
+### Phase 3: Missing Features (Tracked in Linear)
+
+These features need implementation before full Platform Hub functionality:
+
+**Authentication & Security:**
+- [ ] Password reset token page `/reset-password` (BEA-319)
+- [ ] Session timeout handling (BEA-320)
+
+**Profile & Settings:**
+- [ ] Theme switching in settings (BEA-321)
+- [ ] Avatar upload functionality (BEA-322)
+- [ ] Notification preferences UI (BEA-323)
+
+**Template Management:**
+- [ ] Template list UI in dashboard (BEA-324)
+- [ ] Template selector component (BEA-325)
+
+**Infrastructure:**
+- [ ] Platform Hub PWA support (BEA-328)
+
+**Future (Not Tracked):**
 - [ ] Facility branding/logo management
 - [ ] Admin dashboard (RBAC tables exist, no UI)
 - [ ] Cross-game session history
