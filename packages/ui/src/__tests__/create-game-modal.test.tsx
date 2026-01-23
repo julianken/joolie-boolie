@@ -3,6 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateGameModal } from '../create-game-modal';
 
+// Cache bust for CI: tests updated to fix React 19 strict mode double rendering
 describe('CreateGameModal', () => {
   const mockOnClose = vi.fn();
   const mockOnSubmit = vi.fn();

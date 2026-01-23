@@ -1,12 +1,74 @@
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import {
   WelcomeHeader,
   DashboardGameCard,
   RecentSessions,
   UserPreferences,
 } from '@/components/dashboard';
+import type { GameSession } from '@/components/dashboard/RecentSessions';
 
 // Force dynamic rendering to avoid build-time Supabase initialization
 export const dynamic = 'force-dynamic';
+
+/**
+ * Fetch recent game sessions for a user from the database
+ */
+async function fetchRecentSessions(userId: string): Promise<GameSession[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('game_sessions')
+    .select('id, game_type, created_at, updated_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error('Error fetching recent sessions:', error);
+    return [];
+  }
+
+  // Transform database records to GameSession format
+  return (data || []).map((session) => {
+    const createdAt = new Date(session.created_at);
+    const updatedAt = new Date(session.updated_at);
+    const durationMs = updatedAt.getTime() - createdAt.getTime();
+    const durationMinutes = Math.max(1, Math.round(durationMs / (1000 * 60)));
+
+    return {
+      id: session.id,
+      gameType: session.game_type as 'bingo' | 'trivia',
+      startedAt: session.created_at,
+      durationMinutes,
+    };
+  });
+}
+
+/**
+ * Calculate game statistics from recent sessions
+ */
+function calculateGameStats(sessions: GameSession[]) {
+  const bingoSessions = sessions.filter((s) => s.gameType === 'bingo');
+  const triviaSessions = sessions.filter((s) => s.gameType === 'trivia');
+
+  return {
+    bingo: {
+      lastPlayed:
+        bingoSessions.length > 0
+          ? new Date(bingoSessions[0].startedAt)
+          : null,
+      timesPlayed: bingoSessions.length,
+    },
+    trivia: {
+      lastPlayed:
+        triviaSessions.length > 0
+          ? new Date(triviaSessions[0].startedAt)
+          : null,
+      timesPlayed: triviaSessions.length,
+    },
+  };
+}
 
 /**
  * Bingo icon - Grid pattern representing bingo card
@@ -48,56 +110,74 @@ function TriviaIcon() {
   );
 }
 
-// Game data configuration
-const games = [
-  {
-    id: 'bingo',
-    title: 'Beak Bingo',
-    description:
-      'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers.',
-    href: process.env.NEXT_PUBLIC_BINGO_URL
-      ? `${process.env.NEXT_PUBLIC_BINGO_URL}/play`
-      : 'http://localhost:3000/play',
-    icon: <BingoIcon />,
-    colorClass: 'bg-blue-50 dark:bg-blue-950/30',
-    lastPlayed: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    timesPlayed: 8,
-  },
-  {
-    id: 'trivia',
-    title: 'Trivia Night',
-    description:
-      'Team-based trivia with presenter controls. Great for group entertainment with customizable categories.',
-    href: process.env.NEXT_PUBLIC_TRIVIA_URL
-      ? `${process.env.NEXT_PUBLIC_TRIVIA_URL}/play`
-      : 'http://localhost:3001/play',
-    icon: <TriviaIcon />,
-    colorClass: 'bg-emerald-50 dark:bg-emerald-950/30',
-    lastPlayed: new Date(Date.now() - 1000 * 60 * 60 * 26), // Yesterday
-    timesPlayed: 4,
-  },
-];
-
-// Placeholder user data (will be replaced with real auth data)
-const placeholderUser = {
-  name: 'Activity Director',
-  email: 'activities@sunnydale.com',
-};
+/**
+ * Generate game cards configuration with real statistics
+ */
+function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
+  return [
+    {
+      id: 'bingo',
+      title: 'Beak Bingo',
+      description:
+        'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers.',
+      href: process.env.NEXT_PUBLIC_BINGO_URL
+        ? `${process.env.NEXT_PUBLIC_BINGO_URL}/play`
+        : 'http://localhost:3000/play',
+      icon: <BingoIcon />,
+      colorClass: 'bg-blue-50 dark:bg-blue-950/30',
+      lastPlayed: stats.bingo.lastPlayed,
+      timesPlayed: stats.bingo.timesPlayed,
+    },
+    {
+      id: 'trivia',
+      title: 'Trivia Night',
+      description:
+        'Team-based trivia with presenter controls. Great for group entertainment with customizable categories.',
+      href: process.env.NEXT_PUBLIC_TRIVIA_URL
+        ? `${process.env.NEXT_PUBLIC_TRIVIA_URL}/play`
+        : 'http://localhost:3001/play',
+      icon: <TriviaIcon />,
+      colorClass: 'bg-emerald-50 dark:bg-emerald-950/30',
+      lastPlayed: stats.trivia.lastPlayed,
+      timesPlayed: stats.trivia.timesPlayed,
+    },
+  ];
+}
 
 export const metadata = {
   title: 'Dashboard | Beak Gaming Platform',
   description: 'Your Beak Gaming dashboard - quick access to games, recent sessions, and settings',
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  // Check authentication
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  // Redirect to login if not authenticated
+  if (userError || !user) {
+    redirect('/login');
+  }
+
+  // Fetch recent sessions and calculate statistics
+  const recentSessions = await fetchRecentSessions(user.id);
+  const gameStats = calculateGameStats(recentSessions);
+  const games = getGamesConfig(gameStats);
+
+  // Extract user name from metadata or email
+  const userName =
+    user.user_metadata?.full_name ||
+    user.email?.split('@')[0] ||
+    'Activity Director';
+
   return (
     <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
         {/* Welcome Header */}
-        <WelcomeHeader
-          userName={placeholderUser.name}
-          userEmail={placeholderUser.email}
-        />
+        <WelcomeHeader userName={userName} userEmail={user.email || ''} />
 
         {/* Quick Access Games Section */}
         <section aria-labelledby="games-heading">
@@ -126,7 +206,7 @@ export default function DashboardPage() {
         {/* Two Column Layout for Sessions and Preferences */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
           {/* Recent Sessions */}
-          <RecentSessions maxSessions={4} />
+          <RecentSessions sessions={recentSessions} maxSessions={4} />
 
           {/* User Preferences */}
           <UserPreferences />
