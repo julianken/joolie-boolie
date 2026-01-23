@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ResetPasswordForm } from '@/components/auth';
 import { useAuth } from '@beak-gaming/auth';
 
 export default function ResetPasswordPage() {
-  const _router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [isCheckingToken, setIsCheckingToken] = useState(true);

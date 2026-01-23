@@ -29,8 +29,7 @@ interface FormErrors {
  * - Confirmation password field
  * - Loading states during submission
  */
-export function SignupForm({ _redirectTo }: SignupFormProps) {
-  const _router = useRouter();
+export function SignupForm() {
   const { signUp, isLoading, error: authError } = useAuth();
 
   const [name, setName] = useState('');
