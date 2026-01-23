@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { JoinGameModal } from '../join-game-modal';
 
+// Cache bust for CI: tests updated to fix React 19 strict mode double rendering
 describe('JoinGameModal', () => {
   const mockOnClose = vi.fn();
   const mockOnSubmit = vi.fn();
