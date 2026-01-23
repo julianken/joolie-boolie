@@ -114,14 +114,16 @@ vi.mock('@/lib/sync/session', () => ({
   generateSessionId: () => 'test-session-id',
 }));
 
-vi.mock('@beak-gaming/ui', () => ({
-  Slider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CreateGameModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
-    isOpen ? <div role="dialog" onClick={onClose}>Create Game Modal</div> : null,
-  JoinGameModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
-    isOpen ? <div role="dialog" onClick={onClose}>Join Game Modal</div> : null,
-  RoomCodeDisplay: ({ roomCode }: { roomCode: string }) => <div>Room: {roomCode}</div>,
-}));
+vi.mock('@beak-gaming/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@beak-gaming/ui')>();
+  return {
+    ...actual,
+    CreateGameModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+      isOpen ? <div role="dialog" onClick={onClose}>Create Game Modal</div> : null,
+    JoinGameModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+      isOpen ? <div role="dialog" onClick={onClose}>Join Game Modal</div> : null,
+  };
+});
 
 vi.mock('@/components/pwa', () => ({
   InstallPrompt: () => null,
