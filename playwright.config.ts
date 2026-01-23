@@ -6,6 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Configured with projects for:
  * - Bingo app (port 3000)
  * - Trivia app (port 3001)
+ * - Platform Hub (port 3002)
  */
 export default defineConfig({
   testDir: './e2e',
@@ -53,6 +54,15 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
       },
     },
+    {
+      name: 'platform-hub',
+      testDir: './e2e/platform-hub',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:3002',
+        viewport: { width: 1280, height: 720 },
+      },
+    },
     /* Mobile testing for accessibility (optional) */
     {
       name: 'bingo-mobile',
@@ -78,6 +88,14 @@ export default defineConfig({
     {
       command: 'pnpm dev:trivia',
       url: 'http://localhost:3001',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
+    {
+      command: 'pnpm dev:hub',
+      url: 'http://localhost:3002',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
       stdout: 'pipe',

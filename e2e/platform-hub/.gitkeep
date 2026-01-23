@@ -1,0 +1,10 @@
+# Platform Hub E2E Tests
+
+This directory contains E2E tests for the Platform Hub application.
+
+Tests will be organized by feature:
+- auth.spec.ts - Authentication flows (login, signup, logout)
+- dashboard.spec.ts - Dashboard features
+- profile.spec.ts - Profile management
+- oauth.spec.ts - OAuth consent flows
+- settings.spec.ts - User settings
