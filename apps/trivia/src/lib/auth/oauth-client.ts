@@ -38,8 +38,9 @@ export async function startOAuthFlow(): Promise<void> {
 
   // Store code_verifier and state in sessionStorage for callback
   // Use state-specific keys to prevent collisions in multi-tab scenarios
-  sessionStorage.setItem(`trivia_pkce_verifier_${state}`, codeVerifier);
-  sessionStorage.setItem(`trivia_oauth_state_${state}`, state);
+  // Using cross-app SSO prefix for consistency
+  sessionStorage.setItem(`beak_pkce_verifier_${state}`, codeVerifier);
+  sessionStorage.setItem(`beak_oauth_state_${state}`, state);
 
   // Build authorization URL with CSRF state parameter
   const params = new URLSearchParams({

@@ -38,7 +38,8 @@ function CallbackHandler() {
         }
 
         // Validate state parameter (CSRF protection)
-        const storedState = sessionStorage.getItem(`trivia_oauth_state_${state}`);
+        // Using cross-app SSO prefix for consistency
+        const storedState = sessionStorage.getItem(`beak_oauth_state_${state}`);
         if (!storedState || storedState !== state) {
           console.error('State mismatch - possible CSRF attack');
           setError('Security validation failed');
@@ -47,7 +48,7 @@ function CallbackHandler() {
         }
 
         // Retrieve code_verifier from sessionStorage
-        const codeVerifier = sessionStorage.getItem(`trivia_pkce_verifier_${state}`);
+        const codeVerifier = sessionStorage.getItem(`beak_pkce_verifier_${state}`);
         if (!codeVerifier) {
           console.error('Missing code_verifier in sessionStorage');
           setError('Session expired - please try again');
@@ -73,8 +74,8 @@ function CallbackHandler() {
         }
 
         // Clean up sessionStorage
-        sessionStorage.removeItem(`trivia_pkce_verifier_${state}`);
-        sessionStorage.removeItem(`trivia_oauth_state_${state}`);
+        sessionStorage.removeItem(`beak_pkce_verifier_${state}`);
+        sessionStorage.removeItem(`beak_oauth_state_${state}`);
 
         // Redirect to app home page
         router.push('/');
