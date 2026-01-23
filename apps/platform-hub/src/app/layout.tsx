@@ -4,6 +4,7 @@ import './globals.css';
 import { Header, Footer } from '@/components';
 import { ErrorBoundaryProvider } from '@/components/providers/ErrorBoundaryProvider';
 import { AuthProvider } from '@beak-gaming/auth';
+import { ToastProvider } from '@beak-gaming/ui';
 import { validateEnvironment } from '@/lib/env-validation';
 
 // Validate environment variables at startup
@@ -46,11 +47,13 @@ export default function RootLayout({
       >
         <ErrorBoundaryProvider>
           <AuthProvider>
-            <Header />
-            <div className="flex-1 flex flex-col">
-              {children}
-            </div>
-            <Footer />
+            <ToastProvider position="top-right">
+              <Header />
+              <div className="flex-1 flex flex-col">
+                {children}
+              </div>
+              <Footer />
+            </ToastProvider>
           </AuthProvider>
         </ErrorBoundaryProvider>
       </body>
