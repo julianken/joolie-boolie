@@ -5,11 +5,6 @@ import Link from 'next/link';
 import { Button } from '@beak-gaming/ui';
 import { useAuth } from '@beak-gaming/auth';
 
-export interface SignupFormProps {
-  /** Optional redirect URL after successful signup */
-  redirectTo?: string;
-}
-
 interface FormErrors {
   name?: string;
   email?: string;
