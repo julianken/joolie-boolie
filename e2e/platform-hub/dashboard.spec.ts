@@ -84,9 +84,9 @@ test.describe('Platform Hub Dashboard @high', () => {
   test('can navigate to bingo from dashboard @critical', async ({
     authenticatedPage,
   }) => {
-    // Find Bingo link (wrapped in article)
+    // Find Bingo link by exact aria-label (case sensitive)
     const bingoLink = authenticatedPage.getByRole('link', {
-      name: /play beak bingo/i,
+      name: 'Play Beak Bingo',
     });
     await expect(bingoLink).toBeVisible();
 
@@ -97,9 +97,9 @@ test.describe('Platform Hub Dashboard @high', () => {
   test('can navigate to trivia from dashboard @critical', async ({
     authenticatedPage,
   }) => {
-    // Find Trivia link
+    // Find Trivia link by exact aria-label (case sensitive)
     const triviaLink = authenticatedPage.getByRole('link', {
-      name: /play trivia night/i,
+      name: 'Play Trivia Night',
     });
     await expect(triviaLink).toBeVisible();
 

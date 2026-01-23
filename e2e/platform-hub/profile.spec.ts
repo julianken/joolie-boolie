@@ -124,17 +124,12 @@ test.describe('Profile & Settings Management @high', () => {
     });
     await saveButton.click();
 
-    // Wait for error toast or message
-    await authenticatedPage.waitForTimeout(1000);
+    // Wait for error toast with proper text matching
+    const errorToast = authenticatedPage.getByRole('alert').filter({
+      hasText: /do not match/i,
+    });
 
-    // Look for error message about password mismatch
-    // The toast should appear with error
-    const toast = authenticatedPage.locator('[role="alert"], .toast, text="do not match"');
-    const toastCount = await toast.count();
-    // If toast exists, it should show error
-    if (toastCount > 0) {
-      await expect(toast.first()).toBeVisible();
-    }
+    await expect(errorToast).toBeVisible({ timeout: 3000 });
   });
 
   test('success toast appears after profile update @high', async ({
@@ -151,20 +146,12 @@ test.describe('Profile & Settings Management @high', () => {
     });
     await saveButton.click();
 
-    // Wait for toast to appear
-    await authenticatedPage.waitForTimeout(1500);
+    // Wait for success toast with proper text matching
+    const successToast = authenticatedPage.getByRole('alert').filter({
+      hasText: /updated successfully/i,
+    });
 
-    // Look for success toast
-    // Toast component should show success message
-    const successToast = authenticatedPage.locator(
-      '[role="alert"]:has-text("success"), .toast:has-text("success"), text="updated successfully"'
-    );
-
-    // Check if toast appeared (it may disappear quickly)
-    const toastCount = await successToast.count();
-    // We expect success feedback in some form
-    // If no toast, the form should show the update persisted
-    expect(toastCount).toBeGreaterThanOrEqual(0);
+    await expect(successToast).toBeVisible({ timeout: 3000 });
   });
 
   test('settings page has proper form structure @medium', async ({
