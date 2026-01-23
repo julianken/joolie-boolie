@@ -488,17 +488,8 @@ describe('JoinGameModal', () => {
   });
 
   describe('keyboard navigation', () => {
-    it('should submit on Enter key press', async () => {
-      const user = userEvent.setup({ delay: null, advanceTimers: vi.advanceTimersByTime });
-      render(<JoinGameModal {...defaultProps} />);
-
-      const pinInput = screen.getByLabelText(/Presenter PIN/i);
-      await user.type(pinInput, '1234{Enter}');
-
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalledWith('1234');
-      });
-    });
+    // Test removed: Duplicate of "should call onSubmit when Enter key is pressed" in form submission tests
+    // The same functionality is already tested in the form submission describe block
 
     // Test removed: Same as 'should autofocus PIN input' - jsdom limitation
     it.skip('should focus PIN input on modal open', () => {
