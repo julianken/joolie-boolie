@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth';
 import { waitForHydration, checkBasicA11y } from '../utils/helpers';
 
 test.describe('Bingo Accessibility', () => {
@@ -95,12 +95,11 @@ test.describe('Bingo Accessibility', () => {
   });
 
   test.describe('Presenter View', () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto('/play');
+    test.beforeEach(async ({ authenticatedBingoPage: page }) => {
       await waitForHydration(page);
     });
 
-    test('has skip link for keyboard navigation', async ({ page }) => {
+    test('has skip link for keyboard navigation', async ({ authenticatedBingoPage: page }) => {
       // Skip link may be visually hidden but present in DOM
       const skipLink = page.locator('a[href="#main"], a:text("skip")').first();
       // If skip link exists, it should work
@@ -110,7 +109,7 @@ test.describe('Bingo Accessibility', () => {
       }
     });
 
-    test('buttons are keyboard accessible', async ({ page }) => {
+    test('buttons are keyboard accessible', async ({ authenticatedBingoPage: page }) => {
       // Tab to buttons and verify they can be focused
       await page.keyboard.press('Tab');
 
@@ -122,7 +121,7 @@ test.describe('Bingo Accessibility', () => {
       expect(['A', 'BUTTON', 'INPUT', 'SELECT']).toContain(focusedElement);
     });
 
-    test('form controls are labeled', async ({ page }) => {
+    test('form controls are labeled', async ({ authenticatedBingoPage: page }) => {
       const inputs = await page.locator('input, select, textarea').all();
 
       for (const input of inputs) {
@@ -140,7 +139,7 @@ test.describe('Bingo Accessibility', () => {
       }
     });
 
-    test('toggle switches have accessible labels', async ({ page }) => {
+    test('toggle switches have accessible labels', async ({ authenticatedBingoPage: page }) => {
       const toggles = await page.getByRole('switch').all();
 
       for (const toggle of toggles) {
@@ -152,7 +151,7 @@ test.describe('Bingo Accessibility', () => {
       }
     });
 
-    test('status changes are announced', async ({ page }) => {
+    test('status changes are announced', async ({ authenticatedBingoPage: page }) => {
       // Look for aria-live regions
       const liveRegions = await page.locator('[aria-live]').all();
 
@@ -160,7 +159,7 @@ test.describe('Bingo Accessibility', () => {
       expect(liveRegions.length).toBeGreaterThanOrEqual(0);
     });
 
-    test('minimum touch target size (44x44px)', async ({ page }) => {
+    test('minimum touch target size (44x44px)', async ({ authenticatedBingoPage: page }) => {
       const buttons = await page.getByRole('button').all();
 
       for (const button of buttons) {
@@ -173,7 +172,7 @@ test.describe('Bingo Accessibility', () => {
       }
     });
 
-    test('minimum font size is 18px', async ({ page }) => {
+    test('minimum font size is 18px', async ({ authenticatedBingoPage: page }) => {
       // Check body text font size
       const fontSize = await page.evaluate(() => {
         const body = document.body;
@@ -186,9 +185,8 @@ test.describe('Bingo Accessibility', () => {
   });
 
   test.describe('Display View', () => {
-    test('display page has proper ARIA landmarks', async ({ page, context }) => {
+    test('display page has proper ARIA landmarks', async ({ authenticatedBingoPage: page, context }) => {
       // Open from presenter
-      await page.goto('/play');
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -204,8 +202,7 @@ test.describe('Bingo Accessibility', () => {
       await expect(displayPage.locator('footer, [role="contentinfo"]')).toHaveCount(1);
     });
 
-    test('connection status is announced', async ({ page, context }) => {
-      await page.goto('/play');
+    test('connection status is announced', async ({ authenticatedBingoPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -220,8 +217,7 @@ test.describe('Bingo Accessibility', () => {
       await expect(statusElement.first()).toBeVisible();
     });
 
-    test('large ball display has alt text or label', async ({ page, context }) => {
-      await page.goto('/play');
+    test('large ball display has alt text or label', async ({ authenticatedBingoPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -244,8 +240,7 @@ test.describe('Bingo Accessibility', () => {
       }
     });
 
-    test('text is readable from distance (large enough)', async ({ page, context }) => {
-      await page.goto('/play');
+    test('text is readable from distance (large enough)', async ({ authenticatedBingoPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -279,8 +274,7 @@ test.describe('Bingo Accessibility', () => {
       expect(results.buttonsHaveAccessibleNames).toBe(true);
     });
 
-    test('presenter page passes basic accessibility checks', async ({ page }) => {
-      await page.goto('/play');
+    test('presenter page passes basic accessibility checks', async ({ authenticatedBingoPage: page }) => {
       await waitForHydration(page);
 
       const results = await checkBasicA11y(page);
