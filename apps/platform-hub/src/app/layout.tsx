@@ -8,6 +8,7 @@ import { ToastProvider } from '@beak-gaming/ui';
 import { validateEnvironment } from '@/lib/env-validation';
 import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
 import { SessionTimeoutMonitor } from '@/components/SessionTimeoutMonitor';
+import { ThemeInitializer } from '@/components/ThemeInitializer';
 
 // Validate environment variables at startup
 // This will throw and prevent the app from starting if configuration is invalid
@@ -67,6 +68,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
+        <ThemeInitializer />
         <ErrorBoundaryProvider>
           <AuthProvider>
             <SessionTimeoutMonitor />
