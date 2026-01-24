@@ -2,6 +2,95 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+---
+
+# 🚨 CRITICAL: SUBAGENT-DRIVEN DEVELOPMENT IS MANDATORY 🚨
+
+## ⚠️ YOU MUST USE `Skill(superpowers:subagent-driven-development)` FOR ALL MULTI-STEP WORK ⚠️
+
+**THIS IS NOT OPTIONAL. THIS IS THE CORE WORKFLOW.**
+
+### When to Use (ALWAYS for multi-step work)
+
+✅ **ANY task with implementation plan**
+✅ **ANY task with multiple steps**
+✅ **ANY coding work beyond trivial single-line fixes**
+
+### The Required Workflow (NEVER SKIP STEPS)
+
+For EVERY task, you MUST complete this cycle:
+
+```
+1. ✅ Dispatch IMPLEMENTER subagent
+   └─ Implementer codes, tests, commits, self-reviews
+
+2. ✅ Dispatch SPEC REVIEWER subagent
+   └─ Reviews implementation against spec
+   └─ If ❌ issues found: Implementer fixes → Spec reviewer re-reviews
+   └─ Must get ✅ SPEC COMPLIANT before proceeding
+
+3. ✅ Dispatch CODE QUALITY REVIEWER subagent
+   └─ Reviews code quality, patterns, best practices
+   └─ If ❌ issues found: Implementer fixes → Quality reviewer re-reviews
+   └─ Must get ✅ APPROVED before proceeding
+
+4. ✅ Mark task COMPLETED
+   └─ Only after BOTH reviews pass
+
+5. ✅ Move to NEXT task
+   └─ Repeat steps 1-4
+```
+
+### ❌ NEVER DO THESE THINGS ❌
+
+**YOU WILL VIOLATE THIS PROCESS IF YOU:**
+
+- ❌ Skip spec compliance review
+- ❌ Skip code quality review
+- ❌ Mark task complete without both reviews passing
+- ❌ Move to next task before current task reviews complete
+- ❌ Try to fix issues yourself instead of dispatching implementer
+- ❌ Accept "close enough" on spec compliance
+- ❌ Proceed with unresolved review issues
+- ❌ Review code quality BEFORE spec compliance passes
+
+### Red Flags You're Violating This
+
+If you think ANY of these thoughts, STOP:
+
+- "I'll just quickly fix this myself" → ❌ NO, dispatch implementer
+- "The code looks good, I'll skip the review" → ❌ NO, reviews are mandatory
+- "Spec compliance passed, that's good enough" → ❌ NO, code quality review is also required
+- "I'll review this while moving to next task" → ❌ NO, complete current task first
+- "This is a small change, doesn't need reviews" → ❌ NO, ALL changes need reviews
+
+### The ONLY Exceptions
+
+You may skip subagent-driven-development ONLY for:
+- ✅ Single-line typo fixes
+- ✅ Pure research tasks (no code changes)
+- ✅ Reading files to answer questions
+
+**Everything else MUST use subagent-driven-development.**
+
+### If You Realize You Violated This
+
+1. STOP immediately
+2. Go back to the task you're on
+3. Run the missing reviews (spec + quality)
+4. Fix any issues found
+5. THEN proceed to next task
+
+### Why This Matters
+
+- **Quality:** Two-stage review catches issues early
+- **Consistency:** Ensures spec compliance and code quality
+- **Efficiency:** Fixes are cheaper when caught in review
+- **Context:** Fresh subagents prevent context pollution
+- **Discipline:** Prevents rushed, incomplete work
+
+---
+
 ## Project Overview
 
 **Beak Gaming Platform** - A unified gaming platform for retirement communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
