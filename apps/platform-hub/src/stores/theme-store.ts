@@ -31,7 +31,7 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: 'platform-hub-theme',
-      partialize: (state) => ({
+      partialize: (state: ThemeStore) => ({
         theme: state.theme,
       }),
     }

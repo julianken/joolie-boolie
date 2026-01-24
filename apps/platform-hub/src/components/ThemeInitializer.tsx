@@ -1,6 +1,6 @@
 'use client';
 
-import { useThemeStore } from '@/stores/theme-store';
+import { useThemeStore, type ThemeStore } from '@/stores/theme-store';
 import { useApplyTheme } from '@/hooks/use-theme';
 
 /**
@@ -8,7 +8,7 @@ import { useApplyTheme } from '@/hooks/use-theme';
  * This runs on the client side and applies the theme to the document root.
  */
 export function ThemeInitializer() {
-  const theme = useThemeStore((state) => state.theme);
+  const theme = useThemeStore((state: ThemeStore) => state.theme);
   useApplyTheme(theme);
 
   return null;
