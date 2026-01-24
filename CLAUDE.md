@@ -115,6 +115,46 @@ You may skip subagent-driven-development ONLY for:
 - ✅ Critical path (order of execution)
 - ✅ Completion status (done vs. remaining)
 
+## 🚨 CRITICAL: Issue Tracking 🚨
+
+**THIS PROJECT USES LINEAR FOR ISSUE TRACKING - NOT GITHUB ISSUES**
+
+### ❌ NEVER Use GitHub Issues
+
+- ❌ DO NOT search GitHub issues (`mcp__plugin_github_github__search_issues`)
+- ❌ DO NOT create GitHub issues (`mcp__plugin_github_github__issue_write`)
+- ❌ DO NOT list GitHub issues (`mcp__plugin_github_github__list_issues`)
+
+### ✅ ALWAYS Use Linear MCP
+
+When asked about issues, tasks, or work tracking:
+
+```bash
+# List open issues
+mcp__linear-server__list_issues
+
+# Get issue details
+mcp__linear-server__get_issue
+
+# Create new issue
+mcp__linear-server__create_issue
+
+# Update existing issue
+mcp__linear-server__update_issue
+```
+
+### Issue Identifier Format
+
+Linear issues use the format: `BEA-###` (e.g., BEA-319, BEA-320)
+
+**NOT GitHub format:** `#123` or `owner/repo#123`
+
+### Why This Matters
+
+- **All project tracking is in Linear** - GitHub issues are not monitored
+- **Issue references in code** use Linear IDs (BEA-###)
+- **Workflow integration** is with Linear, not GitHub
+
 ## Current State
 
 | App/Package | Status | Notes |
@@ -231,6 +271,32 @@ pnpm test:coverage        # With coverage report
 # Run specific test file
 pnpm vitest src/lib/game/__tests__/engine.test.ts
 ```
+
+### Pre-Commit Hooks
+
+**Automatic Quality Checks:** Husky + lint-staged run checks on every commit to catch issues early.
+
+**What runs automatically:**
+- `pnpm lint` - ESLint checks on changed packages
+- `pnpm typecheck` - TypeScript type checking on changed packages
+- `pnpm test:run` - Unit tests on changed packages
+
+**Why:** GitHub Actions were disabled to avoid billing overages. Pre-commit hooks replace CI checks with local validation.
+
+**Bypass when needed:**
+```bash
+git commit --no-verify -m "WIP: bypass hooks for work-in-progress"
+```
+
+**How it works:**
+- Uses Turborepo's `--filter=[HEAD^1]` to only check changed packages
+- Turbo's caching makes repeated runs instant
+- Build validation still happens in Vercel CI (free unlimited builds)
+
+**Configuration:**
+- Hooks: `.husky/pre-commit`
+- Lint-staged: `.lintstagedrc.js`
+- Installed via: `prepare` script in `package.json` (runs automatically on `pnpm install`)
 
 ## Architecture
 
