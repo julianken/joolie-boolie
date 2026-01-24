@@ -10,7 +10,7 @@
  * - Testing audience real-time updates
  * - Testing PIN lockout/verification
  */
-import { test, expect, Page } from '../fixtures/auth';
+import { test, expect } from '../fixtures/auth';
 import { waitForHydration, clickButton } from '../utils/helpers';
 
 test.describe('Trivia Session Flow', () => {
@@ -304,8 +304,8 @@ test.describe('Trivia Session Flow', () => {
       await clickButton(page, /show form to join existing game/i);
 
       // Form inputs should be visible
-      await expect(page.getByLabelText(/room code/i)).toBeVisible();
-      await expect(page.getByLabelText(/room pin/i)).toBeVisible();
+      await expect(page.getByLabel(/room code/i)).toBeVisible();
+      await expect(page.getByLabel(/room pin/i)).toBeVisible();
       await expect(page.getByRole('button', { name: /join game/i })).toBeVisible();
       await expect(page.getByRole('button', { name: /cancel/i })).toBeVisible();
     });
@@ -313,8 +313,8 @@ test.describe('Trivia Session Flow', () => {
     test('should validate PIN format (4 digits)', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
-      const roomCodeInput = page.getByLabelText(/room code/i);
-      const pinInput = page.getByLabelText(/room pin/i);
+      const roomCodeInput = page.getByLabel(/room code/i);
+      const pinInput = page.getByLabel(/room pin/i);
       const joinButton = page.getByRole('button', { name: /join game/i });
 
       // Fill in room code
@@ -332,7 +332,7 @@ test.describe('Trivia Session Flow', () => {
     test('should convert room code to uppercase', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
-      const roomCodeInput = page.getByLabelText(/room code/i);
+      const roomCodeInput = page.getByLabel(/room code/i);
 
       // Type lowercase
       await roomCodeInput.fill('test-123');
@@ -345,7 +345,7 @@ test.describe('Trivia Session Flow', () => {
     test('should only allow numeric input for PIN', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
-      const pinInput = page.getByLabelText(/room pin/i);
+      const pinInput = page.getByLabel(/room pin/i);
 
       // Try to type letters
       await pinInput.fill('abc123xyz');
@@ -358,7 +358,7 @@ test.describe('Trivia Session Flow', () => {
     test('should limit PIN to 4 digits', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
-      const pinInput = page.getByLabelText(/room pin/i);
+      const pinInput = page.getByLabel(/room pin/i);
 
       // Try to type more than 4 digits
       await pinInput.fill('123456789');
@@ -371,8 +371,8 @@ test.describe('Trivia Session Flow', () => {
     test('should clear form when cancel clicked', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
-      const roomCodeInput = page.getByLabelText(/room code/i);
-      const pinInput = page.getByLabelText(/room pin/i);
+      const roomCodeInput = page.getByLabel(/room code/i);
+      const pinInput = page.getByLabel(/room pin/i);
 
       // Fill in form
       await roomCodeInput.fill('TEST-123');
@@ -386,8 +386,8 @@ test.describe('Trivia Session Flow', () => {
 
       // Click join again - form should be empty
       await clickButton(page, /show form to join existing game/i);
-      expect(await page.getByLabelText(/room code/i).inputValue()).toBe('');
-      expect(await page.getByLabelText(/room pin/i).inputValue()).toBe('');
+      expect(await page.getByLabel(/room code/i).inputValue()).toBe('');
+      expect(await page.getByLabel(/room pin/i).inputValue()).toBe('');
     });
   });
 
