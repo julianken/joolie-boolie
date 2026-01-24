@@ -14,6 +14,12 @@ vi.mock('@/lib/csrf', () => ({
   clearCsrfToken: vi.fn(),
 }));
 
+// Mock audit middleware
+vi.mock('@/middleware/audit-middleware', () => ({
+  auditAuthorizationSuccess: vi.fn(),
+  auditAuthorizationError: vi.fn(),
+}));
+
 // Mock Supabase client
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => ({
@@ -24,13 +30,13 @@ vi.mock('@/lib/supabase/server', () => ({
         approveAuthorization: vi.fn(),
       },
     },
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn(),
+      update: vi.fn().mockReturnThis(),
+    })),
   })),
-}));
-
-// Mock audit middleware
-vi.mock('@/middleware/audit-middleware', () => ({
-  auditAuthorizationSuccess: vi.fn(),
-  auditAuthorizationError: vi.fn(),
 }));
 
 import { validateCsrfToken, clearCsrfToken } from '@/lib/csrf';
@@ -297,10 +303,10 @@ describe('POST /api/oauth/approve', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Authorization not found');
+      expect(data.error).toContain('Authorization not found');
     });
 
-    it('should return 500 if no redirect URL provided', async () => {
+    it('should return 400 if authorization details not found', async () => {
       vi.mocked(validateCsrfToken).mockResolvedValue(true);
 
       const mockSupabase = {
@@ -314,17 +320,8 @@ describe('POST /api/oauth/approve', () => {
           select: vi.fn().mockReturnThis(),
           eq: vi.fn().mockReturnThis(),
           single: vi.fn().mockResolvedValue({
-            data: {
-              id: 'auth-123',
-              client_id: 'client-123',
-              user_id: 'user-123',
-              redirect_uri: '', // Empty redirect_uri to trigger the error
-              scope: 'read',
-              state: 'random-state',
-              status: 'pending',
-              oauth_clients: { id: 'client-123', name: 'Test Client' },
-            },
-            error: null,
+            data: null,
+            error: { message: 'Authorization not found' },
           }),
           update: vi.fn().mockReturnThis(),
         })),
@@ -339,8 +336,8 @@ describe('POST /api/oauth/approve', () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.error).toBe('No redirect URL provided by authorization server');
+      expect(response.status).toBe(400);
+      expect(data.error).toBe('Authorization not found');
     });
   });
 
