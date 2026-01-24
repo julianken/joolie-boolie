@@ -1,33 +1,32 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth';
 import { waitForHydration, pressKey } from '../utils/helpers';
 
 test.describe('Trivia Presenter View', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/play');
+  test.beforeEach(async ({ authenticatedTriviaPage: page }) => {
     await waitForHydration(page);
   });
 
   test.describe('Page Structure', () => {
-    test('displays presenter view header', async ({ page }) => {
+    test('displays presenter view header', async ({ authenticatedTriviaPage: page }) => {
       await expect(page.getByRole('heading', { name: /trivia night/i })).toBeVisible();
       await expect(page.getByText(/presenter view/i)).toBeVisible();
     });
 
-    test('shows game status indicator', async ({ page }) => {
+    test('shows game status indicator', async ({ authenticatedTriviaPage: page }) => {
       // Should show setup status initially
       await expect(page.getByText(/setup/i)).toBeVisible();
     });
 
-    test('shows Open Display button', async ({ page }) => {
+    test('shows Open Display button', async ({ authenticatedTriviaPage: page }) => {
       const openDisplayBtn = page.getByRole('button', { name: /open display/i });
       await expect(openDisplayBtn).toBeVisible();
     });
 
-    test('shows sync status', async ({ page }) => {
+    test('shows sync status', async ({ authenticatedTriviaPage: page }) => {
       await expect(page.getByText(/sync ready|sync active/i)).toBeVisible();
     });
 
-    test('shows keyboard shortcuts reference', async ({ page }) => {
+    test('shows keyboard shortcuts reference', async ({ authenticatedTriviaPage: page }) => {
       await expect(page.getByText(/keyboard shortcuts/i)).toBeVisible();
       await expect(page.getByText(/navigate/i)).toBeVisible();
       await expect(page.getByText(/peek/i)).toBeVisible();
@@ -35,13 +34,13 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Starting a New Game', () => {
-    test('cannot start game without teams', async ({ page }) => {
+    test('cannot start game without teams', async ({ authenticatedTriviaPage: page }) => {
       const startBtn = page.getByRole('button', { name: /start game/i });
       await expect(startBtn).toBeVisible();
       await expect(startBtn).toBeDisabled();
     });
 
-    test('can start game after adding a team', async ({ page }) => {
+    test('can start game after adding a team', async ({ authenticatedTriviaPage: page }) => {
       // Add a team
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
       await addTeamBtn.click();
@@ -59,7 +58,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/playing|round 1/i)).toBeVisible();
     });
 
-    test('shows ready message with team count', async ({ page }) => {
+    test('shows ready message with team count', async ({ authenticatedTriviaPage: page }) => {
       // Add teams
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
       await addTeamBtn.click();
@@ -73,11 +72,11 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Team Management', () => {
-    test('displays team manager section', async ({ page }) => {
+    test('displays team manager section', async ({ authenticatedTriviaPage: page }) => {
       await expect(page.getByRole('heading', { name: /teams/i })).toBeVisible();
     });
 
-    test('can add a team', async ({ page }) => {
+    test('can add a team', async ({ authenticatedTriviaPage: page }) => {
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
       await expect(addTeamBtn).toBeVisible();
 
@@ -97,7 +96,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/table 2/i)).toBeVisible();
     });
 
-    test('can remove a team during setup', async ({ page }) => {
+    test('can remove a team during setup', async ({ authenticatedTriviaPage: page }) => {
       // Add a team
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
       await addTeamBtn.click();
@@ -114,7 +113,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/no teams added yet/i)).toBeVisible();
     });
 
-    test('can rename a team', async ({ page }) => {
+    test('can rename a team', async ({ authenticatedTriviaPage: page }) => {
       // Add a team
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
       await addTeamBtn.click();
@@ -135,7 +134,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText('Champions')).toBeVisible();
     });
 
-    test('shows team count limit', async ({ page }) => {
+    test('shows team count limit', async ({ authenticatedTriviaPage: page }) => {
       // Check for the counter showing current/max teams
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
       await addTeamBtn.click();
@@ -147,13 +146,13 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Question Navigation', () => {
-    test('shows question list', async ({ page }) => {
+    test('shows question list', async ({ authenticatedTriviaPage: page }) => {
       // Question list section should be visible
       const questionList = page.locator('section').filter({ hasText: /round 1/i });
       await expect(questionList.first()).toBeVisible();
     });
 
-    test('can navigate questions with keyboard', async ({ page }) => {
+    test('can navigate questions with keyboard', async ({ authenticatedTriviaPage: page }) => {
       // Add team and start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -172,7 +171,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/presenter view/i)).toBeVisible();
     });
 
-    test('can select a question by clicking', async ({ page }) => {
+    test('can select a question by clicking', async ({ authenticatedTriviaPage: page }) => {
       // Start game first
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -189,7 +188,7 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Answer Reveal', () => {
-    test('can toggle peek answer', async ({ page }) => {
+    test('can toggle peek answer', async ({ authenticatedTriviaPage: page }) => {
       // Start game first
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -207,7 +206,7 @@ test.describe('Trivia Presenter View', () => {
       }
     });
 
-    test('can peek answer with Space key', async ({ page }) => {
+    test('can peek answer with Space key', async ({ authenticatedTriviaPage: page }) => {
       // Start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -223,7 +222,7 @@ test.describe('Trivia Presenter View', () => {
       await page.waitForTimeout(200);
     });
 
-    test('can toggle display question with D key', async ({ page }) => {
+    test('can toggle display question with D key', async ({ authenticatedTriviaPage: page }) => {
       // Start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -237,7 +236,7 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Score Adjustment', () => {
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ authenticatedTriviaPage: page }) => {
       // Add team and start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -245,11 +244,11 @@ test.describe('Trivia Presenter View', () => {
       await page.waitForTimeout(500);
     });
 
-    test('shows team score input during game', async ({ page }) => {
+    test('shows team score input during game', async ({ authenticatedTriviaPage: page }) => {
       await expect(page.getByRole('heading', { name: /team scores/i })).toBeVisible();
     });
 
-    test('can increase team score with + button', async ({ page }) => {
+    test('can increase team score with + button', async ({ authenticatedTriviaPage: page }) => {
       // Find the plus button
       const plusBtn = page.getByRole('button', { name: /add 1 point/i }).first();
       await expect(plusBtn).toBeVisible();
@@ -266,7 +265,7 @@ test.describe('Trivia Presenter View', () => {
       }
     });
 
-    test('can decrease team score with - button', async ({ page }) => {
+    test('can decrease team score with - button', async ({ authenticatedTriviaPage: page }) => {
       // First increase score
       const plusBtn = page.getByRole('button', { name: /add 1 point/i }).first();
       await plusBtn.click();
@@ -280,7 +279,7 @@ test.describe('Trivia Presenter View', () => {
       await page.waitForTimeout(300);
     });
 
-    test('can edit score directly by clicking', async ({ page }) => {
+    test('can edit score directly by clicking', async ({ authenticatedTriviaPage: page }) => {
       const scoreDisplay = page.getByRole('button', { name: /click to edit/i }).first();
 
       if (await scoreDisplay.isVisible()) {
@@ -295,7 +294,7 @@ test.describe('Trivia Presenter View', () => {
       }
     });
 
-    test('shows per-round score breakdown', async ({ page }) => {
+    test('shows per-round score breakdown', async ({ authenticatedTriviaPage: page }) => {
       // Add some points
       const plusBtn = page.getByRole('button', { name: /add 1 point/i }).first();
       await plusBtn.click();
@@ -307,7 +306,7 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Game Flow', () => {
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ authenticatedTriviaPage: page }) => {
       // Start game with a team
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -315,7 +314,7 @@ test.describe('Trivia Presenter View', () => {
       await page.waitForTimeout(500);
     });
 
-    test('can pause game', async ({ page }) => {
+    test('can pause game', async ({ authenticatedTriviaPage: page }) => {
       const pauseBtn = page.getByRole('button', { name: /pause/i });
       await pauseBtn.click();
       await page.waitForTimeout(300);
@@ -324,7 +323,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/paused/i)).toBeVisible();
     });
 
-    test('can resume game from pause', async ({ page }) => {
+    test('can resume game from pause', async ({ authenticatedTriviaPage: page }) => {
       // Pause first
       await page.getByRole('button', { name: /pause/i }).click();
       await page.waitForTimeout(300);
@@ -338,7 +337,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/playing|round 1/i)).toBeVisible();
     });
 
-    test('can use pause keyboard shortcut (P)', async ({ page }) => {
+    test('can use pause keyboard shortcut (P)', async ({ authenticatedTriviaPage: page }) => {
       await pressKey(page, 'KeyP');
       await page.waitForTimeout(300);
 
@@ -352,7 +351,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/playing|round 1/i)).toBeVisible();
     });
 
-    test('can trigger emergency pause', async ({ page }) => {
+    test('can trigger emergency pause', async ({ authenticatedTriviaPage: page }) => {
       const emergencyBtn = page.getByRole('button', { name: /emergency/i });
       await emergencyBtn.click();
       await page.waitForTimeout(300);
@@ -361,7 +360,7 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/emergency pause/i)).toBeVisible();
     });
 
-    test('can use emergency pause keyboard shortcut (E)', async ({ page }) => {
+    test('can use emergency pause keyboard shortcut (E)', async ({ authenticatedTriviaPage: page }) => {
       await pressKey(page, 'KeyE');
       await page.waitForTimeout(300);
 
@@ -371,7 +370,7 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Round Completion', () => {
-    test('shows complete round button on last question of round', async ({ page }) => {
+    test('shows complete round button on last question of round', async ({ authenticatedTriviaPage: page }) => {
       // Start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -393,7 +392,7 @@ test.describe('Trivia Presenter View', () => {
       }
     });
 
-    test('can complete round and proceed to next', async ({ page }) => {
+    test('can complete round and proceed to next', async ({ authenticatedTriviaPage: page }) => {
       // Start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -427,7 +426,7 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Game Reset', () => {
-    test('can reset game back to setup', async ({ page }) => {
+    test('can reset game back to setup', async ({ authenticatedTriviaPage: page }) => {
       // Start game
       await page.getByRole('button', { name: /add team/i }).click();
       await page.waitForTimeout(200);
@@ -449,28 +448,28 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('UI Controls', () => {
-    test('has fullscreen toggle button', async ({ page }) => {
+    test('has fullscreen toggle button', async ({ authenticatedTriviaPage: page }) => {
       const fullscreenBtn = page.getByRole('button', { name: /fullscreen/i });
       await expect(fullscreenBtn).toBeVisible();
     });
 
-    test('has settings button', async ({ page }) => {
+    test('has settings button', async ({ authenticatedTriviaPage: page }) => {
       const settingsBtn = page.getByRole('button', { name: /settings/i });
       await expect(settingsBtn).toBeVisible();
     });
 
-    test('has help button for keyboard shortcuts', async ({ page }) => {
+    test('has help button for keyboard shortcuts', async ({ authenticatedTriviaPage: page }) => {
       const helpBtn = page.getByRole('button', { name: /keyboard shortcuts/i });
       await expect(helpBtn).toBeVisible();
     });
 
-    test('can toggle fullscreen with F key', async ({ page }) => {
+    test('can toggle fullscreen with F key', async ({ authenticatedTriviaPage: page }) => {
       // Note: Actual fullscreen may not work in headless mode, but we can test the handler
       await pressKey(page, 'KeyF');
       await page.waitForTimeout(300);
     });
 
-    test('can open keyboard shortcuts modal with ? key', async ({ page }) => {
+    test('can open keyboard shortcuts modal with ? key', async ({ authenticatedTriviaPage: page }) => {
       await page.keyboard.press('Shift+?');
       await page.waitForTimeout(500);
 
@@ -483,7 +482,7 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Theme Selector', () => {
-    test('shows theme selector section', async ({ page }) => {
+    test('shows theme selector section', async ({ authenticatedTriviaPage: page }) => {
       // Look for theme-related elements
       const themeSection = page.getByText(/theme|light|dark/i);
       await expect(themeSection.first()).toBeVisible();
