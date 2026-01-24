@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth';
 import { waitForHydration } from '../utils/helpers';
 
 test.describe('Trivia Audience Display', () => {
@@ -36,9 +36,8 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Valid Session Display', () => {
-    test('displays correctly when opened from presenter', async ({ page, context }) => {
+    test('displays correctly when opened from presenter', async ({ authenticatedTriviaPage: page, context }) => {
       // First go to presenter view
-      await page.goto('/play');
       await waitForHydration(page);
 
       // Open display window
@@ -54,8 +53,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByRole('heading', { name: /trivia night/i })).toBeVisible();
     });
 
-    test('shows waiting state when game not started', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows waiting state when game not started', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -69,8 +67,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByText(/waiting|get ready/i)).toBeVisible();
     });
 
-    test('shows connection status indicator - connected', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows connection status indicator - connected', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -88,8 +85,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(syncIndicator).toBeVisible({ timeout: 10000 });
     });
 
-    test('shows sync timestamp when connected', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows sync timestamp when connected', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -106,8 +102,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Question Content Display', () => {
-    test('shows question when displayed by presenter', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows question when displayed by presenter', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       // Add team and open display
@@ -133,8 +128,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByText(/round 1/i)).toBeVisible();
     });
 
-    test('shows round and question number indicator', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows round and question number indicator', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -157,8 +151,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByText(/question \d+ of \d+/i)).toBeVisible();
     });
 
-    test('shows category badge for questions', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows category badge for questions', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -181,8 +174,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(categoryBadge.first()).toBeVisible();
     });
 
-    test('shows answer options list', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows answer options list', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -207,8 +199,7 @@ test.describe('Trivia Audience Display', () => {
       }
     });
 
-    test('question hides when display toggled off', async ({ page, context }) => {
-      await page.goto('/play');
+    test('question hides when display toggled off', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -238,8 +229,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Scoreboard Display', () => {
-    test('shows scoreboard between rounds', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows scoreboard between rounds', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       // Add multiple teams
@@ -275,8 +265,7 @@ test.describe('Trivia Audience Display', () => {
       }
     });
 
-    test('shows team names on scoreboard', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows team names on scoreboard', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -311,8 +300,7 @@ test.describe('Trivia Audience Display', () => {
       }
     });
 
-    test('shows medal rankings (1st, 2nd, 3rd)', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows medal rankings (1st, 2nd, 3rd)', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       // Add 4 teams to see medals
@@ -350,8 +338,7 @@ test.describe('Trivia Audience Display', () => {
       }
     });
 
-    test('displays team scores on scoreboard', async ({ page, context }) => {
-      await page.goto('/play');
+    test('displays team scores on scoreboard', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -392,8 +379,7 @@ test.describe('Trivia Audience Display', () => {
       }
     });
 
-    test('shows "Next round starting soon" message', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows "Next round starting soon" message', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -428,8 +414,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Timer Display', () => {
-    test('timer can be visible on display based on settings', async ({ page, context }) => {
-      await page.goto('/play');
+    test('timer can be visible on display based on settings', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -451,8 +436,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Pause Overlay', () => {
-    test('shows pause overlay when game is paused', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows pause overlay when game is paused', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -478,8 +462,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByText(/paused/i)).toBeVisible();
     });
 
-    test('shows blank screen during emergency pause', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows blank screen during emergency pause', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -505,8 +488,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByText(/please wait/i)).toBeVisible();
     });
 
-    test('resumes display when game is resumed', async ({ page, context }) => {
-      await page.goto('/play');
+    test('resumes display when game is resumed', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -536,8 +518,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Game End Display', () => {
-    test('shows game end state when game is complete', async ({ page, context }) => {
-      await page.goto('/play');
+    test('shows game end state when game is complete', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -556,8 +537,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('UI Elements and Landmarks', () => {
-    test('has proper ARIA landmarks', async ({ page, context }) => {
-      await page.goto('/play');
+    test('has proper ARIA landmarks', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -577,8 +557,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.locator('footer, [role="contentinfo"]')).toHaveCount(1);
     });
 
-    test('has fullscreen button', async ({ page, context }) => {
-      await page.goto('/play');
+    test('has fullscreen button', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -592,8 +571,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(fullscreenBtn).toBeVisible();
     });
 
-    test('footer shows display hint', async ({ page, context }) => {
-      await page.goto('/play');
+    test('footer shows display hint', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -607,8 +585,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByText(/projector|large display/i)).toBeVisible();
     });
 
-    test('has skip link for keyboard navigation', async ({ page, context }) => {
-      await page.goto('/play');
+    test('has skip link for keyboard navigation', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -625,8 +602,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Animation Support', () => {
-    test('question display has fade-in animation class', async ({ page, context }) => {
-      await page.goto('/play');
+    test('question display has fade-in animation class', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -651,8 +627,7 @@ test.describe('Trivia Audience Display', () => {
       }
     });
 
-    test('respects motion-reduce preference', async ({ page, context }) => {
-      await page.goto('/play');
+    test('respects motion-reduce preference', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       await page.getByRole('button', { name: /add team/i }).click();
@@ -674,8 +649,7 @@ test.describe('Trivia Audience Display', () => {
   });
 
   test.describe('Responsive Design', () => {
-    test('adapts to large viewport (projector)', async ({ page, context }) => {
-      await page.goto('/play');
+    test('adapts to large viewport (projector)', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
@@ -693,8 +667,7 @@ test.describe('Trivia Audience Display', () => {
       await expect(displayPage.getByRole('heading', { name: /trivia night/i })).toBeVisible();
     });
 
-    test('adapts to medium viewport', async ({ page, context }) => {
-      await page.goto('/play');
+    test('adapts to medium viewport', async ({ authenticatedTriviaPage: page, context }) => {
       await waitForHydration(page);
 
       const [displayPage] = await Promise.all([
