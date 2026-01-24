@@ -10,20 +10,19 @@
  * - Testing audience real-time updates
  * - Testing PIN lockout/verification
  */
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page } from '../fixtures/auth';
 import { waitForHydration, clickButton } from '../utils/helpers';
 
 test.describe('Trivia Session Flow', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ authenticatedTriviaPage: page }) => {
     // Clear localStorage before each test
-    await page.goto('/play');
     await page.evaluate(() => localStorage.clear());
     await page.reload();
     await waitForHydration(page);
   });
 
   test.describe('Create Game with PIN', () => {
-    test('should show room setup modal on first visit', async ({ page }) => {
+    test('should show room setup modal on first visit', async ({ authenticatedTriviaPage: page }) => {
       // Modal should be visible
       await expect(page.getByRole('dialog')).toBeVisible();
       await expect(page.getByText('Room Setup')).toBeVisible();
@@ -34,7 +33,7 @@ test.describe('Trivia Session Flow', () => {
       await expect(page.getByRole('button', { name: /play offline without network/i })).toBeVisible();
     });
 
-    test('should create online room and display room code with PIN', async ({ page }) => {
+    test('should create online room and display room code with PIN', async ({ authenticatedTriviaPage: page }) => {
       // Click create room button
       await clickButton(page, /create a new game room/i);
 
@@ -54,7 +53,7 @@ test.describe('Trivia Session Flow', () => {
       expect(pinText).toMatch(/\d{4}/);
     });
 
-    test('should persist PIN in localStorage after creation', async ({ page }) => {
+    test('should persist PIN in localStorage after creation', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /create a new game room/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
 
@@ -66,7 +65,7 @@ test.describe('Trivia Session Flow', () => {
   });
 
   test.describe('Session Recovery', () => {
-    test('should recover session after page refresh with teams and scores', async ({ page }) => {
+    test('should recover session after page refresh with teams and scores', async ({ authenticatedTriviaPage: page }) => {
       // Create offline session for easier testing (no API calls)
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -109,7 +108,7 @@ test.describe('Trivia Session Flow', () => {
       await expect(page.getByText(/playing|round 1/i)).toBeVisible();
     });
 
-    test('should restore current question after refresh', async ({ page }) => {
+    test('should restore current question after refresh', async ({ authenticatedTriviaPage: page }) => {
       // Create offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -142,7 +141,7 @@ test.describe('Trivia Session Flow', () => {
       expect(questionAfter).toBe(questionBefore);
     });
 
-    test('should restore team scores after refresh', async ({ page }) => {
+    test('should restore team scores after refresh', async ({ authenticatedTriviaPage: page }) => {
       // Create offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -175,7 +174,7 @@ test.describe('Trivia Session Flow', () => {
   });
 
   test.describe('Audience Display Sync', () => {
-    test('should sync question display to audience window', async ({ page, context }) => {
+    test('should sync question display to audience window', async ({ authenticatedTriviaPage: page, context }) => {
       // Create offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -214,7 +213,7 @@ test.describe('Trivia Session Flow', () => {
       await displayPage.close();
     });
 
-    test('should sync team scores to audience display in real-time', async ({ page, context }) => {
+    test('should sync team scores to audience display in real-time', async ({ authenticatedTriviaPage: page, context }) => {
       // Create offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -253,7 +252,7 @@ test.describe('Trivia Session Flow', () => {
       await displayPage.close();
     });
 
-    test('should sync question navigation to audience display', async ({ page, context }) => {
+    test('should sync question navigation to audience display', async ({ authenticatedTriviaPage: page, context }) => {
       // Create offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -301,7 +300,7 @@ test.describe('Trivia Session Flow', () => {
   });
 
   test.describe('PIN Verification', () => {
-    test('should show join form when clicking join existing game', async ({ page }) => {
+    test('should show join form when clicking join existing game', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
       // Form inputs should be visible
@@ -311,7 +310,7 @@ test.describe('Trivia Session Flow', () => {
       await expect(page.getByRole('button', { name: /cancel/i })).toBeVisible();
     });
 
-    test('should validate PIN format (4 digits)', async ({ page }) => {
+    test('should validate PIN format (4 digits)', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
       const roomCodeInput = page.getByLabelText(/room code/i);
@@ -330,7 +329,7 @@ test.describe('Trivia Session Flow', () => {
       await expect(joinButton).not.toBeDisabled();
     });
 
-    test('should convert room code to uppercase', async ({ page }) => {
+    test('should convert room code to uppercase', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
       const roomCodeInput = page.getByLabelText(/room code/i);
@@ -343,7 +342,7 @@ test.describe('Trivia Session Flow', () => {
       expect(value).toBe('TEST-123');
     });
 
-    test('should only allow numeric input for PIN', async ({ page }) => {
+    test('should only allow numeric input for PIN', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
       const pinInput = page.getByLabelText(/room pin/i);
@@ -356,7 +355,7 @@ test.describe('Trivia Session Flow', () => {
       expect(value).toBe('123');
     });
 
-    test('should limit PIN to 4 digits', async ({ page }) => {
+    test('should limit PIN to 4 digits', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
       const pinInput = page.getByLabelText(/room pin/i);
@@ -369,7 +368,7 @@ test.describe('Trivia Session Flow', () => {
       expect(value).toBe('1234');
     });
 
-    test('should clear form when cancel clicked', async ({ page }) => {
+    test('should clear form when cancel clicked', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /show form to join existing game/i);
 
       const roomCodeInput = page.getByLabelText(/room code/i);
@@ -393,7 +392,7 @@ test.describe('Trivia Session Flow', () => {
   });
 
   test.describe('Offline Mode', () => {
-    test('should create offline session without API calls', async ({ page }) => {
+    test('should create offline session without API calls', async ({ authenticatedTriviaPage: page }) => {
       // Track network requests
       const requests: string[] = [];
       page.on('request', (request) => {
@@ -411,7 +410,7 @@ test.describe('Trivia Session Flow', () => {
       expect(requests.length).toBe(0);
     });
 
-    test('should generate and display 6-character session ID in offline mode', async ({ page }) => {
+    test('should generate and display 6-character session ID in offline mode', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
@@ -427,7 +426,7 @@ test.describe('Trivia Session Flow', () => {
       expect(sessionIdText).not.toMatch(/[0O1I]/);
     });
 
-    test('should persist offline session in localStorage', async ({ page }) => {
+    test('should persist offline session in localStorage', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
@@ -437,7 +436,7 @@ test.describe('Trivia Session Flow', () => {
       expect(sessionId).toMatch(/^[A-Z0-9]{6}$/);
     });
 
-    test('should recover offline session after page refresh', async ({ page }) => {
+    test('should recover offline session after page refresh', async ({ authenticatedTriviaPage: page }) => {
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
@@ -463,7 +462,7 @@ test.describe('Trivia Session Flow', () => {
   });
 
   test.describe('Multi-Window Sync', () => {
-    test('should sync display window in offline mode', async ({ page, context }) => {
+    test('should sync display window in offline mode', async ({ authenticatedTriviaPage: page, context }) => {
       // Create offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -491,7 +490,7 @@ test.describe('Trivia Session Flow', () => {
       await displayPage.close();
     });
 
-    test('should sync game state between windows via BroadcastChannel', async ({ page, context }) => {
+    test('should sync game state between windows via BroadcastChannel', async ({ authenticatedTriviaPage: page, context }) => {
       // Create offline session for simpler testing (no API calls)
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -527,7 +526,7 @@ test.describe('Trivia Session Flow', () => {
   });
 
   test.describe('Create New Game Button', () => {
-    test('should show Create New Game button after session is created', async ({ page }) => {
+    test('should show Create New Game button after session is created', async ({ authenticatedTriviaPage: page }) => {
       // Close modal by playing offline
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -537,7 +536,7 @@ test.describe('Trivia Session Flow', () => {
       await expect(createNewButton).toBeVisible();
     });
 
-    test('should show modal when Create New Game clicked', async ({ page }) => {
+    test('should show modal when Create New Game clicked', async ({ authenticatedTriviaPage: page }) => {
       // First create an offline session
       await clickButton(page, /play offline without network/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
