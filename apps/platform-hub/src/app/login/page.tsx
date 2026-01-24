@@ -19,11 +19,11 @@ export const dynamic = 'force-dynamic';
  * - Easy navigation to signup and password reset
  * - OAuth redirect support (preserves authorization_id parameter)
  */
-export default function LoginPage({
-  searchParams,
-}: {
-  searchParams: { redirect?: string; authorization_id?: string };
+export default async function LoginPage(props: {
+  searchParams: Promise<{ redirect?: string; authorization_id?: string }>;
 }) {
+  const searchParams = await props.searchParams;
+
   return (
     <main className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">

@@ -16,14 +16,22 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
 /**
- * JWKS endpoint for Supabase JWT verification
- */
-const JWKS = createRemoteJWKSet(new URL(`${SUPABASE_URL}/auth/v1/.well-known/jwks.json`));
-
-/**
  * Routes that require authentication
  */
 const PROTECTED_ROUTES = ['/play'];
+
+/**
+ * JWKS endpoint for Supabase JWT verification
+ * Lazy-initialized to avoid module-load-time network requests
+ */
+let jwksCache: ReturnType<typeof createRemoteJWKSet> | null = null;
+
+function getJWKS() {
+  if (!jwksCache) {
+    jwksCache = createRemoteJWKSet(new URL(`${SUPABASE_URL}/auth/v1/.well-known/jwks.json`));
+  }
+  return jwksCache;
+}
 
 /**
  * Check if path requires authentication
@@ -38,7 +46,7 @@ function isProtectedRoute(pathname: string): boolean {
 async function verifyAccessToken(token: string): Promise<boolean> {
   try {
     // Verify JWT signature using JWKS
-    await jwtVerify(token, JWKS, {
+    await jwtVerify(token, getJWKS(), {
       issuer: `${SUPABASE_URL}/auth/v1`,
       audience: 'authenticated',
     });
