@@ -8,6 +8,14 @@ import userEvent from '@testing-library/user-event';
 import { TemplateCard } from '../TemplateCard';
 import type { Template } from '../../../app/api/templates/route';
 
+// Mock Next.js router
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 describe('TemplateCard', () => {
   const mockBingoTemplate: Template = {
     game: 'bingo',
@@ -52,6 +60,7 @@ describe('TemplateCard', () => {
 
   beforeEach(() => {
     mockOnDelete.mockClear();
+    mockPush.mockClear();
   });
 
   it('should render Bingo template with correct details', () => {
@@ -282,5 +291,52 @@ describe('TemplateCard', () => {
     });
 
     consoleError.mockRestore();
+  });
+
+  it('should navigate to detail page when View Details is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <TemplateCard template={mockBingoTemplate} onDelete={mockOnDelete} />
+    );
+
+    const viewDetailsButton = screen.getByRole('button', {
+      name: /View Details/i,
+    });
+    await user.click(viewDetailsButton);
+
+    expect(mockPush).toHaveBeenCalledWith(
+      '/dashboard/templates/bingo-1?game=bingo'
+    );
+  });
+
+  it('should navigate to Trivia detail page with correct game param', async () => {
+    const user = userEvent.setup();
+    render(
+      <TemplateCard template={mockTriviaTemplate} onDelete={mockOnDelete} />
+    );
+
+    const viewDetailsButton = screen.getByRole('button', {
+      name: /View Details/i,
+    });
+    await user.click(viewDetailsButton);
+
+    expect(mockPush).toHaveBeenCalledWith(
+      '/dashboard/templates/trivia-1?game=trivia'
+    );
+  });
+
+  it('should have View Details button with correct styling', () => {
+    render(
+      <TemplateCard template={mockBingoTemplate} onDelete={mockOnDelete} />
+    );
+
+    const viewDetailsButton = screen.getByRole('button', {
+      name: /View Details/i,
+    });
+    expect(viewDetailsButton).toHaveClass(
+      'min-h-[44px]',
+      'bg-blue-50',
+      'text-blue-700'
+    );
   });
 });
