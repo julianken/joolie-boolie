@@ -10,7 +10,8 @@
  * - Page refresh with PIN/session preservation
  * - BroadcastChannel message delivery
  */
-import { test, expect, Page } from '../fixtures/auth';
+import { test, expect } from '../fixtures/auth';
+import type { Page } from '@playwright/test';
 import { waitForHydration, clickButton, openDisplayWindow } from '../utils/helpers';
 
 test.describe('Room Setup Flow', () => {

@@ -90,7 +90,8 @@ test.describe('Bingo Accessibility', () => {
         focusStyles.border.includes('ring');
 
       // Note: Tailwind uses ring utilities for focus
-      expect(hasFocusStyle || await playButton.getAttribute('class')?.includes('focus')).toBeTruthy;
+      const className = await playButton.getAttribute('class');
+      expect(hasFocusStyle || className?.includes('focus')).toBeTruthy();
     });
   });
 
