@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/auth';
-import { waitForHydration } from '../utils/helpers';
+import { waitForHydration, waitForDualScreenSync, waitForSyncedContent } from '../utils/helpers';
 
 test.describe('Trivia Dual-Screen Synchronization', () => {
   test.describe('Initial Connection', () => {

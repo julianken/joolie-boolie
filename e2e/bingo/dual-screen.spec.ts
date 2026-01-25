@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/auth';
-import { waitForHydration, waitForRoomSetupModal } from '../utils/helpers';
+import { waitForHydration, waitForDualScreenSync, waitForSyncedContent, waitForRoomSetupModal } from '../utils/helpers';
 
 test.describe('Bingo Dual-Screen Synchronization', () => {
   test('presenter and display sync on connection', async ({ authenticatedBingoPage: page }) => {
