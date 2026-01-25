@@ -283,11 +283,12 @@ Task({
     1. Read Linear issue BEA-330 for FULL context (description, comments, linked PRs)
     2. Implement the ENTIRE issue in this worktree
     3. Write tests for all functionality
-    4. Commit changes with Linear reference: feat(auth): add login form (BEA-330)
-    5. Self-review your code
-    6. Push branch and create draft PR (one PR for entire issue)
-    7. Update Linear issue with comment when done
-    8. Mark task status as completed
+    4. Run E2E tests (see CLAUDE.md "E2E Testing" section) - MUST pass before PR
+    5. Commit changes with Linear reference: feat(auth): add login form (BEA-330)
+    6. Self-review your code
+    7. Push branch and create draft PR (one PR for entire issue)
+    8. Update Linear issue with comment when done
+    9. Mark task status as completed
 
     **Commit message format:**
     feat(scope): description (BEA-330)
@@ -322,11 +323,12 @@ Each implementer MUST:
 1. ✅ **Read Linear issue** - Full context including comments/PRs, dependencies
 2. ✅ **Implement ENTIRE issue** - All acceptance criteria in Linear issue
 3. ✅ **Write tests** - Unit tests with >80% coverage
-4. ✅ **Commit with Linear reference** - `feat(scope): description (BEA-###)`
-5. ✅ **Self-review code** - Check for issues before PR
-6. ✅ **Create ONE draft PR** - Entire issue in one PR, use PR template
-7. ✅ **Update Linear issue** - Comment when implementation complete
-8. ✅ **Update task status** - Mark as completed when done
+4. ✅ **Run E2E tests** - See CLAUDE.md "E2E Testing" section for commands - MUST pass
+5. ✅ **Commit with Linear reference** - `feat(scope): description (BEA-###)`
+6. ✅ **Self-review code** - Check for issues before PR
+7. ✅ **Create ONE draft PR** - Entire issue in one PR, use PR template
+8. ✅ **Update Linear issue** - Comment when implementation complete
+9. ✅ **Update task status** - Mark as completed when done
 
 ## Monitoring Progress
 
@@ -394,10 +396,12 @@ Task({
     3. Verify EACH acceptance criterion is met
     4. Check for missing features
     5. Verify tests cover acceptance criteria
+    6. Verify E2E tests pass (see CLAUDE.md "E2E Testing" section)
 
     **Approval criteria:**
     - ✅ ALL acceptance criteria from BEA-330 implemented
     - ✅ Tests validate acceptance criteria
+    - ✅ E2E tests pass for the feature
     - ✅ No missing features from spec
 
     **If issues found:**
@@ -500,14 +504,16 @@ Task({
     4. Performance considerations
     5. Accessibility (WCAG 2.1 AA)
     6. Test quality and coverage
-    7. Documentation/comments where needed
-    8. No code duplication
+    7. E2E tests pass (full suite if touching shared code)
+    8. Documentation/comments where needed
+    9. No code duplication
 
     **Approval criteria:**
     - ✅ Code follows established patterns
     - ✅ No security issues
     - ✅ Proper error handling
     - ✅ Tests are thorough
+    - ✅ E2E tests pass
     - ✅ No major tech debt
 
     **If issues found:**
@@ -691,6 +697,8 @@ Backlog → Todo → In Progress → In Review → Done
 13. ❌ Review code quality BEFORE spec compliance passes
 14. ❌ Dispatch parallel agents without creating worktrees
 15. ❌ Forget to update Linear status at transitions
+16. ❌ Skip E2E tests before marking implementation complete
+17. ❌ Approve reviews without verifying E2E tests pass
 
 ---
 
@@ -709,6 +717,8 @@ If you think ANY of these thoughts, STOP:
 - "I can work in the main directory, no need for worktrees" → ❌ NO, isolation is mandatory
 - "Let me just update code without dispatching agent" → ❌ NO, agents do implementation
 - "This issue has 3 features, I'll make 3 PRs" → ❌ NO, all features in one PR for the issue
+- "E2E tests are slow, I'll skip them" → ❌ NO, E2E tests are mandatory (no GitHub Actions)
+- "Unit tests pass, that's good enough" → ❌ NO, E2E tests validate the full system
 
 ---
 
@@ -926,10 +936,13 @@ Use this checklist for every Linear issue:
 - [ ] Step 3: Update Linear issues: Todo → In Progress
 - [ ] Step 3: Dispatch implementer agents (all in one message, one per issue)
 - [ ] Step 3: Each implementer handles ENTIRE issue, creates ONE PR
+- [ ] Step 3: Run E2E tests before marking implementation complete
 - [ ] Step 3: Monitor implementer progress
 - [ ] Step 4: Dispatch spec reviewer agents (all in one message, one per issue/PR)
+- [ ] Step 4: Verify E2E tests pass during spec review
 - [ ] Step 4: Verify all spec reviews pass (re-review if needed)
 - [ ] Step 5: Dispatch quality reviewer agents (all in one message, one per issue/PR)
+- [ ] Step 5: Run full E2E suite during quality review
 - [ ] Step 5: Verify all quality reviews pass (re-review if needed)
 - [ ] Step 6: Update Linear issues: In Progress → In Review
 - [ ] Step 6: Merge PRs in dependency order (one PR per issue)
