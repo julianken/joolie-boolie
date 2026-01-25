@@ -4,6 +4,8 @@
  *
  * NOTE: Test user creation is handled manually via Supabase dashboard.
  * Expected test user: e2e-test@beak-gaming.test
+ *
+ * Environment variables are loaded from .env file by Playwright's config.
  */
 
 async function globalSetup() {
