@@ -160,12 +160,6 @@ export function RoomSetupModal({
       showFooter={false}
     >
       <div className="flex flex-col gap-6">
-        {/* Template Selector */}
-        <TemplateSelector disabled={isLoading} />
-
-        {/* Divider */}
-        <div className="border-t border-border" />
-
         {/* Error message display */}
         {error && (
           <div
@@ -433,6 +427,12 @@ export function RoomSetupModal({
             Play Offline
           </Button>
         </div>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
+        {/* Template Selector */}
+        <TemplateSelector disabled={isLoading} />
       </div>
     </Modal>
   );
