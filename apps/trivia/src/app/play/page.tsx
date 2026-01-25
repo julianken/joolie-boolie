@@ -388,6 +388,7 @@ export default function PlayPage() {
       // Store the PIN for session recovery
       storePin(pin);
       setShowCreateModal(false);
+      setUserDismissedModal(true);
       // Clear offline mode
       setIsOfflineMode(false);
       setOfflineSessionId(null);
@@ -420,6 +421,7 @@ export default function PlayPage() {
       storePin(pin);
       setCurrentPin(pin);
       setShowCreateModal(false);
+      setUserDismissedModal(true);
       // Trigger recovery to load game state
       await recover();
     } catch (error) {
@@ -472,6 +474,7 @@ export default function PlayPage() {
   const handleModalPlayOffline = useCallback(() => {
     handlePlayOffline();
     setShowCreateModal(false);
+    setUserDismissedModal(true);
   }, [handlePlayOffline]);
 
   // Open display window with room code or offline session ID in URL
