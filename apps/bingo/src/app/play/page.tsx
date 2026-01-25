@@ -185,7 +185,7 @@ export default function PlayPage() {
   const shouldShowModal =
     showCreateModal ||
     (!userDismissedModal && !roomCode && !isOfflineMode && recoveryAttempted && offlineRecoveryAttempted) ||
-    (recoveryErrorMessage !== null && !dismissedRecoveryError);
+    (!isRecovering && recoveryErrorMessage !== null && !dismissedRecoveryError);
 
   // Auto-sync game state to database (only in online mode)
   const gameState = useGameStore();
