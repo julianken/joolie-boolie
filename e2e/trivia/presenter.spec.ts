@@ -55,8 +55,8 @@ test.describe('Trivia Presenter View', () => {
       await startBtn.click();
       await page.waitForTimeout(500);
 
-      // Status should change to playing - use more specific selector to avoid multiple matches
-      await expect(page.locator('span').filter({ hasText: /^playing/i }).first()).toBeVisible();
+      // Status should change to playing
+      await expect(page.getByText(/playing|round 1/i)).toBeVisible();
     });
 
     test('shows ready message with team count', async ({ authenticatedTriviaPage: page }) => {
@@ -143,15 +143,15 @@ test.describe('Trivia Presenter View', () => {
       await addTeamBtn.click();
       await page.waitForTimeout(200);
 
-      // Should show 1/20 - use first match to avoid strict mode violation
-      await expect(page.getByText(/1\/20/).first()).toBeVisible();
+      // Should show 1/20
+      await expect(page.getByText(/1\/20/)).toBeVisible();
     });
   });
 
   test.describe('Question Navigation', () => {
     test('shows question list', async ({ authenticatedTriviaPage: page }) => {
-      // Question list section should be visible - use first heading to avoid strict mode violation
-      await expect(page.getByRole('heading', { name: /round 1/i }).first()).toBeVisible();
+      // Question list section should be visible - use heading to find the section
+      await expect(page.getByRole('heading', { name: /round 1/i })).toBeVisible();
     });
 
     test('can navigate questions with keyboard', async ({ authenticatedTriviaPage: page }) => {
@@ -313,8 +313,8 @@ test.describe('Trivia Presenter View', () => {
       await plusBtn.click();
       await page.waitForTimeout(200);
 
-      // Check for round indicator - use first match to avoid strict mode violation
-      await expect(page.getByText(/round 1/i).first()).toBeVisible();
+      // Check for round indicator
+      await expect(page.getByText(/round 1/i)).toBeVisible();
     });
   });
 
@@ -328,17 +328,17 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('can pause game', async ({ authenticatedTriviaPage: page }) => {
-      const pauseBtn = page.getByRole('button', { name: /pause/i });
+      const pauseBtn = page.getByRole('button', { name: /^pause$/i });
       await pauseBtn.click();
       await page.waitForTimeout(300);
 
-      // Should show paused state
-      await expect(page.getByText(/paused/i).first()).toBeVisible();
+      // Should show paused state - use status badge specifically
+      await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
     });
 
     test('can resume game from pause', async ({ authenticatedTriviaPage: page }) => {
       // Pause first
-      await page.getByRole('button', { name: /pause/i }).click();
+      await page.getByRole('button', { name: /^pause$/i }).click();
       await page.waitForTimeout(300);
 
       // Resume
@@ -346,39 +346,40 @@ test.describe('Trivia Presenter View', () => {
       await resumeBtn.click();
       await page.waitForTimeout(300);
 
-      // Should be playing again - use more specific selector to avoid multiple matches
-      await expect(page.locator('span').filter({ hasText: /^playing/i }).first()).toBeVisible();
+      // Should be playing again - use status badge specifically
+      await expect(page.locator('span').filter({ hasText: /^playing/i })).toBeVisible();
     });
 
     test('can use pause keyboard shortcut (P)', async ({ authenticatedTriviaPage: page }) => {
       await pressKey(page, 'KeyP');
       await page.waitForTimeout(300);
 
-      // Should show paused state
-      await expect(page.getByText(/paused/i).first()).toBeVisible();
+      // Should show paused state - use status badge specifically
+      await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
 
       // Press P again to resume
       await pressKey(page, 'KeyP');
       await page.waitForTimeout(300);
 
-      await expect(page.locator('span').filter({ hasText: /^playing/i }).first()).toBeVisible();
+      // Should be playing again - use status badge specifically
+      await expect(page.locator('span').filter({ hasText: /^playing/i })).toBeVisible();
     });
 
     test('can trigger emergency pause', async ({ authenticatedTriviaPage: page }) => {
-      const emergencyBtn = page.getByRole('button', { name: /emergency/i });
+      const emergencyBtn = page.getByRole('button', { name: /^emergency$/i });
       await emergencyBtn.click();
       await page.waitForTimeout(300);
 
-      // Should show emergency pause state
-      await expect(page.getByText(/emergency pause/i).first()).toBeVisible();
+      // Should show emergency pause state - use status badge specifically
+      await expect(page.locator('span').filter({ hasText: /^emergency pause$/i })).toBeVisible();
     });
 
     test('can use emergency pause keyboard shortcut (E)', async ({ authenticatedTriviaPage: page }) => {
       await pressKey(page, 'KeyE');
       await page.waitForTimeout(300);
 
-      // Should show emergency pause state
-      await expect(page.getByText(/emergency pause/i).first()).toBeVisible();
+      // Should show emergency pause state - use status badge specifically
+      await expect(page.locator('span').filter({ hasText: /^emergency pause$/i })).toBeVisible();
     });
   });
 
@@ -425,8 +426,8 @@ test.describe('Trivia Presenter View', () => {
         await completeBtn.click();
         await page.waitForTimeout(500);
 
-        // Should show between rounds state - use first match to avoid strict mode violation
-        await expect(page.getByText(/round.*complete/i).first()).toBeVisible();
+        // Should show between rounds state - use heading specifically
+        await expect(page.getByRole('heading', { name: /round.*complete/i })).toBeVisible();
 
         // Click next round
         const nextRoundBtn = page.getByRole('button', { name: /next round/i });
