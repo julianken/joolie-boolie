@@ -45,10 +45,10 @@ export default function PlayPage() {
   const [sessionError, setSessionError] = useState<string | null>(null);
 
   // Recovery state tracking
-  const [hasRecoveryStarted, setHasRecoveryStarted] = useState(false);
   const [recoveryAttempted, setRecoveryAttempted] = useState(false);
   const [recoveryErrorMessage, setRecoveryErrorMessage] = useState<string | null>(null);
   const [dismissedRecoveryError, setDismissedRecoveryError] = useState(false);
+  const recoveryInitialized = useRef(false);
 
   // Offline mode state
   const [isOfflineMode, setIsOfflineMode] = useState(false);
@@ -129,13 +129,14 @@ export default function PlayPage() {
   // Track when recovery starts
   useEffect(() => {
     if (isRecovering) {
-      setHasRecoveryStarted(true);
+      recoveryInitialized.current = true;
     }
   }, [isRecovering]);
 
   // Track when recovery completes and capture errors
+  // Use ref to ensure we track completion even if state updates are batched
   useEffect(() => {
-    if (hasRecoveryStarted && !isRecovering) {
+    if (recoveryInitialized.current && !isRecovering) {
       setRecoveryAttempted(true);
 
       // Capture recovery error if present
@@ -149,7 +150,23 @@ export default function PlayPage() {
         setRecoveryErrorMessage(null);
       }
     }
-  }, [hasRecoveryStarted, isRecovering, recoveryError]);
+  }, [isRecovering, recoveryError]);
+
+  // Fallback: If recovery is enabled but hasn't started after mount, mark as attempted
+  // This handles the case where recovery completes so fast that React batches the state updates
+  useEffect(() => {
+    if (!isOfflineMode && !recoveryInitialized.current && !isRecovering) {
+      // Recovery should have run by now but we never saw isRecovering=true
+      // This can happen when there's no token and recovery completes instantly
+      const timer = setTimeout(() => {
+        if (!recoveryInitialized.current) {
+          recoveryInitialized.current = true;
+          setRecoveryAttempted(true);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOfflineMode, isRecovering]);
 
   // Sync recovered room code to local state
   useEffect(() => {

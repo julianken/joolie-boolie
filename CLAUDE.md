@@ -60,6 +60,59 @@ Skill(subagent-workflow)
 
 ---
 
+# 🚨 CRITICAL: E2E Testing 🚨
+
+## ⚠️ ALL CODE MUST PASS E2E TESTS LOCALLY BEFORE COMMITTING ⚠️
+
+**GitHub Actions are DISABLED to avoid billing costs. Local E2E validation is MANDATORY.**
+
+### Quick E2E Test Commands
+
+```bash
+# 1. Start dev servers (required for E2E tests)
+pnpm dev
+
+# 2. Run E2E tests for your changes
+pnpm exec playwright test e2e/<your-feature>.spec.ts
+
+# 3. Run ALL E2E tests before creating PR
+pnpm exec playwright test
+
+# 4. If tests fail: FIX CODE, DO NOT COMMIT
+```
+
+### E2E Test Checklist (MANDATORY)
+
+Before marking ANY task complete or creating a PR:
+
+- [ ] Dev servers running (bingo, trivia, platform-hub on ports 3000, 3001, 3002)
+- [ ] `.env.local` files exist in ALL apps (bingo, trivia, platform-hub)
+- [ ] SESSION_TOKEN_SECRET is valid 64-char hex (generate with `openssl rand -hex 32`)
+- [ ] E2E tests pass: `pnpm exec playwright test e2e/<feature>.spec.ts`
+- [ ] NO test failures (0 failures required)
+- [ ] Test screenshots reviewed (check `test-results/` directory)
+
+**If E2E tests fail: DO NOT COMMIT. Fix the code first.**
+
+### Common E2E Issues
+
+| Issue | Fix |
+|-------|-----|
+| "Missing environment variables" | Create `.env` in project root: `cp apps/bingo/.env.local .env` |
+| Tests timeout at login page | Platform Hub crashed - restart: `pnpm dev:hub` |
+| "SESSION_TOKEN_SECRET must contain only hexadecimal" | Generate valid secret: `openssl rand -hex 32` and update ALL `.env.local` files |
+| Servers hung at 100%+ CPU | Kill and restart: `pkill -f next-server && pnpm dev` |
+
+### Integration with Parallel Workflow
+
+**Implementer agents**: Run E2E tests BEFORE marking task complete
+**Spec reviewers**: Verify E2E tests pass as part of review
+**Quality reviewers**: Run full E2E suite before approval
+
+**Full E2E Testing Guide:** `docs/E2E_TESTING_GUIDE.md`
+
+---
+
 ## Project Overview
 
 **Beak Gaming Platform** - A unified gaming platform for retirement communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
