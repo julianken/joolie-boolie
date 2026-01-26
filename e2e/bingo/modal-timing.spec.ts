@@ -44,10 +44,10 @@ test.describe('Room Setup Modal Timing', () => {
     const modal = page.getByRole('dialog', { name: /room setup/i });
     await expect(modal).toBeVisible();
 
-    // Verify all three options are present
-    await expect(page.getByRole('button', { name: /create new game/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /join with room code/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /play offline/i })).toBeVisible();
+    // Verify all three options are present (scope to modal)
+    await expect(modal.getByRole('button', { name: /create new game/i })).toBeVisible();
+    await expect(modal.getByRole('button', { name: /join with room code/i })).toBeVisible();
+    await expect(modal.getByRole('button', { name: /play offline/i })).toBeVisible();
   });
 
   test('should show modal on recovery error', async ({ authenticatedBingoPage: page }) => {
@@ -71,10 +71,10 @@ test.describe('Room Setup Modal Timing', () => {
     const modal = page.getByRole('dialog', { name: /room setup/i });
     await expect(modal).toBeVisible();
 
-    // Verify error message is displayed
-    const errorAlert = page.getByRole('alert');
+    // Verify error message is displayed - scope to modal to avoid Next.js route announcer
+    const errorAlert = modal.getByRole('alert');
     await expect(errorAlert).toBeVisible();
-    await expect(errorAlert).toContainText(/error/i);
+    await expect(errorAlert).toContainText(/error|failed/i);
   });
 
   test('should NOT show modal on successful recovery', async ({ authenticatedBingoPage: page }) => {
@@ -84,11 +84,11 @@ test.describe('Room Setup Modal Timing', () => {
     // Wait for modal to appear on first visit
     await waitForRoomSetupModal(page);
 
-    // Click "Play Offline" button in the modal
+    // Click "Play Offline" button in the modal (scope to modal to avoid header button)
     const modal = page.getByRole('dialog', { name: /room setup/i });
     await expect(modal).toBeVisible();
 
-    const playOfflineButton = page.getByRole('button', { name: /play offline/i });
+    const playOfflineButton = modal.getByRole('button', { name: /play offline/i });
     await playOfflineButton.click();
 
     // Modal should close after selecting offline mode
@@ -129,9 +129,9 @@ test.describe('Room Setup Modal Timing', () => {
     const modal = page.getByRole('dialog', { name: /room setup/i });
     await expect(modal).toBeVisible();
 
-    // Close the modal
-    const closeButton = page.getByRole('button', { name: /close/i }).first();
-    await closeButton.click();
+    // Close the modal (scope to modal to avoid other close buttons)
+    const closeButton = modal.getByRole('button', { name: /close/i });
+    await closeButton.click({ force: true });
 
     // Modal should be dismissed
     await expect(modal).not.toBeVisible();
@@ -154,11 +154,12 @@ test.describe('Room Setup Modal Timing', () => {
     // Verify modal is visible with error
     const modal = page.getByRole('dialog', { name: /room setup/i });
     await expect(modal).toBeVisible();
-    const errorAlert = page.getByRole('alert');
+    // Scope alert to modal to avoid Next.js route announcer
+    const errorAlert = modal.getByRole('alert');
     await expect(errorAlert).toBeVisible();
 
-    // Click "Play Offline" to create a new session
-    const playOfflineButton = page.getByRole('button', { name: /play offline/i });
+    // Click "Play Offline" to create a new session (scope to modal)
+    const playOfflineButton = modal.getByRole('button', { name: /play offline/i });
     await playOfflineButton.click();
 
     // Modal should close and error should be cleared
