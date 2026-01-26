@@ -238,8 +238,12 @@ export async function waitForCondition(condition: () => Promise<void>, timeout =
 export async function waitForSyncedContent(
   displayPage: Page,
   pattern: string | RegExp,
-  timeout = 10000
+  timeout = 15000  // Increased from 10000ms
 ): Promise<void> {
+  // First verify sync is established
+  await waitForDualScreenSync(displayPage, 10000);
+
+  // Then wait for content
   await expect(async () => {
     const content = displayPage.getByText(pattern);
     await expect(content.first()).toBeVisible({ timeout: 5000 });

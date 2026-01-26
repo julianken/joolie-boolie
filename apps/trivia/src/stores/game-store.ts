@@ -162,12 +162,28 @@ export const useGameStore = create<GameStore>()((set) => ({
   },
 
   _hydrate: (newState: Partial<TriviaGameState>) => {
-    set((state) => ({ ...state, _isHydrating: true }));
-    set((state) => ({ ...state, ...newState }));
-    // Use setTimeout to ensure all subscriptions see the hydrating flag before clearing it
-    setTimeout(() => {
-      set((state) => ({ ...state, _isHydrating: false }));
-    }, 0);
+    set((state) => {
+      // Create completely new state object with new array references
+      // to ensure Zustand detects changes and notifies subscribers
+      const updatedState = {
+        ...state,
+        ...newState,
+        _isHydrating: false,
+      };
+
+      // Force new array references if arrays are provided
+      if (newState.teams) {
+        updatedState.teams = [...newState.teams.map(team => ({ ...team }))];
+      }
+      if (newState.questions) {
+        updatedState.questions = [...newState.questions.map(q => ({ ...q }))];
+      }
+      if (newState.teamAnswers) {
+        updatedState.teamAnswers = { ...newState.teamAnswers };
+      }
+
+      return updatedState;
+    });
   },
 
   // Settings actions
@@ -212,8 +228,43 @@ export const useGameStore = create<GameStore>()((set) => ({
 }));
 
 // Selector hooks for computed values
+// IMPORTANT: This hook subscribes to the entire store, which means the component
+// will re-render on ANY state change. For performance-critical components, use
+// individual selectors instead.
 export function useGameSelectors() {
-  const state = useGameStore();
+  // Subscribe to specific state that affects selectors to ensure re-renders
+  const displayQuestionIndex = useGameStore((state) => state.displayQuestionIndex);
+  const questions = useGameStore((state) => state.questions);
+  const teams = useGameStore((state) => state.teams);
+  const status = useGameStore((state) => state.status);
+  const currentRound = useGameStore((state) => state.currentRound);
+  const selectedQuestionIndex = useGameStore((state) => state.selectedQuestionIndex);
+  const totalRounds = useGameStore((state) => state.totalRounds);
+  const teamAnswers = useGameStore((state) => state.teamAnswers);
+  const settings = useGameStore((state) => state.settings);
+
+  // CRITICAL FIX (BEA-374): Build state object from reactive subscriptions
+  // DO NOT use getState() here - it can return stale state during React's
+  // reconciliation phase, causing computed selectors to return wrong values.
+  // This was causing display components to not re-render after state hydration.
+  const state: TriviaGameState = {
+    sessionId: '', // Not needed for selectors
+    status,
+    statusBeforePause: null, // Not needed for selectors
+    questions,
+    selectedQuestionIndex,
+    displayQuestionIndex,
+    currentRound,
+    totalRounds,
+    teams,
+    teamAnswers,
+    timer: { duration: 0, remaining: 0, isRunning: false }, // Not needed for most selectors
+    settings,
+    showScoreboard: false, // Not needed for selectors
+    emergencyBlank: false, // Not needed for selectors
+    ttsEnabled: false, // Not needed for selectors
+  };
+
   return {
     selectedQuestion: getSelectedQuestion(state),
     displayQuestion: getDisplayQuestion(state),
@@ -226,13 +277,13 @@ export function useGameSelectors() {
     isLastQuestionOfRound: isLastQuestionOfRound(state),
     isLastRound: isLastRound(state),
     currentRoundQuestions: getCurrentRoundQuestions(state),
-    roundWinners: getRoundWinners(state, state.currentRound),
+    roundWinners: getRoundWinners(state, currentRound),
     overallLeaders: getOverallLeaders(state),
     teamsSortedByScore: getTeamsSortedByScore(state),
     // Pause selectors
-    isPaused: state.status === 'paused',
-    canPause: state.status === 'playing' || state.status === 'between_rounds',
-    canResume: state.status === 'paused',
+    isPaused: status === 'paused',
+    canPause: status === 'playing' || status === 'between_rounds',
+    canResume: status === 'paused',
   };
 }
 
