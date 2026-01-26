@@ -32,7 +32,8 @@ class TriviaBroadcastSync extends BroadcastSync<TriviaSyncPayload> {
  */
 function createTriviaBroadcastSync(sessionId: string): TriviaBroadcastSync {
   const channelName = getChannelName(sessionId);
-  return new TriviaBroadcastSync(channelName);
+  // Enable debug mode to trace message flow
+  return new TriviaBroadcastSync(channelName, { debug: true });
 }
 
 type MessageHandler = (message: SyncMessage<TriviaSyncPayload>) => void;
@@ -44,6 +45,7 @@ export function createMessageRouter(handlers: Partial<{
   onStateUpdate: (state: TriviaGameState) => void;
   onSyncRequest: () => void;
   onDisplayThemeChanged: (theme: ThemeMode) => void;
+  onChannelReady: () => void;
 }>): MessageHandler {
   return (message: SyncMessage<TriviaSyncPayload>) => {
     switch (message.type as TriviaMessageType) {
@@ -55,6 +57,9 @@ export function createMessageRouter(handlers: Partial<{
         break;
       case 'DISPLAY_THEME_CHANGED':
         handlers.onDisplayThemeChanged?.((message.payload as ThemePayload).theme);
+        break;
+      case 'CHANNEL_READY':
+        handlers.onChannelReady?.();
         break;
     }
   };
@@ -151,6 +156,12 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     if (isInitializedRef.current) return;
     if (!broadcastSyncRef.current) return;
 
+    // CRITICAL FIX (BEA-374): Don't initialize with empty sessionId
+    // Wait for offline session ID to load asynchronously before initializing channel
+    if (!sessionId) {
+      return;
+    }
+
     const sync = broadcastSyncRef.current;
     const success = sync.initialize();
     if (!success) {
@@ -170,6 +181,12 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
       },
       onSyncRequest: handleSyncRequest,
       onDisplayThemeChanged: handleDisplayThemeChanged,
+      onChannelReady: () => {
+        // Audience: when presenter signals ready, request sync immediately
+        if (role === 'audience') {
+          sync.requestSync();
+        }
+      },
     });
 
     const unsubscribe = sync.subscribe(router);
@@ -187,7 +204,6 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
       retryTimeoutId = setTimeout(() => {
         if (!hasReceivedStateRef.current && retryCount < maxRetries) {
           retryCount++;
-          console.log(`[Display] REQUEST_SYNC retry ${retryCount}/${maxRetries}`);
           requestSyncWithRetry();
         }
       }, 100 * Math.pow(2, retryCount)); // Exponential backoff: 100ms, 200ms, 400ms, 800ms, 1600ms
@@ -202,6 +218,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     if (role === 'presenter') {
       // Send CHANNEL_READY signal
       sync.broadcastChannelReady();
+
       // Broadcast initial state
       const state = getCurrentState();
       sync.broadcastState(state);
@@ -219,10 +236,12 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     };
   }, [
     role,
+    sessionId, // CRITICAL: Re-initialize when sessionId changes (e.g., offline ID loads)
+    getCurrentState,
     handleStateUpdate,
     handleSyncRequest,
     handleDisplayThemeChanged,
-  ]); // broadcastSync removed from deps, using ref instead
+  ]);
 
   // Subscribe to game state changes (presenter only)
   useEffect(() => {
@@ -259,7 +278,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     });
 
     return unsubscribe;
-  }, [role]); // broadcastSync removed from deps, using ref instead
+  }, [role, sessionId]); // Re-subscribe when sessionId changes (new channel)
 
   // Subscribe to display theme changes (presenter only)
   useEffect(() => {
@@ -276,7 +295,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     });
 
     return unsubscribe;
-  }, [role]); // broadcastSync removed from deps, using ref instead
+  }, [role, sessionId]); // Re-subscribe when sessionId changes (new channel)
 
   return {
     isConnected: true,
