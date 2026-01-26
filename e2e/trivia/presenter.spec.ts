@@ -161,7 +161,8 @@ test.describe('Trivia Presenter View', () => {
   test.describe('Question Navigation', () => {
     test('shows question list', async ({ authenticatedTriviaPage: page }) => {
       // Question list section should be visible - use heading to find the section
-      await expect(page.getByRole('heading', { name: /round 1/i })).toBeVisible();
+      // Use first() to handle multiple "Round 1" headings
+      await expect(page.getByRole('heading', { name: /round 1/i }).first()).toBeVisible();
     });
 
     test('can navigate questions with keyboard', async ({ authenticatedTriviaPage: page }) => {
@@ -208,12 +209,17 @@ test.describe('Trivia Presenter View', () => {
       await page.getByRole('button', { name: /start game/i }).click();
       await expect(page.locator('span').filter({ hasText: /^Playing/i })).toBeVisible();
 
-      // Find peek button
+      // Find peek button - button may not exist in this version, so just check page structure
       const peekBtn = page.getByRole('button', { name: /peek|show answer/i });
-      if (await peekBtn.isVisible()) {
+      // If button exists, test it; otherwise, test still passes (feature may not be implemented)
+      const btnExists = await peekBtn.count();
+      if (btnExists > 0) {
         await peekBtn.click();
         // Button toggle is synchronous - button should remain visible
         await expect(peekBtn).toBeVisible();
+      } else {
+        // Button doesn't exist - just verify we're still on the page
+        await expect(page.getByText(/presenter view/i)).toBeVisible();
       }
     });
 
@@ -456,7 +462,8 @@ test.describe('Trivia Presenter View', () => {
         await completeBtn.click();
 
         // Wait for between rounds state (Pattern 2)
-        await expect(page.getByRole('heading', { name: /round.*complete/i })).toBeVisible();
+        // Use first() to handle multiple "Round Complete" headings
+        await expect(page.getByRole('heading', { name: /round.*complete/i }).first()).toBeVisible();
 
         // Click next round
         const nextRoundBtn = page.getByRole('button', { name: /next round/i });
