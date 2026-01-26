@@ -9,7 +9,7 @@ import type { TriviaGameState, ThemeMode, ThemePayload, TriviaSyncPayload } from
 import { useThemeStore } from '@/stores/theme-store';
 
 // Trivia message types
-type TriviaMessageType = 'STATE_UPDATE' | 'REQUEST_SYNC' | 'DISPLAY_THEME_CHANGED';
+type TriviaMessageType = 'STATE_UPDATE' | 'REQUEST_SYNC' | 'DISPLAY_THEME_CHANGED' | 'CHANNEL_READY';
 
 /**
  * Extended BroadcastSync with trivia-specific convenience methods.
@@ -195,6 +195,16 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
 
     if (role === 'audience') {
       requestSyncWithRetry();
+    }
+
+    // CRITICAL FIX (BEA-374): Presenter broadcasts initial state immediately
+    // to fix race where display REQUEST_SYNC arrives before handler ready
+    if (role === 'presenter') {
+      // Send CHANNEL_READY signal
+      sync.broadcastChannelReady();
+      // Broadcast initial state
+      const state = getCurrentState();
+      sync.broadcastState(state);
     }
 
     return () => {

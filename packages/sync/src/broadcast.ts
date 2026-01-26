@@ -261,6 +261,30 @@ export class BroadcastSync<TPayload = unknown> {
   }
 
   /**
+   * Broadcast CHANNEL_READY signal.
+   * Used by presenter to signal that handlers are ready to receive messages.
+   */
+  broadcastChannelReady(): void {
+    if (!this.channel) {
+      this.handleError({
+        code: 'CHANNEL_UNAVAILABLE',
+        message: 'Cannot broadcast - channel not initialized',
+        context: { messageType: 'CHANNEL_READY' },
+      });
+      return;
+    }
+
+    this.channel.postMessage({
+      type: 'CHANNEL_READY',
+      timestamp: Date.now(),
+      originId: this.instanceId,
+      payload: null,
+    });
+
+    this.log('CHANNEL_READY broadcast');
+  }
+
+  /**
    * Close the broadcast channel and clean up.
    */
   close(): void {

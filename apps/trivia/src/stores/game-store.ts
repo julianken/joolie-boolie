@@ -162,12 +162,11 @@ export const useGameStore = create<GameStore>()((set) => ({
   },
 
   _hydrate: (newState: Partial<TriviaGameState>) => {
-    set((state) => ({ ...state, _isHydrating: true }));
-    set((state) => ({ ...state, ...newState }));
-    // Use setTimeout to ensure all subscriptions see the hydrating flag before clearing it
-    setTimeout(() => {
-      set((state) => ({ ...state, _isHydrating: false }));
-    }, 0);
+    set((state) => ({
+      ...state,
+      ...newState,
+      _isHydrating: false  // Single atomic update, no setTimeout
+    }));
   },
 
   // Settings actions
