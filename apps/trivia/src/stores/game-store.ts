@@ -162,11 +162,28 @@ export const useGameStore = create<GameStore>()((set) => ({
   },
 
   _hydrate: (newState: Partial<TriviaGameState>) => {
-    set((state) => ({
-      ...state,
-      ...newState,
-      _isHydrating: false  // Single atomic update, no setTimeout
-    }));
+    set((state) => {
+      // Create completely new state object with new array references
+      // to ensure Zustand detects changes and notifies subscribers
+      const updatedState = {
+        ...state,
+        ...newState,
+        _isHydrating: false,
+      };
+
+      // Force new array references if arrays are provided
+      if (newState.teams) {
+        updatedState.teams = [...newState.teams.map(team => ({ ...team }))];
+      }
+      if (newState.questions) {
+        updatedState.questions = [...newState.questions.map(q => ({ ...q }))];
+      }
+      if (newState.teamAnswers) {
+        updatedState.teamAnswers = { ...newState.teamAnswers };
+      }
+
+      return updatedState;
+    });
   },
 
   // Settings actions
