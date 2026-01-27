@@ -181,26 +181,26 @@ test.describe('Bingo Presenter View', () => {
 
     await rollButton.click(); // Start game
 
-    // Wait for button to be enabled and roll sound from start to complete
+    // Wait for game to start (button text changes from "Start Game" to "Roll")
+    await expect(page.getByRole('button', { name: /roll/i })).toBeVisible({ timeout: 5000 });
+
+    // Call first ball
     await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(3000);
+    await rollButton.click();
 
-    await rollButton.click(); // Call first ball
-
-    // Wait for first ball (Pattern 3) - use data-testid for precise targeting
+    // Wait for first ball to be called and Roll button to be ready
     await expect(async () => {
       const calledCount = page.getByTestId('balls-called-count');
       const countText = await calledCount.textContent();
       expect(parseInt(countText || '0')).toBeGreaterThanOrEqual(1);
     }).toPass({ timeout: 10000 });
 
-    // Wait for button to be enabled and roll sound to complete before second call
     await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(3000);
 
-    await rollButton.click(); // Call second ball
+    // Call second ball
+    await rollButton.click();
 
-    // Wait for second ball (Pattern 3) - use data-testid for precise targeting
+    // Wait for second ball to be called
     await expect(async () => {
       const calledCount = page.getByTestId('balls-called-count');
       const countText = await calledCount.textContent();
