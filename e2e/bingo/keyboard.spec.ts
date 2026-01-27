@@ -103,8 +103,12 @@ test.describe('Bingo Keyboard Shortcuts', () => {
     }).toPass({ timeout: 5000 });
 
     // Wait for audio processing to complete before second call
-    // Ball calls include: roll sound + reveal chime + voice (~2-3s total)
-    await page.waitForTimeout(3000);
+    // Uses data-processing attribute from Roll button
+    await expect(async () => {
+      const rollButton = page.getByRole('button', { name: /roll/i });
+      const processing = await rollButton.getAttribute('data-processing');
+      expect(processing).not.toBe('true');
+    }).toPass({ timeout: 5000 });
 
     // Call second ball
     await page.keyboard.press('Space');
@@ -153,8 +157,12 @@ test.describe('Bingo Keyboard Shortcuts', () => {
     }).toPass({ timeout: 5000 });
 
     // Wait for audio processing to complete before second call
-    // Ball calls include: roll sound + reveal chime + voice (~2-3s total)
-    await page.waitForTimeout(3000);
+    // Uses data-processing attribute from Roll button
+    await expect(async () => {
+      const rollButton = page.getByRole('button', { name: /roll/i });
+      const processing = await rollButton.getAttribute('data-processing');
+      expect(processing).not.toBe('true');
+    }).toPass({ timeout: 5000 });
 
     // Call second ball
     await page.keyboard.press('Space');
