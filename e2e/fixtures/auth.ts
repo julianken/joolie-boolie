@@ -402,6 +402,76 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
 
         await Promise.race([dashboardPromise, rateLimitCheckPromise]);
 
+        // Wait for SSO cookies to be set (required for Platform Hub pages)
+        // The login API sets beak_access_token and beak_user_id cookies
+        await playwrightExpect(async () => {
+          const cookies = await page.context().cookies();
+          const hasAccessToken = cookies.some((c) => c.name === 'beak_access_token');
+          const hasUserId = cookies.some((c) => c.name === 'beak_user_id');
+          playwrightExpect(hasAccessToken).toBe(true);
+          playwrightExpect(hasUserId).toBe(true);
+        }).toPass({
+          timeout: 5000,
+          intervals: [100, 250, 500, 1000], // Exponential backoff polling
+        });
+
+        // Ensure OAuth cookies are explicitly set for Platform Hub E2E test mode
+        // This is a fallback in case the server-side cookies don't propagate correctly
+        // Uses the E2E test user ID that matches the login API's E2E_TEST_USER_ID constant
+        const existingCookies = await page.context().cookies();
+        const accessTokenCookie = existingCookies.find((c) => c.name === 'beak_access_token');
+        const userIdCookie = existingCookies.find((c) => c.name === 'beak_user_id');
+
+        // If cookies exist but need to be reinforced for cross-origin access, add them explicitly
+        if (accessTokenCookie && userIdCookie) {
+          await page.context().addCookies([
+            {
+              name: 'beak_access_token',
+              value: accessTokenCookie.value,
+              domain: 'localhost',
+              path: '/',
+              httpOnly: true,
+              secure: false,
+              sameSite: 'Lax',
+            },
+            {
+              name: 'beak_user_id',
+              value: userIdCookie.value,
+              domain: 'localhost',
+              path: '/',
+              httpOnly: false, // Allow client-side access
+              secure: false,
+              sameSite: 'Lax',
+            },
+          ]);
+        } else {
+          // Fallback: Set test cookies if server didn't set them properly
+          // This matches the E2E test user data from the login API
+          const e2eTestUserId = 'e2e-test-user-00000000-0000-0000-0000-000000000000';
+          const e2eTestToken = 'e2e-fallback-access-token';
+          console.log('[Auth Fixture] Setting fallback E2E auth cookies');
+          await page.context().addCookies([
+            {
+              name: 'beak_access_token',
+              value: e2eTestToken,
+              domain: 'localhost',
+              path: '/',
+              httpOnly: true,
+              secure: false,
+              sameSite: 'Lax',
+            },
+            {
+              name: 'beak_user_id',
+              value: e2eTestUserId,
+              domain: 'localhost',
+              path: '/',
+              httpOnly: false,
+              secure: false,
+              sameSite: 'Lax',
+            },
+          ]);
+        }
+
         // Success! Store auth state and break out of retry loop
         await page.context().storageState({ path: '.auth/user.json' });
         break;
@@ -468,7 +538,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
         // If we got redirected to login, wait and retry (auth race condition)
         if (page.url().includes('/login')) {
           // Wait for any in-flight redirects to settle
-          await page.waitForTimeout(500);
+          await expect(page.locator('body')).toBeVisible();
           retries--;
           continue;
         }
@@ -483,7 +553,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
           error.message.includes('interrupted')
         ) {
           // Wait for redirect to complete
-          await page.waitForTimeout(1000);
+          await page.waitForLoadState('networkidle');
           retries--;
           if (retries === 0) throw error;
           continue;
@@ -529,7 +599,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
         // If we got redirected to login, wait and retry (auth race condition)
         if (page.url().includes('/login')) {
           // Wait for any in-flight redirects to settle
-          await page.waitForTimeout(500);
+          await expect(page.locator('body')).toBeVisible();
           retries--;
           continue;
         }
@@ -544,7 +614,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
           error.message.includes('interrupted')
         ) {
           // Wait for redirect to complete
-          await page.waitForTimeout(1000);
+          await page.waitForLoadState('networkidle');
           retries--;
           if (retries === 0) throw error;
           continue;

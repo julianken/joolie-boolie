@@ -42,8 +42,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     // Wait for sync to update display with called ball
     await waitForSyncedContent(displayPage, /called numbers|current ball/i);
 
-    // Get the ball from presenter (looking for B-XX, I-XX, etc. format)
-    const presenterBallArea = page.locator('text="Current Ball"').locator('..').locator('[class*="ball-"]');
+    // Get the ball from presenter using data-testid
+    const presenterBallArea = page.getByTestId('current-ball-section').locator('[role="img"]');
     const presenterBallCount = await presenterBallArea.count();
 
     // If presenter shows a ball, display should also
@@ -71,9 +71,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     // First click starts the game
     await rollButton.click();
 
-    // Wait for button to be enabled and roll sound from start to complete
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(3000);
+    // Wait for button to be enabled (roll sound and audio complete)
+    await expect(rollButton).toBeEnabled({ timeout: 10000 });
 
     // Call first ball
     await rollButton.click();
@@ -88,9 +87,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
       expect(displayNum).toBeGreaterThanOrEqual(1);
     }).toPass({ timeout: 10000 });
 
-    // Wait for button to be enabled and roll sound to complete
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(3000);
+    // Wait for button to be enabled (roll sound complete)
+    await expect(rollButton).toBeEnabled({ timeout: 10000 });
 
     // Call second ball
     await rollButton.click();
@@ -105,9 +103,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
       expect(displayNum).toBeGreaterThanOrEqual(2);
     }).toPass({ timeout: 10000 });
 
-    // Wait for button to be enabled and roll sound to complete
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(3000);
+    // Wait for button to be enabled (roll sound complete)
+    await expect(rollButton).toBeEnabled({ timeout: 10000 });
 
     // Call third ball
     await rollButton.click();
@@ -261,8 +258,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
 
     // Connection should still be active
     await waitForDualScreenSync(displayPage);
-    const syncIndicator = displayPage.locator('[class*="bg-success"]').first();
-    await expect(syncIndicator).toBeVisible({ timeout: 5000 });
+    // Check sync is active using data-testid
+    await expect(displayPage.locator('[class*="bg-success"]').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('closing display does not affect presenter', async ({ authenticatedBingoPage: page }) => {
@@ -280,9 +277,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     const rollButton = page.getByRole('button', { name: /roll|call|start/i }).first();
     await rollButton.click(); // Start game
 
-    // Wait for button to be enabled and roll sound to complete
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(3000);
+    // Wait for button to be enabled (roll sound complete)
+    await expect(rollButton).toBeEnabled({ timeout: 10000 });
 
     await rollButton.click(); // Call first ball
     await waitForSyncedContent(displayPage, /called numbers|current ball/i);
@@ -297,9 +293,8 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     // Close display
     await displayPage.close();
 
-    // Wait for button to be enabled and roll sound to complete
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await page.waitForTimeout(5000); // Longer wait after display closes
+    // Wait for button to be enabled (roll sound complete)
+    await expect(rollButton).toBeEnabled({ timeout: 15000 }); // Longer wait after display closes
 
     // Presenter should still work - wait for ball count to update using data-testid
     await rollButton.click(); // Call second ball

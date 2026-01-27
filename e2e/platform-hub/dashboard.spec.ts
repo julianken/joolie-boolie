@@ -3,19 +3,20 @@
  *
  * Note: These tests use Playwright auth fixtures to create authenticated sessions.
  *
- * IMPORTANT: All tests in this file are currently SKIPPED because they require real
- * server-side session handling which cannot be fully mocked at the browser level.
- * MSW (Mock Service Worker) can intercept API calls but cannot create the server-side
- * session state needed for protected routes like /dashboard. These tests should be
- * run against a real Supabase instance with proper authentication.
+ * The auth fixture handles login and sets required SSO cookies (beak_access_token,
+ * beak_user_id) for Platform Hub protected routes.
  */
 
 import { test, expect } from '../fixtures/auth';
+import { portConfig } from '../../playwright.config';
 
-test.describe.skip('Platform Hub Dashboard @high', () => {
+// Dynamic URL based on port configuration (supports worktree isolation)
+const HUB_URL = `http://localhost:${portConfig.hubPort}`;
+
+test.describe('Platform Hub Dashboard @high', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
     // Navigate to dashboard - user is already authenticated via fixture
-    await authenticatedPage.goto('http://localhost:3002/dashboard');
+    await authenticatedPage.goto(`${HUB_URL}/dashboard`);
     await authenticatedPage.waitForLoadState('networkidle');
   });
 
@@ -33,7 +34,7 @@ test.describe.skip('Platform Hub Dashboard @high', () => {
     // Verify help section
     await expect(
       authenticatedPage.getByRole('heading', {
-        name: /need help getting started/i,
+        name: /recent sessions/i,
       })
     ).toBeVisible();
   });
@@ -176,7 +177,7 @@ test.describe.skip('Platform Hub Dashboard @high', () => {
   test('loading states render correctly @medium', async ({ page }) => {
     // Use unauthenticated page to test loading state
     // Navigate to login first, then to dashboard to see loading
-    await page.goto('http://localhost:3002/login');
+    await page.goto(`${HUB_URL}/login`);
 
     // Fill credentials
     await page.fill('input[name="email"]', 'e2e-test@beak-gaming.test');
@@ -186,7 +187,7 @@ test.describe.skip('Platform Hub Dashboard @high', () => {
     await page.click('button[type="submit"]');
 
     // Dashboard should eventually load
-    await page.waitForURL('http://localhost:3002/dashboard', {
+    await page.waitForURL(`${HUB_URL}/dashboard`, {
       timeout: 10000,
     });
 
@@ -207,20 +208,20 @@ test.describe.skip('Platform Hub Dashboard @high', () => {
   });
 });
 
-test.describe.skip('Dashboard Protection @critical', () => {
+test.describe('Dashboard Protection @critical', () => {
   // Skipped: Requires real server-side session to test redirect behavior
   test('dashboard redirects to login when not authenticated', async ({
     page,
   }) => {
     // Try to access dashboard without authentication
-    await page.goto('http://localhost:3002/dashboard');
+    await page.goto(`${HUB_URL}/dashboard`);
 
     // Should be redirected to login
     await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
 
     // Login page should be visible
     await expect(
-      page.getByRole('heading', { name: /sign in/i, level: 1 })
+      page.getByRole('heading', { name: /welcome back/i, level: 1 })
     ).toBeVisible();
   });
 });
