@@ -65,25 +65,62 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await waitForHydration(displayPage);
     await waitForDualScreenSync(displayPage);
 
-    // Call 3 balls
+    // Start game and call 3 balls
     const rollButton = page.getByRole('button', { name: /roll|call|start/i }).first();
-    for (let i = 0; i < 3; i++) {
-      await rollButton.click();
-      // Wait for ball count to increment on presenter using data-testid
-      const expectedCount = i + 1;
-      await expect(async () => {
-        const countText = await page.getByTestId('balls-called-count').textContent();
-        const num = parseInt(countText || '0');
-        expect(num).toBeGreaterThanOrEqual(expectedCount);
-      }).toPass({ timeout: 10000 });
 
-      // Wait for sync to complete on display
-      await expect(async () => {
-        const displayCountText = await displayPage.getByTestId('balls-called-count').textContent();
-        const displayNum = parseInt(displayCountText || '0');
-        expect(displayNum).toBeGreaterThanOrEqual(expectedCount);
-      }).toPass({ timeout: 10000 });
-    }
+    // First click starts the game
+    await rollButton.click();
+
+    // Wait for button to be enabled and roll sound from start to complete
+    await expect(rollButton).toBeEnabled({ timeout: 5000 });
+    await page.waitForTimeout(3000);
+
+    // Call first ball
+    await rollButton.click();
+    await expect(async () => {
+      const countText = await page.getByTestId('balls-called-count').textContent();
+      const num = parseInt(countText || '0');
+      expect(num).toBeGreaterThanOrEqual(1);
+    }).toPass({ timeout: 10000 });
+    await expect(async () => {
+      const displayCountText = await displayPage.getByTestId('balls-called-count').textContent();
+      const displayNum = parseInt(displayCountText || '0');
+      expect(displayNum).toBeGreaterThanOrEqual(1);
+    }).toPass({ timeout: 10000 });
+
+    // Wait for button to be enabled and roll sound to complete
+    await expect(rollButton).toBeEnabled({ timeout: 5000 });
+    await page.waitForTimeout(3000);
+
+    // Call second ball
+    await rollButton.click();
+    await expect(async () => {
+      const countText = await page.getByTestId('balls-called-count').textContent();
+      const num = parseInt(countText || '0');
+      expect(num).toBeGreaterThanOrEqual(2);
+    }).toPass({ timeout: 10000 });
+    await expect(async () => {
+      const displayCountText = await displayPage.getByTestId('balls-called-count').textContent();
+      const displayNum = parseInt(displayCountText || '0');
+      expect(displayNum).toBeGreaterThanOrEqual(2);
+    }).toPass({ timeout: 10000 });
+
+    // Wait for button to be enabled and roll sound to complete
+    await expect(rollButton).toBeEnabled({ timeout: 5000 });
+    await page.waitForTimeout(3000);
+
+    // Call third ball
+    await rollButton.click();
+    await expect(async () => {
+      const countText = await page.getByTestId('balls-called-count').textContent();
+      const num = parseInt(countText || '0');
+      expect(num).toBeGreaterThanOrEqual(3);
+    }).toPass({ timeout: 10000 });
+    await expect(async () => {
+      const displayCountText = await displayPage.getByTestId('balls-called-count').textContent();
+      const displayNum = parseInt(displayCountText || '0');
+      expect(displayNum).toBeGreaterThanOrEqual(3);
+    }).toPass({ timeout: 10000 });
 
     // Check presenter ball count
     const presenterCountText = await page.getByTestId('balls-called-count').textContent();
@@ -239,15 +276,33 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await waitForHydration(displayPage);
     await waitForDualScreenSync(displayPage);
 
-    // Call a ball
-    await page.getByRole('button', { name: /roll|call|start/i }).first().click();
+    // Start game then call a ball
+    const rollButton = page.getByRole('button', { name: /roll|call|start/i }).first();
+    await rollButton.click(); // Start game
+
+    // Wait for button to be enabled and roll sound to complete
+    await expect(rollButton).toBeEnabled({ timeout: 5000 });
+    await page.waitForTimeout(3000);
+
+    await rollButton.click(); // Call first ball
     await waitForSyncedContent(displayPage, /called numbers|current ball/i);
+
+    // Verify first ball was called before proceeding
+    await expect(async () => {
+      const countText = await page.getByTestId('balls-called-count').textContent();
+      const num = parseInt(countText || '0');
+      expect(num).toBeGreaterThanOrEqual(1);
+    }).toPass({ timeout: 10000 });
 
     // Close display
     await displayPage.close();
 
+    // Wait for button to be enabled and roll sound to complete
+    await expect(rollButton).toBeEnabled({ timeout: 5000 });
+    await page.waitForTimeout(5000); // Longer wait after display closes
+
     // Presenter should still work - wait for ball count to update using data-testid
-    await page.getByRole('button', { name: /roll|call|start/i }).first().click();
+    await rollButton.click(); // Call second ball
     await expect(async () => {
       const countText = await page.getByTestId('balls-called-count').textContent();
       const num = parseInt(countText || '0');
