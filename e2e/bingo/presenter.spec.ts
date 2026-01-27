@@ -104,7 +104,10 @@ test.describe('Bingo Presenter View', () => {
     // Find and click the roll/call button - "Start Game" initially, then "Roll [Space]"
     const rollButton = page.getByRole('button', { name: /start game|roll/i });
 
-    // Click to start the game and call first ball
+    // Click to start the game
+    await rollButton.click();
+
+    // Click again to call first ball (button text changes to "Roll [Space]" after starting)
     await rollButton.click();
 
     // Wait for ball to be called and counter to update (Pattern 3: complex condition)
@@ -122,7 +125,8 @@ test.describe('Bingo Presenter View', () => {
   test('displays current ball after calling @high', async ({ authenticatedBingoPage: page }) => {
     // Call a ball - "Start Game" initially, then "Roll [Space]"
     const rollButton = page.getByRole('button', { name: /start game|roll/i });
-    await rollButton.click();
+    await rollButton.click(); // Start game
+    await rollButton.click(); // Call first ball
 
     // Wait for the ball to be displayed (Pattern 1: element visibility)
     const currentBallSection = page.locator('text="Current Ball"').locator('..');
@@ -130,22 +134,26 @@ test.describe('Bingo Presenter View', () => {
   });
 
   test('board updates when ball is called @high', async ({ authenticatedBingoPage: page }) => {
-    // Get initial state of board
-    const initialHighlighted = await page.locator('[class*="called"], [class*="highlighted"]').count();
+    // Get initial state of board (cells with aria-label containing ", called")
+    const initialHighlighted = await page.locator('[role="gridcell"][aria-label*=", called"]').count();
 
     // Call a ball - "Start Game" initially, then "Roll [Space]"
-    await page.getByRole('button', { name: /start game|roll/i }).click();
+    const rollButton = page.getByRole('button', { name: /start game|roll/i });
+    await rollButton.click(); // Start game
+    await rollButton.click(); // Call first ball
 
     // Wait for board to update (Pattern 3: use .toPass() for count change)
     await expect(async () => {
-      const newHighlighted = await page.locator('[class*="called"], [class*="highlighted"]').count();
+      const newHighlighted = await page.locator('[role="gridcell"][aria-label*=", called"]').count();
       expect(newHighlighted).toBeGreaterThanOrEqual(initialHighlighted + 1);
     }).toPass({ timeout: 10000 });
   });
 
   test('can pause and resume the game @medium', async ({ authenticatedBingoPage: page }) => {
     // Start the game first - "Start Game" initially
-    await page.getByRole('button', { name: /start game|roll/i }).click();
+    const rollButton = page.getByRole('button', { name: /start game|roll/i });
+    await rollButton.click(); // Start game
+    await rollButton.click(); // Call first ball
 
     // Wait for game to start (Pattern 2: button text changes to "Roll")
     await expect(async () => {
@@ -171,7 +179,8 @@ test.describe('Bingo Presenter View', () => {
     // Call two balls first - "Start Game" initially, then "Roll [Space]"
     const rollButton = page.getByRole('button', { name: /start game|roll/i });
 
-    await rollButton.click();
+    await rollButton.click(); // Start game
+    await rollButton.click(); // Call first ball
 
     // Wait for first ball (Pattern 3) - use data-testid for precise targeting
     await expect(async () => {
@@ -180,7 +189,11 @@ test.describe('Bingo Presenter View', () => {
       expect(parseInt(countText || '0')).toBeGreaterThanOrEqual(1);
     }).toPass({ timeout: 10000 });
 
-    await rollButton.click();
+    // Wait for roll sound to complete (2s duration + buffer)
+    await page.waitForTimeout(3000);
+
+    // Use keyboard shortcut for more reliable second call
+    await page.keyboard.press('Space'); // Call second ball
 
     // Wait for second ball (Pattern 3) - use data-testid for precise targeting
     await expect(async () => {
@@ -212,7 +225,8 @@ test.describe('Bingo Presenter View', () => {
   test('reset clears all called balls @high', async ({ authenticatedBingoPage: page }) => {
     // Call some balls first - "Start Game" initially
     const rollButton = page.getByRole('button', { name: /start game|roll/i });
-    await rollButton.click();
+    await rollButton.click(); // Start game
+    await rollButton.click(); // Call first ball
 
     // Wait for ball to be called (Pattern 3) - use data-testid for precise targeting
     await expect(async () => {
