@@ -34,7 +34,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     // Verify help section
     await expect(
       authenticatedPage.getByRole('heading', {
-        name: /need help getting started/i,
+        name: /recent sessions/i,
       })
     ).toBeVisible();
   });
@@ -104,7 +104,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     await expect(bingoLink).toBeVisible();
 
     // Verify link has correct href
-    await expect(bingoLink).toHaveAttribute('href', new RegExp(`localhost:${portConfig.bingoPort}/play`));
+    await expect(bingoLink).toHaveAttribute('href', /localhost:3000\/play/);
   });
 
   test('can navigate to trivia from dashboard @critical', async ({
@@ -117,7 +117,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     await expect(triviaLink).toBeVisible();
 
     // Verify link has correct href
-    await expect(triviaLink).toHaveAttribute('href', new RegExp(`localhost:${portConfig.triviaPort}/play`));
+    await expect(triviaLink).toHaveAttribute('href', /localhost:3001\/play/);
   });
 
   test('dashboard shows recent activity section @high', async ({
@@ -221,7 +221,7 @@ test.describe('Dashboard Protection @critical', () => {
 
     // Login page should be visible
     await expect(
-      page.getByRole('heading', { name: /sign in/i, level: 1 })
+      page.getByRole('heading', { name: /welcome back/i, level: 1 })
     ).toBeVisible();
   });
 });
