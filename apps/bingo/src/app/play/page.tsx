@@ -448,6 +448,10 @@ export default function PlayPage() {
       setCurrentPin(pin);
       storePin(pin);
     }
+    // Dismiss modal BEFORE creating session to avoid race condition
+    // where modal visibility check runs before all state updates complete
+    setShowCreateModal(false);
+    setUserDismissedModal(true);
     handleCreateSession(pin);
   }, [currentPin, handleCreateSession]);
 
@@ -456,9 +460,11 @@ export default function PlayPage() {
   }, [handleJoinSession]);
 
   const handleModalPlayOffline = useCallback(() => {
-    handlePlayOffline();
+    // Dismiss modal BEFORE initiating offline mode to avoid race condition
+    // where modal visibility check runs before all state updates complete
     setShowCreateModal(false);
     setUserDismissedModal(true);
+    handlePlayOffline();
   }, [handlePlayOffline]);
 
   // Open display window with room code or offline session ID in URL
@@ -494,8 +500,16 @@ export default function PlayPage() {
 
   return (
     <>
+      {/* Skip link for keyboard navigation */}
+      <a
+        href="#main"
+        className="sr-only skip-link focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:font-medium"
+      >
+        Skip to main content
+      </a>
+
       <OfflineBanner />
-      <main className="min-h-screen bg-background p-4 md:p-6">
+      <main id="main" className="min-h-screen bg-background p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
