@@ -42,14 +42,14 @@ test.describe('Room Setup Flow', () => {
       await expect(page.getByText('Room Setup')).toBeVisible();
 
       // All three options should be visible
-      await expect(page.getByRole('button', { name: /create a new game room/i })).toBeVisible();
-      await expect(page.getByRole('button', { name: /show form to join existing game/i })).toBeVisible();
-      await expect(page.getByRole('button', { name: /play offline without network/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /create new game/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /join with room code/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /play offline/i })).toBeVisible();
     });
 
     test('should create online room and display room code', async ({ authenticatedBingoPage: page }) => {
       // Click create room button
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
 
       // Wait for modal to close and room code to appear
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
@@ -60,7 +60,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should generate and display 4-digit PIN', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
 
       // Wait for modal to close
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
@@ -75,7 +75,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should persist PIN in localStorage after creation', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
 
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
 
@@ -86,7 +86,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should recover PIN after page refresh', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
 
       // Get the PIN before refresh
@@ -112,7 +112,7 @@ test.describe('Room Setup Flow', () => {
         }
       });
 
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
 
       // Wait for modal to close
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
@@ -122,7 +122,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should generate and display 6-character session ID', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
 
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
@@ -143,7 +143,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should persist offline session in localStorage', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
 
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
@@ -164,7 +164,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should recover offline session after page refresh', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
       // Get session ID before refresh
@@ -207,7 +207,7 @@ test.describe('Room Setup Flow', () => {
       await waitForHydration(page);
 
       // Should be able to click Play Offline
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
 
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
@@ -224,7 +224,7 @@ test.describe('Room Setup Flow', () => {
 
   test.describe('Join Existing Room', () => {
     test('should show join form when button clicked', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /show form to join existing game/i);
+      await clickButton(page, /join with room code/i);
 
       // Form inputs should be visible
       await expect(page.getByLabel(/enter room code/i)).toBeVisible();
@@ -234,7 +234,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should validate PIN format (4 digits)', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /show form to join existing game/i);
+      await clickButton(page, /join with room code/i);
 
       const roomCodeInput = page.getByLabel(/enter room code/i);
       const pinInput = page.getByLabel(/enter room pin/i);
@@ -253,7 +253,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should convert room code to uppercase', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /show form to join existing game/i);
+      await clickButton(page, /join with room code/i);
 
       const roomCodeInput = page.getByLabel(/enter room code/i);
 
@@ -266,7 +266,7 @@ test.describe('Room Setup Flow', () => {
     });
 
     test('should clear form when cancel clicked', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /show form to join existing game/i);
+      await clickButton(page, /join with room code/i);
 
       const roomCodeInput = page.getByLabel(/enter room code/i);
       const pinInput = page.getByLabel(/enter room pin/i);
@@ -282,7 +282,7 @@ test.describe('Room Setup Flow', () => {
       await expect(roomCodeInput).not.toBeVisible();
 
       // Click join again - form should be empty
-      await clickButton(page, /show form to join existing game/i);
+      await clickButton(page, /join with room code/i);
       expect(await page.getByLabel(/enter room code/i).inputValue()).toBe('');
       expect(await page.getByLabel(/enter room pin/i).inputValue()).toBe('');
     });
@@ -291,7 +291,7 @@ test.describe('Room Setup Flow', () => {
   test.describe('Create New Game Button', () => {
     test('should show Create New Game button', async ({ authenticatedBingoPage: page }) => {
       // Close modal first
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
       // Create New Game button should be visible (bottom-left)
@@ -301,7 +301,7 @@ test.describe('Room Setup Flow', () => {
 
     test('should clear session when Create New Game clicked', async ({ authenticatedBingoPage: page }) => {
       // First create an offline session
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
       // Verify session exists
@@ -323,7 +323,7 @@ test.describe('Room Setup Flow', () => {
 
     test('should show confirmation for active game', async ({ authenticatedBingoPage: page }) => {
       // Create offline session
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
       // Start a game by clicking a pattern and starting
@@ -344,7 +344,7 @@ test.describe('Room Setup Flow', () => {
   test.describe('Multi-Window Sync', () => {
     test('should sync display window in online mode', async ({ authenticatedBingoPage: page, context }) => {
       // Create online room
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
       // Modal may take longer to dismiss in multi-window scenarios due to BroadcastChannel sync (BEA-381)
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 15000 });
 
@@ -367,7 +367,7 @@ test.describe('Room Setup Flow', () => {
 
     test('should sync display window in offline mode', async ({ authenticatedBingoPage: page, context }) => {
       // Create offline session
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
       // Get offline session ID
@@ -393,7 +393,7 @@ test.describe('Room Setup Flow', () => {
 
     test('should sync game state between windows via BroadcastChannel', async ({ authenticatedBingoPage: page, context }) => {
       // Create offline session for simpler testing (no API calls)
-      await clickButton(page, /play offline without network/i);
+      await clickButton(page, /play offline/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
       // Open display window
@@ -422,14 +422,14 @@ test.describe('Room Setup Flow', () => {
   test.describe('Network Offline Graceful Degradation', () => {
     test('should show offline banner when network is disconnected', async ({ authenticatedBingoPage: page, context }) => {
       // Start online
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
 
       // Disconnect network
       await context.setOffline(true);
 
-      // Offline banner should appear
-      await expect(page.getByText(/offline|no connection/i)).toBeVisible({ timeout: 5000 });
+      // Offline banner should appear - use first() to avoid strict mode violation
+      await expect(page.getByText(/offline|no connection/i).first()).toBeVisible({ timeout: 5000 });
 
       // Restore network
       await context.setOffline(false);
@@ -466,7 +466,7 @@ test.describe('Room Setup Flow', () => {
 
     test('should continue working in offline mode when network fails', async ({ authenticatedBingoPage: page, context }) => {
       // Create online session first
-      await clickButton(page, /create a new game room/i);
+      await clickButton(page, /create new game/i);
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
 
       // Disconnect network
@@ -501,11 +501,11 @@ test.describe('Room Setup Flow', () => {
       await expect(dialog).toBeVisible();
 
       // Check for accessible labels
-      await expect(page.getByRole('button', { name: /create a new game room/i })).toHaveAttribute('aria-label');
+      await expect(page.getByRole('button', { name: /create new game/i })).toHaveAttribute('aria-label');
     });
 
     test('form inputs should have proper labels', async ({ authenticatedBingoPage: page }) => {
-      await clickButton(page, /show form to join existing game/i);
+      await clickButton(page, /join with room code/i);
 
       const roomCodeInput = page.getByLabel(/enter room code/i);
       const pinInput = page.getByLabel(/enter room pin/i);
