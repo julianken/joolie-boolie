@@ -179,6 +179,20 @@ test.describe('Bingo Accessibility', () => {
       const buttons = await page.getByRole('button').all();
 
       for (const button of buttons) {
+        // Skip Next.js DevTools buttons (only present in development mode)
+        // These are framework-injected UI elements, not application buttons
+        const ariaLabel = await button.getAttribute('aria-label');
+        const buttonText = await button.textContent();
+        const isDevToolsButton =
+          ariaLabel?.includes('Next.js') ||
+          ariaLabel?.includes('issues') ||
+          buttonText?.includes('Next.js') ||
+          buttonText?.includes('Issue');
+
+        if (isDevToolsButton) {
+          continue;
+        }
+
         const box = await button.boundingBox();
         if (box) {
           // Senior-friendly design requires 44x44px minimum

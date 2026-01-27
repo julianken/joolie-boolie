@@ -17,13 +17,13 @@ function UpdatePrompt({ onUpdate, onDismiss }: UpdatePromptProps) {
       <div className="flex gap-2">
         <button
           onClick={onUpdate}
-          className="px-4 py-2 bg-white text-indigo-600 rounded font-medium hover:bg-indigo-50 transition-colors"
+          className="min-h-[var(--size-touch)] px-4 py-3 bg-white text-indigo-600 rounded font-medium hover:bg-indigo-50 transition-colors"
         >
           Update
         </button>
         <button
           onClick={onDismiss}
-          className="px-4 py-2 text-indigo-100 hover:text-white transition-colors"
+          className="min-h-[var(--size-touch)] px-4 py-3 text-indigo-100 hover:text-white transition-colors"
         >
           Later
         </button>

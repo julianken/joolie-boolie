@@ -109,13 +109,13 @@ export function InstallPrompt() {
           <div className="flex gap-2 mt-3">
             <button
               onClick={handleInstall}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700 transition-colors"
+              className="min-h-[var(--size-touch)] px-4 py-3 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700 transition-colors"
             >
               Install
             </button>
             <button
               onClick={handleDismiss}
-              className="px-4 py-2 text-gray-600 text-sm hover:text-gray-900 transition-colors"
+              className="min-h-[var(--size-touch)] px-4 py-3 text-gray-600 text-sm hover:text-gray-900 transition-colors"
             >
               Not now
             </button>

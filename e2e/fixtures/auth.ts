@@ -304,7 +304,7 @@ async function dismissRoomSetupModal(page: Page, timeout = 5000): Promise<void> 
   // Wait for modal content to be fully rendered and click Play Offline
   // Use the button's aria-label for precise selection
   const playOfflineButton = modal.getByRole('button', {
-    name: 'Play offline without network connection',
+    name: /Play offline/i,
   });
   await playOfflineButton.waitFor({ state: 'visible', timeout: 2000 });
 
