@@ -538,7 +538,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
         // If we got redirected to login, wait and retry (auth race condition)
         if (page.url().includes('/login')) {
           // Wait for any in-flight redirects to settle
-          await page.waitForTimeout(500);
+          await expect(page.locator('body')).toBeVisible();
           retries--;
           continue;
         }
@@ -553,7 +553,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
           error.message.includes('interrupted')
         ) {
           // Wait for redirect to complete
-          await page.waitForTimeout(1000);
+          await page.waitForLoadState('networkidle');
           retries--;
           if (retries === 0) throw error;
           continue;
@@ -599,7 +599,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
         // If we got redirected to login, wait and retry (auth race condition)
         if (page.url().includes('/login')) {
           // Wait for any in-flight redirects to settle
-          await page.waitForTimeout(500);
+          await expect(page.locator('body')).toBeVisible();
           retries--;
           continue;
         }
@@ -614,7 +614,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
           error.message.includes('interrupted')
         ) {
           // Wait for redirect to complete
-          await page.waitForTimeout(1000);
+          await page.waitForLoadState('networkidle');
           retries--;
           if (retries === 0) throw error;
           continue;
