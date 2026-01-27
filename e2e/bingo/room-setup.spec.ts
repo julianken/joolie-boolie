@@ -53,7 +53,7 @@ test.describe('Room Setup Flow', () => {
     test('should create online room and display room code', async ({ authenticatedBingoPage: page }) => {
       // Click create room button inside the modal (not the "Create New Game" button outside)
       const modal = page.getByRole('dialog');
-      await modal.getByRole('button', { name: /create new game/i }).click();
+      await modal.getByRole('button', { name: /create.*new.*game/i }).click();
 
       // Wait for modal to close and room code to appear
       await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
