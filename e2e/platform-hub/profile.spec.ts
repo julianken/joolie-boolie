@@ -2,20 +2,27 @@
  * Profile & Settings E2E Tests
  *
  * Note: These tests use Playwright auth fixtures to create authenticated sessions.
+ * The auth fixture handles login and sets required SSO cookies (beak_access_token,
+ * beak_user_id) for Platform Hub protected routes.
  *
- * IMPORTANT: All tests in this file are currently SKIPPED because they require real
- * server-side session handling which cannot be fully mocked at the browser level.
- * MSW (Mock Service Worker) can intercept API calls but cannot create the server-side
- * session state needed for protected routes like /settings. These tests should be
- * run against a real Supabase instance with proper authentication.
+ * IMPORTANT: The authenticated tests are currently SKIPPED because the settings page
+ * (/settings) uses the useAuth() hook which does not recognize E2E SSO cookies.
+ * The dashboard page works because its layout.tsx checks for beak_access_token cookie
+ * before calling Supabase auth. The settings page needs similar E2E support.
+ *
+ * TODO (BEA-XXX): Add E2E authentication support to settings page
  */
 
 import { test, expect } from '../fixtures/auth';
+import { portConfig } from '../../playwright.config';
+
+// Dynamic URL based on port configuration (supports worktree isolation)
+const HUB_URL = `http://localhost:${portConfig.hubPort}`;
 
 test.describe.skip('Profile & Settings Management @high', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
     // Navigate to settings page - user is already authenticated via fixture
-    await authenticatedPage.goto('http://localhost:3002/settings');
+    await authenticatedPage.goto(`${HUB_URL}/settings`);
     await authenticatedPage.waitForLoadState('networkidle');
   });
 
@@ -69,7 +76,7 @@ test.describe.skip('Profile & Settings Management @high', () => {
     await saveButton.click();
 
     // Wait for success indication
-    await authenticatedPage.waitForTimeout(1000); // Wait for API call
+    // API call completed - verify form is still visible
 
     // Form should still be visible (not redirected)
     await expect(
@@ -104,7 +111,7 @@ test.describe.skip('Profile & Settings Management @high', () => {
 
     // Should show error (either browser validation or toast)
     // The form won't submit due to minLength validation
-    await authenticatedPage.waitForTimeout(500);
+    
 
     // Page should still be on settings (not submitted)
     await expect(
@@ -208,20 +215,20 @@ test.describe.skip('Profile & Settings Management @high', () => {
   });
 });
 
-test.describe.skip('Settings Protection @critical', () => {
+test.describe('Settings Protection @critical', () => {
   // Skipped: Requires real server-side session to test redirect behavior
   test('settings page redirects to login when not authenticated', async ({
     page,
   }) => {
     // Try to access settings without authentication
-    await page.goto('http://localhost:3002/settings');
+    await page.goto(`${HUB_URL}/settings`);
 
     // Should be redirected to login
     await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
 
     // Login page should be visible
     await expect(
-      page.getByRole('heading', { name: /sign in/i, level: 1 })
+      page.getByRole('heading', { name: /welcome back/i, level: 1 })
     ).toBeVisible();
   });
 });
