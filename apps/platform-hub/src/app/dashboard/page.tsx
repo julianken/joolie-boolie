@@ -83,11 +83,21 @@ async function fetchRecentSessions(userId: string): Promise<GameSession[]> {
 async function fetchProfile(
   _userId: string,
   _isE2E: boolean = false
-): Promise<Record<string, never>> {
+): Promise<{
+  emailNotificationsEnabled: boolean;
+  gameRemindersEnabled: boolean;
+  weeklySummaryEnabled: boolean;
+  marketingEmailsEnabled: boolean;
+}> {
   // E2E mode: Profile data comes from in-memory store but is not used
   // Production mode: Profile data comes from database but is not used
   // This function is kept for future profile-related features
-  return {};
+  return {
+    emailNotificationsEnabled: false,
+    gameRemindersEnabled: false,
+    weeklySummaryEnabled: false,
+    marketingEmailsEnabled: false,
+  };
 }
 
 /**
@@ -193,6 +203,79 @@ export const metadata = {
     'Your Beak Gaming dashboard - quick access to games, recent sessions, and settings',
 };
 
+/**
+ * Dashboard Content Component
+ * Extracted to eliminate duplicate renders of RecentTemplates and other components
+ */
+interface DashboardContentProps {
+  userName: string;
+  userEmail: string;
+  games: ReturnType<typeof getGamesConfig>;
+  recentTemplates: Template[];
+  recentSessions: GameSession[];
+  profile: {
+    emailNotificationsEnabled: boolean;
+    gameRemindersEnabled: boolean;
+    weeklySummaryEnabled: boolean;
+    marketingEmailsEnabled: boolean;
+  };
+}
+
+function DashboardContent({
+  userName,
+  userEmail,
+  games,
+  recentTemplates,
+  recentSessions,
+  profile,
+}: DashboardContentProps) {
+  return (
+    <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
+        <WelcomeHeader userName={userName} userEmail={userEmail} />
+
+        <section aria-labelledby="games-heading">
+          <h2
+            id="games-heading"
+            className="text-2xl md:text-3xl font-bold text-foreground mb-6"
+          >
+            Quick Play
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            {games.map((game) => (
+              <DashboardGameCard
+                key={game.id}
+                title={game.title}
+                description={game.description}
+                href={game.href}
+                icon={game.icon}
+                colorClass={game.colorClass}
+                lastPlayed={game.lastPlayed}
+                timesPlayed={game.timesPlayed}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Recent Templates - rendered ONCE */}
+        <RecentTemplates templates={recentTemplates} />
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
+          <RecentSessions sessions={recentSessions} maxSessions={4} />
+          <UserPreferences
+            preferences={{
+              emailNotificationsEnabled: profile.emailNotificationsEnabled,
+              gameRemindersEnabled: profile.gameRemindersEnabled,
+              weeklySummaryEnabled: profile.weeklySummaryEnabled,
+              marketingEmailsEnabled: profile.marketingEmailsEnabled,
+            }}
+          />
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default async function DashboardPage() {
   // Check for E2E auth via custom SSO cookie (set by /api/auth/login in E2E mode)
   // This allows E2E tests to bypass real Supabase auth and avoid rate limits
@@ -214,48 +297,14 @@ export default async function DashboardPage() {
     const profile = await fetchProfile(e2eUserId.value, true);
 
     return (
-      <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
-          <WelcomeHeader
-            userName={userName}
-            userEmail={E2E_TEST_EMAIL}
-          />
-          <section aria-labelledby="games-heading">
-            <h2
-              id="games-heading"
-              className="text-2xl md:text-3xl font-bold text-foreground mb-6"
-            >
-              Quick Play
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-              {games.map((game) => (
-                <DashboardGameCard
-                  key={game.id}
-                  title={game.title}
-                  description={game.description}
-                  href={game.href}
-                  icon={game.icon}
-                  colorClass={game.colorClass}
-                  lastPlayed={game.lastPlayed}
-                  timesPlayed={game.timesPlayed}
-                />
-              ))}
-            </div>
-          </section>
-          <RecentTemplates templates={recentTemplates} />
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
-            <RecentSessions sessions={recentSessions} maxSessions={4} />
-            <UserPreferences
-              preferences={{
-                emailNotificationsEnabled: profile.emailNotificationsEnabled,
-                gameRemindersEnabled: profile.gameRemindersEnabled,
-                weeklySummaryEnabled: profile.weeklySummaryEnabled,
-                marketingEmailsEnabled: profile.marketingEmailsEnabled,
-              }}
-            />
-          </div>
-        </div>
-      </main>
+      <DashboardContent
+        userName={userName}
+        userEmail={E2E_TEST_EMAIL}
+        games={games}
+        recentTemplates={recentTemplates}
+        recentSessions={recentSessions}
+        profile={profile}
+      />
     );
   }
 
@@ -287,154 +336,13 @@ export default async function DashboardPage() {
     'Activity Director';
 
   return (
-    <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
-        {/* Welcome Header */}
-        <WelcomeHeader
-          userName={userName}
-          userEmail={user.email || ''}
-        />
-
-        {/* Quick Access Games Section */}
-        <section aria-labelledby="games-heading">
-          <h2
-            id="games-heading"
-            className="text-2xl md:text-3xl font-bold text-foreground mb-6"
-          >
-            Quick Play
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {games.map((game) => (
-              <DashboardGameCard
-                key={game.id}
-                title={game.title}
-                description={game.description}
-                href={game.href}
-                icon={game.icon}
-                colorClass={game.colorClass}
-                lastPlayed={game.lastPlayed}
-                timesPlayed={game.timesPlayed}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Templates */}
-        <RecentTemplates templates={recentTemplates} />
-
-        {/* Two Column Layout for Sessions and Preferences */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
-          {/* Recent Sessions */}
-          <RecentSessions sessions={recentSessions} maxSessions={4} />
-
-          {/* User Preferences */}
-          <UserPreferences
-            preferences={{
-              emailNotificationsEnabled: profile.emailNotificationsEnabled,
-              gameRemindersEnabled: profile.gameRemindersEnabled,
-              weeklySummaryEnabled: profile.weeklySummaryEnabled,
-              marketingEmailsEnabled: profile.marketingEmailsEnabled,
-            }}
-          />
-        </div>
-
-        {/* Help Section */}
-        <section
-          className="p-6 md:p-8 bg-primary/5 rounded-2xl border border-primary/20"
-          aria-labelledby="help-heading"
-        >
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h2
-                id="help-heading"
-                className="text-2xl md:text-3xl font-bold text-foreground mb-2"
-              >
-                Need Help Getting Started?
-              </h2>
-              <p className="text-lg text-muted-foreground mb-4">
-                Check out our quick start guides for running games, or contact
-                support if you need assistance.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="/help/bingo"
-                  className="
-                    inline-flex items-center gap-2
-                    min-h-[44px] px-6 py-2
-                    text-lg font-medium
-                    bg-primary text-primary-foreground
-                    hover:bg-primary/90
-                    rounded-lg
-                    focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/50
-                    transition-colors duration-150
-                  "
-                >
-                  Bingo Guide
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </a>
-                <a
-                  href="/help/trivia"
-                  className="
-                    inline-flex items-center gap-2
-                    min-h-[44px] px-6 py-2
-                    text-lg font-medium
-                    bg-secondary text-secondary-foreground
-                    hover:bg-secondary/90
-                    rounded-lg
-                    focus:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50
-                    transition-colors duration-150
-                  "
-                >
-                  Trivia Guide
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
+    <DashboardContent
+      userName={userName}
+      userEmail={user.email || ''}
+      games={games}
+      recentTemplates={recentTemplates}
+      recentSessions={recentSessions}
+      profile={profile}
+    />
   );
 }
