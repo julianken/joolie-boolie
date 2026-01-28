@@ -7,6 +7,7 @@ import { Button, Input, Toggle } from '@beak-gaming/ui';
 import { useToast } from '@beak-gaming/ui';
 import { useThemeStore, THEME_OPTIONS } from '@/stores/theme-store';
 import { ThemeMode } from '@/types';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 export default function SettingsPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -16,6 +17,7 @@ export default function SettingsPage() {
 
   const [facilityName, setFacilityName] = useState('');
   const [email, setEmail] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -38,7 +40,7 @@ export default function SettingsPage() {
     }
   }, [user, authLoading, router]);
 
-  // Load user data and profile from API
+  // Load user data and profile from API (avatar + notification preferences)
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -47,6 +49,7 @@ export default function SettingsPage() {
           const data = await response.json();
           setEmail(data.email || '');
           setFacilityName(data.facility_name || '');
+          setAvatarUrl(data.avatar_url || null);
           setEmailNotificationsEnabled(data.email_notifications_enabled ?? true);
           setGameRemindersEnabled(data.game_reminders_enabled ?? false);
           setWeeklySummaryEnabled(data.weekly_summary_enabled ?? false);
@@ -87,6 +90,21 @@ export default function SettingsPage() {
     }
   };
 
+  // Avatar upload handlers (BEA-322)
+  const handleAvatarUploadSuccess = (url: string) => {
+    setAvatarUrl(url);
+    toast.success('Avatar uploaded successfully');
+  };
+
+  const handleAvatarUploadError = (error: string) => {
+    toast.error(error);
+  };
+
+  const handleAvatarDelete = () => {
+    setAvatarUrl(null);
+    toast.success('Avatar removed successfully');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -119,6 +137,8 @@ export default function SettingsPage() {
           email,
           currentPassword: newPassword ? currentPassword : undefined,
           newPassword: newPassword || undefined,
+          // NOTE: notification preferences are NOT included here
+          // They auto-save immediately via PATCH /api/profile
         }),
       });
 
@@ -177,6 +197,22 @@ export default function SettingsPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Avatar Upload (BEA-322) */}
+          <section className="p-6 bg-background rounded-2xl border border-border">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
+              Profile Picture
+            </h2>
+            <p className="text-base text-muted-foreground mb-6">
+              Upload a profile picture to personalize your account
+            </p>
+            <AvatarUpload
+              currentAvatarUrl={avatarUrl}
+              onUploadSuccess={handleAvatarUploadSuccess}
+              onUploadError={handleAvatarUploadError}
+              onDelete={handleAvatarDelete}
+            />
+          </section>
+
           {/* Facility Information */}
           <section className="p-6 bg-background rounded-2xl border border-border">
             <h2 className="text-2xl font-semibold text-foreground mb-4">
@@ -255,7 +291,7 @@ export default function SettingsPage() {
             </div>
           </section>
 
-          {/* Notification Preferences */}
+          {/* Notification Preferences (BEA-323) */}
           <section className="p-6 bg-background rounded-2xl border border-border">
             <h2 className="text-2xl font-semibold text-foreground mb-4">
               Notification Preferences

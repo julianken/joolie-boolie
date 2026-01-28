@@ -48,7 +48,7 @@ export async function GET() {
       );
     }
 
-    // Fetch profile from database
+    // Fetch profile from database (includes avatar_url + notification preferences)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('avatar_url, facility_name, email, email_notifications_enabled, game_reminders_enabled, weekly_summary_enabled, marketing_emails_enabled')

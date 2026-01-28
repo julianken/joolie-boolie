@@ -5,15 +5,42 @@ import {
   WelcomeHeader,
   DashboardGameCard,
   RecentSessions,
+  RecentTemplates,
   UserPreferences,
 } from '@/components/dashboard';
 import type { GameSession } from '@/components/dashboard/RecentSessions';
+import type { Template } from '@/app/api/templates/route';
 
 // Force dynamic rendering to avoid build-time Supabase initialization
 export const dynamic = 'force-dynamic';
 
 // E2E Testing constants (must match login API route)
 const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
+
+/**
+ * Fetch recent templates from aggregation API
+ */
+async function fetchRecentTemplates(): Promise<Template[]> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002'}/api/templates?recent=true`,
+      {
+        cache: 'no-store',
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to fetch templates:', response.statusText);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.templates || [];
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    return [];
+  }
+}
 
 /**
  * Fetch recent game sessions for a user from the database
@@ -47,6 +74,44 @@ async function fetchRecentSessions(userId: string): Promise<GameSession[]> {
       durationMinutes,
     };
   });
+}
+
+/**
+ * Fetch user profile data including avatar URL
+ */
+async function fetchProfile(userId: string): Promise<{
+  avatarUrl: string | null;
+  emailNotificationsEnabled: boolean;
+  gameRemindersEnabled: boolean;
+  weeklySummaryEnabled: boolean;
+  marketingEmailsEnabled: boolean;
+}> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('avatar_url, email_notifications_enabled, game_reminders_enabled, weekly_summary_enabled, marketing_emails_enabled')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching profile:', error);
+    return {
+      avatarUrl: null,
+      emailNotificationsEnabled: true,
+      gameRemindersEnabled: false,
+      weeklySummaryEnabled: false,
+      marketingEmailsEnabled: false,
+    };
+  }
+
+  return {
+    avatarUrl: data?.avatar_url || null,
+    emailNotificationsEnabled: data?.email_notifications_enabled ?? true,
+    gameRemindersEnabled: data?.game_reminders_enabled ?? false,
+    weeklySummaryEnabled: data?.weekly_summary_enabled ?? false,
+    marketingEmailsEnabled: data?.marketing_emails_enabled ?? false,
+  };
 }
 
 /**
@@ -167,26 +232,19 @@ export default async function DashboardPage() {
     const gameStats = calculateGameStats(recentSessions);
     const games = getGamesConfig(gameStats);
     const userName = E2E_TEST_EMAIL.split('@')[0];
+    const recentTemplates = await fetchRecentTemplates();
 
-    // Fetch profile data for notification preferences (BEA-323)
-    let profileData = null;
-    try {
-      const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002'}/api/profile`, {
-        headers: {
-          Cookie: `beak_access_token=${e2eToken.value}; beak_user_id=${e2eUserId.value}`,
-        },
-      });
-      if (profileResponse.ok) {
-        profileData = await profileResponse.json();
-      }
-    } catch (error) {
-      console.error('Failed to fetch profile for E2E mode:', error);
-    }
+    // Fetch profile for E2E user (includes avatar + notification preferences)
+    const profile = await fetchProfile(e2eUserId.value);
 
     return (
       <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
         <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
-          <WelcomeHeader userName={userName} userEmail={E2E_TEST_EMAIL} />
+          <WelcomeHeader
+            userName={userName}
+            userEmail={E2E_TEST_EMAIL}
+            avatarUrl={profile.avatarUrl}
+          />
           <section aria-labelledby="games-heading">
             <h2
               id="games-heading"
@@ -209,15 +267,16 @@ export default async function DashboardPage() {
               ))}
             </div>
           </section>
+          <RecentTemplates templates={recentTemplates} />
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
             <RecentSessions sessions={recentSessions} maxSessions={4} />
             <UserPreferences
-              preferences={profileData ? {
-                emailNotificationsEnabled: profileData.email_notifications_enabled,
-                gameRemindersEnabled: profileData.game_reminders_enabled,
-                weeklySummaryEnabled: profileData.weekly_summary_enabled,
-                marketingEmailsEnabled: profileData.marketing_emails_enabled,
-              } : undefined}
+              preferences={{
+                emailNotificationsEnabled: profile.emailNotificationsEnabled,
+                gameRemindersEnabled: profile.gameRemindersEnabled,
+                weeklySummaryEnabled: profile.weeklySummaryEnabled,
+                marketingEmailsEnabled: profile.marketingEmailsEnabled,
+              }}
             />
           </div>
         </div>
@@ -241,6 +300,10 @@ export default async function DashboardPage() {
   const recentSessions = await fetchRecentSessions(user.id);
   const gameStats = calculateGameStats(recentSessions);
   const games = getGamesConfig(gameStats);
+  const recentTemplates = await fetchRecentTemplates();
+
+  // Fetch user profile (including avatar + notification preferences)
+  const profile = await fetchProfile(user.id);
 
   // Extract user name from metadata or email
   const userName =
@@ -248,18 +311,15 @@ export default async function DashboardPage() {
     user.email?.split('@')[0] ||
     'Activity Director';
 
-  // Fetch profile data for notification preferences (BEA-323)
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('email_notifications_enabled, game_reminders_enabled, weekly_summary_enabled, marketing_emails_enabled')
-    .eq('id', user.id)
-    .single();
-
   return (
     <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
         {/* Welcome Header */}
-        <WelcomeHeader userName={userName} userEmail={user.email || ''} />
+        <WelcomeHeader
+          userName={userName}
+          userEmail={user.email || ''}
+          avatarUrl={profile.avatarUrl}
+        />
 
         {/* Quick Access Games Section */}
         <section aria-labelledby="games-heading">
@@ -285,6 +345,9 @@ export default async function DashboardPage() {
           </div>
         </section>
 
+        {/* Recent Templates */}
+        <RecentTemplates templates={recentTemplates} />
+
         {/* Two Column Layout for Sessions and Preferences */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
           {/* Recent Sessions */}
@@ -292,12 +355,12 @@ export default async function DashboardPage() {
 
           {/* User Preferences */}
           <UserPreferences
-            preferences={profile ? {
-              emailNotificationsEnabled: profile.email_notifications_enabled ?? true,
-              gameRemindersEnabled: profile.game_reminders_enabled ?? false,
-              weeklySummaryEnabled: profile.weekly_summary_enabled ?? false,
-              marketingEmailsEnabled: profile.marketing_emails_enabled ?? false,
-            } : undefined}
+            preferences={{
+              emailNotificationsEnabled: profile.emailNotificationsEnabled,
+              gameRemindersEnabled: profile.gameRemindersEnabled,
+              weeklySummaryEnabled: profile.weeklySummaryEnabled,
+              marketingEmailsEnabled: profile.marketingEmailsEnabled,
+            }}
           />
         </div>
 
