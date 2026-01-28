@@ -68,8 +68,8 @@ test.describe('Trivia Session Flow', () => {
 
       // Wait for API call and modal to close - use toPass for retry on timing
       await expect(async () => {
-        await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 2000 });
-      }).toPass({ timeout: 15000 });
+        await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 15000, intervals: [500, 1000, 1500, 2000] });
 
       // Room code should be displayed - look for the Room: label
       await expect(async () => {
@@ -89,8 +89,8 @@ test.describe('Trivia Session Flow', () => {
 
       // Wait for API call and modal to close
       await expect(async () => {
-        await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 2000 });
-      }).toPass({ timeout: 15000 });
+        await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 15000, intervals: [500, 1000, 1500, 2000] });
 
       // Check localStorage for PIN - may need retry for async storage
       await expect(async () => {
