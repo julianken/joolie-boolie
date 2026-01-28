@@ -46,6 +46,8 @@ export class BroadcastSync<TPayload = unknown> {
   private readonly options: BroadcastSyncOptions;
   /** Current connection state */
   private _connectionState: ConnectionState = 'disconnected';
+  /** Monotonically increasing sequence counter for message uniqueness */
+  private sequenceCounter = 0;
 
   constructor(channelName: string, options: BroadcastSyncOptions = {}) {
     this.channelName = channelName;
@@ -168,12 +170,12 @@ export class BroadcastSync<TPayload = unknown> {
   }
 
   /**
-   * Check if a message is a duplicate based on type and timestamp.
+   * Check if a message is a duplicate based on type, timestamp, and sequence number.
    * This prevents processing the same logical message multiple times
    * within a short time window (e.g., from rapid state changes).
    */
   private isDuplicateMessage(message: SyncMessage<TPayload>): boolean {
-    const key = `${message.type}-${message.timestamp}`;
+    const key = `${message.type}-${message.timestamp}-${message.sequenceNumber ?? ''}`;
 
     if (this.recentMessageKeys.has(key)) {
       return true;
@@ -230,10 +232,11 @@ export class BroadcastSync<TPayload = unknown> {
       payload,
       timestamp: Date.now(),
       originId: this.instanceId,
+      sequenceNumber: ++this.sequenceCounter,
     };
 
     try {
-      this.log('Sending message', { type, timestamp: message.timestamp });
+      this.log('Sending message', { type, timestamp: message.timestamp, sequenceNumber: message.sequenceNumber });
       this.channel.postMessage(message);
     } catch (err) {
       this.handleError({
@@ -265,22 +268,7 @@ export class BroadcastSync<TPayload = unknown> {
    * Used by presenter to signal that handlers are ready to receive messages.
    */
   broadcastChannelReady(): void {
-    if (!this.channel) {
-      this.handleError({
-        code: 'CHANNEL_UNAVAILABLE',
-        message: 'Cannot broadcast - channel not initialized',
-        context: { messageType: 'CHANNEL_READY' },
-      });
-      return;
-    }
-
-    this.channel.postMessage({
-      type: 'CHANNEL_READY',
-      timestamp: Date.now(),
-      originId: this.instanceId,
-      payload: null,
-    });
-
+    this.send('CHANNEL_READY', null);
     this.log('CHANNEL_READY broadcast');
   }
 
@@ -295,6 +283,7 @@ export class BroadcastSync<TPayload = unknown> {
     }
     this.handlers.clear();
     this.recentMessageKeys.clear();
+    this.sequenceCounter = 0;
     this.isInitialized = false;
     this.setConnectionState('disconnected');
   }
