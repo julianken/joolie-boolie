@@ -457,7 +457,7 @@ test.describe('Room Setup Flow', () => {
     test('should show offline banner when network is disconnected', async ({ authenticatedBingoPage: page, context }) => {
       // Start online - click button inside modal
       const modal = page.getByRole('dialog');
-      await modal.getByRole('button', { name: /create.*new.*game/i }).click();
+      await modal.getByRole('button', { name: /play offline/i }).click();
       // Use .toPass() pattern to handle timing variability in modal state transitions
       await expect(async () => {
         await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 1000 });
