@@ -366,9 +366,9 @@ test.describe('Room Setup Flow', () => {
         await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 1000 });
       }).toPass({ timeout: 20000, intervals: [500, 1000, 1500, 2000, 3000] });
 
-      // Wait for room code to be created and displayed before opening display
+      // Wait for offline session ID to be created and displayed before opening display
       // The async session creation takes time after modal dismisses
-      const roomCodeDisplay = page.locator('text=/room code/i').first();
+      const roomCodeDisplay = page.locator('text=/offline session id/i').first();
       await expect(roomCodeDisplay).toBeVisible({ timeout: 10000 });
 
       // Wait for "Open Display" button to be visible and enabled
@@ -390,7 +390,7 @@ test.describe('Room Setup Flow', () => {
       // Both windows should be synced via BroadcastChannel
       // Verify room code is in URL
       const displayUrl = displayPage.url();
-      expect(displayUrl).toContain('/display?room=');
+      expect(displayUrl).toContain('/display?offline=');
     });
 
     test('should sync display window in offline mode', async ({ authenticatedBingoPage: page, context }) => {
