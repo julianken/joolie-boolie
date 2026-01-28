@@ -32,42 +32,60 @@ SESSION_TOKEN_SECRET=<64-character-hex-string-from-openssl>
 
 ### Running E2E Tests
 
+#### RECOMMENDED: Production Build Mode (Stable)
+
+**Default mode as of BEA-407.** Production builds are 50-70% more memory efficient and prevent server crashes under parallel test load.
+
 ```bash
-# 1. Start all dev servers with E2E testing mode (IMPORTANT!)
-# This enables auth bypass to avoid Supabase rate limits
-pnpm dev:e2e
+# Run all tests (builds apps automatically)
+pnpm test:e2e
 
-# OR regular dev (without E2E auth bypass):
-pnpm dev
+# Run specific tests
+pnpm test:e2e e2e/bingo/room-setup.spec.ts
+pnpm test:e2e --grep @critical
 
-# OR start individually:
-pnpm dev:bingo    # Port 3000
-pnpm dev:trivia   # Port 3001
-pnpm dev:hub      # Port 3002
+# Run with browser UI visible
+pnpm test:e2e --headed
 
-# 2. Verify servers are running (should show 0.0% CPU when idle)
-ps aux | grep next-server
+# View test results summary
+pnpm test:e2e:summary
+```
 
-# 3. Check servers respond
+**What happens:**
+1. Script builds all 3 apps (`pnpm build`)
+2. Kills any existing dev servers
+3. Starts production servers on ports 3000-3002
+4. Runs Playwright tests
+5. Cleans up servers on exit
+
+**Pros:**
+- Stable (no server crashes from resource exhaustion)
+- Matches production environment
+- Maintains parallel execution (6 workers)
+
+**Cons:**
+- Requires 30-60s build step before tests
+- Can't hot-reload during test development
+
+#### ALTERNATIVE: Dev Server Mode (Rapid Iteration)
+
+**Use during active test development** when you need hot-reload. Faster iteration but less stable under load.
+
+```bash
+# 1. Start dev servers manually
+pnpm dev:e2e    # Includes E2E_TESTING=true for auth bypass
+
+# 2. Run tests against dev servers
+pnpm test:e2e:dev
+
+# 3. Verify servers are healthy
+ps aux | grep next-server    # Should show 0-10% CPU when idle
 curl -I http://localhost:3000
 curl -I http://localhost:3001
 curl -I http://localhost:3002/login
-
-# 4. Run E2E tests
-pnpm test:e2e
-
-# Run specific test file
-pnpm test:e2e e2e/bingo/room-setup.spec.ts
-
-# Run specific test
-pnpm test:e2e -g "should show room setup modal"
-
-# Run in headed mode (see browser)
-pnpm test:e2e --headed
-
-# Run with UI mode (interactive)
-pnpm test:e2e --ui
 ```
+
+**WARNING:** Dev servers may crash after ~250 tests (3.9min runtime) due to resource exhaustion. If you see "Could not connect to the server" errors, switch to production build mode.
 
 ### Anti-Pattern: Fixed Timeouts (waitForTimeout)
 

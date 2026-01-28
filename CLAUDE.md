@@ -69,30 +69,33 @@ Skill(subagent-workflow)
 ### Quick E2E Test Commands
 
 ```bash
-# 1. Start dev servers (required for E2E tests)
-pnpm dev
+# RECOMMENDED: Production build testing (stable, prevents server crashes)
+pnpm test:e2e                           # Build apps + run all tests
+pnpm test:e2e e2e/bingo                 # Build + run bingo tests only
+pnpm test:e2e --grep @critical          # Build + run critical tests
 
-# 2. Run E2E tests for your changes
-pnpm test:e2e e2e/<your-feature>.spec.ts
+# ALTERNATIVE: Dev server testing (for rapid iteration during development)
+# WARNING: Dev servers may crash under heavy load (6 parallel workers)
+pnpm dev                                # Start dev servers
+pnpm test:e2e:dev                       # Run tests against dev servers
 
-# 3. Run ALL E2E tests before creating PR
-pnpm test:e2e
-
-# 4. If tests fail: FIX CODE, DO NOT COMMIT
+# View test results
+pnpm test:e2e:summary                   # Show pass/fail counts
 ```
 
 ### E2E Test Checklist (MANDATORY)
 
 Before marking ANY task complete or creating a PR:
 
-- [ ] Dev servers running (bingo, trivia, platform-hub on ports 3000, 3001, 3002)
 - [ ] `.env.local` files exist in ALL apps (bingo, trivia, platform-hub)
 - [ ] SESSION_TOKEN_SECRET is valid 64-char hex (generate with `openssl rand -hex 32`)
-- [ ] E2E tests pass: `pnpm test:e2e e2e/<feature>.spec.ts`
-- [ ] NO test failures (0 failures required)
+- [ ] E2E tests pass: `pnpm test:e2e` (production build mode)
+- [ ] NO test failures (0 failures required - verify with `pnpm test:e2e:summary`)
 - [ ] Test screenshots reviewed (check `test-results/` directory)
 
 **If E2E tests fail: DO NOT COMMIT. Fix the code first.**
+
+**Why production builds?** Dev servers crash under parallel test load (BEA-407). Production builds are 50-70% more memory efficient and stable.
 
 ### Port Isolation for Worktrees
 
@@ -141,9 +144,10 @@ Test Results Summary:
 | Issue | Fix |
 |-------|-----|
 | "Missing environment variables" | Create `.env` in project root: `cp apps/bingo/.env.local .env` |
-| Tests timeout at login page | Platform Hub crashed - restart: `pnpm dev:hub` |
+| "Could not connect to the server" errors | Use production builds: `pnpm test:e2e` (default mode, auto-builds apps) |
+| Tests timeout at login page | Check server logs: `tail -f /tmp/e2e-*.log` |
 | "SESSION_TOKEN_SECRET must contain only hexadecimal" | Generate valid secret: `openssl rand -hex 32` and update ALL `.env.local` files |
-| Servers hung at 100%+ CPU | Kill and restart: `pkill -f next-server && pnpm dev` |
+| Build fails before tests | Check dependencies: `pnpm install` and verify `.env.local` files exist |
 
 ### Integration with Parallel Workflow
 
