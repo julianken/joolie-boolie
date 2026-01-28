@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@beak-gaming/auth';
-import { Button, Input } from '@beak-gaming/ui';
+import { Button, Input, Toggle } from '@beak-gaming/ui';
 import { useToast } from '@beak-gaming/ui';
 import { useThemeStore, THEME_OPTIONS } from '@/stores/theme-store';
 import { ThemeMode } from '@/types';
@@ -20,6 +20,12 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Notification preferences state
+  const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(true);
+  const [gameRemindersEnabled, setGameRemindersEnabled] = useState(false);
+  const [weeklySummaryEnabled, setWeeklySummaryEnabled] = useState(false);
+  const [marketingEmailsEnabled, setMarketingEmailsEnabled] = useState(false);
 
   // Redirect to login if not authenticated
   // Skip redirect in E2E mode (cookies checked server-side in layout.tsx)
@@ -44,6 +50,31 @@ export default function SettingsPage() {
       // E2E mode: use test user data
       setEmail('e2e-test@beak-gaming.test');
       setFacilityName('E2E Test Facility');
+    }
+  }, [user]);
+
+  // Load notification preferences
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setEmailNotificationsEnabled(data.email_notifications_enabled ?? true);
+          setGameRemindersEnabled(data.game_reminders_enabled ?? false);
+          setWeeklySummaryEnabled(data.weekly_summary_enabled ?? false);
+          setMarketingEmailsEnabled(data.marketing_emails_enabled ?? false);
+        }
+      } catch (error) {
+        console.error('Failed to load notification preferences:', error);
+      }
+    };
+
+    // Check for E2E mode
+    const hasE2ECookies = document.cookie.includes('beak_user_id=');
+
+    if (user || hasE2ECookies) {
+      loadPreferences();
     }
   }, [user]);
 
@@ -79,6 +110,10 @@ export default function SettingsPage() {
           email,
           currentPassword: newPassword ? currentPassword : undefined,
           newPassword: newPassword || undefined,
+          emailNotificationsEnabled,
+          gameRemindersEnabled,
+          weeklySummaryEnabled,
+          marketingEmailsEnabled,
         }),
       });
 
@@ -212,6 +247,61 @@ export default function SettingsPage() {
                   </div>
                 </label>
               ))}
+            </div>
+          </section>
+
+          {/* Notification Preferences */}
+          <section className="p-6 bg-background rounded-2xl border border-border">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
+              Notification Preferences
+            </h2>
+            <p className="text-base text-muted-foreground mb-6">
+              Control which email notifications you receive
+            </p>
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-muted/5">
+                <Toggle
+                  checked={emailNotificationsEnabled}
+                  onChange={setEmailNotificationsEnabled}
+                  label="Important Account Updates"
+                />
+                <p className="text-sm text-muted-foreground mt-2 ml-[95px]">
+                  Security alerts, password changes, and critical account notifications
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-muted/5">
+                <Toggle
+                  checked={gameRemindersEnabled}
+                  onChange={setGameRemindersEnabled}
+                  label="Game Reminders"
+                />
+                <p className="text-sm text-muted-foreground mt-2 ml-[95px]">
+                  Reminders about upcoming scheduled games and events
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-muted/5">
+                <Toggle
+                  checked={weeklySummaryEnabled}
+                  onChange={setWeeklySummaryEnabled}
+                  label="Weekly Activity Summary"
+                />
+                <p className="text-sm text-muted-foreground mt-2 ml-[95px]">
+                  Weekly recap of your games, scores, and achievements
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-muted/5">
+                <Toggle
+                  checked={marketingEmailsEnabled}
+                  onChange={setMarketingEmailsEnabled}
+                  label="Newsletter & Promotions"
+                />
+                <p className="text-sm text-muted-foreground mt-2 ml-[95px]">
+                  New features, tips, and special offers from Beak Gaming
+                </p>
+              </div>
             </div>
           </section>
 

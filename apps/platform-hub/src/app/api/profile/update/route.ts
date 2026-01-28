@@ -40,7 +40,16 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { facilityName, email, currentPassword, newPassword } = body;
+    const {
+      facilityName,
+      email,
+      currentPassword,
+      newPassword,
+      emailNotificationsEnabled,
+      gameRemindersEnabled,
+      weeklySummaryEnabled,
+      marketingEmailsEnabled,
+    } = body;
 
     // Validate inputs
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -98,17 +107,65 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update profile in profiles table
+    // Build update object for profiles table
+    const profileUpdates: Record<string, unknown> = {};
+
     if (facilityName !== undefined) {
+      profileUpdates.facility_name = facilityName;
+    }
+
+    // Add notification preferences if provided
+    if (emailNotificationsEnabled !== undefined) {
+      if (typeof emailNotificationsEnabled !== 'boolean') {
+        return NextResponse.json(
+          { error: 'emailNotificationsEnabled must be a boolean' },
+          { status: 400 }
+        );
+      }
+      profileUpdates.email_notifications_enabled = emailNotificationsEnabled;
+    }
+
+    if (gameRemindersEnabled !== undefined) {
+      if (typeof gameRemindersEnabled !== 'boolean') {
+        return NextResponse.json(
+          { error: 'gameRemindersEnabled must be a boolean' },
+          { status: 400 }
+        );
+      }
+      profileUpdates.game_reminders_enabled = gameRemindersEnabled;
+    }
+
+    if (weeklySummaryEnabled !== undefined) {
+      if (typeof weeklySummaryEnabled !== 'boolean') {
+        return NextResponse.json(
+          { error: 'weeklySummaryEnabled must be a boolean' },
+          { status: 400 }
+        );
+      }
+      profileUpdates.weekly_summary_enabled = weeklySummaryEnabled;
+    }
+
+    if (marketingEmailsEnabled !== undefined) {
+      if (typeof marketingEmailsEnabled !== 'boolean') {
+        return NextResponse.json(
+          { error: 'marketingEmailsEnabled must be a boolean' },
+          { status: 400 }
+        );
+      }
+      profileUpdates.marketing_emails_enabled = marketingEmailsEnabled;
+    }
+
+    // Update profile in profiles table
+    if (Object.keys(profileUpdates).length > 0) {
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ facility_name: facilityName })
+        .update(profileUpdates)
         .eq('id', user.id);
 
       if (profileError) {
         console.error('Profile update error:', profileError);
         return NextResponse.json(
-          { error: 'Failed to update facility name' },
+          { error: 'Failed to update profile' },
           { status: 500 }
         );
       }
