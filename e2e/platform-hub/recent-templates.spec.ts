@@ -1,15 +1,13 @@
-import { test, expect } from '@playwright/test';
-import { loginAsTestUser, testUserEmail } from '../fixtures/auth';
+import { test, expect } from '../fixtures/auth';
 
 test.describe('Recent Templates Display (BEA-325)', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsTestUser(page);
-    await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+  test.beforeEach(async ({ authenticatedPage }) => {
+    await authenticatedPage.goto('/dashboard');
+    await authenticatedPage.waitForLoadState('networkidle');
   });
 
   test('should display Recent Templates section on dashboard', async ({
-    page,
+    authenticatedPage: page,
   }) => {
     // Verify section exists
     const section = page.locator('section', {
@@ -23,7 +21,7 @@ test.describe('Recent Templates Display (BEA-325)', () => {
     await expect(viewAllLink).toHaveAttribute('href', '/dashboard/templates');
   });
 
-  test('should display Bingo and Trivia columns', async ({ page }) => {
+  test('should display Bingo and Trivia columns', async ({ authenticatedPage: page }) => {
     const section = page.locator('section', {
       has: page.locator('h2:has-text("Recent Templates")'),
     });
@@ -39,7 +37,7 @@ test.describe('Recent Templates Display (BEA-325)', () => {
     await expect(triviaHeading.locator('svg')).toBeVisible(); // Trivia icon
   });
 
-  test('should show empty state when no templates exist', async ({ page }) => {
+  test('should show empty state when no templates exist', async ({ authenticatedPage: page }) => {
     // Assuming fresh test user has no templates
     const section = page.locator('section', {
       has: page.locator('h2:has-text("Recent Templates")'),
@@ -209,7 +207,7 @@ test.describe('Recent Templates Display (BEA-325)', () => {
     expect(hasEmptyState).toBeTruthy();
   });
 
-  test('should display up to 3 templates per game type', async ({ page }) => {
+  test('should display up to 3 templates per game type', async ({ authenticatedPage: page }) => {
     const section = page.locator('section', {
       has: page.locator('h2:has-text("Recent Templates")'),
     });
