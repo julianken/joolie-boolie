@@ -14,6 +14,13 @@ vi.mock('@/lib/csrf', () => ({
   clearCsrfToken: vi.fn(),
 }));
 
+// Mock Next.js cookies
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(() => ({
+    get: vi.fn(() => undefined), // No E2E cookies in unit tests
+  })),
+}));
+
 // Mock audit middleware
 vi.mock('@/middleware/audit-middleware', () => ({
   auditAuthorizationSuccess: vi.fn(),

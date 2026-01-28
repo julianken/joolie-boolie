@@ -15,12 +15,18 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import {
   refreshAccessToken,
   tokenRotationLogger,
   TokenRefreshError,
 } from '@/lib/token-rotation';
+import {
+  getE2EAuthorizationByCode,
+  updateE2EAuthorization,
+  isE2EMode,
+} from '@/lib/oauth/e2e-store';
 
 /**
  * POST /api/oauth/token
@@ -149,6 +155,83 @@ async function handleAuthorizationCodeGrant(params: {
   }
 
   try {
+    // Check if this is an E2E authorization code (stored in memory)
+    const e2eAuth = getE2EAuthorizationByCode(code);
+
+    if (e2eAuth && isE2EMode()) {
+      console.log('[Token Endpoint] E2E mode: exchanging in-memory authorization code');
+
+      // Validate PKCE code_verifier against code_challenge
+      const codeChallenge = crypto
+        .createHash('sha256')
+        .update(code_verifier)
+        .digest('base64url');
+
+      if (codeChallenge !== e2eAuth.code_challenge) {
+        return NextResponse.json(
+          {
+            error: 'invalid_grant',
+            error_description: 'Invalid code_verifier',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate client_id matches
+      if (client_id !== e2eAuth.client_id) {
+        return NextResponse.json(
+          {
+            error: 'invalid_grant',
+            error_description: 'Client ID mismatch',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate redirect_uri matches
+      if (redirect_uri !== e2eAuth.redirect_uri) {
+        return NextResponse.json(
+          {
+            error: 'invalid_grant',
+            error_description: 'Redirect URI mismatch',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check if code has expired
+      if (e2eAuth.code_expires_at && new Date(e2eAuth.code_expires_at) < new Date()) {
+        return NextResponse.json(
+          {
+            error: 'invalid_grant',
+            error_description: 'Authorization code has expired',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Mark authorization as used (invalidate code)
+      updateE2EAuthorization(e2eAuth.id, {
+        code: undefined,
+        status: 'approved', // Keep approved but remove code
+      });
+
+      // Generate E2E test tokens
+      const accessToken = `e2e-access-${crypto.randomBytes(32).toString('hex')}`;
+      const refreshToken = `e2e-refresh-${crypto.randomBytes(32).toString('hex')}`;
+
+      console.log('[Token Endpoint] E2E mode: returning test tokens');
+
+      // Return E2E tokens in OAuth 2.1 format
+      return NextResponse.json({
+        access_token: accessToken,
+        token_type: 'Bearer',
+        expires_in: 3600,
+        refresh_token: refreshToken,
+      });
+    }
+
+    // Normal mode: use Supabase
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

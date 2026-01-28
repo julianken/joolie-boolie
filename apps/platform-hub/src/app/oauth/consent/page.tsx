@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { ConsentScreen } from '@/components/oauth';
 import type { AuthorizationDetails } from '@/types/oauth';
 
@@ -10,14 +9,14 @@ import type { AuthorizationDetails } from '@/types/oauth';
 export const dynamic = 'force-dynamic';
 
 export interface ConsentPageProps {
-  searchParams: {
+  searchParams: Promise<{
     authorization_id?: string;
-  };
+  }>;
 }
 
 /**
  * Type guard to validate authorization details response
- * Ensures runtime type safety for Supabase SDK response
+ * Ensures runtime type safety for API response
  */
 function isValidAuthorizationDetails(data: unknown): data is AuthorizationDetails {
   if (!data || typeof data !== 'object') return false;
@@ -43,22 +42,22 @@ function isValidAuthorizationDetails(data: unknown): data is AuthorizationDetail
  *
  * Handles the OAuth 2.1 authorization consent flow:
  * 1. Extracts authorization_id from URL
- * 2. Fetches authorization details from Supabase
+ * 2. Fetches authorization details via API (supports E2E mode)
  * 3. Displays consent screen with client info and scopes
  * 4. Handles approve/deny actions
  * 5. Redirects back to client app
  *
  * Features:
- * - Direct Supabase SDK calls (no API routes needed)
+ * - API-based data fetching (supports both DB and E2E in-memory)
  * - Complete error handling
  * - Loading states
  * - Redirects unauthenticated users to login
  * - Senior-friendly design
  * - WCAG 2.1 AA accessible
  */
-export default function ConsentPage({ searchParams }: ConsentPageProps) {
+export default function ConsentPage(props: ConsentPageProps) {
+  const searchParams = use(props.searchParams);
   const router = useRouter();
-  const supabase = createClient();
 
   const [details, setDetails] = useState<AuthorizationDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,91 +76,49 @@ export default function ConsentPage({ searchParams }: ConsentPageProps) {
       }
 
       try {
-        // Check if user is authenticated
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // Fetch authorization details via API (supports E2E mode)
+        const response = await fetch(`/api/oauth/authorization-details?authorization_id=${encodeURIComponent(authorizationId)}`);
+        const data = await response.json();
 
-        if (sessionError || !session) {
-          // Redirect to login with return URL
-          const redirectUrl = `/login?redirect=/oauth/consent&authorization_id=${encodeURIComponent(authorizationId)}`;
-          router.push(redirectUrl);
-          return;
-        }
-
-        // Fetch authorization details from oauth_authorizations table
-        const { data: authData, error: authError } = await supabase
-          .from('oauth_authorizations')
-          .select(`
-            id,
-            client_id,
-            user_id,
-            scope,
-            status,
-            expires_at,
-            oauth_clients!inner(id, name)
-          `)
-          .eq('id', authorizationId)
-          .eq('user_id', session.user.id)
-          .eq('status', 'pending')
-          .single();
-
-        if (authError) {
-          // Handle different error scenarios
-          const errorMessage = authError.message || 'Unknown error';
-
-          if (errorMessage.includes('No rows') || authError.code === 'PGRST116') {
-            setError('Authorization request not found or has expired. Please try again from the application.');
-          } else {
-            setError(`Unable to load authorization details: ${errorMessage}`);
-          }
-        } else if (authData) {
-          // Check if authorization has expired
-          if (authData.expires_at && new Date(authData.expires_at) < new Date()) {
-            setError('This authorization request has expired. Please start a new authorization from the application.');
-            setLoading(false);
+        if (!response.ok) {
+          if (response.status === 401 && data.requiresLogin) {
+            // Redirect to login with return URL
+            const redirectUrl = `/login?redirect=/oauth/consent&authorization_id=${encodeURIComponent(authorizationId)}`;
+            router.push(redirectUrl);
             return;
           }
 
-          // Extract client info (handle both array and object response from Supabase)
-          const clientArray = authData.oauth_clients as unknown as Array<{ id: string; name: string }>;
-          const client = Array.isArray(clientArray) ? clientArray[0] : clientArray;
+          setError(data.error || 'Failed to load authorization details');
+          setLoading(false);
+          return;
+        }
 
-          // Parse scopes
-          const scopes = authData.scope.split(' ');
+        // Transform API response to AuthorizationDetails format
+        const scopes = data.authorization.scope.split(' ');
+        const authDetails: AuthorizationDetails = {
+          client: data.client,
+          scopes,
+          user: data.user,
+        };
 
-          // Transform to AuthorizationDetails format
-          const authDetails: AuthorizationDetails = {
-            client: {
-              id: client.id,
-              name: client.name,
-            },
-            scopes,
-            user: {
-              id: session.user.id,
-              email: session.user.email || '',
-            },
-          };
+        if (isValidAuthorizationDetails(authDetails)) {
+          setDetails(authDetails);
 
-          if (isValidAuthorizationDetails(authDetails)) {
-            setDetails(authDetails);
-
-            // Fetch CSRF token after successful authorization details load
-            try {
-              const csrfResponse = await fetch('/api/oauth/csrf');
-              if (csrfResponse.ok) {
-                const { token } = await csrfResponse.json();
-                setCsrfToken(token);
-              } else {
-                setError('Failed to generate security token. Please refresh and try again.');
-              }
-            } catch (csrfErr) {
-              console.error('Error fetching CSRF token:', csrfErr);
-              setError('Failed to initialize security token. Please refresh and try again.');
+          // Fetch CSRF token after successful authorization details load
+          try {
+            const csrfResponse = await fetch('/api/oauth/csrf');
+            if (csrfResponse.ok) {
+              const { token } = await csrfResponse.json();
+              setCsrfToken(token);
+            } else {
+              setError('Failed to generate security token. Please refresh and try again.');
             }
-          } else {
-            setError('Invalid authorization details structure received from server.');
+          } catch (csrfErr) {
+            console.error('Error fetching CSRF token:', csrfErr);
+            setError('Failed to initialize security token. Please refresh and try again.');
           }
         } else {
-          setError('No authorization details received. Please try again.');
+          setError('Invalid authorization details structure received from server.');
         }
       } catch (err) {
         console.error('Error fetching authorization details:', err);
@@ -172,7 +129,7 @@ export default function ConsentPage({ searchParams }: ConsentPageProps) {
     }
 
     fetchAuthorizationDetails();
-  }, [authorizationId, router, supabase]);
+  }, [authorizationId, router]);
 
   /**
    * Handle user approval of the authorization request

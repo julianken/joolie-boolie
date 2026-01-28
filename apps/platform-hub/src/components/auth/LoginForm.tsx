@@ -35,7 +35,20 @@ function isValidRedirect(path: string): boolean {
  * Builds a redirect URL with optional authorization_id query parameter
  */
 function buildRedirectUrl(redirectTo: string | undefined, authorizationId: string | undefined): string {
-  const redirect = redirectTo || '/dashboard';
+  let redirect = redirectTo || '/dashboard';
+
+  // Decode redirect if it's URL-encoded (OAuth flow encodes it)
+  // This handles the double-encoding from /api/oauth/authorize
+  try {
+    while (redirect.includes('%')) {
+      const decoded = decodeURIComponent(redirect);
+      if (decoded === redirect) break; // No more decoding needed
+      redirect = decoded;
+    }
+  } catch {
+    // If decoding fails, use original value
+    console.warn('Failed to decode redirect URL, using as-is');
+  }
 
   // Validate redirect path (security: prevent open redirects)
   if (!isValidRedirect(redirect)) {

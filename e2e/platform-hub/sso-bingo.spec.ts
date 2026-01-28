@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth';
+import { portConfig } from '../../playwright.config';
 
 /**
  * Cross-App SSO E2E Tests: Bingo → Platform Hub OAuth Flow
@@ -18,20 +19,14 @@ import { test, expect } from '@playwright/test';
  * @high - Important security/UX features (SSO-003, SSO-004, SSO-007, SSO-010, SSO-011)
  * @medium - Error handling and edge cases (SSO-008, SSO-009)
  *
- * IMPORTANT: Most tests are skipped because they require real server-side OAuth token exchange
- * and authenticated session handling which cannot be fully mocked at the browser level with MSW.
- * These tests should be run against a real Platform Hub OAuth server instance.
+ * Note: Uses testUser fixture from auth.ts for authentication.
+ * Platform Hub login API has E2E testing mode that bypasses Supabase for
+ * e2e-test@beak-gaming.test, eliminating the need to create new users via signup.
  */
 
-const BINGO_URL = 'http://localhost:3000';
-const HUB_URL = 'http://localhost:3002';
-
-/**
- * Generate unique test user email
- */
-function generateTestEmail(): string {
-  return `e2e-sso-bingo+${Date.now()}@beak-gaming.test`;
-}
+// Dynamic URLs based on port configuration (supports worktree isolation)
+const BINGO_URL = `http://localhost:${portConfig.bingoPort}`;
+const HUB_URL = `http://localhost:${portConfig.hubPort}`;
 
 test.describe('Bingo → Platform Hub SSO', () => {
   test.describe('@critical OAuth Authorization Flow', () => {
@@ -44,7 +39,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.click('button:has-text("Sign in with Beak Gaming")');
 
       // Should redirect to Platform Hub authorization endpoint
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
+      await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Should then redirect to login page (not authenticated)
       await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
@@ -55,7 +50,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
     });
 
     // ENABLED: Testing complete OAuth flow with token exchange
-    test('can complete OAuth flow from Bingo to Platform Hub (SSO-002)', async ({ page }) => {
+    test('can complete OAuth flow from Bingo to Platform Hub (SSO-002)', async ({ page, testUser }) => {
       // Start at Bingo home page
       await page.goto(BINGO_URL);
 
@@ -63,32 +58,14 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.click('button:has-text("Sign in with Beak Gaming")');
 
       // Wait for redirect to Platform Hub
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
+      await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Should be on login page
       await expect(page).toHaveURL(/\/login/);
 
-      // Create test user and login
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // First, signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
-
-      // Now restart OAuth flow
-      await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
-
-      // Login
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      // Login using testUser fixture (no signup needed - E2E testing mode)
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
 
       // Should redirect to OAuth consent page
@@ -99,39 +76,26 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.click('button[aria-label="Allow access"]');
 
       // Should redirect back to Bingo callback
-      await expect(page).toHaveURL(new RegExp(`${BINGO_URL}/auth/callback`), { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}/auth/callback`), { timeout: 10000 });
 
       // Should have authorization code in URL
       await expect(page).toHaveURL(/code=/);
       await expect(page).toHaveURL(/state=/);
 
       // Wait for callback handler to complete and redirect to Bingo home
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
 
       // Verify successful authentication - user should see authenticated state
       // (specific UI depends on Bingo implementation - check for logout or user menu)
       await expect(page.locator('text=Completing Sign In')).not.toBeVisible();
     });
 
-    // SKIPPED: Requires OAuth consent approval and token exchange to establish authenticated session
-    test.skip('can approve OAuth consent and gain access to Bingo (SSO-005)', async ({ page }) => {
-      // Create and login test user
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
-
+    // ENABLED: Testing OAuth consent approval with authenticated user
+    test('can approve OAuth consent and gain access to Bingo (SSO-005)', async ({ page, testUser }) => {
       // Login to Platform Hub first
       await page.goto(`${HUB_URL}/login`);
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL(`${HUB_URL}/dashboard`, { timeout: 10000 });
 
@@ -145,45 +109,32 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Verify consent page shows correct information
       await expect(page.locator('h1:has-text("Authorize Access")')).toBeVisible();
-      await expect(page.locator(`text=${email}`)).toBeVisible();
+      await expect(page.locator(`text=${testUser.email}`)).toBeVisible();
 
       // Approve consent
       await page.click('button[aria-label="Allow access"]');
 
       // Should redirect back to Bingo with authorization code
-      await expect(page).toHaveURL(new RegExp(`${BINGO_URL}/auth/callback`), { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}/auth/callback`), { timeout: 10000 });
       await expect(page).toHaveURL(/code=/);
 
       // Wait for token exchange and redirect to Bingo home
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
 
       // Verify authentication successful
       await expect(page.locator('text=Completing Sign In')).not.toBeVisible();
     });
 
-    // SKIPPED: Requires real server-side session that persists across page reloads
-    test.skip('session persists after OAuth flow completes (SSO-006)', async ({ page }) => {
-      // Complete OAuth flow first
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
-
+    // ENABLED: Testing session persistence after OAuth flow
+    test('session persists after OAuth flow completes (SSO-006)', async ({ page, testUser }) => {
       // Start OAuth flow
       await page.goto(BINGO_URL);
       await page.click('button:has-text("Sign in with Beak Gaming")');
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
+      await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Login
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
 
       // Approve consent
@@ -191,37 +142,24 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.click('button[aria-label="Allow access"]');
 
       // Wait for OAuth flow to complete
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
 
       // Refresh the page
       await page.reload();
 
       // Session should persist - user should still be authenticated
       // (Verify based on Bingo's authenticated UI state)
-      await expect(page).toHaveURL(BINGO_URL);
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`));
     });
   });
 
   test.describe('@high OAuth Consent and Callbacks', () => {
-    // SKIPPED: Requires authenticated Platform Hub session to reach consent page
-    test.skip('OAuth consent page displays correct app info (SSO-003)', async ({ page }) => {
-      // Create and login test user
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
-
-      // Login
+    // ENABLED: Testing OAuth consent page display
+    test('OAuth consent page displays correct app info (SSO-003)', async ({ page, testUser }) => {
+      // Login to Platform Hub first
       await page.goto(`${HUB_URL}/login`);
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL(`${HUB_URL}/dashboard`, { timeout: 10000 });
 
@@ -234,37 +172,24 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Verify consent page elements
       await expect(page.locator('h1:has-text("Authorize Access")')).toBeVisible();
-      await expect(page.locator('text=Beak Bingo')).toBeVisible(); // Client name
-      await expect(page.locator(`text=${email}`)).toBeVisible(); // User email
+      await expect(page.getByRole('heading', { name: 'Beak Bingo' })).toBeVisible(); // Client name
+      await expect(page.locator(`text=${testUser.email}`)).toBeVisible(); // User email
       await expect(page.locator('text=wants to access your Beak Gaming account')).toBeVisible();
 
       // Verify buttons present
       await expect(page.locator('button[aria-label="Allow access"]')).toBeVisible();
       await expect(page.locator('button[aria-label="Deny access"]')).toBeVisible();
 
-      // Verify scopes list
-      await expect(page.locator('text=openid')).toBeVisible();
+      // Verify scopes list (openid scope is displayed as "Identity")
+      await expect(page.locator('text=Identity')).toBeVisible();
     });
 
-    // SKIPPED: Requires OAuth flow and consent page interaction with real server handling
-    test.skip('can deny OAuth consent and return to Bingo (SSO-004)', async ({ page }) => {
-      // Create and login test user
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
-
-      // Login
+    // ENABLED: Testing OAuth consent denial
+    test('can deny OAuth consent and return to Bingo (SSO-004)', async ({ page, testUser }) => {
+      // Login to Platform Hub first
       await page.goto(`${HUB_URL}/login`);
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL(`${HUB_URL}/dashboard`, { timeout: 10000 });
 
@@ -277,36 +202,23 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.click('button[aria-label="Deny access"]');
 
       // Should redirect back to Bingo with error
-      await expect(page).toHaveURL(new RegExp(BINGO_URL), { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
       await expect(page).toHaveURL(/error=access_denied/);
 
       // Verify error is displayed
       await expect(page.locator('text=Authentication Error')).toBeVisible({ timeout: 5000 });
     });
 
-    // SKIPPED: Requires OAuth callback with real authorization code and token exchange
-    test.skip('OAuth callback handles authorization code correctly (SSO-007)', async ({ page }) => {
-      // Complete OAuth flow
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
-
+    // ENABLED: Testing OAuth callback handling
+    test('OAuth callback handles authorization code correctly (SSO-007)', async ({ page, testUser }) => {
       // Start OAuth flow
       await page.goto(BINGO_URL);
       await page.click('button:has-text("Sign in with Beak Gaming")');
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
+      await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Login
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
 
       // Approve consent
@@ -314,7 +226,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.click('button[aria-label="Allow access"]');
 
       // Wait for redirect to callback
-      await expect(page).toHaveURL(new RegExp(`${BINGO_URL}/auth/callback`), { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}/auth/callback`), { timeout: 10000 });
 
       // Verify callback URL has required parameters
       const url = page.url();
@@ -322,92 +234,68 @@ test.describe('Bingo → Platform Hub SSO', () => {
       expect(url).toContain('state=');
 
       // Verify callback handler processes successfully (redirects to home)
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
 
       // Should not show error
       await expect(page.locator('text=Authentication Error')).not.toBeVisible();
     });
 
-    // SKIPPED: PKCE validation happens server-side during token exchange
-    test.skip('PKCE code verifier validation works (SSO-010)', async ({ page }) => {
+    // ENABLED: Testing PKCE validation
+    test('PKCE code verifier validation works (SSO-010)', async ({ page, testUser }) => {
       // This test verifies PKCE by checking that the flow completes successfully
       // The server validates code_challenge on authorization and code_verifier on token exchange
-
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
 
       // Start OAuth flow (client generates code_challenge)
       await page.goto(BINGO_URL);
       await page.click('button:has-text("Sign in with Beak Gaming")');
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
+      await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // The authorization URL should include code_challenge
       // (verified by server accepting the request)
 
       // Login and approve
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL(/\/oauth\/consent/, { timeout: 10000 });
       await page.click('button[aria-label="Allow access"]');
 
       // Callback exchanges code with code_verifier (PKCE validation happens server-side)
-      await expect(page).toHaveURL(new RegExp(`${BINGO_URL}/auth/callback`), { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}/auth/callback`), { timeout: 10000 });
 
       // If PKCE validation succeeds, we redirect to home
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
 
       // If PKCE failed, we'd see an error
       await expect(page.locator('text=Authentication Error')).not.toBeVisible();
     });
 
-    // SKIPPED: State parameter validation requires complete OAuth flow with server-side validation
-    test.skip('OAuth state parameter prevents CSRF (SSO-011)', async ({ page }) => {
+    // ENABLED: Testing state parameter (CSRF protection)
+    test('OAuth state parameter prevents CSRF (SSO-011)', async ({ page, testUser }) => {
       // This test verifies CSRF protection via state parameter
       // The client generates a random state, stores it, and validates it on callback
-
-      const email = generateTestEmail();
-      const password = 'TestPassword123!';
-
-      // Signup
-      await page.goto(`${HUB_URL}/signup`);
-      await page.fill('input[name="name"]', 'Test User');
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
-      await page.fill('input[name="confirmPassword"]', password);
-      await page.click('button[type="submit"]');
-      await expect(page.locator('text=Account Created!')).toBeVisible({ timeout: 10000 });
 
       // Start OAuth flow (client generates state parameter)
       await page.goto(BINGO_URL);
       await page.click('button:has-text("Sign in with Beak Gaming")');
-      await page.waitForURL(/localhost:3002/, { timeout: 10000 });
+      await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Login and approve
-      await page.fill('input[name="email"]', email);
-      await page.fill('input[name="password"]', password);
+      await page.fill('input[name="email"]', testUser.email);
+      await page.fill('input[name="password"]', testUser.password);
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL(/\/oauth\/consent/, { timeout: 10000 });
       await page.click('button[aria-label="Allow access"]');
 
       // Callback validates state parameter matches stored value
-      await expect(page).toHaveURL(new RegExp(`${BINGO_URL}/auth/callback`), { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}/auth/callback`), { timeout: 10000 });
 
       // Verify state parameter is present in callback URL
       const url = page.url();
       expect(url).toContain('state=');
 
       // If state validation succeeds, we redirect to home
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 10000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 10000 });
 
       // If state validation failed, we'd see an error
       await expect(page.locator('text=Authentication Error')).not.toBeVisible();
@@ -424,7 +312,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await expect(page.locator('text=Authentication Error')).toBeVisible({ timeout: 5000 });
 
       // Should redirect to home after delay
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 5000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 5000 });
     });
 
     // ENABLED: Testing error handling for expired authorization code
@@ -439,7 +327,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await expect(page.locator('text=Authentication Error')).toBeVisible({ timeout: 5000 });
 
       // Should redirect to home
-      await expect(page).toHaveURL(BINGO_URL, { timeout: 5000 });
+      await expect(page).toHaveURL(new RegExp(`localhost:${portConfig.bingoPort}`), { timeout: 5000 });
     });
   });
 });

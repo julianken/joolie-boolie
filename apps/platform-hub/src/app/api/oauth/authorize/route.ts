@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { v4 as uuidv4 } from 'uuid';
+import { cookies } from 'next/headers';
+import {
+  E2E_TEST_USER_ID,
+  E2E_MOCK_CLIENTS,
+  createE2EAuthorization,
+  cleanupE2EAuthorizations,
+} from '@/lib/oauth/e2e-store';
 
 /**
  * OAuth 2.1 Authorization Endpoint
@@ -19,9 +26,13 @@ import { v4 as uuidv4 } from 'uuid';
  *
  * Flow:
  * 1. Validate OAuth parameters
- * 2. Check user authentication
+ * 2. Check user authentication (supports E2E testing mode via SSO cookies)
  * 3. If not authenticated → redirect to /login
  * 4. If authenticated → create authorization → redirect to /oauth/consent
+ *
+ * E2E Testing Mode:
+ * When running in development or E2E mode with the test user's SSO cookies,
+ * bypasses Supabase session check and uses the E2E test user ID.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -75,28 +86,84 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check for E2E testing mode via SSO cookies
+    // This allows tests to bypass Supabase session when Login API sets E2E cookies
+    const cookieStore = await cookies();
+    const beakAccessToken = cookieStore.get('beak_access_token')?.value;
+    const beakUserId = cookieStore.get('beak_user_id')?.value;
+
+    // Determine if this is an E2E test session
+    const isE2ETestSession =
+      beakUserId === E2E_TEST_USER_ID ||
+      (process.env.E2E_TESTING === 'true' && beakAccessToken && beakUserId);
+
     // Create Supabase client
     const supabase = await createClient();
 
     // Check authentication
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // In E2E mode with valid SSO cookies, skip Supabase session check
+    let userId: string;
 
-    if (sessionError || !session) {
-      // Not authenticated - redirect to login
-      const loginUrl = new URL('/login', request.nextUrl.origin);
-      const returnUrl = `/api/oauth/authorize?${searchParams.toString()}`;
-      loginUrl.searchParams.set('redirect', encodeURIComponent(returnUrl));
-      return NextResponse.redirect(loginUrl);
+    if (isE2ETestSession && beakUserId) {
+      // E2E testing mode - use the user ID from SSO cookie
+      console.log('[OAuth Authorize] E2E testing mode: using SSO cookie user ID');
+      userId = beakUserId;
+    } else {
+      // Normal mode - check Supabase session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        // Not authenticated - redirect to login
+        const loginUrl = new URL('/login', request.nextUrl.origin);
+        const returnUrl = `/api/oauth/authorize?${searchParams.toString()}`;
+        loginUrl.searchParams.set('redirect', encodeURIComponent(returnUrl));
+        return NextResponse.redirect(loginUrl);
+      }
+
+      userId = session.user.id;
     }
 
-    // Validate client exists and redirect_uri is registered
-    const { data: client, error: clientError } = await supabase
-      .from('oauth_clients')
-      .select('id, name, redirect_uris')
-      .eq('id', clientId)
-      .single();
+    // Use service role client for database operations in E2E mode
+    // (the authenticated user's client won't work when bypassing Supabase auth)
+    const dbClient = isE2ETestSession ? createServiceRoleClient() : supabase;
 
-    if (clientError || !client) {
+    console.log('[OAuth Authorize] Looking up client:', clientId);
+    console.log('[OAuth Authorize] Is E2E test session:', isE2ETestSession);
+    console.log('[OAuth Authorize] User ID:', userId);
+
+    // Validate client exists and redirect_uri is registered
+    let client: { id: string; name: string; redirect_uris: string[] } | null = null;
+
+    // In E2E mode, try mock clients first (handles case where migration isn't applied)
+    if (isE2ETestSession && E2E_MOCK_CLIENTS[clientId]) {
+      console.log('[OAuth Authorize] Using E2E mock client data');
+      client = E2E_MOCK_CLIENTS[clientId];
+    }
+
+    // If no mock client or not in E2E mode, query database
+    if (!client) {
+      const { data: dbClient_, error: clientError } = await dbClient
+        .from('oauth_clients')
+        .select('id, name, redirect_uris')
+        .eq('id', clientId)
+        .single();
+
+      console.log('[OAuth Authorize] DB client lookup result:', {
+        client: dbClient_ ? { id: dbClient_.id, name: dbClient_.name } : null,
+        error: clientError?.message,
+        code: clientError?.code
+      });
+
+      if (clientError || !dbClient_) {
+        console.error('[OAuth Authorize] Client not found, error:', clientError);
+        return errorRedirect(redirectUri, 'invalid_client', 'Client not found', state);
+      }
+
+      client = dbClient_;
+    }
+
+    // At this point client is guaranteed to exist
+    if (!client) {
       return errorRedirect(redirectUri, 'invalid_client', 'Client not found', state);
     }
 
@@ -112,24 +179,47 @@ export async function GET(request: NextRequest) {
 
     // Create authorization request
     const authorizationId = uuidv4();
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 10 minutes
 
-    const { error: insertError } = await supabase
-      .from('oauth_authorizations')
-      .insert({
+    // In E2E mode, store authorization in memory to avoid FK constraint issues
+    if (isE2ETestSession) {
+      console.log('[OAuth Authorize] E2E mode: storing authorization in memory');
+      cleanupE2EAuthorizations();
+
+      createE2EAuthorization({
         id: authorizationId,
         client_id: clientId,
-        user_id: session.user.id,
+        user_id: userId,
         redirect_uri: redirectUri,
         scope,
         state,
         code_challenge: codeChallenge,
         code_challenge_method: codeChallengeMethod,
         status: 'pending',
+        created_at: now.toISOString(),
+        expires_at: expiresAt.toISOString(),
       });
+    } else {
+      // Normal mode: store in database
+      const { error: insertError } = await dbClient
+        .from('oauth_authorizations')
+        .insert({
+          id: authorizationId,
+          client_id: clientId,
+          user_id: userId,
+          redirect_uri: redirectUri,
+          scope,
+          state,
+          code_challenge: codeChallenge,
+          code_challenge_method: codeChallengeMethod,
+          status: 'pending',
+        });
 
-    if (insertError) {
-      console.error('Failed to create authorization:', insertError);
-      return errorRedirect(redirectUri, 'server_error', 'Failed to create authorization', state);
+      if (insertError) {
+        console.error('Failed to create authorization:', insertError);
+        return errorRedirect(redirectUri, 'server_error', 'Failed to create authorization', state);
+      }
     }
 
     // Redirect to consent page

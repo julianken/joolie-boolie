@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 /**
@@ -54,6 +55,33 @@ export async function createClient() {
           // Called from Server Component - ignore
         }
       },
+    },
+  })
+}
+
+/**
+ * Creates a Supabase client with service role access.
+ * Used for E2E testing and admin operations that bypass RLS.
+ *
+ * WARNING: This client has full database access - use with caution!
+ */
+export function createServiceRoleClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !serviceRoleKey) {
+    throw new Error(
+      'Missing Supabase service role configuration.\n' +
+      'Required environment variables:\n' +
+      '- NEXT_PUBLIC_SUPABASE_URL\n' +
+      '- SUPABASE_SERVICE_ROLE_KEY'
+    )
+  }
+
+  return createSupabaseClient(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
     },
   })
 }
