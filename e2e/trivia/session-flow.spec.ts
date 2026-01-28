@@ -51,6 +51,19 @@ test.describe('Trivia Session Flow', () => {
     // Prevent fixture from auto-dismissing modal - these tests need to interact with it
     test.use({ skipModalDismissal: true });
 
+    test.beforeEach(async ({ authenticatedTriviaPage: page }) => {
+      // Clear game-specific state pollution from previous tests, but keep auth state
+      await page.evaluate(() => {
+        const keys = Object.keys(localStorage);
+        for (const key of keys) {
+          // Only clear game-specific keys, preserve auth cookies/tokens
+          if (key.startsWith('trivia_') || key.startsWith('bingo_')) {
+            localStorage.removeItem(key);
+          }
+        }
+      });
+    });
+
     test('should show room setup modal on first visit', async ({ authenticatedTriviaPage: page }) => {
       // Modal should be visible
       await expect(page.getByRole('dialog')).toBeVisible();
