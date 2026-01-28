@@ -20,6 +20,9 @@ export async function POST(request: Request) {
     if (isE2ETesting && e2eToken && e2eUserId) {
       console.log('[Avatar Upload API] E2E testing mode: bypassing Supabase');
 
+      // Add 500ms delay to simulate upload and allow UI to show "Uploading..." state
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       return NextResponse.json({
         success: true,
         url: 'https://example.com/avatar.jpg',

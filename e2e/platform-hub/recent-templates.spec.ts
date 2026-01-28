@@ -49,11 +49,11 @@ test.describe('Recent Templates Display (BEA-325)', () => {
     const triviaEmpty = section.locator('text=No Trivia templates yet');
 
     // At least one empty state should be visible
-    const hasEmptyState = await Promise.race([
-      overallEmpty.isVisible().then((v) => v && 'overall'),
-      bingoEmpty.isVisible().then((v) => v && 'bingo'),
-      triviaEmpty.isVisible().then((v) => v && 'trivia'),
-    ]);
+    const hasEmptyState = await Promise.all([
+      overallEmpty.isVisible(),
+      bingoEmpty.isVisible(),
+      triviaEmpty.isVisible(),
+    ]).then((results) => results.some((v) => v));
 
     expect(hasEmptyState).toBeTruthy();
   });
@@ -199,11 +199,11 @@ test.describe('Recent Templates Display (BEA-325)', () => {
     const emptyState = section.locator(
       'text=No templates yet, text=No Bingo templates yet, text=No Trivia templates yet'
     );
-    const hasEmptyState = await Promise.race([
+    const hasEmptyState = await Promise.all([
       emptyState.nth(0).isVisible(),
       emptyState.nth(1).isVisible(),
       emptyState.nth(2).isVisible(),
-    ]);
+    ]).then((results) => results.some((v) => v));
     expect(hasEmptyState).toBeTruthy();
   });
 
