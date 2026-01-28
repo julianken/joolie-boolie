@@ -123,6 +123,14 @@ test.describe('Bingo Keyboard Shortcuts', () => {
     const countBefore = await page.getByText(/(\d+)\s*called/i).first().textContent();
     const numBefore = parseInt(countBefore?.match(/(\d+)/)?.[1] || '0');
 
+    // Wait for audio processing to complete before undo
+    // Uses data-processing attribute from Roll button
+    await expect(async () => {
+      const rollButton = page.getByRole('button', { name: /roll/i });
+      const processing = await rollButton.getAttribute('data-processing');
+      expect(processing).not.toBe('true');
+    }).toPass({ timeout: 5000 });
+
     // Press U to undo
     await page.keyboard.press('KeyU');
 
