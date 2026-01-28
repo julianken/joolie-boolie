@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+const bingoUrl = process.env.NEXT_PUBLIC_BINGO_URL || 'http://localhost:3000';
+const triviaUrl = process.env.NEXT_PUBLIC_TRIVIA_URL || 'http://localhost:3001';
+
 /**
  * Template with discriminated union for game type
  */
@@ -37,8 +40,8 @@ export type Template = BingoTemplate | TriviaTemplate;
  * Aggregation API: Fetch templates from both Bingo and Trivia games
  *
  * GET /api/templates
- * - Fetches from Bingo API (localhost:3000/api/templates)
- * - Fetches from Trivia API (localhost:3001/api/templates)
+ * - Fetches from Bingo API (NEXT_PUBLIC_BINGO_URL/api/templates)
+ * - Fetches from Trivia API (NEXT_PUBLIC_TRIVIA_URL/api/templates)
  * - Combines results with discriminated union type
  * - Sorts by updated_at descending
  *
@@ -55,12 +58,12 @@ export async function GET(request: Request) {
       : null;
 
     const [bingoResponse, triviaResponse] = await Promise.allSettled([
-      fetch('http://localhost:3000/api/templates', {
+      fetch(`${bingoUrl}/api/templates`, {
         headers: {
           'Content-Type': 'application/json',
         },
       }),
-      fetch('http://localhost:3001/api/templates', {
+      fetch(`${triviaUrl}/api/templates`, {
         headers: {
           'Content-Type': 'application/json',
         },
