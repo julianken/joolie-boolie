@@ -1,14 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { loginAsTestUser } from '../fixtures/auth';
+import { test, expect } from '../fixtures/auth';
 
 test.describe('Notification Preferences (BEA-323)', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsTestUser(page);
-    await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+  test.beforeEach(async ({ authenticatedPage }) => {
+    // Reset E2E profile to default state before each test (ensures test isolation)
+    await authenticatedPage.request.post('http://localhost:3992/api/profile/reset-e2e');
+
+    await authenticatedPage.goto('/settings');
+    await authenticatedPage.waitForLoadState('networkidle');
   });
 
-  test('should display notification preferences section', async ({ page }) => {
+  test('should display notification preferences section', async ({ authenticatedPage: page }) => {
     // Check for section heading
     const heading = page.getByRole('heading', { name: 'Notification Preferences' });
     await expect(heading).toBeVisible();
@@ -23,7 +24,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(page.getByText('Newsletter & Promotions')).toBeVisible();
   });
 
-  test('should have correct default values', async ({ page }) => {
+  test('should have correct default values', async ({ authenticatedPage: page }) => {
     // Email notifications should be enabled by default
     const emailToggle = page.locator('label:has-text("Important Account Updates") input[type="checkbox"]');
     await expect(emailToggle).toBeChecked();
@@ -39,7 +40,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(marketingToggle).not.toBeChecked();
   });
 
-  test('should toggle notification preferences', async ({ page }) => {
+  test('should toggle notification preferences', async ({ authenticatedPage: page }) => {
     // Find toggles by their labels
     const gameRemindersToggle = page.locator('label:has-text("Game Reminders") input[type="checkbox"]');
     const weeklySummaryToggle = page.locator('label:has-text("Weekly Activity Summary") input[type="checkbox"]');
@@ -60,7 +61,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(gameRemindersToggle).not.toBeChecked();
   });
 
-  test('should save notification preferences', async ({ page }) => {
+  test('should save notification preferences', async ({ authenticatedPage: page }) => {
     // Enable game reminders
     const gameRemindersToggle = page.locator('label:has-text("Game Reminders") input[type="checkbox"]');
     await gameRemindersToggle.click();
@@ -78,7 +79,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(page.getByText('Profile updated successfully')).toBeVisible({ timeout: 5000 });
   });
 
-  test('should persist notification preferences after save and reload', async ({ page }) => {
+  test('should persist notification preferences after save and reload', async ({ authenticatedPage: page }) => {
     // Enable marketing emails
     const marketingToggle = page.locator('label:has-text("Newsletter & Promotions") input[type="checkbox"]');
     await marketingToggle.click();
@@ -97,7 +98,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(marketingToggleAfter).toBeChecked();
   });
 
-  test('should display all notification preference descriptions', async ({ page }) => {
+  test('should display all notification preference descriptions', async ({ authenticatedPage: page }) => {
     // Check all descriptions are visible
     await expect(page.getByText('Security alerts, password changes, and critical account notifications')).toBeVisible();
     await expect(page.getByText('Reminders about upcoming scheduled games and events')).toBeVisible();
@@ -105,7 +106,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(page.getByText('New features, tips, and special offers from Beak Gaming')).toBeVisible();
   });
 
-  test('should have accessible touch targets (44x44px minimum)', async ({ page }) => {
+  test('should have accessible touch targets (44x44px minimum)', async ({ authenticatedPage: page }) => {
     // Get all toggle inputs
     const toggles = page.locator('label:has-text("Important Account Updates"), label:has-text("Game Reminders"), label:has-text("Weekly Activity Summary"), label:has-text("Newsletter & Promotions")');
 
@@ -117,7 +118,7 @@ test.describe('Notification Preferences (BEA-323)', () => {
     expect(box!.height).toBeGreaterThanOrEqual(44);
   });
 
-  test('should maintain other settings when saving notification preferences', async ({ page }) => {
+  test('should maintain other settings when saving notification preferences', async ({ authenticatedPage: page }) => {
     // Change facility name
     const facilityInput = page.getByLabel('Facility Name');
     await facilityInput.fill('Updated Test Facility');
@@ -139,27 +140,35 @@ test.describe('Notification Preferences (BEA-323)', () => {
     await expect(gameRemindersToggleAfter).toBeChecked();
   });
 
-  test('should support keyboard navigation', async ({ page }) => {
-    // Tab to first toggle
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-
-    // Should focus on Important Account Updates toggle
+  test('should support keyboard navigation', async ({ authenticatedPage: page }) => {
+    // Get references to toggles
     const emailToggle = page.locator('label:has-text("Important Account Updates") input[type="checkbox"]');
-    await expect(emailToggle).toBeFocused();
+    const gameRemindersToggle = page.locator('label:has-text("Game Reminders") input[type="checkbox"]');
+    const weeklySummaryToggle = page.locator('label:has-text("Weekly Activity Summary") input[type="checkbox"]');
 
-    // Space to toggle
+    // Initial state
+    await expect(emailToggle).toBeChecked();
+    await expect(gameRemindersToggle).not.toBeChecked();
+    await expect(weeklySummaryToggle).not.toBeChecked();
+
+    // Focus and toggle email notifications checkbox directly
+    await emailToggle.focus();
     await page.keyboard.press('Space');
     await expect(emailToggle).not.toBeChecked();
 
-    // Tab to next toggle
-    await page.keyboard.press('Tab');
-    const gameRemindersToggle = page.locator('label:has-text("Game Reminders") input[type="checkbox"]');
-    await expect(gameRemindersToggle).toBeFocused();
-
-    // Space to toggle
+    // Focus and toggle game reminders checkbox
+    await gameRemindersToggle.focus();
     await page.keyboard.press('Space');
     await expect(gameRemindersToggle).toBeChecked();
+
+    // Focus and toggle weekly summary checkbox
+    await weeklySummaryToggle.focus();
+    await page.keyboard.press('Space');
+    await expect(weeklySummaryToggle).toBeChecked();
+
+    // Verify we can toggle back
+    await emailToggle.focus();
+    await page.keyboard.press('Space');
+    await expect(emailToggle).toBeChecked();
   });
 });

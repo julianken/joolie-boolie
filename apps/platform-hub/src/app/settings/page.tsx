@@ -38,35 +38,22 @@ export default function SettingsPage() {
     }
   }, [user, authLoading, router]);
 
-  // Load user data
+  // Load user data and profile from API
   useEffect(() => {
-    // Check for E2E mode
-    const hasE2ECookies = document.cookie.includes('beak_user_id=');
-
-    if (user) {
-      setEmail(user.email || '');
-      setFacilityName(user.user_metadata?.facility_name || '');
-    } else if (hasE2ECookies) {
-      // E2E mode: use test user data
-      setEmail('e2e-test@beak-gaming.test');
-      setFacilityName('E2E Test Facility');
-    }
-  }, [user]);
-
-  // Load notification preferences
-  useEffect(() => {
-    const loadPreferences = async () => {
+    const loadProfile = async () => {
       try {
         const response = await fetch('/api/profile');
         if (response.ok) {
           const data = await response.json();
+          setEmail(data.email || '');
+          setFacilityName(data.facility_name || '');
           setEmailNotificationsEnabled(data.email_notifications_enabled ?? true);
           setGameRemindersEnabled(data.game_reminders_enabled ?? false);
           setWeeklySummaryEnabled(data.weekly_summary_enabled ?? false);
           setMarketingEmailsEnabled(data.marketing_emails_enabled ?? false);
         }
       } catch (error) {
-        console.error('Failed to load notification preferences:', error);
+        console.error('Failed to load profile:', error);
       }
     };
 
@@ -74,9 +61,10 @@ export default function SettingsPage() {
     const hasE2ECookies = document.cookie.includes('beak_user_id=');
 
     if (user || hasE2ECookies) {
-      loadPreferences();
+      loadProfile();
     }
   }, [user]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

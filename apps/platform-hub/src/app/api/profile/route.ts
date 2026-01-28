@@ -1,49 +1,57 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { getE2EProfile } from '@/lib/e2e-profile-store';
 
+/**
+ * GET /api/profile
+ *
+ * Retrieves the current user's profile information including avatar_url.
+ *
+ * E2E Testing:
+ * - Detects E2E mode via cookies: beak_access_token, beak_user_id
+ * - Returns profile data from in-memory store in E2E mode
+ *
+ * @returns {Object} Profile data with avatar_url, facility_name, email, notification preferences
+ */
 export async function GET() {
+  // Check for E2E auth via custom SSO cookie (set by /api/auth/login in E2E mode)
+  const cookieStore = await cookies();
+  const e2eToken = cookieStore.get('beak_access_token');
+  const e2eUserId = cookieStore.get('beak_user_id');
+
+  // E2E Testing Mode: Use in-memory profile store
+  const isE2ETesting =
+    process.env.E2E_TESTING === 'true' ||
+    (process.env.NODE_ENV !== 'production' && e2eToken && e2eUserId);
+
+  if (isE2ETesting && e2eToken && e2eUserId) {
+    const profile = getE2EProfile(e2eUserId.value);
+    return NextResponse.json({
+      success: true,
+      ...profile,
+    });
+  }
+
   try {
-    // Check for E2E auth via custom SSO cookie
-    const cookieStore = await cookies();
-    const e2eToken = cookieStore.get('beak_access_token');
-    const e2eUserId = cookieStore.get('beak_user_id');
-
-    // E2E Testing Mode
-    const isE2ETesting =
-      process.env.E2E_TESTING === 'true' ||
-      (process.env.NODE_ENV !== 'production' && e2eToken && e2eUserId);
-
-    if (isE2ETesting && e2eToken && e2eUserId) {
-      console.log('[Profile API] E2E testing mode: returning mock data');
-
-      return NextResponse.json({
-        id: e2eUserId.value,
-        email: 'e2e-test@beak-gaming.test',
-        facility_name: 'E2E Test Facility',
-        email_notifications_enabled: true,
-        game_reminders_enabled: false,
-        weekly_summary_enabled: false,
-        marketing_emails_enabled: false,
-      });
-    }
-
-    // Normal flow: Check Supabase authentication
+    // Get authenticated user
     const supabase = await createClient();
-
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
     }
 
-    // Get profile from database
+    // Fetch profile from database
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('avatar_url, facility_name, email, email_notifications_enabled, game_reminders_enabled, weekly_summary_enabled, marketing_emails_enabled')
       .eq('id', user.id)
       .single();
 
@@ -56,12 +64,17 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      id: user.id,
-      email: user.email,
-      ...profile,
+      success: true,
+      avatar_url: profile?.avatar_url || null,
+      facility_name: profile?.facility_name || user.user_metadata?.facility_name || '',
+      email: profile?.email || user.email || '',
+      email_notifications_enabled: profile?.email_notifications_enabled ?? true,
+      game_reminders_enabled: profile?.game_reminders_enabled ?? false,
+      weekly_summary_enabled: profile?.weekly_summary_enabled ?? false,
+      marketing_emails_enabled: profile?.marketing_emails_enabled ?? false,
     });
   } catch (error) {
-    console.error('Profile fetch error:', error);
+    console.error('Profile API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
