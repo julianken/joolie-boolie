@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+const bingoUrl = process.env.NEXT_PUBLIC_BINGO_URL || 'http://localhost:3000';
+const triviaUrl = process.env.NEXT_PUBLIC_TRIVIA_URL || 'http://localhost:3001';
+
 /**
  * Template with discriminated union for game type
  */
@@ -37,20 +40,30 @@ export type Template = BingoTemplate | TriviaTemplate;
  * Aggregation API: Fetch templates from both Bingo and Trivia games
  *
  * GET /api/templates
- * - Fetches from Bingo API (localhost:3000/api/templates)
- * - Fetches from Trivia API (localhost:3001/api/templates)
+ * - Fetches from Bingo API (NEXT_PUBLIC_BINGO_URL/api/templates)
+ * - Fetches from Trivia API (NEXT_PUBLIC_TRIVIA_URL/api/templates)
  * - Combines results with discriminated union type
  * - Sorts by updated_at descending
+ *
+ * Query Parameters:
+ * - recent=true: Return only recent templates (3 most recent per game)
+ * - limit=N: Maximum total templates to return (default: no limit)
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const recent = searchParams.get('recent') === 'true';
+    const limit = searchParams.get('limit')
+      ? parseInt(searchParams.get('limit')!, 10)
+      : null;
+
     const [bingoResponse, triviaResponse] = await Promise.allSettled([
-      fetch('http://localhost:3000/api/templates', {
+      fetch(`${bingoUrl}/api/templates`, {
         headers: {
           'Content-Type': 'application/json',
         },
       }),
-      fetch('http://localhost:3001/api/templates', {
+      fetch(`${triviaUrl}/api/templates`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -106,8 +119,28 @@ export async function GET() {
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     );
 
+    // Apply recent filter if requested
+    let filteredTemplates = templates;
+    if (recent) {
+      const bingoTemplates = templates
+        .filter((t) => t.game === 'bingo')
+        .slice(0, 3);
+      const triviaTemplates = templates
+        .filter((t) => t.game === 'trivia')
+        .slice(0, 3);
+      filteredTemplates = [...bingoTemplates, ...triviaTemplates].sort(
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
+    }
+
+    // Apply limit if provided
+    if (limit && limit > 0) {
+      filteredTemplates = filteredTemplates.slice(0, limit);
+    }
+
     return NextResponse.json({
-      templates,
+      templates: filteredTemplates,
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
