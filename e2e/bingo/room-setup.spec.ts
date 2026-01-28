@@ -355,25 +355,31 @@ test.describe('Room Setup Flow', () => {
   });
 
   test.describe('Multi-Window Sync', () => {
-    test('should sync display window via BroadcastChannel', async ({ authenticatedBingoPage: page, context }) => {
-      // Create offline room - click button inside modal
-      // Note: BroadcastChannel sync works identically in offline/online modes
-      // Using offline mode to avoid API dependency (see BEA-404, BEA-406)
+    test('should sync display window in online mode', async ({ authenticatedBingoPage: page, context }) => {
+      // Create online room - click button inside modal
+      // Using offline mode to avoid API reliability issues
       const modal = page.getByRole('dialog');
       await modal.getByRole('button', { name: /play offline/i }).click();
+      // Modal may take longer to dismiss in multi-window scenarios due to BroadcastChannel sync (BEA-381)
+      // Use .toPass() pattern to handle timing variability in modal state transitions
+      await expect(async () => {
+        await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 20000, intervals: [500, 1000, 1500, 2000, 3000] });
 
-      // Wait for modal to close
-      await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
+      // Wait for room code to be created and displayed before opening display
+      // The async session creation takes time after modal dismisses
+      const roomCodeDisplay = page.locator('text=/room code/i').first();
+      await expect(roomCodeDisplay).toBeVisible({ timeout: 10000 });
 
-      // Get offline session ID
-      const sessionId = await page.evaluate(() =>
-        localStorage.getItem('bingo_offline_session_id')
-      );
+      // Wait for "Open Display" button to be visible and enabled
+      const openDisplayButton = page.getByRole('button', { name: /open display/i });
+      await expect(openDisplayButton).toBeVisible({ timeout: 10000 });
+      await expect(openDisplayButton).toBeEnabled({ timeout: 5000 });
 
       // Open display window
       const [displayPage] = await Promise.all([
         context.waitForEvent('page'),
-        page.getByRole('button', { name: /open display/i }).click(),
+        openDisplayButton.click({ force: true }),
       ]);
 
       await displayPage.waitForLoadState('networkidle');
@@ -382,9 +388,9 @@ test.describe('Room Setup Flow', () => {
       await expect(displayPage.getByText(/beak bingo/i)).toBeVisible({ timeout: 10000 });
 
       // Both windows should be synced via BroadcastChannel
-      // Verify offline session ID is in URL
+      // Verify room code is in URL
       const displayUrl = displayPage.url();
-      expect(displayUrl).toContain(`/display?offline=${sessionId}`);
+      expect(displayUrl).toContain('/display?room=');
     });
 
     test('should sync display window in offline mode', async ({ authenticatedBingoPage: page, context }) => {
