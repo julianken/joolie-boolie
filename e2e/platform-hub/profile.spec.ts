@@ -5,12 +5,10 @@
  * The auth fixture handles login and sets required SSO cookies (beak_access_token,
  * beak_user_id) for Platform Hub protected routes.
  *
- * IMPORTANT: The authenticated tests are currently SKIPPED because the settings page
- * (/settings) uses the useAuth() hook which does not recognize E2E SSO cookies.
- * The dashboard page works because its layout.tsx checks for beak_access_token cookie
- * before calling Supabase auth. The settings page needs similar E2E support.
+ * The settings page layout.tsx now checks for E2E SSO cookies before calling
+ * Supabase auth, enabling these tests to run in E2E mode.
  *
- * TODO (BEA-XXX): Add E2E authentication support to settings page
+ * BEA-397: E2E authentication support added to settings page layout
  */
 
 import { test, expect } from '../fixtures/auth';
@@ -19,7 +17,7 @@ import { portConfig } from '../../playwright.config';
 // Dynamic URL based on port configuration (supports worktree isolation)
 const HUB_URL = `http://localhost:${portConfig.hubPort}`;
 
-test.describe.skip('Profile & Settings Management @high', () => {
+test.describe('Profile & Settings Management @high', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
     // Navigate to settings page - user is already authenticated via fixture
     await authenticatedPage.goto(`${HUB_URL}/settings`);
