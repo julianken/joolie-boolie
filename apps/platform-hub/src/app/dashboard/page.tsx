@@ -5,15 +5,42 @@ import {
   WelcomeHeader,
   DashboardGameCard,
   RecentSessions,
+  RecentTemplates,
   UserPreferences,
 } from '@/components/dashboard';
 import type { GameSession } from '@/components/dashboard/RecentSessions';
+import type { Template } from '@/app/api/templates/route';
 
 // Force dynamic rendering to avoid build-time Supabase initialization
 export const dynamic = 'force-dynamic';
 
 // E2E Testing constants (must match login API route)
 const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
+
+/**
+ * Fetch recent templates from aggregation API
+ */
+async function fetchRecentTemplates(): Promise<Template[]> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002'}/api/templates?recent=true`,
+      {
+        cache: 'no-store',
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to fetch templates:', response.statusText);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.templates || [];
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    return [];
+  }
+}
 
 /**
  * Fetch recent game sessions for a user from the database
@@ -167,6 +194,7 @@ export default async function DashboardPage() {
     const gameStats = calculateGameStats(recentSessions);
     const games = getGamesConfig(gameStats);
     const userName = E2E_TEST_EMAIL.split('@')[0];
+    const recentTemplates = await fetchRecentTemplates();
 
     return (
       <main className="flex-1 py-8 md:py-12 px-4 md:px-8">
@@ -194,6 +222,7 @@ export default async function DashboardPage() {
               ))}
             </div>
           </section>
+          <RecentTemplates templates={recentTemplates} />
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
             <RecentSessions sessions={recentSessions} maxSessions={4} />
             <UserPreferences />
@@ -219,6 +248,7 @@ export default async function DashboardPage() {
   const recentSessions = await fetchRecentSessions(user.id);
   const gameStats = calculateGameStats(recentSessions);
   const games = getGamesConfig(gameStats);
+  const recentTemplates = await fetchRecentTemplates();
 
   // Extract user name from metadata or email
   const userName =
@@ -255,6 +285,9 @@ export default async function DashboardPage() {
             ))}
           </div>
         </section>
+
+        {/* Recent Templates */}
+        <RecentTemplates templates={recentTemplates} />
 
         {/* Two Column Layout for Sessions and Preferences */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
