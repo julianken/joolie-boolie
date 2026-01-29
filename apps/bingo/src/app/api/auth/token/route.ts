@@ -7,7 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const PLATFORM_HUB_URL =
+  process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002';
 const CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID!;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI!;
 
@@ -21,11 +22,6 @@ interface TokenResponse {
   token_type: string;
   expires_in: number;
   refresh_token: string;
-  user: {
-    id: string;
-    email?: string;
-    [key: string]: unknown;
-  };
 }
 
 export async function POST(request: NextRequest) {
@@ -41,8 +37,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Exchange authorization code for tokens
-    const tokenUrl = `${SUPABASE_URL}/auth/v1/token?grant_type=authorization_code`;
+    // Exchange authorization code for tokens via Platform Hub OAuth server
+    const tokenUrl = `${PLATFORM_HUB_URL}/api/oauth/token`;
     const tokenResponse = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
@@ -67,6 +63,27 @@ export async function POST(request: NextRequest) {
     }
 
     const tokens: TokenResponse = await tokenResponse.json();
+
+    // Extract user info from the access token.
+    // E2E tokens are opaque (prefixed "e2e-"), real tokens are JWTs.
+    let userId = 'unknown';
+    let userEmail: string | undefined;
+
+    if (tokens.access_token.startsWith('e2e-')) {
+      // E2E mode: extract user ID from the token pattern or use placeholder
+      userId = 'e2e-user';
+    } else {
+      // Real JWT: decode payload (second segment, base64url)
+      try {
+        const payload = JSON.parse(
+          Buffer.from(tokens.access_token.split('.')[1], 'base64url').toString()
+        );
+        userId = payload.sub || 'unknown';
+        userEmail = payload.email;
+      } catch {
+        console.error('Failed to decode access token JWT');
+      }
+    }
 
     // Set httpOnly cookies for secure token storage
     const cookieStore = await cookies();
@@ -94,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     // User ID cookie (for client-side access)
-    cookieStore.set('beak_user_id', tokens.user.id, {
+    cookieStore.set('beak_user_id', userId, {
       httpOnly: false, // Allow client-side access
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
@@ -106,8 +123,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       user: {
-        id: tokens.user.id,
-        email: tokens.user.email,
+        id: userId,
+        email: userEmail,
       },
     });
   } catch (error) {
