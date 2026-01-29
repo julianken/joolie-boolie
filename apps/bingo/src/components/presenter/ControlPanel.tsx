@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from "@beak-gaming/ui";
 import { GameStatus } from '@/types';
-import { SaveTemplateModal } from './SaveTemplateModal';
+import { SavePresetModal } from './SavePresetModal';
 
 export interface ControlPanelProps {
   isProcessing?: boolean;
@@ -36,7 +36,7 @@ export function ControlPanel({
   onReset,
   onUndo,
 }: ControlPanelProps) {
-  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [showSavePresetModal, setShowSavePresetModal] = useState(false);
 
   return (
     <>
@@ -102,15 +102,15 @@ export function ControlPanel({
         </Button>
       </div>
 
-      {/* Save as Template button */}
+      {/* Save as Preset button */}
       <Button
         variant="secondary"
         size="md"
-        onClick={() => setShowSaveTemplateModal(true)}
+        onClick={() => setShowSavePresetModal(true)}
         className="w-full"
-        aria-label="Save current settings as a template"
+        aria-label="Save current settings as a preset"
       >
-        Save as Template
+        Save as Preset
       </Button>
 
       {/* Status indicator */}
@@ -129,10 +129,10 @@ export function ControlPanel({
       </div>
     </div>
 
-    {/* Save Template Modal */}
-    <SaveTemplateModal
-      isOpen={showSaveTemplateModal}
-      onClose={() => setShowSaveTemplateModal(false)}
+    {/* Save Preset Modal */}
+    <SavePresetModal
+      isOpen={showSavePresetModal}
+      onClose={() => setShowSavePresetModal(false)}
     />
   </>
   );

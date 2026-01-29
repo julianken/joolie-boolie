@@ -3,7 +3,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { Modal, Button } from '@beak-gaming/ui';
 import { Input } from '../ui/Input';
-import { TemplateSelector } from './TemplateSelector';
+import { PresetSelector } from './PresetSelector';
 import { useGameStore } from '@/stores/game-store';
 import { useAudioStore } from '@/stores/audio-store';
 import { patternRegistry } from '@/lib/game/patterns';
@@ -33,60 +33,60 @@ export function RoomSetupModal({
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [roomCodeError, setRoomCodeError] = useState('');
   const [pinError, setPinError] = useState('');
-  const [hasLoadedDefaultTemplate, setHasLoadedDefaultTemplate] = useState(false);
+  const [hasLoadedDefaultPreset, setHasLoadedDefaultPreset] = useState(false);
 
-  // Get store actions for auto-loading default template
+  // Get store actions for auto-loading default preset
   const setPattern = useGameStore((state) => state.setPattern);
   const setAutoCallEnabled = useGameStore((state) => state.toggleAutoCall);
   const setAutoCallSpeed = useGameStore((state) => state.setAutoCallSpeed);
   const gameStore = useGameStore();
   const setVoicePack = useAudioStore((state) => state.setVoicePack);
 
-  // Auto-load default template when modal opens
+  // Auto-load default preset when modal opens
   useEffect(() => {
-    if (isOpen && !hasLoadedDefaultTemplate) {
-      const loadDefaultTemplate = async () => {
+    if (isOpen && !hasLoadedDefaultPreset) {
+      const loadDefaultPreset = async () => {
         try {
-          const response = await fetch('/api/templates');
+          const response = await fetch('/api/presets');
           if (!response || !response.ok) {
             // Mark as loaded even on failure to prevent retries
-            setHasLoadedDefaultTemplate(true);
+            setHasLoadedDefaultPreset(true);
             return; // Silently fail - not critical
           }
 
           const data = await response.json();
-          const defaultTemplate = data.templates?.find((t: { is_default: boolean }) => t.is_default);
+          const defaultPreset = data.presets?.find((p: { is_default: boolean }) => p.is_default);
 
-          if (defaultTemplate) {
+          if (defaultPreset) {
             // Load pattern
-            const pattern = patternRegistry.get(defaultTemplate.pattern_id);
+            const pattern = patternRegistry.get(defaultPreset.pattern_id);
             if (pattern) {
               setPattern(pattern);
             }
 
             // Load auto-call settings
             const currentAutoCall = gameStore.autoCallEnabled;
-            if (defaultTemplate.auto_call_enabled !== currentAutoCall) {
+            if (defaultPreset.auto_call_enabled !== currentAutoCall) {
               setAutoCallEnabled();
             }
-            setAutoCallSpeed(defaultTemplate.auto_call_interval);
+            setAutoCallSpeed(defaultPreset.auto_call_interval);
 
             // Load voice pack
-            setVoicePack(defaultTemplate.voice_pack as VoicePackId);
+            setVoicePack(defaultPreset.voice_pack as VoicePackId);
           }
 
-          setHasLoadedDefaultTemplate(true);
+          setHasLoadedDefaultPreset(true);
         } catch (err) {
-          console.error('Error loading default template:', err);
+          console.error('Error loading default preset:', err);
           // Mark as loaded even on error to prevent retries
-          setHasLoadedDefaultTemplate(true);
+          setHasLoadedDefaultPreset(true);
           // Silently fail - not critical to modal functionality
         }
       };
 
-      loadDefaultTemplate();
+      loadDefaultPreset();
     }
-  }, [isOpen, hasLoadedDefaultTemplate, setPattern, setAutoCallEnabled, setAutoCallSpeed, setVoicePack, gameStore.autoCallEnabled]);
+  }, [isOpen, hasLoadedDefaultPreset, setPattern, setAutoCallEnabled, setAutoCallSpeed, setVoicePack, gameStore.autoCallEnabled]);
 
   // Reset state when modal closes
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -435,8 +435,8 @@ export function RoomSetupModal({
         {/* Divider */}
         <div className="border-t border-border" />
 
-        {/* Template Selector */}
-        <TemplateSelector disabled={isLoading} />
+        {/* Preset Selector */}
+        <PresetSelector disabled={isLoading} />
       </div>
     </Modal>
   );
