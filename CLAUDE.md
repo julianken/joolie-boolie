@@ -66,96 +66,14 @@ Skill(subagent-workflow)
 
 **GitHub Actions are DISABLED to avoid billing costs. Local E2E validation is MANDATORY.**
 
-### Quick E2E Test Commands
-
 ```bash
-# RECOMMENDED: Production build testing (stable, prevents server crashes)
-pnpm test:e2e                           # Build apps + run all tests
-pnpm test:e2e e2e/bingo                 # Build + run bingo tests only
-pnpm test:e2e --grep @critical          # Build + run critical tests
-
-# ALTERNATIVE: Dev server testing (for rapid iteration during development)
-# WARNING: Dev servers may crash under heavy load (6 parallel workers)
-pnpm dev                                # Start dev servers
-pnpm test:e2e:dev                       # Run tests against dev servers
-
-# View test results
-pnpm test:e2e:summary                   # Show pass/fail counts
+pnpm test:e2e              # Build apps + run all tests
+pnpm test:e2e:summary      # Show pass/fail counts (ALWAYS check this)
 ```
-
-### E2E Test Checklist (MANDATORY)
-
-Before marking ANY task complete or creating a PR:
-
-- [ ] `.env.local` files exist in ALL apps (bingo, trivia, platform-hub)
-- [ ] SESSION_TOKEN_SECRET is valid 64-char hex (generate with `openssl rand -hex 32`)
-- [ ] E2E tests pass: `pnpm test:e2e` (production build mode)
-- [ ] NO test failures (0 failures required - verify with `pnpm test:e2e:summary`)
-- [ ] Test screenshots reviewed (check `test-results/` directory)
 
 **If E2E tests fail: DO NOT COMMIT. Fix the code first.**
 
-**Why production builds?** Dev servers crash under parallel test load (BEA-407). Production builds are 50-70% more memory efficient and stable.
-
-### Port Isolation for Worktrees
-
-**When running E2E tests in a git worktree (parallel development), you MUST use port isolation:**
-
-```bash
-# In your worktree directory
-./scripts/setup-worktree-e2e.sh    # Creates .env.e2e with isolated ports
-./start-e2e-servers.sh             # Starts servers on isolated ports
-pnpm test:e2e                       # Playwright auto-detects ports
-```
-
-**Why:** Default ports 3000-3002 conflict with main repo dev servers.
-
-**See:** `docs/E2E_TESTING_GUIDE.md` section "Parallel Task Execution with Port Isolation" for details.
-
-### E2E Test Output Format
-
-**CRITICAL:** Always check the JSON summary after running tests.
-
-```bash
-# Run tests (generates test-results/results.json)
-$ pnpm test:e2e
-
-# View clear summary with failure counts
-$ pnpm test:e2e:summary
-
-Test Results Summary:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  155 failed      ← ALWAYS clearly visible
-  45 skipped
-  138 passed
-  338 total
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**Why this matters:**
-- Terminal output from `pnpm test:e2e` may not show failure counts (background runs, TTY detection issues)
-- The JSON reporter (`test-results/results.json`) has complete, structured results
-- The summary script (`pnpm test:e2e:summary`) parses JSON and shows counts clearly
-- **NEVER claim "no failures" without running `pnpm test:e2e:summary`**
-- Exit code 1 = failures exist (even if terminal output doesn't show count)
-
-### Common E2E Issues
-
-| Issue | Fix |
-|-------|-----|
-| "Missing environment variables" | Create `.env` in project root: `cp apps/bingo/.env.local .env` |
-| "Could not connect to the server" errors | Use production builds: `pnpm test:e2e` (default mode, auto-builds apps) |
-| Tests timeout at login page | Check server logs: `tail -f /tmp/e2e-*.log` |
-| "SESSION_TOKEN_SECRET must contain only hexadecimal" | Generate valid secret: `openssl rand -hex 32` and update ALL `.env.local` files |
-| Build fails before tests | Check dependencies: `pnpm install` and verify `.env.local` files exist |
-
-### Integration with Parallel Workflow
-
-**Implementer agents**: Run E2E tests BEFORE marking task complete
-**Spec reviewers**: Verify E2E tests pass as part of review
-**Quality reviewers**: Run full E2E suite before approval
-
-**Full E2E Testing Guide:** `docs/E2E_TESTING_GUIDE.md`
+See [docs/E2E_TESTING_GUIDE.md](docs/E2E_TESTING_GUIDE.md) for full details: commands, checklist, port isolation, troubleshooting, and workflow integration.
 
 ---
 
@@ -242,24 +160,7 @@ Linear issues use the format: `BEA-###` (e.g., BEA-319, BEA-320)
 
 ## Monorepo Structure
 
-```
-beak-gaming-platform/
-├── apps/
-│   ├── bingo/           # Beak Bingo - 75-ball bingo game (port 3000)
-│   ├── trivia/          # Trivia Night - Team trivia game (port 3001)
-│   └── platform-hub/    # Central hub - auth, dashboard, game selector (port 3002)
-├── packages/
-│   ├── sync/            # Dual-screen synchronization (BroadcastChannel)
-│   ├── ui/              # Shared UI components (Button, Modal, Toggle, Input, etc.)
-│   ├── theme/           # Senior-friendly design tokens and CSS
-│   ├── auth/            # Supabase authentication wrappers (30 exports)
-│   ├── game-engine/     # Abstract game state machine
-│   ├── database/        # Supabase database utilities (212 exports)
-│   ├── types/           # Shared TypeScript type definitions
-│   ├── error-tracking/  # Error logging and tracking utilities
-│   └── testing/         # Shared test utilities and mocks
-└── supabase/            # Database migrations and functions
-```
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full monorepo tree, BFF pattern, dual-screen system, and game engine pattern.
 
 ## Tech Stack
 
@@ -368,110 +269,13 @@ git commit --no-verify -m "WIP: bypass hooks for work-in-progress"
 
 ## Architecture
 
-### BFF Pattern
-Apps never talk directly to Supabase. All requests go through Next.js API routes (`app/api/`).
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for BFF pattern, dual-screen system, game engine pattern, and app structure.
 
-### Dual-Screen System
-Each game app has two views synced via BroadcastChannel API:
-- **Presenter window** (`/play`): Game controls for the host
-- **Audience window** (`/display`): Large display optimized for projectors
+See [docs/APP_STRUCTURE.md](docs/APP_STRUCTURE.md) for canonical `lib/` layout with common vs app-specific directories.
 
-The `BroadcastSync` class in `lib/sync/broadcast.ts` handles same-device window communication with message types: `GAME_STATE_UPDATE`, `BALL_CALLED`, `GAME_RESET`, `PATTERN_CHANGED`, `REQUEST_SYNC`.
+## Middleware Patterns
 
-### Game Engine Pattern
-Pure function-based state management. The engine (`lib/game/engine.ts`) contains pure functions that transform `GameState`. The Zustand store wraps these functions to provide React integration.
-
-```
-GameState (immutable) → engine functions → new GameState
-                              ↓
-                    Zustand store (reactive)
-                              ↓
-                    React components via hooks
-```
-
-### App Structure (each app follows this pattern)
-```
-src/
-├── app/              # Next.js App Router pages
-│   ├── api/          # BFF routes
-│   ├── play/         # Presenter view
-│   └── display/      # Audience view
-├── components/
-│   ├── presenter/    # Host control components
-│   ├── audience/     # Display components
-│   └── ui/           # App-specific UI
-├── lib/
-│   ├── game/         # Game engine, patterns, state machine
-│   └── sync/         # BroadcastChannel wrapper
-├── stores/           # Zustand stores
-├── hooks/            # Custom React hooks
-└── types/            # TypeScript types
-```
-
-### Next.js Middleware Best Practices
-
-**CRITICAL:** Middleware files execute during module compilation, BEFORE the Next.js server is ready. Never make network requests or perform async operations at module-load time.
-
-#### ❌ NEVER: Module-Load-Time Network Requests
-
-```typescript
-// ❌ WRONG - Causes server to hang indefinitely
-import { createRemoteJWKSet } from 'jose';
-
-const JWKS = createRemoteJWKSet(new URL(`${SUPABASE_URL}/auth/v1/.well-known/jwks.json`));
-// Network request executes during compilation → infinite retry loop → server hangs
-
-export async function middleware(request: NextRequest) {
-  await jwtVerify(token, JWKS, { ... });
-}
-```
-
-**Why this fails:**
-- Module runs during Next.js compilation (before server starts)
-- `createRemoteJWKSet()` tries to fetch JWKS from Supabase
-- Network stack not ready → request fails → error handler retries → infinite recursion
-- Server consumes 100%+ CPU, never responds to HTTP requests
-
-**Evidence of failure:**
-```bash
-$ ps -o pid,state,time
-  PID STAT      TIME
-93817 R    111:42.93  # Server hung for 111+ minutes at 117% CPU
-```
-
-#### ✅ ALWAYS: Lazy Initialization
-
-```typescript
-// ✅ CORRECT - Defers network request until first use
-import { createRemoteJWKSet } from 'jose';
-
-let jwksCache: ReturnType<typeof createRemoteJWKSet> | null = null;
-
-function getJWKS() {
-  if (!jwksCache) {
-    jwksCache = createRemoteJWKSet(new URL(`${SUPABASE_URL}/auth/v1/.well-known/jwks.json`));
-  }
-  return jwksCache;
-}
-
-export async function middleware(request: NextRequest) {
-  await jwtVerify(token, getJWKS(), { ... }); // Network request only on first HTTP request
-}
-```
-
-**Why this works:**
-- No network requests during module compilation
-- JWKS fetch only happens on first middleware invocation (when server is ready)
-- Server starts in <1 second
-- Singleton pattern ensures JWKS is only fetched once
-
-#### Files Using This Pattern
-
-- `apps/bingo/src/middleware.ts` - OAuth token verification
-- `apps/trivia/src/middleware.ts` - OAuth token verification
-- `e2e/fixtures/auth.ts` - E2E test authentication
-
-**Related:** See `docs/plans/2026-01-23-fix-e2e-auth.md` for full debugging analysis of the server hanging issue.
+See [docs/MIDDLEWARE_PATTERNS.md](docs/MIDDLEWARE_PATTERNS.md) for critical Next.js middleware rules (lazy initialization, JWKS caching).
 
 ## Design Requirements
 
