@@ -487,50 +487,89 @@ export default function PlayPage() {
       <main id="main" className="min-h-screen bg-background p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Beak Bingo
-            </h1>
-            <p className="text-lg text-muted-foreground">Presenter View</p>
-          </div>
-
-          {/* Display controls */}
-          <div className="flex items-center gap-4">
-            {/* Connection status */}
-            <div className="flex items-center gap-2" data-testid="sync-indicator">
-              <div
-                className={`
-                  w-3 h-3 rounded-full
-                  ${isConnected ? 'bg-success' : 'bg-muted'}
-                `}
-                title={isConnected ? 'Sync active' : 'Sync not active'}
-              />
-              <span className="text-base text-muted-foreground hidden sm:block">
-                {isConnected ? 'Sync Active' : 'Sync Ready'}
-              </span>
+        <header className="mb-6 space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            {/* Title section */}
+            <div className="flex-shrink-0">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                Beak Bingo
+              </h1>
+              <p className="text-lg text-muted-foreground">Presenter View</p>
             </div>
 
-            {/* Play Offline button - only show if no session active */}
-            {!roomCode && !isOfflineMode && (
-              <Button
-                onClick={handlePlayOffline}
-                variant="secondary"
-                size="md"
-                aria-label="Quick offline play"
-              >
-                Play Offline
-              </Button>
+            {/* Room information - integrated into header */}
+            {(roomCode || isOfflineMode) && (
+              <div className="flex flex-col sm:flex-row gap-4 items-start flex-1">
+                {roomCode && !isOfflineMode && (
+                  <>
+                    <RoomCodeDisplay
+                      roomCode={roomCode}
+                      showSyncStatus={false}
+                    />
+                    <PinDisplay
+                      pin={currentPin}
+                      offlineSessionId={null}
+                    />
+                  </>
+                )}
+                {isOfflineMode && offlineSessionId && (
+                  <PinDisplay
+                    pin={null}
+                    offlineSessionId={offlineSessionId}
+                  />
+                )}
+              </div>
             )}
 
-            {/* Open Display button */}
-            <Button
-              onClick={openDisplay}
-              variant="secondary"
-              size="md"
-            >
-              Open Display
-            </Button>
+            {/* Display controls */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-shrink-0">
+              {/* Connection status */}
+              <div className="flex items-center gap-2" data-testid="sync-indicator">
+                <div
+                  className={`
+                    w-3 h-3 rounded-full
+                    ${isConnected ? 'bg-success' : 'bg-muted'}
+                  `}
+                  title={isConnected ? 'Sync active' : 'Sync not active'}
+                />
+                <span className="text-base text-muted-foreground hidden sm:block">
+                  {isConnected ? 'Sync Active' : 'Sync Ready'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Play Offline button - only show if no session active */}
+                {!roomCode && !isOfflineMode && (
+                  <Button
+                    onClick={handlePlayOffline}
+                    variant="secondary"
+                    size="md"
+                    aria-label="Quick offline play"
+                  >
+                    Play Offline
+                  </Button>
+                )}
+
+                {/* Create New Game button - always visible */}
+                <Button
+                  onClick={handleCreateNewGame}
+                  variant="secondary"
+                  size="md"
+                  className="shadow-lg"
+                >
+                  Create New Game
+                </Button>
+
+                {/* Open Display button */}
+                <Button
+                  onClick={openDisplay}
+                  variant="secondary"
+                  size="md"
+                >
+                  Open Display
+                </Button>
+              </div>
+            </div>
           </div>
         </header>
 
@@ -695,36 +734,6 @@ export default function PlayPage() {
         </div>
       </div>
       </main>
-
-      {/* Admin controls - Room code, PIN display, and Create New Game button */}
-      <div className="fixed bottom-4 left-4 z-40 flex flex-col gap-3">
-        {roomCode && !isOfflineMode && (
-          <>
-            <RoomCodeDisplay
-              roomCode={roomCode}
-              showSyncStatus={false}
-            />
-            <PinDisplay
-              pin={currentPin}
-              offlineSessionId={null}
-            />
-          </>
-        )}
-        {isOfflineMode && offlineSessionId && (
-          <PinDisplay
-            pin={null}
-            offlineSessionId={offlineSessionId}
-          />
-        )}
-        <Button
-          onClick={handleCreateNewGame}
-          variant="secondary"
-          size="md"
-          className="shadow-lg"
-        >
-          Create New Game
-        </Button>
-      </div>
 
       {/* Session modals */}
       <RoomSetupModal
