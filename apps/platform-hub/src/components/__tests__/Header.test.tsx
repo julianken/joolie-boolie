@@ -16,7 +16,7 @@ vi.mock('next/navigation', () => ({
 
 // Mock @beak-gaming/auth hooks
 const mockSignOut = vi.fn();
-const mockUseAuth = vi.fn<[], { user: AuthUser | null; signOut: typeof mockSignOut; isLoading: boolean }>();
+const mockUseAuth = vi.fn<() => { user: AuthUser | null; signOut: typeof mockSignOut; isLoading: boolean }>();
 
 mockUseAuth.mockReturnValue({
   user: null,
@@ -164,6 +164,11 @@ describe('Header', () => {
         expect(signInButton).toHaveTextContent('Sign In');
       });
 
+      it('does not show greeting when user is not authenticated', () => {
+        render(<Header />);
+        expect(screen.queryByTestId('facility-greeting')).not.toBeInTheDocument();
+      });
+
       it('does not show Dashboard link when user is not authenticated', () => {
         render(<Header />);
         expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
@@ -215,6 +220,28 @@ describe('Header', () => {
         const logoutButton = screen.getByTestId('logout-button');
         expect(logoutButton).toBeInTheDocument();
         expect(logoutButton).toHaveTextContent('Sign Out');
+      });
+
+      it('shows "Welcome" greeting when user has no facility name', () => {
+        render(<Header />);
+        const greeting = screen.getByTestId('facility-greeting');
+        expect(greeting).toHaveTextContent('Welcome');
+        expect(greeting).not.toHaveTextContent('Welcome,');
+      });
+
+      it('shows "Welcome, [Facility Name]" when user has facility name', () => {
+        mockUseAuth.mockReturnValue({
+          user: {
+            id: 'user-123',
+            email: 'test@example.com',
+            user_metadata: { facility_name: 'Sunny Acres' },
+          } as unknown as AuthUser,
+          signOut: mockSignOut,
+          isLoading: false,
+        });
+        render(<Header />);
+        const greeting = screen.getByTestId('facility-greeting');
+        expect(greeting).toHaveTextContent('Welcome, Sunny Acres');
       });
 
       it('does not show Sign In button when user is authenticated', () => {
