@@ -3,41 +3,13 @@
 import { useId, useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
 import { useToast } from "@beak-gaming/ui";
-import type { TriviaQuestionSet, TriviaQuestion } from '@beak-gaming/database/types';
+import type { TriviaQuestionSet } from '@beak-gaming/database/types';
 import type { Question } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
+import { triviaQuestionToQuestion } from '@/lib/questions/conversion';
 
 export interface QuestionSetSelectorProps {
   disabled?: boolean;
   onQuestionSetLoad?: (questionSet: TriviaQuestionSet) => void;
-}
-
-/**
- * Convert database TriviaQuestion to app Question format.
- * Same conversion as TemplateSelector but scoped to question sets.
- */
-function convertDbQuestion(
-  dbQuestion: TriviaQuestion,
-  roundIndex: number
-): Question {
-  const type = dbQuestion.options.length === 2 ? 'true_false' : 'multiple_choice';
-
-  const options = type === 'true_false'
-    ? ['True', 'False']
-    : dbQuestion.options.map((_, i) => String.fromCharCode(65 + i));
-
-  const correctAnswer = options[dbQuestion.correctIndex];
-
-  return {
-    id: uuidv4(),
-    text: dbQuestion.question,
-    type,
-    correctAnswers: [correctAnswer],
-    options,
-    optionTexts: dbQuestion.options,
-    category: (dbQuestion.category as Question['category']) || 'general_knowledge',
-    roundIndex,
-  };
 }
 
 /**
@@ -104,7 +76,7 @@ export function QuestionSetSelector({
 
       questionSet.questions.forEach((dbQuestion, index) => {
         const roundIndex = Math.floor(index / questionsPerRound);
-        convertedQuestions.push(convertDbQuestion(dbQuestion, roundIndex));
+        convertedQuestions.push(triviaQuestionToQuestion(dbQuestion, roundIndex));
       });
 
       importQuestions(convertedQuestions, 'replace');

@@ -4,28 +4,12 @@ import { useState, useId, useMemo } from 'react';
 import { Modal } from "@beak-gaming/ui";
 import { useGameStore } from '@/stores/game-store';
 import { useToast } from "@beak-gaming/ui";
-import type { Question } from '@/types';
-import type { TriviaQuestion } from '@beak-gaming/database/types';
+import { questionsToTriviaQuestions } from '@/lib/questions/conversion';
 
 export interface SaveQuestionSetModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-}
-
-/**
- * Convert app Question to database TriviaQuestion format
- */
-function convertQuestionToDb(question: Question): TriviaQuestion {
-  const correctAnswer = question.correctAnswers[0];
-  const correctIndex = question.options.indexOf(correctAnswer);
-
-  return {
-    question: question.text,
-    options: question.optionTexts,
-    correctIndex,
-    category: question.category,
-  };
 }
 
 /**
@@ -76,7 +60,7 @@ export function SaveQuestionSetModal({
     setError(null);
 
     try {
-      const dbQuestions = questions.map(convertQuestionToDb);
+      const dbQuestions = questionsToTriviaQuestions(questions);
 
       const response = await fetch('/api/question-sets', {
         method: 'POST',
