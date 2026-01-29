@@ -34,6 +34,7 @@ import { OfflineBanner, InstallPrompt } from '@/components/pwa';
 import { serializeBingoState, deserializeBingoState } from '@/lib/session/serializer';
 import { createDebouncedStorageWriter, createOfflineSession } from '@/lib/session/storage';
 import { useGameStore } from '@/stores/game-store';
+import { patternRegistry } from '@/lib/game/patterns';
 
 export default function PlayPage() {
   const game = useGameKeyboard();
@@ -47,8 +48,6 @@ export default function PlayPage() {
 
   // Recovery state tracking
   const [recoveryAttempted, setRecoveryAttempted] = useState(false);
-  const [recoveryErrorMessage, setRecoveryErrorMessage] = useState<string | null>(null);
-  const [dismissedRecoveryError, setDismissedRecoveryError] = useState(false);
   const [userDismissedModal, setUserDismissedModal] = useState(false);
   const recoveryInitialized = useRef(false);
 
@@ -140,24 +139,13 @@ export default function PlayPage() {
     }
   }, [isRecovering]);
 
-  // Track when recovery completes and capture errors
+  // Track when recovery completes
   // Use ref to ensure we track completion even if state updates are batched
   useEffect(() => {
     if (recoveryInitialized.current && !isRecovering) {
       setRecoveryAttempted(true);
-
-      // Capture recovery error if present
-      if (recoveryError) {
-        setRecoveryErrorMessage(
-          typeof recoveryError === 'string'
-            ? recoveryError
-            : (recoveryError as Error).message || 'Failed to recover session'
-        );
-      } else {
-        setRecoveryErrorMessage(null);
-      }
     }
-  }, [isRecovering, recoveryError]);
+  }, [isRecovering]);
 
   // Fallback: If recovery is enabled but hasn't started after mount, mark as attempted
   // This handles the case where recovery completes so fast that React batches the state updates
@@ -182,15 +170,69 @@ export default function PlayPage() {
     }
   }, [isRecovered, recoveredRoomCode]);
 
+  // Track if auto-create has already run to prevent multiple executions
+  const autoCreateExecuted = useRef(false);
+
+  // Auto-create game with default settings if no session exists
+  // This runs once after both online and offline recovery attempts complete
+  useEffect(() => {
+    // Only auto-create if:
+    // 1. Both recovery attempts are complete
+    // 2. No active session (roomCode or offline mode)
+    // 3. Modal hasn't been explicitly shown by user action
+    // 4. User hasn't dismissed the modal
+    // 5. Auto-create hasn't already executed
+    if (
+      recoveryAttempted &&
+      offlineRecoveryAttempted &&
+      !roomCode &&
+      !isOfflineMode &&
+      !showCreateModal &&
+      !userDismissedModal &&
+      !autoCreateExecuted.current
+    ) {
+      autoCreateExecuted.current = true;
+
+      // Auto-create offline game with defaults
+      const newSessionId = generateShortSessionId();
+      setOfflineSessionId(newSessionId);
+      setIsOfflineMode(true);
+
+      // Store the new session ID
+      storeOfflineSessionId(newSessionId);
+
+      // Set default pattern (Blackout) and ensure audio is enabled
+      const blackoutPattern = patternRegistry.get('blackout');
+      if (blackoutPattern) {
+        useGameStore.setState((state) => ({
+          ...state,
+          pattern: blackoutPattern,
+          audioEnabled: true,
+        }));
+      }
+
+      // Initialize offline session in localStorage with default settings
+      const currentState = useGameStore.getState();
+      const initialState = {
+        ...currentState,
+        pattern: blackoutPattern || currentState.pattern,
+        audioEnabled: true,
+      };
+      createOfflineSession(newSessionId, initialState);
+    }
+  }, [
+    recoveryAttempted,
+    offlineRecoveryAttempted,
+    roomCode,
+    isOfflineMode,
+    showCreateModal,
+    userDismissedModal,
+  ]);
+
   // Determine if modal should be shown
-  // Show modal if:
-  // 1. Explicitly requested via showCreateModal state
-  // 2. No active session (roomCode or offline mode) after BOTH online AND offline recovery complete AND user hasn't dismissed it
-  // 3. Recovery failed with an error that hasn't been dismissed
-  const shouldShowModal =
-    showCreateModal ||
-    (!userDismissedModal && !roomCode && !isOfflineMode && recoveryAttempted && offlineRecoveryAttempted) ||
-    (!isRecovering && recoveryErrorMessage !== null && !dismissedRecoveryError);
+  // Show modal ONLY if explicitly requested via showCreateModal state
+  // Auto-create handles the "no session" case, so we don't show modal on recovery errors
+  const shouldShowModal = showCreateModal;
 
   // Auto-sync game state to database (only in online mode)
   const gameState = useGameStore();
@@ -409,8 +451,15 @@ export default function PlayPage() {
     setRoomCode(null);
     setSessionToken(null);
 
+    // Reset offline mode
+    setIsOfflineMode(false);
+    setOfflineSessionId(null);
+
     // Reset game state to initial
     game.resetGame();
+
+    // Reset auto-create flag to allow auto-create on next recovery
+    autoCreateExecuted.current = false;
 
     // Show modal for new room setup
     setShowCreateModal(true);
@@ -497,7 +546,7 @@ export default function PlayPage() {
               <p className="text-lg text-muted-foreground">Presenter View</p>
             </div>
 
-            {/* Room information - integrated into header */}
+            {/* Room information - integrated into header (BEA-418) */}
             {(roomCode || isOfflineMode) && (
               <div className="flex flex-col sm:flex-row gap-4 items-start flex-1">
                 {roomCode && !isOfflineMode && (
@@ -550,7 +599,7 @@ export default function PlayPage() {
                   </Button>
                 )}
 
-                {/* Create New Game button - always visible */}
+                {/* Create New Game button - always visible (BEA-417) */}
                 <Button
                   onClick={handleCreateNewGame}
                   variant="secondary"
@@ -741,14 +790,12 @@ export default function PlayPage() {
         onClose={() => {
           setShowCreateModal(false);
           setSessionError(null);
-          setRecoveryErrorMessage(null);
-          setDismissedRecoveryError(true);
           setUserDismissedModal(true);
         }}
         onCreateRoom={handleModalCreateRoom}
         onJoinRoom={handleModalJoinRoom}
         onPlayOffline={handleModalPlayOffline}
-        error={sessionError || recoveryErrorMessage}
+        error={sessionError}
         isLoading={isCreatingSession}
       />
 
