@@ -489,34 +489,31 @@ export default function PlayPage() {
     setUserDismissedModal(true);
   }, [handlePlayOffline]);
 
-  // Open display window with room code or offline session ID in URL
+  // Open display window with room code or offline session ID in URL (BEA-415)
+  // Always opens the display window — never shows the room setup modal
   const openDisplay = useCallback(() => {
+    let displayUrl: string;
+    let windowName: string;
+
     if (isOfflineMode && offlineSessionId) {
-      // Offline mode: use session ID
-      const displayUrl = `${window.location.origin}/display?offline=${offlineSessionId}`;
-      const displayWindow = window.open(
-        displayUrl,
-        `trivia-display-offline-${offlineSessionId}`,
-        'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
-      );
-      if (displayWindow) {
-        displayWindow.focus();
-      }
+      displayUrl = `${window.location.origin}/display?offline=${offlineSessionId}`;
+      windowName = `trivia-display-offline-${offlineSessionId}`;
     } else if (roomCode) {
-      // Online mode: use room code
-      const displayUrl = `${window.location.origin}/display?room=${roomCode}`;
-      const displayWindow = window.open(
-        displayUrl,
-        `trivia-display-${roomCode}`,
-        'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
-      );
-      if (displayWindow) {
-        displayWindow.focus();
-      }
+      displayUrl = `${window.location.origin}/display?room=${roomCode}`;
+      windowName = `trivia-display-${roomCode}`;
     } else {
-      // No session: show create modal
-      setShowCreateModal(true);
-      setUserDismissedModal(false);
+      // No session yet — open display anyway, it shows its own error/loading state
+      displayUrl = `${window.location.origin}/display`;
+      windowName = 'trivia-display';
+    }
+
+    const displayWindow = window.open(
+      displayUrl,
+      windowName,
+      'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
+    );
+    if (displayWindow) {
+      displayWindow.focus();
     }
   }, [roomCode, isOfflineMode, offlineSessionId]);
 
