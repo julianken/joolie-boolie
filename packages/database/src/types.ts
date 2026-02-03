@@ -78,6 +78,7 @@ export interface TriviaQuestion {
   options: string[];
   correctIndex: number;
   category?: string;
+  explanation?: string;
 }
 
 export interface TriviaTemplate {

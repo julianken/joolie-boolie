@@ -15,8 +15,11 @@ import type { QuestionCategory } from '@/types';
 export interface QuestionFormData {
   id: string; // Unique ID for React key
   question: string;
+  type: 'multiple_choice' | 'true_false';
   options: string[];
   correctIndex: number;
+  category: QuestionCategory;
+  explanation: string;
 }
 
 /**
@@ -104,8 +107,11 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const newQuestion: QuestionFormData = {
         id: `q-${Date.now()}-${Math.random()}`,
         question: '',
+        type: 'multiple_choice',
         options: ['', '', '', ''],
         correctIndex: 0,
+        category: 'general_knowledge',
+        explanation: '',
       };
 
       const categories = state.categories.map((cat, idx) =>
