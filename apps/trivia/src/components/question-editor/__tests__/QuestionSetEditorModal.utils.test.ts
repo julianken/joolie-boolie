@@ -7,6 +7,17 @@ import {
   type QuestionFormData,
 } from '../QuestionSetEditorModal.utils';
 
+// Helper to create a complete QuestionFormData object
+const createQuestion = (partial: Partial<QuestionFormData>): QuestionFormData => ({
+  id: partial.id ?? 'test-id',
+  question: partial.question ?? '',
+  type: partial.type ?? 'multiple_choice',
+  options: partial.options ?? ['', '', '', ''],
+  correctIndex: partial.correctIndex ?? 0,
+  category: partial.category ?? 'general_knowledge',
+  explanation: partial.explanation ?? '',
+});
+
 describe('QuestionSetEditorModal.utils', () => {
   describe('createInitialState', () => {
     it('should create default initial state', () => {
@@ -248,18 +259,18 @@ describe('QuestionSetEditorModal.utils', () => {
 
     describe('REMOVE_QUESTION', () => {
       it('should remove a question from specified category', () => {
-        const question1: QuestionFormData = {
+        const question1 = createQuestion({
           id: 'q1',
           question: 'Question 1',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
-        const question2: QuestionFormData = {
+        });
+        const question2 = createQuestion({
           id: 'q2',
           question: 'Question 2',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 1,
-        };
+        });
         const stateWithQuestions = {
           ...initialState,
           categories: [
@@ -275,18 +286,18 @@ describe('QuestionSetEditorModal.utils', () => {
       });
 
       it('should handle removing the last question', () => {
-        const question1: QuestionFormData = {
+        const question1 = createQuestion({
           id: 'q1',
           question: 'Question 1',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
-        const question2: QuestionFormData = {
+        });
+        const question2 = createQuestion({
           id: 'q2',
           question: 'Question 2',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 1,
-        };
+        });
         const stateWithQuestions = {
           ...initialState,
           categories: [
@@ -304,12 +315,12 @@ describe('QuestionSetEditorModal.utils', () => {
 
     describe('UPDATE_QUESTION', () => {
       it('should update question text', () => {
-        const question: QuestionFormData = {
+        const question = createQuestion({
           id: 'q1',
           question: 'Old Question',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
+        });
         const stateWithQuestion = {
           ...initialState,
           categories: [{ id: 'science' as const, name: 'Science', questions: [question] }],
@@ -327,12 +338,12 @@ describe('QuestionSetEditorModal.utils', () => {
       });
 
       it('should update correctIndex', () => {
-        const question: QuestionFormData = {
+        const question = createQuestion({
           id: 'q1',
           question: 'Question',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
+        });
         const stateWithQuestion = {
           ...initialState,
           categories: [{ id: 'science' as const, name: 'Science', questions: [question] }],
@@ -350,12 +361,12 @@ describe('QuestionSetEditorModal.utils', () => {
       });
 
       it('should update options array', () => {
-        const question: QuestionFormData = {
+        const question = createQuestion({
           id: 'q1',
           question: 'Question',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
+        });
         const stateWithQuestion = {
           ...initialState,
           categories: [{ id: 'science' as const, name: 'Science', questions: [question] }],
@@ -374,18 +385,18 @@ describe('QuestionSetEditorModal.utils', () => {
       });
 
       it('should not affect other questions in the same category', () => {
-        const question1: QuestionFormData = {
+        const question1 = createQuestion({
           id: 'q1',
           question: 'Question 1',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
-        const question2: QuestionFormData = {
+        });
+        const question2 = createQuestion({
           id: 'q2',
           question: 'Question 2',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 1,
-        };
+        });
         const stateWithQuestions = {
           ...initialState,
           categories: [
@@ -406,12 +417,12 @@ describe('QuestionSetEditorModal.utils', () => {
       });
 
       it('should not affect other categories', () => {
-        const question: QuestionFormData = {
+        const question = createQuestion({
           id: 'q1',
           question: 'Science Question',
           options: ['A', 'B', 'C', 'D'],
           correctIndex: 0,
-        };
+        });
         const stateWithCategories = {
           ...initialState,
           categories: [

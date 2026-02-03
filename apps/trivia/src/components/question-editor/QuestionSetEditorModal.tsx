@@ -112,7 +112,8 @@ export function QuestionSetEditorModal({
             question: question.question.trim(),
             options: question.options.map((opt) => opt.trim()),
             correctIndex: question.correctIndex,
-            category: category.id,
+            category: question.category,
+            explanation: question.explanation.trim() || undefined,
           });
         }
       }
