@@ -27,7 +27,7 @@ async function registerClients() {
   const bingoResult = await supabase.auth.admin.oauth.createClient({
     redirect_uris: [
       'http://localhost:3000/auth/callback',
-      'https://bingo.beakgaming.com/auth/callback'
+      'https://bingo.beak-gaming.com/auth/callback'
     ],
     client_type: 'public'
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,7 +46,7 @@ async function registerClients() {
   const triviaResult = await supabase.auth.admin.oauth.createClient({
     redirect_uris: [
       'http://localhost:3001/auth/callback',
-      'https://trivia.beakgaming.com/auth/callback'
+      'https://trivia.beak-gaming.com/auth/callback'
     ],
     client_type: 'public'
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

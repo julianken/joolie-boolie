@@ -20,8 +20,7 @@ export const E2E_MOCK_CLIENTS: Record<string, { id: string; name: string; redire
     name: 'Beak Bingo',
     redirect_uris: [
       'http://localhost:3000/auth/callback',
-      'https://bingo.beakgaming.com/auth/callback',
-      'https://feat-vercel-setup.vercel.app/auth/callback',
+      'https://bingo.beak-gaming.com/auth/callback',
     ],
     is_first_party: true,
   },
@@ -30,8 +29,7 @@ export const E2E_MOCK_CLIENTS: Record<string, { id: string; name: string; redire
     name: 'Beak Trivia',
     redirect_uris: [
       'http://localhost:3001/auth/callback',
-      'https://trivia.beakgaming.com/auth/callback',
-      'https://trivia-nine-flax.vercel.app/auth/callback',
+      'https://trivia.beak-gaming.com/auth/callback',
     ],
     is_first_party: true,
   },

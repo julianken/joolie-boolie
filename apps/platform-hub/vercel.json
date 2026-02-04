@@ -12,12 +12,12 @@
   "redirects": [
     {
       "source": "/bingo",
-      "destination": "https://bingo.beakgaming.com",
+      "destination": "https://bingo.beak-gaming.com",
       "permanent": false
     },
     {
       "source": "/trivia",
-      "destination": "https://trivia.beakgaming.com",
+      "destination": "https://trivia.beak-gaming.com",
       "permanent": false
     }
   ]
