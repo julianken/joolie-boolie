@@ -8,6 +8,9 @@ export default async function Home() {
   const cookieStore = await cookies();
   const isSignedIn = !!cookieStore.get('beak_access_token')?.value;
 
+  // Get return path if set by middleware (when unauthenticated user tried to access protected route)
+  const returnTo = cookieStore.get('beak_return_to')?.value;
+
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -53,7 +56,7 @@ export default async function Home() {
                 </Link>
               ) : (
                 // Not Signed In: Show only "Sign in with Beak Gaming" button
-                <LoginButton />
+                <LoginButton returnTo={returnTo} />
               )}
             </div>
           </div>

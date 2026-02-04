@@ -77,8 +77,10 @@ function CallbackHandler() {
         sessionStorage.removeItem(`beak_pkce_verifier_${state}`);
         sessionStorage.removeItem(`beak_oauth_state_${state}`);
 
-        // Redirect to app home page
-        router.push('/');
+        // Redirect to original destination or home
+        const returnTo = sessionStorage.getItem('beak_oauth_return_to') || '/';
+        sessionStorage.removeItem('beak_oauth_return_to');
+        router.push(returnTo);
       } catch (err) {
         console.error('OAuth callback error:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed');
