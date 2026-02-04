@@ -137,8 +137,15 @@ export function LoginForm({ redirectTo, authorizationId }: LoginFormProps) {
       // Success - redirect with preserved authorization_id if present
       const redirectUrl = buildRedirectUrl(redirectTo, authorizationId);
       console.log('[LoginForm] Login successful, redirecting to:', redirectUrl);
-      router.push(redirectUrl);
-      console.log('[LoginForm] router.push() called');
+
+      // Use window.location for API routes (they return HTTP redirects)
+      // router.push can't follow HTTP 302 redirects from API endpoints
+      if (redirectUrl.startsWith('/api/')) {
+        window.location.href = redirectUrl;
+      } else {
+        router.push(redirectUrl);
+      }
+      console.log('[LoginForm] Redirect initiated');
     } catch (error) {
       console.error('Login API error:', error);
       // Fallback to direct signIn on network errors
