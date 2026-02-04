@@ -105,8 +105,10 @@ export async function middleware(request: NextRequest) {
       response = rateLimitResponse;
     }
 
-    // Update session
-    response = await updateSession(request);
+    // Update session (skip in E2E mode)
+    if (!isE2ETesting) {
+      response = await updateSession(request);
+    }
 
     // Add CORS headers to final response
     return addCorsHeaders(response, validOrigin);
@@ -126,7 +128,12 @@ export async function middleware(request: NextRequest) {
       return rateLimitResponse;
     }
 
-    // Update Supabase session and apply rate limit headers
+    // Update Supabase session (skip in E2E mode - no real Supabase connection)
+    if (isE2ETesting) {
+      // In E2E mode, just apply rate limit headers without Supabase session
+      return rateLimitResponse;
+    }
+
     const sessionResponse = await updateSession(request);
 
     // Copy rate limit headers to session response
@@ -139,7 +146,10 @@ export async function middleware(request: NextRequest) {
     return sessionResponse;
   }
 
-  // For non-OAuth paths, just update session
+  // For non-OAuth paths, just update session (skip in E2E mode)
+  if (isE2ETesting) {
+    return NextResponse.next();
+  }
   return updateSession(request);
 }
 

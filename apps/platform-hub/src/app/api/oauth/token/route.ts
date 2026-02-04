@@ -17,6 +17,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import { SignJWT } from 'jose';
+
+// E2E Testing: Same secret used by Bingo/Trivia middleware for token verification
+const E2E_JWT_SECRET = new TextEncoder().encode(
+  'e2e-test-secret-key-that-is-at-least-32-characters-long'
+);
+const E2E_TEST_USER_ID = 'e2e-test-user-00000000-0000-0000-0000-000000000000';
+const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
 import {
   refreshAccessToken,
   tokenRotationLogger,
@@ -216,8 +224,24 @@ async function handleAuthorizationCodeGrant(params: {
         status: 'approved', // Keep approved but remove code
       });
 
-      // Generate E2E test tokens
-      const accessToken = `e2e-access-${crypto.randomBytes(32).toString('hex')}`;
+      // Generate E2E test tokens as proper JWTs (so middleware can parse exp claim)
+      const now = Math.floor(Date.now() / 1000);
+      const expiresIn = 3600; // 1 hour
+
+      const accessToken = await new SignJWT({
+        sub: E2E_TEST_USER_ID,
+        email: E2E_TEST_EMAIL,
+        role: 'authenticated',
+        aud: 'authenticated',
+        iss: 'e2e-test',
+        app_metadata: { provider: 'email', providers: ['email'] },
+        user_metadata: { email: E2E_TEST_EMAIL },
+      })
+        .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+        .setIssuedAt(now)
+        .setExpirationTime(now + expiresIn)
+        .sign(E2E_JWT_SECRET);
+
       const refreshToken = `e2e-refresh-${crypto.randomBytes(32).toString('hex')}`;
 
       console.log('[Token Endpoint] E2E mode: returning test tokens');
@@ -226,7 +250,7 @@ async function handleAuthorizationCodeGrant(params: {
       return NextResponse.json({
         access_token: accessToken,
         token_type: 'Bearer',
-        expires_in: 3600,
+        expires_in: expiresIn,
         refresh_token: refreshToken,
       });
     }
@@ -326,6 +350,37 @@ async function handleRefreshTokenGrant(params: {
       },
       { status: 400 }
     );
+  }
+
+  // E2E Testing Mode: Generate new test tokens without calling Supabase
+  if (isE2EMode() && refresh_token.startsWith('e2e-refresh-')) {
+    console.log('[Token Endpoint] E2E mode: refreshing test tokens');
+
+    const now = Math.floor(Date.now() / 1000);
+    const expiresIn = 3600; // 1 hour
+
+    const accessToken = await new SignJWT({
+      sub: E2E_TEST_USER_ID,
+      email: E2E_TEST_EMAIL,
+      role: 'authenticated',
+      aud: 'authenticated',
+      iss: 'e2e-test',
+      app_metadata: { provider: 'email', providers: ['email'] },
+      user_metadata: { email: E2E_TEST_EMAIL },
+    })
+      .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+      .setIssuedAt(now)
+      .setExpirationTime(now + expiresIn)
+      .sign(E2E_JWT_SECRET);
+
+    const newRefreshToken = `e2e-refresh-${crypto.randomBytes(32).toString('hex')}`;
+
+    return NextResponse.json({
+      access_token: accessToken,
+      token_type: 'Bearer',
+      expires_in: expiresIn,
+      refresh_token: newRefreshToken,
+    });
   }
 
   try {
