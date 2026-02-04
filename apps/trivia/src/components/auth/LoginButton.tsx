@@ -3,17 +3,22 @@
 import { useState } from 'react';
 import { startOAuthFlow } from '@/lib/auth/oauth-client';
 
+interface LoginButtonProps {
+  /** Path to redirect to after authentication (e.g., '/play') */
+  returnTo?: string;
+}
+
 /**
  * Login button component that initiates OAuth 2.1 flow
  * Redirects to Platform Hub for authentication
  */
-export function LoginButton() {
+export function LoginButton({ returnTo }: LoginButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     try {
       setLoading(true);
-      await startOAuthFlow();
+      await startOAuthFlow(returnTo);
     } catch (error) {
       console.error('OAuth login failed:', error);
       setLoading(false);

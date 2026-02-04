@@ -13,8 +13,9 @@ const REDIRECT_URI = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI!;
 /**
  * Start OAuth 2.1 authorization code flow with PKCE
  * Generates PKCE parameters, stores code_verifier, and redirects to Platform Hub
+ * @param returnTo - Optional path to redirect to after authentication (e.g., '/play')
  */
-export async function startOAuthFlow(): Promise<void> {
+export async function startOAuthFlow(returnTo?: string): Promise<void> {
   // Validate environment variables
   if (!PLATFORM_HUB_URL) {
     throw new Error('NEXT_PUBLIC_PLATFORM_HUB_URL is not configured');
@@ -24,6 +25,13 @@ export async function startOAuthFlow(): Promise<void> {
   }
   if (!REDIRECT_URI) {
     throw new Error('NEXT_PUBLIC_OAUTH_REDIRECT_URI is not configured');
+  }
+
+  // Store return URL for post-auth redirect (before generating state)
+  if (returnTo) {
+    sessionStorage.setItem('beak_oauth_return_to', returnTo);
+  } else {
+    sessionStorage.removeItem('beak_oauth_return_to');
   }
 
   // Generate PKCE parameters

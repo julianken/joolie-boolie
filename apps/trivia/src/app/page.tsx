@@ -4,10 +4,13 @@ import { StatsDisplay } from '@/components/stats';
 import { LoginButton } from '@/components/auth/LoginButton';
 
 export default async function Home() {
-  // Server-side auth check via cookie (BEA-421)
+  // Server-side auth check via cross-app SSO cookie
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('sb-access-token');
+  const accessToken = cookieStore.get('beak_access_token');
   const isAuthenticated = !!accessToken?.value;
+
+  // Get return path if set by middleware (when unauthenticated user tried to access protected route)
+  const returnTo = cookieStore.get('beak_return_to')?.value;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
@@ -34,7 +37,7 @@ export default async function Home() {
             </Link>
           </>
         ) : (
-          <LoginButton />
+          <LoginButton returnTo={returnTo} />
         )}
       </div>
 

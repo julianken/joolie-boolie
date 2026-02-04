@@ -152,9 +152,20 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('beak_refresh_token')?.value;
 
   if (!accessToken) {
-    // No token - redirect to login
+    // No token - redirect to login with return path stored
     const loginUrl = new URL('/', request.url);
-    return NextResponse.redirect(loginUrl);
+    const response = NextResponse.redirect(loginUrl);
+
+    // Store the requested path for post-auth redirect
+    response.cookies.set('beak_return_to', pathname, {
+      path: '/',
+      maxAge: 300, // 5 minutes - expires quickly for security
+      httpOnly: false, // Client-side JS needs to read this
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    return response;
   }
 
   // Check if token needs proactive refresh (5 minutes before expiry)
