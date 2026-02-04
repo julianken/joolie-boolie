@@ -34,6 +34,14 @@ const E2E_JWT_SECRET = new TextEncoder().encode(
   'e2e-test-secret-key-that-is-at-least-32-characters-long'
 );
 
+// Production: Same secret used by Platform Hub OAuth token endpoint
+// This must match the SESSION_TOKEN_SECRET used by Platform Hub
+function getSessionSecret(): Uint8Array | null {
+  const secret = process.env.SESSION_TOKEN_SECRET;
+  if (!secret) return null;
+  return new TextEncoder().encode(secret);
+}
+
 /**
  * Routes that require authentication
  */
@@ -61,7 +69,10 @@ function isProtectedRoute(pathname: string): boolean {
 
 /**
  * Verify JWT access token from httpOnly cookie
- * Supports both Supabase tokens (production) and E2E test tokens
+ * Supports multiple token types:
+ * 1. Platform Hub tokens (HS256, signed with SESSION_TOKEN_SECRET)
+ * 2. E2E test tokens (HS256, signed with E2E_JWT_SECRET)
+ * 3. Supabase tokens (RS256, verified via JWKS)
  */
 async function verifyAccessToken(token: string): Promise<boolean> {
   const isE2ETesting = process.env.E2E_TESTING === 'true';
@@ -75,12 +86,25 @@ async function verifyAccessToken(token: string): Promise<boolean> {
       });
       return true;
     } catch {
-      // E2E token verification failed, fall through to Supabase verification
-      // This allows real Supabase tokens to still work during E2E tests
+      // E2E token verification failed, fall through to other methods
     }
   }
 
-  // Production Mode (or E2E fallback): Verify with Supabase JWKS
+  // Platform Hub OAuth tokens: Verify with SESSION_TOKEN_SECRET
+  const sessionSecret = getSessionSecret();
+  if (sessionSecret) {
+    try {
+      await jwtVerify(token, sessionSecret, {
+        issuer: 'beak-gaming-platform',
+        audience: 'authenticated',
+      });
+      return true;
+    } catch {
+      // Platform Hub token verification failed, fall through to Supabase
+    }
+  }
+
+  // Supabase tokens (fallback): Verify with JWKS
   try {
     await jwtVerify(token, getJWKS(), {
       issuer: `${SUPABASE_URL}/auth/v1`,
