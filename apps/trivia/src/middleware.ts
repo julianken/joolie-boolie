@@ -124,19 +124,13 @@ function createResponseWithRefreshedTokens(
 }
 
 /**
- * Clear auth cookies and redirect to login
+ * Clear all auth cookies
  */
-function createLogoutResponse(request: NextRequest): NextResponse {
-  const response = NextResponse.redirect(new URL('/', request.url));
-  const clearOptions = {
-    path: '/',
-    domain: COOKIE_DOMAIN,
-    maxAge: 0,
-  };
-  response.cookies.set('beak_access_token', '', clearOptions);
-  response.cookies.set('beak_refresh_token', '', clearOptions);
-  response.cookies.set('beak_user_id', '', clearOptions);
-  return response;
+function clearAuthCookies(response: NextResponse) {
+  const cookieOptions = getCookieOptions(0);
+  response.cookies.set('beak_access_token', '', cookieOptions);
+  response.cookies.set('beak_refresh_token', '', cookieOptions);
+  response.cookies.set('beak_user_id', '', { ...cookieOptions, httpOnly: false });
 }
 
 export async function middleware(request: NextRequest) {
@@ -208,7 +202,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // All refresh attempts failed - clear cookies and redirect to login
-    return createLogoutResponse(request);
+    const response = NextResponse.redirect(new URL('/', request.url));
+    clearAuthCookies(response);
+    return response;
   }
 
   // Token is valid - allow request to proceed
