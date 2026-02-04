@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { auditAuthorizationDenial, auditAuthorizationError } from '@/middleware/audit-middleware';
 import {
   E2E_TEST_USER_ID,
@@ -67,8 +67,10 @@ export async function POST(request: NextRequest) {
       beakUserId === E2E_TEST_USER_ID ||
       (process.env.E2E_TESTING === 'true' && beakAccessToken && beakUserId);
 
-    // Get authenticated user session
+    // Get authenticated user session (for auth checks)
     const supabase = await createClient();
+    // Service role client for database operations (RLS only allows SELECT for users, not UPDATE)
+    const dbClient = createServiceRoleClient();
 
     // Variables to hold authorization details
     let userId: string;
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
       userId = session.user.id;
 
       // Fetch authorization details from custom oauth_authorizations table
-      const { data: dbAuthDetails, error: detailsError } = await supabase
+      const { data: dbAuthDetails, error: detailsError } = await dbClient
         .from('oauth_authorizations')
         .select(`
           id,
@@ -174,8 +176,8 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
-      // Normal mode: update database
-      const { error: denialError } = await supabase
+      // Normal mode: update database using service role client
+      const { error: denialError } = await dbClient
         .from('oauth_authorizations')
         .update({ status: 'denied' })
         .eq('id', authorization_id)

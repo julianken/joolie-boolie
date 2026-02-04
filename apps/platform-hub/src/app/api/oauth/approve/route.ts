@@ -27,7 +27,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { validateCsrfToken, clearCsrfToken } from '@/lib/csrf';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { auditAuthorizationSuccess, auditAuthorizationError } from '@/middleware/audit-middleware';
 import {
   E2E_TEST_USER_ID,
@@ -84,8 +84,10 @@ export async function POST(request: NextRequest) {
       beakUserId === E2E_TEST_USER_ID ||
       (process.env.E2E_TESTING === 'true' && beakAccessToken && beakUserId);
 
-    // Create Supabase client with user session
+    // Create Supabase client with user session (for auth checks)
     const supabase = await createClient();
+    // Service role client for database operations (RLS only allows SELECT for users, not UPDATE)
+    const dbClient = createServiceRoleClient();
 
     // Variables to hold authorization details
     let userId: string;
@@ -139,7 +141,7 @@ export async function POST(request: NextRequest) {
       userId = session.user.id;
 
       // Fetch authorization details from custom oauth_authorizations table
-      const { data: dbAuthDetails, error: detailsError } = await supabase
+      const { data: dbAuthDetails, error: detailsError } = await dbClient
         .from('oauth_authorizations')
         .select(`
           id,
@@ -208,8 +210,8 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
-      // Normal mode: update database
-      const { error: approveError } = await supabase
+      // Normal mode: update database using service role client
+      const { error: approveError } = await dbClient
         .from('oauth_authorizations')
         .update({
           code: authCode,

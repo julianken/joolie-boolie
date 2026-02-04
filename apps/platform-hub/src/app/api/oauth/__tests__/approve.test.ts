@@ -28,6 +28,15 @@ vi.mock('@/middleware/audit-middleware', () => ({
 }));
 
 // Mock Supabase client
+const mockDbClient = {
+  from: vi.fn(() => ({
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+    update: vi.fn().mockReturnThis(),
+  })),
+};
+
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => ({
     auth: {
@@ -37,17 +46,13 @@ vi.mock('@/lib/supabase/server', () => ({
         approveAuthorization: vi.fn(),
       },
     },
-    from: vi.fn(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn(),
-      update: vi.fn().mockReturnThis(),
-    })),
+    from: mockDbClient.from,
   })),
+  createServiceRoleClient: vi.fn(() => mockDbClient),
 }));
 
 import { validateCsrfToken, clearCsrfToken } from '@/lib/csrf';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 describe('POST /api/oauth/approve', () => {
   beforeEach(() => {
@@ -198,23 +203,19 @@ describe('POST /api/oauth/approve', () => {
     it('should approve authorization and return redirect URL', async () => {
       vi.mocked(validateCsrfToken).mockResolvedValue(true);
 
+      // Mock createClient for auth operations
       const mockSupabase = {
         auth: {
           getSession: vi.fn().mockResolvedValue({
             data: { session: { user: { id: 'user-123' } } },
             error: null,
           }),
-          oauth: {
-            getAuthorizationDetails: vi.fn().mockResolvedValue({
-              data: { client: { id: 'client-123', name: 'Test Client' }, scopes: ['read'] },
-              error: null,
-            }),
-            approveAuthorization: vi.fn().mockResolvedValue({
-              data: { redirect_url: 'https://client.example.com/callback?code=abc123' },
-              error: null,
-            }),
-          },
         },
+      };
+      vi.mocked(createClient).mockReturnValue(mockSupabase as never);
+
+      // Mock createServiceRoleClient for database operations
+      const mockDbClient = {
         from: vi.fn(() => ({
           select: vi.fn().mockReturnThis(),
           eq: vi.fn().mockReturnThis(),
@@ -234,7 +235,7 @@ describe('POST /api/oauth/approve', () => {
           update: vi.fn().mockReturnThis(),
         })),
       };
-      vi.mocked(createClient).mockReturnValue(mockSupabase as never);
+      vi.mocked(createServiceRoleClient).mockReturnValue(mockDbClient as never);
 
       const request = createRequest({
         authorization_id: 'auth-123',
@@ -247,13 +248,13 @@ describe('POST /api/oauth/approve', () => {
       expect(response.status).toBe(200);
       expect(data.redirect_url).toMatch(/^https:\/\/client\.example\.com\/callback\?code=[a-f0-9]{64}&state=random-state$/);
       // Verify the from().update() was called to store the authorization code
-      expect(mockSupabase.from).toHaveBeenCalledWith('oauth_authorizations');
+      expect(mockDbClient.from).toHaveBeenCalledWith('oauth_authorizations');
     });
 
     it('should return 400 if authorization approval fails', async () => {
       vi.mocked(validateCsrfToken).mockResolvedValue(true);
 
-      let callCount = 0;
+      // Mock createClient for auth operations
       const mockSupabase = {
         auth: {
           getSession: vi.fn().mockResolvedValue({
@@ -261,6 +262,12 @@ describe('POST /api/oauth/approve', () => {
             error: null,
           }),
         },
+      };
+      vi.mocked(createClient).mockReturnValue(mockSupabase as never);
+
+      // Mock createServiceRoleClient for database operations
+      let callCount = 0;
+      const mockDbClient = {
         from: vi.fn(() => {
           callCount++;
           if (callCount === 1) {
@@ -299,7 +306,7 @@ describe('POST /api/oauth/approve', () => {
           }
         }),
       };
-      vi.mocked(createClient).mockReturnValue(mockSupabase as never);
+      vi.mocked(createServiceRoleClient).mockReturnValue(mockDbClient as never);
 
       const request = createRequest({
         authorization_id: 'auth-123',
@@ -316,6 +323,7 @@ describe('POST /api/oauth/approve', () => {
     it('should return 400 if authorization details not found', async () => {
       vi.mocked(validateCsrfToken).mockResolvedValue(true);
 
+      // Mock createClient for auth operations
       const mockSupabase = {
         auth: {
           getSession: vi.fn().mockResolvedValue({
@@ -323,6 +331,11 @@ describe('POST /api/oauth/approve', () => {
             error: null,
           }),
         },
+      };
+      vi.mocked(createClient).mockReturnValue(mockSupabase as never);
+
+      // Mock createServiceRoleClient for database operations
+      const mockDbClient = {
         from: vi.fn(() => ({
           select: vi.fn().mockReturnThis(),
           eq: vi.fn().mockReturnThis(),
@@ -333,7 +346,7 @@ describe('POST /api/oauth/approve', () => {
           update: vi.fn().mockReturnThis(),
         })),
       };
-      vi.mocked(createClient).mockReturnValue(mockSupabase as never);
+      vi.mocked(createServiceRoleClient).mockReturnValue(mockDbClient as never);
 
       const request = createRequest({
         authorization_id: 'auth-123',

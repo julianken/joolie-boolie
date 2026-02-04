@@ -126,9 +126,10 @@ export async function GET(request: NextRequest) {
       userId = session.user.id;
     }
 
-    // Use service role client for database operations in E2E mode
-    // (the authenticated user's client won't work when bypassing Supabase auth)
-    const dbClient = isE2ETestSession ? createServiceRoleClient() : supabase;
+    // Always use service role client for database operations
+    // The authorize endpoint needs to create authorizations on behalf of users,
+    // which requires bypassing RLS (oauth_authorizations only allows SELECT for users)
+    const dbClient = createServiceRoleClient();
 
     console.log('[OAuth Authorize] Looking up client:', clientId);
     console.log('[OAuth Authorize] Is E2E test session:', isE2ETestSession);
