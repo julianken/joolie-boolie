@@ -123,7 +123,7 @@ async function verifyAccessToken(token: string): Promise<boolean> {
 function getCookieOptions(maxAge: number) {
   return {
     path: '/',
-    domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
+    domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN?.trim() || undefined,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
