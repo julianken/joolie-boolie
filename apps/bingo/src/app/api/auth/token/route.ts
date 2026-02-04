@@ -89,10 +89,11 @@ export async function POST(request: NextRequest) {
     const cookieStore = await cookies();
 
     // Access token cookie (expires with token)
+    // Use sameSite: 'lax' for same-origin OAuth flows (not cross-origin)
     cookieStore.set('beak_access_token', tokens.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: 'lax',
       maxAge: tokens.expires_in,
       path: '/',
       domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       cookieStore.set('beak_refresh_token', tokens.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
+        sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60, // 30 days
         path: '/',
         domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set('beak_user_id', userId, {
       httpOnly: false, // Allow client-side access
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: 'lax',
       maxAge: tokens.expires_in,
       path: '/',
       domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || undefined,
