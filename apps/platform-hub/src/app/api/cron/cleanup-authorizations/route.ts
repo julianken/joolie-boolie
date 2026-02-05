@@ -7,7 +7,7 @@
  * Security: Protected by CRON_SECRET environment variable.
  * The secret is sent in the Authorization header by Vercel.
  *
- * Schedule: "0 0,6,12,18 * * *" (every 6 hours)
+ * Schedule: Every 6 hours (see vercel.json for cron expression)
  *
  * @see supabase/migrations/20260123000001_create_oauth_tables.sql
  *      for the cleanup_expired_authorizations() function definition.
