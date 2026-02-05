@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
-import { useSyncStore } from '@/stores/sync-store';
+import { useSyncStore } from '@beak-gaming/sync';
 import { useSync } from '@/hooks/use-sync';
 import { useFullscreen } from '@/hooks/use-fullscreen';
 import { isValidSessionId } from '@/lib/sync/session';
