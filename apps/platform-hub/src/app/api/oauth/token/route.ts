@@ -551,14 +551,14 @@ async function handleRefreshTokenGrant(params: {
     // Get user info from the validated token data
     // We need to look up the token to get user_id
     const dbClient = createServiceRoleClient();
-    const { data: tokenData } = await dbClient
+    const { data: tokenData, error: tokenError } = await dbClient
       .from('refresh_tokens')
       .select('user_id, scopes')
       .eq('id', rotationResult.newTokenId)
       .single();
 
-    if (!tokenData) {
-      console.error('[Token Endpoint] Could not find new token data');
+    if (tokenError || !tokenData) {
+      console.error('[Token Endpoint] Could not find new token data:', tokenError);
       return NextResponse.json(
         {
           error: 'server_error',
