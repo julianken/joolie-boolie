@@ -54,3 +54,11 @@ export {
 export { CreateGameModal, type CreateGameModalProps } from './create-game-modal';
 export { JoinGameModal, type JoinGameModalProps } from './join-game-modal';
 export { RoomCodeDisplay, type RoomCodeDisplayProps } from './room-code-display';
+
+// ThemeSelector
+export {
+  ThemeSelector,
+  DEFAULT_THEME_OPTIONS,
+  type ThemeSelectorProps,
+  type ThemeOption,
+} from './theme-selector';

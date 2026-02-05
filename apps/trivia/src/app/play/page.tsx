@@ -24,7 +24,7 @@ import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
 import { TeamManager } from '@/components/presenter/TeamManager';
 import { OpenDisplayButton as _OpenDisplayButton } from '@/components/presenter/OpenDisplayButton';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
-import { ThemeSelector } from '@/components/presenter/ThemeSelector';
+import { ThemeSelector } from '@beak-gaming/ui';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
 import { KeyboardShortcutsModal } from '@/components/ui/KeyboardShortcutsModal';
 import { RoomSetupModal } from '@/components/presenter/RoomSetupModal';
@@ -97,8 +97,13 @@ export default function PlayPage() {
   // Initialize sync as presenter role with session-scoped channel
   const { isConnected } = useSync({ role: 'presenter', sessionId });
 
-  // Apply presenter theme
+  // Theme store selectors
   const presenterTheme = useThemeStore((state) => state.presenterTheme);
+  const displayTheme = useThemeStore((state) => state.displayTheme);
+  const setPresenterTheme = useThemeStore((state) => state.setPresenterTheme);
+  const setDisplayTheme = useThemeStore((state) => state.setDisplayTheme);
+
+  // Apply presenter theme
   useApplyTheme(presenterTheme);
 
   // Session recovery on mount (skip in offline mode)
@@ -843,7 +848,12 @@ export default function PlayPage() {
 
             {/* Theme Settings */}
             <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <ThemeSelector />
+              <ThemeSelector
+                presenterTheme={presenterTheme}
+                displayTheme={displayTheme}
+                onPresenterThemeChange={setPresenterTheme}
+                onDisplayThemeChange={setDisplayTheme}
+              />
             </div>
 
             {/* Settings Panel - collapsible */}
