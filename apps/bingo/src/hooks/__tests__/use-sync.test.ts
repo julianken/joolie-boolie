@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSync } from '../use-sync';
-import { useSyncStore } from '@/stores/sync-store';
+import { useSyncStore } from '@beak-gaming/sync';
 import { useGameStore } from '@/stores/game-store';
 import { createMessageRouter } from '../use-sync';
 import { SyncMessage, BingoPattern, BingoBall, GameState } from '@/types';

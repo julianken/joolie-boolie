@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useMemo } from 'react';
-import { useSyncStore, SyncRole } from '@/stores/sync-store';
+import { useSyncStore, type SyncRole } from '@beak-gaming/sync';
 import { useGameStore } from '@/stores/game-store';
 import { BroadcastSync, type SyncMessage } from '@beak-gaming/sync';
 import { getChannelName } from '@/lib/sync/session';

@@ -1,5 +1,5 @@
 import { useGameStore } from '@/stores/game-store';
-import { useSyncStore } from '@/stores/sync-store';
+import { useSyncStore } from '@beak-gaming/sync';
 import { createInitialState } from '@/lib/game/engine';
 
 /**

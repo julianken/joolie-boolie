@@ -48,3 +48,9 @@ export function createSyncStore() {
  * Type helper for the store hook returned by createSyncStore.
  */
 export type UseSyncStore = ReturnType<typeof createSyncStore>;
+
+/**
+ * Pre-created sync store singleton for apps that don't need multiple instances.
+ * Most apps should use this directly instead of createSyncStore.
+ */
+export const useSyncStore = createSyncStore();
