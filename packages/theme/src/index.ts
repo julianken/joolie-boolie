@@ -38,3 +38,12 @@ export const touchTargets = {
 export type ColorToken = keyof typeof colors;
 export type FontSizeToken = keyof typeof fontSizes;
 export type TouchTargetSize = keyof typeof touchTargets;
+
+// Theme store factory
+export {
+  createThemeStore,
+  DEFAULT_THEME,
+  THEME_OPTIONS,
+  type ThemeStore,
+  type ThemeMode,
+} from './create-theme-store';
