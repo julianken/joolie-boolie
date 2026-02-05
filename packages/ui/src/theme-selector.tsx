@@ -1,35 +1,92 @@
 'use client';
 
 import { useId, useCallback } from 'react';
-import { ThemeMode } from '@/types';
-import { useThemeStore, THEME_OPTIONS } from '@/stores/theme-store';
+import type { ThemeMode } from '@beak-gaming/types';
 
-export interface ThemeSelectorProps {
-  disabled?: boolean;
+/**
+ * Theme option for the selector dropdown.
+ */
+export interface ThemeOption {
+  value: ThemeMode;
+  label: string;
 }
 
-export function ThemeSelector({ disabled = false }: ThemeSelectorProps) {
+/**
+ * Default theme options available in both presenter and display selectors.
+ */
+export const DEFAULT_THEME_OPTIONS: ThemeOption[] = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System Default' },
+];
+
+export interface ThemeSelectorProps {
+  /** Whether the selector is disabled */
+  disabled?: boolean;
+  /** Current presenter theme value */
+  presenterTheme: ThemeMode;
+  /** Current display theme value */
+  displayTheme: ThemeMode;
+  /** Callback when presenter theme changes */
+  onPresenterThemeChange: (theme: ThemeMode) => void;
+  /** Callback when display theme changes */
+  onDisplayThemeChange: (theme: ThemeMode) => void;
+  /** Theme options to display (defaults to light/dark/system) */
+  themeOptions?: ThemeOption[];
+}
+
+/**
+ * Theme selector component for dual-screen presenter/display themes.
+ *
+ * This component provides two dropdown selectors:
+ * - Presenter: Theme for the control panel view
+ * - Display: Theme for the audience/projection view
+ *
+ * @example
+ * ```tsx
+ * import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '@beak-gaming/ui';
+ * import { useThemeStore } from '@/stores/theme-store';
+ *
+ * function SettingsPanel() {
+ *   const presenterTheme = useThemeStore((state) => state.presenterTheme);
+ *   const displayTheme = useThemeStore((state) => state.displayTheme);
+ *   const setPresenterTheme = useThemeStore((state) => state.setPresenterTheme);
+ *   const setDisplayTheme = useThemeStore((state) => state.setDisplayTheme);
+ *
+ *   return (
+ *     <ThemeSelector
+ *       presenterTheme={presenterTheme}
+ *       displayTheme={displayTheme}
+ *       onPresenterThemeChange={setPresenterTheme}
+ *       onDisplayThemeChange={setDisplayTheme}
+ *     />
+ *   );
+ * }
+ * ```
+ */
+export function ThemeSelector({
+  disabled = false,
+  presenterTheme,
+  displayTheme,
+  onPresenterThemeChange,
+  onDisplayThemeChange,
+  themeOptions = DEFAULT_THEME_OPTIONS,
+}: ThemeSelectorProps) {
   const presenterThemeId = useId();
   const displayThemeId = useId();
 
-  const presenterTheme = useThemeStore((state) => state.presenterTheme);
-  const displayTheme = useThemeStore((state) => state.displayTheme);
-  const setPresenterTheme = useThemeStore((state) => state.setPresenterTheme);
-  const setDisplayTheme = useThemeStore((state) => state.setDisplayTheme);
-
   const handlePresenterThemeChange = useCallback(
     (theme: ThemeMode) => {
-      setPresenterTheme(theme);
+      onPresenterThemeChange(theme);
     },
-    [setPresenterTheme]
+    [onPresenterThemeChange]
   );
 
   const handleDisplayThemeChange = useCallback(
     (theme: ThemeMode) => {
-      // Just update the store - use-sync handles broadcasting
-      setDisplayTheme(theme);
+      onDisplayThemeChange(theme);
     },
-    [setDisplayTheme]
+    [onDisplayThemeChange]
   );
 
   const selectClassName = `
@@ -72,7 +129,7 @@ export function ThemeSelector({ disabled = false }: ThemeSelectorProps) {
             className={selectClassName}
             style={selectStyle}
           >
-            {THEME_OPTIONS.map((option) => (
+            {themeOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -99,7 +156,7 @@ export function ThemeSelector({ disabled = false }: ThemeSelectorProps) {
             className={selectClassName}
             style={selectStyle}
           >
-            {THEME_OPTIONS.map((option) => (
+            {themeOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

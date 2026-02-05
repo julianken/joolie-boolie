@@ -611,6 +611,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@beak-gaming/types':
+        specifier: workspace:*
+        version: link:../types
       react:
         specifier: ^19.0.0
         version: 19.2.3

@@ -25,7 +25,7 @@ import { Button } from "@beak-gaming/ui";
 import { VoiceSelector } from '@/components/ui/VoiceSelector';
 import { RollSoundSelector } from '@/components/presenter/RollSoundSelector';
 import { RevealChimeSelector } from '@/components/presenter/RevealChimeSelector';
-import { ThemeSelector } from '@/components/presenter/ThemeSelector';
+import { ThemeSelector } from '@beak-gaming/ui';
 import { useAudioPreload, useAudio } from '@/hooks/use-audio';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
@@ -101,8 +101,13 @@ export default function PlayPage() {
   const { preloadProgress } = useAudioPreload();
   const { voicePack, setVoicePack } = useAudio();
 
-  // Apply presenter theme
+  // Theme store selectors
   const presenterTheme = useThemeStore((state) => state.presenterTheme);
+  const displayTheme = useThemeStore((state) => state.displayTheme);
+  const setPresenterTheme = useThemeStore((state) => state.setPresenterTheme);
+  const setDisplayTheme = useThemeStore((state) => state.setDisplayTheme);
+
+  // Apply presenter theme
   useApplyTheme(presenterTheme);
 
   // Session recovery on mount (skip in offline mode)
@@ -739,7 +744,12 @@ export default function PlayPage() {
               <RevealChimeSelector />
 
               {/* Theme selector */}
-              <ThemeSelector />
+              <ThemeSelector
+                presenterTheme={presenterTheme}
+                displayTheme={displayTheme}
+                onPresenterThemeChange={setPresenterTheme}
+                onDisplayThemeChange={setDisplayTheme}
+              />
             </div>
 
             {/* Keyboard shortcuts reference - hidden on mobile (not relevant for touch) */}

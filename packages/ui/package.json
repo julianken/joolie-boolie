@@ -31,6 +31,7 @@
     "vitest": "^4.0.17"
   },
   "dependencies": {
+    "@beak-gaming/types": "workspace:*",
     "react-aria-components": "^1.14.0",
     "web-vitals": "^5.1.0"
   }
