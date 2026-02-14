@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game-keyboard';
 import { useSync } from '@/hooks/use-sync';
 import { useSessionRecovery, useAutoSync } from '@beak-gaming/sync';
@@ -34,6 +34,9 @@ import { QuestionSetSelector } from '@/components/presenter/QuestionSetSelector'
 import { QuestionImporter } from '@/components/presenter/QuestionImporter';
 import { SavePresetModal } from '@/components/presenter/SavePresetModal';
 import { SaveQuestionSetModal } from '@/components/presenter/SaveQuestionSetModal';
+import { CategoryFilterCompact } from '@/components/presenter/CategoryFilter';
+import { filterQuestionsByCategory } from '@/lib/categories';
+import type { QuestionCategory } from '@/types';
 import { Button } from '@beak-gaming/ui';
 import { serializeTriviaState, deserializeTriviaState } from '@/lib/state/serializer';
 
@@ -294,6 +297,13 @@ export default function PlayPage() {
   // Save preset/question set modal state
   const [showSavePresetModal, setShowSavePresetModal] = useState(false);
   const [showSaveQuestionSetModal, setShowSaveQuestionSetModal] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<QuestionCategory[]>([]);
+
+  // Filter questions by selected categories (setup-time filtering)
+  const filteredQuestions = useMemo(() => {
+    if (selectedCategories.length === 0) return game.questions;
+    return filterQuestionsByCategory(game.questions, selectedCategories);
+  }, [game.questions, selectedCategories]);
 
   // Get settings from settings store
   const {
@@ -726,7 +736,7 @@ export default function PlayPage() {
           <section className="hidden sm:block md:col-span-1 lg:col-span-3 lg:order-1">
             <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
               <QuestionList
-                questions={game.questions}
+                questions={game.status === 'setup' ? filteredQuestions : game.questions}
                 selectedIndex={game.selectedQuestionIndex}
                 displayIndex={game.displayQuestionIndex}
                 currentRound={game.currentRound}
@@ -936,6 +946,11 @@ export default function PlayPage() {
                 <h2 className="text-lg font-semibold text-foreground">Question Content</h2>
                 <QuestionImporter status={game.status} onImport={gameState.importQuestions} />
                 <QuestionSetSelector disabled={game.status !== 'setup'} />
+                <CategoryFilterCompact
+                  selectedCategories={selectedCategories}
+                  onCategoryChange={setSelectedCategories}
+                  questions={game.questions}
+                />
                 <button
                   onClick={() => setShowSaveQuestionSetModal(true)}
                   disabled={game.questions.length === 0}
