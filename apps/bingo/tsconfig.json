@@ -18,6 +18,7 @@
     "jsx": "react-jsx",
     "incremental": true,
     "types": [
+      "node",
       "vitest/globals",
       "@testing-library/jest-dom",
       "vitest-axe/matchers"
