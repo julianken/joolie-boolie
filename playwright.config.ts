@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { getE2EPortConfig } from './e2e/utils/port-config';
 
 // Load .env file manually (Playwright doesn't auto-load it)
+// Respects existing env vars — runner scripts (e.g., e2e-real-auth.sh) can
+// export values that take precedence over the .env file.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.join(__dirname, '.env');
 if (fs.existsSync(envPath)) {
@@ -13,14 +15,18 @@ if (fs.existsSync(envPath)) {
     const match = line.match(/^([^=]+)=(.*)$/);
     if (match) {
       const [, key, value] = match;
-      process.env[key.trim()] = value.trim();
+      const trimmedKey = key.trim();
+      // Don't overwrite env vars already set (e.g., by e2e-real-auth.sh)
+      if (process.env[trimmedKey] === undefined) {
+        process.env[trimmedKey] = value.trim();
+      }
     }
   });
 }
 
-// Set E2E testing flag - this signals to Platform Hub to bypass Supabase auth
-// and generate JWTs locally to avoid rate limits
-process.env.E2E_TESTING = 'true';
+// Set E2E testing flag unless explicitly disabled (e.g., for real-auth tests).
+// This signals to Platform Hub to bypass Supabase auth and generate JWTs locally.
+process.env.E2E_TESTING ??= 'true';
 
 const isCI = !!process.env.CI;
 

@@ -210,6 +210,11 @@ export NEXT_PUBLIC_SUPABASE_ANON_KEY="$LOCAL_ANON_KEY"
 export SUPABASE_SERVICE_ROLE_KEY="$LOCAL_SERVICE_KEY"
 export SESSION_TOKEN_SECRET="$SESSION_SECRET"
 
+# Disable E2E bypass — forces Playwright config to NOT set E2E_TESTING=true.
+# This ensures the Playwright process (test code) uses real Supabase credentials.
+# The dev servers already lack E2E_TESTING since .env.real-auth doesn't include it.
+export E2E_TESTING=false
+
 # =============================================================================
 # 11. Run real-auth tests only
 # =============================================================================
