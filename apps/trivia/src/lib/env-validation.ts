@@ -6,11 +6,12 @@
  */
 
 /**
- * Validates that SESSION_TOKEN_SECRET is present and has minimum length
+ * Validates that SESSION_TOKEN_SECRET is present and correctly formatted
  *
  * Requirements:
  * - Must exist (not undefined, not empty string)
- * - Must be at least 32 characters for cryptographic security
+ * - Must be exactly 64 characters (32 bytes in hex)
+ * - Must be valid hexadecimal (0-9, a-f, A-F)
  *
  * @throws Error if SESSION_TOKEN_SECRET is missing or invalid
  */
@@ -38,11 +39,21 @@ export function validateSessionTokenSecret(): void {
     );
   }
 
-  // Check minimum length (32 characters for cryptographic security)
-  if (secret.length < 32) {
+  // Check length (32 bytes = 64 hex characters)
+  if (secret.length !== 64) {
     throw new Error(
-      `FATAL: SESSION_TOKEN_SECRET must be at least 32 characters for cryptographic security.\n\n` +
+      `FATAL: SESSION_TOKEN_SECRET must be exactly 64 characters (32 bytes in hex).\n\n` +
       `Current length: ${secret.length} characters\n\n` +
+      'Generate a correct value with:\n' +
+      '  openssl rand -hex 32\n'
+    );
+  }
+
+  // Check if valid hexadecimal
+  const hexRegex = /^[0-9a-fA-F]{64}$/;
+  if (!hexRegex.test(secret)) {
+    throw new Error(
+      'FATAL: SESSION_TOKEN_SECRET must contain only hexadecimal characters (0-9, a-f, A-F).\n\n' +
       'Generate a correct value with:\n' +
       '  openssl rand -hex 32\n'
     );
