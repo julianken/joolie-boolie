@@ -3,9 +3,9 @@
 import { useId, useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
 import { useAudioStore } from '@/stores/audio-store';
-import { useToast } from "@beak-gaming/ui";
+import { useToast } from "@joolie-boolie/ui";
 import { patternRegistry } from '@/lib/game/patterns';
-import type { BingoTemplate } from '@beak-gaming/database/types';
+import type { BingoTemplate } from '@joolie-boolie/database/types';
 import type { VoicePackId } from '@/types';
 
 export interface TemplateSelectorProps {

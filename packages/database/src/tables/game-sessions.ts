@@ -7,7 +7,7 @@
  *
  * Please migrate to the new persistent sessions system:
  * - **Database operations**: Use `persistent-sessions.ts` for database-backed sessions
- * - **Client-side state**: Use `@beak-gaming/sync/session-store` for BroadcastChannel sync
+ * - **Client-side state**: Use `@joolie-boolie/sync/session-store` for BroadcastChannel sync
  *
  * ## Why Deprecated?
  *

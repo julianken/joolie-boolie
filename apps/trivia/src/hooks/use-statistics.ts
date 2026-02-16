@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { TriviaStatistics, TriviaSessionRecord } from '@beak-gaming/game-engine';
+import type { TriviaStatistics, TriviaSessionRecord } from '@joolie-boolie/game-engine';
 import {
   loadTriviaStats,
   addTriviaSession,
@@ -10,7 +10,7 @@ import {
   getMostPopularCategories,
   formatDuration,
   generateSessionId,
-} from '@beak-gaming/game-engine';
+} from '@joolie-boolie/game-engine';
 import type { Team, Question } from '@/types';
 
 /**

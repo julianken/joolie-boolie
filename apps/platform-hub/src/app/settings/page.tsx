@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@beak-gaming/auth';
-import { Button, Input } from '@beak-gaming/ui';
-import { useToast } from '@beak-gaming/ui';
+import { useAuth } from '@joolie-boolie/auth';
+import { Button, Input } from '@joolie-boolie/ui';
+import { useToast } from '@joolie-boolie/ui';
 import { useThemeStore, THEME_OPTIONS } from '@/stores/theme-store';
 import { ThemeMode } from '@/types';
 
@@ -25,7 +25,7 @@ export default function SettingsPage() {
   // Skip redirect in E2E mode (cookies checked server-side in layout.tsx)
   useEffect(() => {
     // Check for E2E auth cookies (client-side check)
-    const hasE2ECookies = document.cookie.includes('beak_user_id=');
+    const hasE2ECookies = document.cookie.includes('jb_user_id=');
 
     if (!authLoading && !user && !hasE2ECookies) {
       router.push('/login?redirect=%2Fsettings');
@@ -48,7 +48,7 @@ export default function SettingsPage() {
     };
 
     // Check for E2E mode
-    const hasE2ECookies = document.cookie.includes('beak_user_id=');
+    const hasE2ECookies = document.cookie.includes('jb_user_id=');
 
     if (user || hasE2ECookies) {
       loadProfile();
@@ -113,7 +113,7 @@ export default function SettingsPage() {
   };
 
   // Check for E2E mode
-  const hasE2ECookies = typeof window !== 'undefined' && document.cookie.includes('beak_user_id=');
+  const hasE2ECookies = typeof window !== 'undefined' && document.cookie.includes('jb_user_id=');
 
   if (authLoading && !hasE2ECookies) {
     return (

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { Header } from '../Header';
-import type { AuthUser } from '@beak-gaming/auth';
+import type { AuthUser } from '@joolie-boolie/auth';
 
 // Mock Next.js navigation hooks
 const mockPush = vi.fn();
@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => mockUseRouter(),
 }));
 
-// Mock @beak-gaming/auth hooks
+// Mock @joolie-boolie/auth hooks
 const mockSignOut = vi.fn();
 const mockUseAuth = vi.fn<() => { user: AuthUser | null; signOut: typeof mockSignOut; isLoading: boolean }>();
 
@@ -24,12 +24,12 @@ mockUseAuth.mockReturnValue({
   isLoading: false,
 });
 
-vi.mock('@beak-gaming/auth', () => ({
+vi.mock('@joolie-boolie/auth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-// Mock @beak-gaming/ui Button component
-vi.mock('@beak-gaming/ui', () => ({
+// Mock @joolie-boolie/ui Button component
+vi.mock('@joolie-boolie/ui', () => ({
   Button: ({
     children,
     onClick,
@@ -69,7 +69,7 @@ describe('Header', () => {
 
     it('renders the brand name', () => {
       render(<Header />);
-      expect(screen.getByText('Beak Gaming')).toBeInTheDocument();
+      expect(screen.getByText('Joolie Boolie')).toBeInTheDocument();
     });
 
     it('renders the tagline on larger screens', () => {
@@ -79,7 +79,7 @@ describe('Header', () => {
 
     it('renders the home link', () => {
       render(<Header />);
-      const homeLink = screen.getByLabelText('Beak Gaming Platform - Home');
+      const homeLink = screen.getByLabelText('Joolie Boolie Platform - Home');
       expect(homeLink).toBeInTheDocument();
       expect(homeLink).toHaveAttribute('href', '/');
     });
@@ -107,7 +107,7 @@ describe('Header', () => {
 
     it('home link has aria-label', () => {
       render(<Header />);
-      expect(screen.getByLabelText('Beak Gaming Platform - Home')).toBeInTheDocument();
+      expect(screen.getByLabelText('Joolie Boolie Platform - Home')).toBeInTheDocument();
     });
 
     it('logo SVG has aria-hidden', () => {

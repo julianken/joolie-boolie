@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import PlayPage from '../page';
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 
 // Create mock functions to be shared across tests
 const mockClearToken = vi.fn();
@@ -52,7 +52,7 @@ vi.mock('@/hooks/use-sync', () => ({
   useSync: () => ({ isConnected: true }),
 }));
 
-vi.mock('@beak-gaming/sync', () => ({
+vi.mock('@joolie-boolie/sync', () => ({
   useSessionRecovery: () => ({
     isRecovering: false,
     isRecovered: false,
@@ -114,8 +114,8 @@ vi.mock('@/lib/sync/session', () => ({
   generateSessionId: () => 'test-session-id',
 }));
 
-vi.mock('@beak-gaming/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@beak-gaming/ui')>();
+vi.mock('@joolie-boolie/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@joolie-boolie/ui')>();
   return {
     ...actual,
     CreateGameModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>

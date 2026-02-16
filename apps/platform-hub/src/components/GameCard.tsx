@@ -36,7 +36,7 @@ const statusConfig: Record<GameStatus, { label: string; className: string }> = {
 
 /**
  * GameCard - A large, accessible card for selecting games.
- * Designed for senior users with large touch targets, high contrast, and clear CTAs.
+ * Designed for users with large touch targets, high contrast, and clear CTAs.
  */
 export const GameCard = forwardRef<HTMLAnchorElement, GameCardProps>(
   (

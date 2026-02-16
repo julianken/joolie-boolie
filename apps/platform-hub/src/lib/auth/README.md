@@ -122,7 +122,7 @@ const result = await createSupabaseSession(
   'refresh-token-xyz',
   {
     facility_name: 'Sunny Acres',
-    default_game_title: 'Trivia Night'
+    default_game_title: 'Trivia'
   }
 );
 ```

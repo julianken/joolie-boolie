@@ -4,9 +4,9 @@ import {
   THEME_OPTIONS,
   type ThemeStore,
   type ThemeMode,
-} from '@beak-gaming/theme';
+} from '@joolie-boolie/theme';
 
-export const useThemeStore = createThemeStore('beak-bingo-theme');
+export const useThemeStore = createThemeStore('jb-bingo-theme');
 
 // Re-export types and constants for backward compatibility
 export { DEFAULT_THEME, THEME_OPTIONS };

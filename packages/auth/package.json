@@ -1,5 +1,5 @@
 {
-  "name": "@beak-gaming/auth",
+  "name": "@joolie-boolie/auth",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -34,7 +34,7 @@
     }
   },
   "devDependencies": {
-    "@beak-gaming/testing": "workspace:*",
+    "@joolie-boolie/testing": "workspace:*",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.1.0",
     "@types/node": "^22",

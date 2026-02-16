@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
-import { Button } from '@beak-gaming/ui';
-import { useAuth } from '@beak-gaming/auth';
+import { Button } from '@joolie-boolie/ui';
+import { useAuth } from '@joolie-boolie/auth';
 
 export interface LoginFormProps {
   /** Optional redirect URL after successful login */
@@ -64,7 +64,7 @@ function buildRedirectUrl(redirectTo: string | undefined, authorizationId: strin
 }
 
 /**
- * LoginForm - Senior-friendly login form with email and password.
+ * LoginForm - Accessible login form with email and password.
  *
  * Features:
  * - Large fonts and buttons for accessibility
@@ -110,7 +110,7 @@ export function LoginForm({ redirectTo, authorizationId }: LoginFormProps) {
     }
 
     // Call Platform Hub login API to set cross-app SSO cookies
-    // This replaces direct signIn call to ensure beak_access_token is set
+    // This replaces direct signIn call to ensure jb_access_token is set
     try {
       console.log('[LoginForm] Calling /api/auth/login...');
       const response = await fetch('/api/auth/login', {

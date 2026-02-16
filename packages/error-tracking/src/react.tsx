@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @beak-gaming/error-tracking - React Integration
+ * @joolie-boolie/error-tracking - React Integration
  *
  * React components and hooks for error tracking.
  * Includes ErrorBoundary, hooks, and context providers.
@@ -147,7 +147,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 }
 
 /**
- * Default error fallback with senior-friendly design
+ * Default error fallback with accessible design
  */
 function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) {
   return (

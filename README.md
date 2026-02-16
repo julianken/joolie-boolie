@@ -1,6 +1,6 @@
-# Beak Gaming Platform
+# Joolie Boolie Platform
 
-A unified gaming platform for retirement communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
+A unified gaming platform for groups and communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
 
 ## Current Status
 
@@ -9,18 +9,18 @@ A unified gaming platform for retirement communities, featuring Bingo, Trivia, a
 | **[Bingo](./apps/bingo/README.md)** | ✅ Production Ready | 85% | 75-ball bingo with audio, patterns, themes, dual-screen sync, PWA |
 | **[Trivia](./apps/trivia/README.md)** | ✅ Production Ready | 95% | Team trivia with rounds, scoring, TTS, themes, dual-screen sync, PWA |
 | **[Platform Hub](./apps/platform-hub/README.md)** | 🚧 Backend Complete | 55-60% | OAuth 2.1 server, game selector UI, auth forms. Dashboard/profile TODO |
-| **[@beak-gaming/sync](./packages/sync/README.md)** | ✅ Complete | 100% | BroadcastChannel dual-screen synchronization |
-| **[@beak-gaming/ui](./packages/ui/README.md)** | ✅ Complete | 100% | Button, Toggle, Slider, Card, Modal, Toast components |
-| **[@beak-gaming/theme](./packages/theme/README.md)** | ✅ Complete | 100% | Design tokens, 10+ themes, senior-friendly typography |
-| **[@beak-gaming/database](./packages/database/README.md)** | ✅ Complete | 98% | Type-safe Supabase client wrappers (268 exports) |
-| **[@beak-gaming/auth](./packages/auth/README.md)** | ✅ Complete | 95% | Supabase authentication wrappers (34 exports) |
-| **[@beak-gaming/types](./packages/types/README.md)** | ✅ Complete | 100% | Shared TypeScript type definitions (30 exports) |
-| **[@beak-gaming/game-engine](./packages/game-engine/README.md)** | ⚠️ Partial | 40% | Abstract game state machine |
-| **[@beak-gaming/testing](./packages/testing/README.md)** | ✅ Complete | 100% | BroadcastChannel and Audio mocks for tests |
+| **[@joolie-boolie/sync](./packages/sync/README.md)** | ✅ Complete | 100% | BroadcastChannel dual-screen synchronization |
+| **[@joolie-boolie/ui](./packages/ui/README.md)** | ✅ Complete | 100% | Button, Toggle, Slider, Card, Modal, Toast components |
+| **[@joolie-boolie/theme](./packages/theme/README.md)** | ✅ Complete | 100% | Design tokens, 10+ themes, accessible typography |
+| **[@joolie-boolie/database](./packages/database/README.md)** | ✅ Complete | 98% | Type-safe Supabase client wrappers (268 exports) |
+| **[@joolie-boolie/auth](./packages/auth/README.md)** | ✅ Complete | 95% | Supabase authentication wrappers (34 exports) |
+| **[@joolie-boolie/types](./packages/types/README.md)** | ✅ Complete | 100% | Shared TypeScript type definitions (30 exports) |
+| **[@joolie-boolie/game-engine](./packages/game-engine/README.md)** | ⚠️ Partial | 40% | Abstract game state machine |
+| **[@joolie-boolie/testing](./packages/testing/README.md)** | ✅ Complete | 100% | BroadcastChannel and Audio mocks for tests |
 
 ## Features
 
-### Beak Bingo
+### Joolie Boolie Bingo
 - 75-ball bingo (B:1-15, I:16-30, N:31-45, G:46-60, O:61-75)
 - 15+ bingo patterns (lines, corners, frames, shapes, letters, blackout)
 - Voice packs with British slang variant and hall reverb options
@@ -31,7 +31,7 @@ A unified gaming platform for retirement communities, featuring Bingo, Trivia, a
 - Fullscreen mode for audience display
 - PWA with offline support
 
-### Trivia Night
+### Trivia
 - Multi-round team trivia (configurable rounds and questions per round)
 - Team management with scoring
 - Text-to-speech announcements for questions and answers
@@ -63,15 +63,15 @@ A unified gaming platform for retirement communities, featuring Bingo, Trivia, a
 ## Project Structure
 
 ```
-beak-gaming-platform/
+joolie-boolie-platform/
 ├── apps/
-│   ├── bingo/           # Beak Bingo (port 3000) - See README: apps/bingo/README.md
-│   ├── trivia/          # Trivia Night (port 3001) - See README: apps/trivia/README.md
+│   ├── bingo/           # Joolie Boolie Bingo (port 3000) - See README: apps/bingo/README.md
+│   ├── trivia/          # Trivia (port 3001) - See README: apps/trivia/README.md
 │   └── platform-hub/    # Central hub (port 3002) - See README: apps/platform-hub/README.md
 ├── packages/
 │   ├── sync/            # Dual-screen synchronization - See README: packages/sync/README.md
 │   ├── ui/              # Shared UI components - See README: packages/ui/README.md
-│   ├── theme/           # Senior-friendly design tokens - See README: packages/theme/README.md
+│   ├── theme/           # Accessible design tokens - See README: packages/theme/README.md
 │   ├── auth/            # Supabase authentication - See README: packages/auth/README.md
 │   ├── game-engine/     # Abstract game state machine - See README: packages/game-engine/README.md
 │   ├── database/        # Database utilities - See README: packages/database/README.md
@@ -96,8 +96,8 @@ beak-gaming-platform/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/beak-gaming-platform.git
-cd beak-gaming-platform
+git clone https://github.com/your-org/joolie-boolie-platform.git
+cd joolie-boolie-platform
 
 # Install dependencies
 pnpm install
@@ -205,7 +205,7 @@ This monorepo is configured for deployment to Vercel with each app deployed as a
 2. Click **"Add New Project"**
 3. Import your repository
 4. Configure the project:
-   - **Project Name:** `beak-bingo` (or your choice)
+   - **Project Name:** `jb-bingo` (or your choice)
    - **Framework Preset:** Next.js (auto-detected)
    - **Root Directory:** `apps/bingo`
    - **Build Command:** Leave default (uses vercel.json)
@@ -215,7 +215,7 @@ This monorepo is configured for deployment to Vercel with each app deployed as a
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   NEXT_PUBLIC_APP_URL=https://beak-bingo.vercel.app
+   NEXT_PUBLIC_APP_URL=https://bingo.joolie-boolie.com
    ```
 6. Click **Deploy**
 
@@ -223,18 +223,18 @@ This monorepo is configured for deployment to Vercel with each app deployed as a
 
 Repeat the same steps with:
 - **Root Directory:** `apps/trivia`
-- **Project Name:** `beak-trivia`
+- **Project Name:** `jb-trivia`
 - Update `NEXT_PUBLIC_APP_URL` to the trivia deployment URL
 
 #### 4. Deploy Platform Hub
 
 Repeat the same steps with:
 - **Root Directory:** `apps/platform-hub`
-- **Project Name:** `beak-platform-hub`
+- **Project Name:** `jb-platform-hub`
 - Add additional environment variables:
   ```
-  NEXT_PUBLIC_BINGO_URL=https://beak-bingo.vercel.app
-  NEXT_PUBLIC_TRIVIA_URL=https://beak-trivia.vercel.app
+  NEXT_PUBLIC_BINGO_URL=https://bingo.joolie-boolie.com.vercel.app
+  NEXT_PUBLIC_TRIVIA_URL=https://trivia.joolie-boolie.com.vercel.app
   ```
 
 ### Custom Domains
@@ -242,14 +242,14 @@ Repeat the same steps with:
 After deployment, you can add custom domains:
 
 1. Go to your project's **Settings > Domains**
-2. Add your domain (e.g., `bingo.beakgaming.com`)
+2. Add your domain (e.g., `bingo.joolieboolie.com`)
 3. Configure DNS as instructed
 4. Update `NEXT_PUBLIC_APP_URL` to match the custom domain
 
 Recommended domain structure:
-- `beakgaming.com` or `hub.beakgaming.com` - Platform Hub
-- `bingo.beakgaming.com` - Bingo
-- `trivia.beakgaming.com` - Trivia
+- `joolieboolie.com` or `hub.joolieboolie.com` - Platform Hub
+- `bingo.joolieboolie.com` - Bingo
+- `trivia.joolieboolie.com` - Trivia
 
 ### Enable Turbo Remote Caching (Optional)
 
@@ -273,11 +273,11 @@ Remote caching speeds up builds by sharing cache across deployments:
 | All | `NEXT_PUBLIC_SUPABASE_URL` | `https://abc123.supabase.co` |
 | All | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIs...` |
 | All | `SUPABASE_SERVICE_ROLE_KEY` | `eyJhbGciOiJIUzI1NiIs...` |
-| Bingo | `NEXT_PUBLIC_APP_URL` | `https://bingo.beakgaming.com` |
-| Trivia | `NEXT_PUBLIC_APP_URL` | `https://trivia.beakgaming.com` |
-| Hub | `NEXT_PUBLIC_APP_URL` | `https://beakgaming.com` |
-| Hub | `NEXT_PUBLIC_BINGO_URL` | `https://bingo.beakgaming.com` |
-| Hub | `NEXT_PUBLIC_TRIVIA_URL` | `https://trivia.beakgaming.com` |
+| Bingo | `NEXT_PUBLIC_APP_URL` | `https://bingo.joolieboolie.com` |
+| Trivia | `NEXT_PUBLIC_APP_URL` | `https://trivia.joolieboolie.com` |
+| Hub | `NEXT_PUBLIC_APP_URL` | `https://joolieboolie.com` |
+| Hub | `NEXT_PUBLIC_BINGO_URL` | `https://bingo.joolieboolie.com` |
+| Hub | `NEXT_PUBLIC_TRIVIA_URL` | `https://trivia.joolieboolie.com` |
 
 ### Deployment Architecture
 
@@ -285,7 +285,7 @@ Remote caching speeds up builds by sharing cache across deployments:
 ┌─────────────────────────────────────────────────────────────┐
 │                        Vercel                                │
 ├─────────────────┬─────────────────┬─────────────────────────┤
-│   beak-bingo    │   beak-trivia   │   beak-platform-hub     │
+│   jb-bingo    │   jb-trivia   │   jb-platform-hub     │
 │   /apps/bingo   │   /apps/trivia  │   /apps/platform-hub    │
 │   port: 3000    │   port: 3001    │   port: 3002            │
 └────────┬────────┴────────┬────────┴────────────┬────────────┘
@@ -360,7 +360,7 @@ Try redeploying with cache cleared:
 
 ## Performance Monitoring
 
-The platform includes comprehensive performance monitoring tools to ensure fast load times and smooth experiences, especially important for users on retirement community networks.
+The platform includes comprehensive performance monitoring tools to ensure fast load times and smooth experiences, especially important for users on group and community networks.
 
 ### Bundle Analysis
 
@@ -398,7 +398,7 @@ pnpm lighthouse:hub
 
 Results are saved to `.lighthouseci/` directory. The audits check:
 - **Performance:** LCP, FCP, CLS, TBT, Speed Index
-- **Accessibility:** Color contrast, tap targets, font sizes (critical for senior users)
+- **Accessibility:** Color contrast, tap targets, font sizes (critical for users)
 - **Best Practices:** Security, modern APIs
 - **SEO:** Meta tags, crawlability
 
@@ -418,11 +418,11 @@ Performance budgets are defined in `performance.config.js`:
 
 ### Web Vitals Monitoring
 
-The `WebVitals` component from `@beak-gaming/ui` collects Core Web Vitals in real-time:
+The `WebVitals` component from `@joolie-boolie/ui` collects Core Web Vitals in real-time:
 
 ```tsx
 // In your root layout.tsx
-import { WebVitals } from '@beak-gaming/ui';
+import { WebVitals } from '@joolie-boolie/ui';
 
 export default function RootLayout({ children }) {
   return (
@@ -467,7 +467,7 @@ Add to your CI workflow to catch performance regressions:
 
 ## Design Principles
 
-- **Senior-friendly:** Large fonts (min 18px), high contrast, large click targets (min 44x44px)
+- **Accessible:** Large fonts (min 18px), high contrast, large click targets (min 44x44px)
 - **Dual-screen:** Presenter controls + audience display synced via BroadcastChannel
 - **Offline-capable:** PWA support for spotty wifi environments
 - **Accessible:** Keyboard navigation, screen reader support
@@ -490,14 +490,14 @@ Each shared package has API documentation:
 
 | Package | README | Description |
 |---------|--------|-------------|
-| **[@beak-gaming/sync](./packages/sync/README.md)** | [README](./packages/sync/README.md) | BroadcastChannel dual-screen synchronization |
-| **[@beak-gaming/ui](./packages/ui/README.md)** | [README](./packages/ui/README.md) | 6 senior-friendly UI components |
-| **[@beak-gaming/theme](./packages/theme/README.md)** | [README](./packages/theme/README.md) | Design tokens and CSS variables |
-| **[@beak-gaming/database](./packages/database/README.md)** | [README](./packages/database/README.md) | Type-safe Supabase utilities (268 exports) |
-| **[@beak-gaming/auth](./packages/auth/README.md)** | [README](./packages/auth/README.md) | Authentication wrappers (34 exports) |
-| **[@beak-gaming/types](./packages/types/README.md)** | [README](./packages/types/README.md) | Shared TypeScript types (30 exports) |
-| **[@beak-gaming/game-engine](./packages/game-engine/README.md)** | [README](./packages/game-engine/README.md) | Abstract game state machine |
-| **[@beak-gaming/testing](./packages/testing/README.md)** | [README](./packages/testing/README.md) | Test utilities and mocks |
+| **[@joolie-boolie/sync](./packages/sync/README.md)** | [README](./packages/sync/README.md) | BroadcastChannel dual-screen synchronization |
+| **[@joolie-boolie/ui](./packages/ui/README.md)** | [README](./packages/ui/README.md) | 6 accessible UI components |
+| **[@joolie-boolie/theme](./packages/theme/README.md)** | [README](./packages/theme/README.md) | Design tokens and CSS variables |
+| **[@joolie-boolie/database](./packages/database/README.md)** | [README](./packages/database/README.md) | Type-safe Supabase utilities (268 exports) |
+| **[@joolie-boolie/auth](./packages/auth/README.md)** | [README](./packages/auth/README.md) | Authentication wrappers (34 exports) |
+| **[@joolie-boolie/types](./packages/types/README.md)** | [README](./packages/types/README.md) | Shared TypeScript types (30 exports) |
+| **[@joolie-boolie/game-engine](./packages/game-engine/README.md)** | [README](./packages/game-engine/README.md) | Abstract game state machine |
+| **[@joolie-boolie/testing](./packages/testing/README.md)** | [README](./packages/testing/README.md) | Test utilities and mocks |
 
 ### Other Documentation
 

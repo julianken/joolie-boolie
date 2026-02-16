@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import type { TriviaQuestionSet, TriviaQuestion } from '@beak-gaming/database/types';
+import type { TriviaQuestionSet, TriviaQuestion } from '@joolie-boolie/database/types';
 import { QuestionSetImporter } from '@/components/presenter/QuestionSetImporter';
 import { QuestionSetEditorModal } from '@/components/question-editor/QuestionSetEditorModal';
 import {

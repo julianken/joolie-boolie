@@ -32,7 +32,7 @@ test.describe('Round Editor', () => {
     expect(box!.height).toBeGreaterThanOrEqual(44);
   });
 
-  test('import questions button has senior-friendly size', async ({ page }) => {
+  test('import questions button has accessible size', async ({ page }) => {
     const importButton = page.getByRole('button', { name: /import questions/i });
     const box = await importButton.boundingBox();
 

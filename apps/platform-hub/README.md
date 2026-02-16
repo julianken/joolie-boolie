@@ -2,7 +2,7 @@
 
 **Status:** 🚧 Scaffolded (10% Complete)
 
-The central entry point for the Beak Gaming Platform. Provides game selection, authentication flows, and user dashboard. Currently features a complete UI layer with game selector, auth forms, and dashboard components, but lacks backend API routes and authentication integration.
+The central entry point for the Joolie Boolie Platform. Provides game selection, authentication flows, and user dashboard. Currently features a complete UI layer with game selector, auth forms, and dashboard components, but lacks backend API routes and authentication integration.
 
 ## Features
 
@@ -10,11 +10,11 @@ The central entry point for the Beak Gaming Platform. Provides game selection, a
 - ✅ **Auth Form Components** - Login, signup, and password reset forms (UI only)
 - ✅ **Dashboard UI** - User dashboard with welcome header, quick play, recent sessions, and preferences (placeholder data)
 - ✅ **Responsive Layout** - Header, Footer, and mobile-friendly components
-- ✅ **Design System Integration** - Uses @beak-gaming/ui and @beak-gaming/theme packages
+- ✅ **Design System Integration** - Uses @joolie-boolie/ui and @joolie-boolie/theme packages
 - ✅ **Error Boundaries** - Global and page-level error handling
 - ✅ **Testing Infrastructure** - Vitest + Testing Library setup with component tests
 - ❌ **API Routes** - No backend endpoints implemented (authentication, sessions, profiles)
-- ❌ **Supabase Auth Integration** - @beak-gaming/auth package not yet wired up
+- ❌ **Supabase Auth Integration** - @joolie-boolie/auth package not yet wired up
 - ❌ **Real User Data** - Dashboard shows placeholder data, no database queries
 - ❌ **Protected Routes** - No route protection or session management
 - ❌ **Template Management** - No backend for saving game templates across apps
@@ -83,7 +83,7 @@ pnpm test:coverage     # With coverage report
 | Frontend | React 19 + Tailwind CSS 4 |
 | Backend (BFF) | None (planned: Next.js API Routes) |
 | Database | None (planned: Supabase PostgreSQL) |
-| Auth | None (planned: Supabase Auth via @beak-gaming/auth) |
+| Auth | None (planned: Supabase Auth via @joolie-boolie/auth) |
 | State Management | None (future: may need Zustand for user state) |
 | Testing | Vitest 4 + Testing Library |
 
@@ -192,11 +192,11 @@ pnpm analyze
 
 This app depends on the following shared packages:
 
-- [`@beak-gaming/ui`](../../packages/ui/README.md) - Button, Toggle, Card, Modal, Toast components - **🚧 Partially Integrated**
-- [`@beak-gaming/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing) - **🚧 Partially Integrated**
-- [`@beak-gaming/auth`](../../packages/auth/README.md) - Supabase authentication wrappers (34 exports) - **❌ Not Integrated**
-- [`@beak-gaming/database`](../../packages/database/README.md) - Type-safe Supabase client wrappers (268 exports) - **❌ Not Integrated**
-- [`@beak-gaming/error-tracking`](../../packages/error-tracking/README.md) - Error logging utilities - **✅ Integrated**
+- [`@joolie-boolie/ui`](../../packages/ui/README.md) - Button, Toggle, Card, Modal, Toast components - **🚧 Partially Integrated**
+- [`@joolie-boolie/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing) - **🚧 Partially Integrated**
+- [`@joolie-boolie/auth`](../../packages/auth/README.md) - Supabase authentication wrappers (34 exports) - **❌ Not Integrated**
+- [`@joolie-boolie/database`](../../packages/database/README.md) - Type-safe Supabase client wrappers (268 exports) - **❌ Not Integrated**
+- [`@joolie-boolie/error-tracking`](../../packages/error-tracking/README.md) - Error logging utilities - **✅ Integrated**
 
 ## Integration Status
 
@@ -205,8 +205,8 @@ This app depends on the following shared packages:
 | **Game Selector UI** | ✅ Complete | Landing page with game cards, responsive layout |
 | **Auth Forms UI** | ✅ Complete | Login, signup, forgot-password forms (no backend) |
 | **Dashboard UI** | ✅ Complete | Welcome header, quick play, recent sessions, preferences (placeholder data) |
-| **Authentication** | ❌ Not Integrated | @beak-gaming/auth package installed but not wired up |
-| **Database** | ❌ Not Integrated | @beak-gaming/database package installed but not used |
+| **Authentication** | ❌ Not Integrated | @joolie-boolie/auth package installed but not wired up |
+| **Database** | ❌ Not Integrated | @joolie-boolie/database package installed but not used |
 | **API Routes** | ❌ Not Implemented | No BFF endpoints for auth, sessions, profiles, templates |
 | **Protected Routes** | ❌ Not Implemented | No route protection or middleware |
 | **User State Management** | ❌ Not Implemented | No Zustand stores for user data |
@@ -228,9 +228,9 @@ This app depends on the following shared packages:
 
 ### Phase 1: Authentication (High Priority)
 - [ ] Implement API routes for auth (login, signup, logout, password reset)
-- [ ] Wire up @beak-gaming/auth package to auth forms
+- [ ] Wire up @joolie-boolie/auth package to auth forms
 - [ ] Add protected route middleware
-- [ ] Implement session token management with @beak-gaming/database
+- [ ] Implement session token management with @joolie-boolie/database
 - [ ] Add user state management (Zustand store)
 - [ ] Replace placeholder data with real user queries
 - [ ] Add logout functionality to Header component
@@ -270,7 +270,7 @@ This app depends on the following shared packages:
 
 ## Design Requirements
 
-- **Senior-friendly:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
+- **Accessible:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
 - **Touch targets:** Minimum 44x44px for all interactive elements (buttons, links, form inputs)
 - **Color contrast:** WCAG AA compliant for text and interactive elements
 - **Responsive design:** Mobile-first approach, works on tablets, laptops, and desktops
@@ -290,7 +290,7 @@ See the [root README](../../README.md) for monorepo setup instructions and the [
 
 **Important:** This app is in early scaffolding phase (10% complete). Most backend functionality is missing. Contributions should focus on:
 1. Implementing API routes for authentication
-2. Wiring up @beak-gaming/auth and @beak-gaming/database packages
+2. Wiring up @joolie-boolie/auth and @joolie-boolie/database packages
 3. Replacing placeholder data with real database queries
 4. Adding protected route middleware
 5. Implementing user state management

@@ -3,15 +3,15 @@ import Link from 'next/link';
 import { LoginForm } from '@/components';
 
 export const metadata: Metadata = {
-  title: 'Sign In - Beak Gaming Platform',
-  description: 'Sign in to your Beak Gaming Platform account to access Bingo, Trivia, and more games.',
+  title: 'Sign In - Joolie Boolie Platform',
+  description: 'Sign in to your Joolie Boolie Platform account to access Bingo, Trivia, and more games.',
 };
 
 // Force dynamic rendering to avoid build-time Supabase initialization
 export const dynamic = 'force-dynamic';
 
 /**
- * Login Page - Senior-friendly sign in page.
+ * Login Page - Accessible sign in page.
  *
  * Features:
  * - Large, clear layout
@@ -116,7 +116,7 @@ export default async function LoginPage(props: {
         <p className="text-center text-base text-muted-foreground mt-8">
           Need help?{' '}
           <a
-            href="mailto:support@beakgaming.com"
+            href="mailto:support@joolieboolie.com"
             className="text-primary hover:text-primary/80 underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
           >
             Contact Support

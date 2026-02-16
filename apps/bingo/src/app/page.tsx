@@ -6,10 +6,10 @@ import { LoginButton } from '@/components/auth/LoginButton';
 export default async function Home() {
   // Check authentication state via cookie
   const cookieStore = await cookies();
-  const isSignedIn = !!cookieStore.get('beak_access_token')?.value;
+  const isSignedIn = !!cookieStore.get('jb_access_token')?.value;
 
   // Get return path if set by middleware (when unauthenticated user tried to access protected route)
-  const returnTo = cookieStore.get('beak_return_to')?.value;
+  const returnTo = cookieStore.get('jb_return_to')?.value;
 
   return (
     <main className="min-h-screen bg-background">
@@ -23,16 +23,16 @@ export default async function Home() {
             {/* Logo / Title */}
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground">
-                Beak Bingo
+                Joolie Boolie Bingo
               </h1>
               <p className="text-2xl md:text-3xl text-muted-foreground max-w-2xl mx-auto">
-                Modern bingo for retirement communities
+                Modern bingo for groups and communities
               </p>
             </div>
 
             {/* Description */}
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              A cloud-based, easy-to-use bingo system designed for seniors.
+              A cloud-based, easy-to-use bingo system designed for everyone.
               Large fonts, high contrast, and audio announcements make every game accessible and fun.
             </p>
 
@@ -55,7 +55,7 @@ export default async function Home() {
                   Play
                 </Link>
               ) : (
-                // Not Signed In: Show only "Sign in with Beak Gaming" button
+                // Not Signed In: Show only "Sign in with Joolie Boolie" button
                 <LoginButton returnTo={returnTo} />
               )}
             </div>
@@ -67,7 +67,7 @@ export default async function Home() {
       <section className="bg-muted/10 py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Designed for Seniors
+            Designed for Everyone
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -206,7 +206,7 @@ export default async function Home() {
       <footer className="bg-muted/10 border-t border-border py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-lg text-muted-foreground">
-            Part of the <span className="font-semibold">Beak Gaming Platform</span> for retirement communities
+            Part of the <span className="font-semibold">Joolie Boolie Platform</span> for groups and communities
           </p>
         </div>
       </footer>

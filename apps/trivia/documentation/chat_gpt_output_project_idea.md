@@ -43,7 +43,7 @@ Residents sit at tables and form teams
 Teams answer using paper answer sheets or verbal answers
 Presenter controls pacing, question reveal, and scoring
 
-This setup works best for senior audiences because it is simple and familiar.
+This setup works best for audiences because it is simple and familiar.
 
 5. Recommended Game Format
 
@@ -80,7 +80,7 @@ The platform should support the following formats:
 Multiple choice
 True/False
 Short answer
-Image-based questions (very effective for seniors)
+Image-based questions (very effective for everyone)
 Optional audio-based questions (music intros or famous speeches)
 
 Avoid formats requiring phones or fast tapping responses.

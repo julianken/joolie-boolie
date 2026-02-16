@@ -108,7 +108,7 @@ Agent 3 (Opus): BEA-370 - Dual-screen sync
 
 ### Phase 2: Accessibility Compliance (Week 1-2)
 
-**Goal:** Fix WCAG violations and senior-friendly design requirements
+**Goal:** Fix WCAG violations and accessible design requirements
 
 **Wave 2A - Simple Fixes (Parallel):**
 ```

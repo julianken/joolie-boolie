@@ -3,7 +3,7 @@
 import { useId, useState, useEffect, useCallback } from 'react';
 import type { QuestionCategory, QuestionType } from '@/types';
 import type { QuestionFormData } from './QuestionSetEditorModal.utils';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 import { OptionsEditor } from './OptionsEditor';
 import { CategorySelector } from './CategorySelector';
 

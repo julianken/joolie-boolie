@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useSyncStore } from '@beak-gaming/sync';
+import { useSyncStore } from '@joolie-boolie/sync';
 import { resetSyncStore } from '@/test/helpers/store';
 
 describe('useSyncStore', () => {

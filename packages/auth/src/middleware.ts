@@ -43,7 +43,7 @@ export interface MiddlewareConfig extends AuthConfig {
  * @example
  * ```typescript
  * // middleware.ts
- * import { updateSession } from '@beak-gaming/auth/middleware';
+ * import { updateSession } from '@joolie-boolie/auth/middleware';
  *
  * export async function middleware(request: NextRequest) {
  *   return await updateSession(request);
@@ -107,7 +107,7 @@ export async function updateSession(
  * @example
  * ```typescript
  * // middleware.ts
- * import { createAuthMiddleware } from '@beak-gaming/auth/middleware';
+ * import { createAuthMiddleware } from '@joolie-boolie/auth/middleware';
  *
  * export const middleware = createAuthMiddleware({
  *   protectedPaths: ['/dashboard/*', '/api/protected/*'],

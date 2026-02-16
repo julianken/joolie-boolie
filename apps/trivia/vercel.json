@@ -3,7 +3,7 @@
   "version": 2,
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@beak-gaming/trivia...",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@joolie-boolie/trivia...",
   "outputDirectory": ".next",
   "headers": [
     {

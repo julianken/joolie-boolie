@@ -21,7 +21,7 @@ import { portConfig } from '../../playwright.config';
  *
  * Note: Uses testUser fixture from auth.ts for authentication.
  * Platform Hub login API has E2E testing mode that bypasses Supabase for
- * e2e-test@beak-gaming.test, eliminating the need to create new users via signup.
+ * e2e-test@joolie-boolie.test, eliminating the need to create new users via signup.
  */
 
 // Dynamic URLs based on port configuration (supports worktree isolation)
@@ -36,7 +36,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.goto(BINGO_URL);
 
       // Click OAuth login button
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
 
       // Should redirect to Platform Hub authorization endpoint
       await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
@@ -55,7 +55,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
       await page.goto(BINGO_URL);
 
       // Click OAuth login button
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
 
       // Wait for redirect to Platform Hub
       await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
@@ -101,7 +101,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Now start OAuth flow from Bingo
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
 
       // Should go directly to consent page (already authenticated)
       await expect(page).toHaveURL(/\/oauth\/consent/, { timeout: 10000 });
@@ -129,7 +129,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
     test('session persists after OAuth flow completes (SSO-006)', async ({ page, testUser }) => {
       // Start OAuth flow
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
       await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Login
@@ -165,16 +165,16 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Start OAuth flow
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
 
       // Should show consent page
       await expect(page).toHaveURL(/\/oauth\/consent/, { timeout: 10000 });
 
       // Verify consent page elements
       await expect(page.locator('h1:has-text("Authorize Access")')).toBeVisible();
-      await expect(page.getByRole('heading', { name: 'Beak Bingo' })).toBeVisible(); // Client name
+      await expect(page.getByRole('heading', { name: 'Joolie Boolie Bingo' })).toBeVisible(); // Client name
       await expect(page.locator(`text=${testUser.email}`)).toBeVisible(); // User email
-      await expect(page.locator('text=wants to access your Beak Gaming account')).toBeVisible();
+      await expect(page.locator('text=wants to access your Joolie Boolie account')).toBeVisible();
 
       // Verify buttons present
       await expect(page.locator('button[aria-label="Allow access"]')).toBeVisible();
@@ -195,7 +195,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Start OAuth flow
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
       await expect(page).toHaveURL(/\/oauth\/consent/, { timeout: 10000 });
 
       // Deny consent
@@ -213,7 +213,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
     test('OAuth callback handles authorization code correctly (SSO-007)', async ({ page, testUser }) => {
       // Start OAuth flow
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
       await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Login
@@ -247,7 +247,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Start OAuth flow (client generates code_challenge)
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
       await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // The authorization URL should include code_challenge
@@ -277,7 +277,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Start OAuth flow (client generates state parameter)
       await page.goto(BINGO_URL);
-      await page.click('button:has-text("Sign in with Beak Gaming")');
+      await page.click('button:has-text("Sign in with Joolie Boolie")');
       await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
 
       // Login and approve

@@ -83,7 +83,7 @@ const placeholderSessions: GameSession[] = [
     startedAt: new Date(Date.now() - 1000 * 60 * 60 * 26), // Yesterday
     durationMinutes: 60,
     participants: 32,
-    name: 'Movie Trivia Night',
+    name: 'Movie Trivia',
   },
   {
     id: '3',
@@ -106,7 +106,7 @@ const placeholderSessions: GameSession[] = [
 /**
  * RecentSessions - Displays a list of recent game sessions.
  * Shows game type, when it was played, duration, and participant count.
- * Designed for senior users with clear visual hierarchy and readable text.
+ * Designed for users with clear visual hierarchy and readable text.
  */
 export const RecentSessions = forwardRef<HTMLElement, RecentSessionsProps>(
   (

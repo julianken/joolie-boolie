@@ -6,17 +6,17 @@ import { LoginButton } from '@/components/auth/LoginButton';
 export default async function Home() {
   // Server-side auth check via cross-app SSO cookie
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('beak_access_token');
+  const accessToken = cookieStore.get('jb_access_token');
   const isAuthenticated = !!accessToken?.value;
 
   // Get return path if set by middleware (when unauthenticated user tried to access protected route)
-  const returnTo = cookieStore.get('beak_return_to')?.value;
+  const returnTo = cookieStore.get('jb_return_to')?.value;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-5xl font-bold mb-8">Trivia Night</h1>
+      <h1 className="text-5xl font-bold mb-8">Trivia</h1>
       <p className="text-xl text-muted-foreground mb-12 text-center max-w-2xl">
-        Presenter-controlled trivia system for retirement communities.
+        Presenter-controlled trivia system for groups and communities.
         Easy to run, fun to play.
       </p>
 

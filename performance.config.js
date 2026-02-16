@@ -1,9 +1,9 @@
 /**
  * Performance Budget Configuration
  *
- * Defines maximum bundle sizes and Core Web Vitals targets for the Beak Gaming Platform.
- * These budgets are designed for senior-friendly applications that need to load quickly
- * on potentially slower connections in retirement community environments.
+ * Defines maximum bundle sizes and Core Web Vitals targets for the Joolie Boolie Platform.
+ * These budgets are designed for accessible applications that need to load quickly
+ * on potentially slower connections in group and community environments.
  *
  * Usage:
  * - Lighthouse CI uses these budgets during CI checks
@@ -75,7 +75,7 @@ const performanceConfig = {
     cls: {
       good: 0.1,
       needsImprovement: 0.25,
-      budget: 0.05, // Very low - important for senior users
+      budget: 0.05, // Very low - important for users
     },
 
     // First Contentful Paint (FCP)
@@ -114,7 +114,7 @@ const performanceConfig = {
   // Lighthouse score targets
   lighthouse: {
     performance: 90,
-    accessibility: 95, // High accessibility for senior users
+    accessibility: 95, // High accessibility for users
     bestPractices: 90,
     seo: 90,
   },

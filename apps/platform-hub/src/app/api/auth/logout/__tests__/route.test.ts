@@ -49,8 +49,8 @@ describe('POST /api/auth/logout', () => {
   describe('successful logout', () => {
     it('should return success response', async () => {
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'some-token' };
-        if (name === 'beak_refresh_token') return { value: 'some-refresh' };
+        if (name === 'jb_access_token') return { value: 'some-token' };
+        if (name === 'jb_refresh_token') return { value: 'some-refresh' };
         return undefined;
       });
       mockSignOut.mockResolvedValue({});
@@ -67,33 +67,33 @@ describe('POST /api/auth/logout', () => {
 
       await POST();
 
-      // Should clear beak_access_token, beak_refresh_token, beak_user_id
+      // Should clear jb_access_token, jb_refresh_token, jb_user_id
       expect(mockCookieStore.set).toHaveBeenCalledTimes(3);
 
       const cookieCalls = mockCookieStore.set.mock.calls;
 
-      expect(cookieCalls[0][0]).toBe('beak_access_token');
+      expect(cookieCalls[0][0]).toBe('jb_access_token');
       expect(cookieCalls[0][1]).toBe('');
       expect(cookieCalls[0][2]).toMatchObject({ maxAge: 0, path: '/' });
 
-      expect(cookieCalls[1][0]).toBe('beak_refresh_token');
+      expect(cookieCalls[1][0]).toBe('jb_refresh_token');
       expect(cookieCalls[1][1]).toBe('');
       expect(cookieCalls[1][2]).toMatchObject({ maxAge: 0, path: '/' });
 
-      expect(cookieCalls[2][0]).toBe('beak_user_id');
+      expect(cookieCalls[2][0]).toBe('jb_user_id');
       expect(cookieCalls[2][1]).toBe('');
       expect(cookieCalls[2][2]).toMatchObject({ maxAge: 0, path: '/' });
     });
 
     it('should include COOKIE_DOMAIN in cleared cookies when set', async () => {
-      process.env.COOKIE_DOMAIN = '.beak-gaming.com';
+      process.env.COOKIE_DOMAIN = '.joolie-boolie.com';
       mockCookieStore.get.mockReturnValue(undefined);
 
       await POST();
 
       const cookieCalls = mockCookieStore.set.mock.calls;
       cookieCalls.forEach((call: unknown[]) => {
-        expect((call[2] as Record<string, unknown>).domain).toBe('.beak-gaming.com');
+        expect((call[2] as Record<string, unknown>).domain).toBe('.joolie-boolie.com');
       });
     });
   });
@@ -103,8 +103,8 @@ describe('POST /api/auth/logout', () => {
   describe('Supabase token revocation', () => {
     it('should call Supabase signOut when tokens exist', async () => {
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'access-token-123' };
-        if (name === 'beak_refresh_token') return { value: 'refresh-token-456' };
+        if (name === 'jb_access_token') return { value: 'access-token-123' };
+        if (name === 'jb_refresh_token') return { value: 'refresh-token-456' };
         return undefined;
       });
       mockSignOut.mockResolvedValue({});
@@ -124,7 +124,7 @@ describe('POST /api/auth/logout', () => {
 
     it('should still clear cookies even if Supabase signOut fails', async () => {
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'token' };
+        if (name === 'jb_access_token') return { value: 'token' };
         return undefined;
       });
       mockSignOut.mockRejectedValue(new Error('Supabase network error'));
@@ -141,7 +141,7 @@ describe('POST /api/auth/logout', () => {
       delete process.env.NEXT_PUBLIC_SUPABASE_URL;
 
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'token' };
+        if (name === 'jb_access_token') return { value: 'token' };
         return undefined;
       });
 

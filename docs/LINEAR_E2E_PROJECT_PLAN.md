@@ -933,11 +933,11 @@ e2e/
 
 ## References
 
-- `/Users/j/repos/beak-gaming-platform/docs/E2E_TESTING_STRATEGY.md` - Detailed test case analysis
-- `/Users/j/repos/beak-gaming-platform/docs/LINEAR_PROJECT_STRUCTURE.md` - Linear conventions
-- `/Users/j/repos/beak-gaming-platform/playwright.config.ts` - Current Playwright config
-- `/Users/j/repos/beak-gaming-platform/e2e/fixtures/auth.ts` - Auth fixture implementation
-- `/Users/j/repos/beak-gaming-platform/e2e/utils/fixtures.ts` - Existing test fixtures
+- `/Users/j/repos/joolie-boolie-platform/docs/E2E_TESTING_STRATEGY.md` - Detailed test case analysis
+- `/Users/j/repos/joolie-boolie-platform/docs/LINEAR_PROJECT_STRUCTURE.md` - Linear conventions
+- `/Users/j/repos/joolie-boolie-platform/playwright.config.ts` - Current Playwright config
+- `/Users/j/repos/joolie-boolie-platform/e2e/fixtures/auth.ts` - Auth fixture implementation
+- `/Users/j/repos/joolie-boolie-platform/e2e/utils/fixtures.ts` - Existing test fixtures
 
 ---
 

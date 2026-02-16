@@ -2,8 +2,8 @@
 
 import { useId, useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from "@beak-gaming/ui";
-import type { TriviaQuestionSet } from '@beak-gaming/database/types';
+import { useToast } from "@joolie-boolie/ui";
+import type { TriviaQuestionSet } from '@joolie-boolie/database/types';
 import type { Question } from '@/types';
 import { triviaQuestionToQuestion } from '@/lib/questions/conversion';
 

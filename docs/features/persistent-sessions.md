@@ -86,7 +86,7 @@ SWAN-42
 - Easy to announce over PA system
 - Memorable for participants
 - ~1,000 combinations per bird word
-- Fits "Beak Gaming" branding
+- Fits "Joolie Boolie" branding
 
 ### Database Schema
 
@@ -644,7 +644,7 @@ apps/trivia/src/
 ### Required Before Implementation
 - Supabase project configured
 - Database migrations system working
-- `@beak-gaming/database` package functional
+- `@joolie-boolie/database` package functional
 
 ### No External Dependencies
 - Uses Web Crypto API (built into Node.js)

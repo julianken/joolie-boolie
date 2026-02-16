@@ -53,7 +53,7 @@ function createMockRequest(accessToken?: string) {
   return {
     cookies: {
       get: (name: string) => {
-        if (name === 'beak_access_token' && accessToken) {
+        if (name === 'jb_access_token' && accessToken) {
           return { value: accessToken };
         }
         return undefined;
@@ -90,7 +90,7 @@ describe('getApiUser', () => {
     const request = {
       cookies: {
         get: (name: string) => {
-          if (name === 'beak_access_token') return { value: '' };
+          if (name === 'jb_access_token') return { value: '' };
           return undefined;
         },
       },
@@ -212,7 +212,7 @@ describe('getApiUser', () => {
       const token = await createTestToken({
         sub: 'user-789',
         email: 'legacy@example.com',
-        iss: 'beak-gaming-platform',
+        iss: 'joolie-boolie-platform',
         aud: 'authenticated',
         secret,
       });
@@ -286,7 +286,7 @@ describe('getApiUser', () => {
       const token = await createTestToken({
         sub: 'legacy-user',
         email: 'legacy@example.com',
-        iss: 'beak-gaming-platform',
+        iss: 'joolie-boolie-platform',
         aud: 'authenticated',
         secret,
       });
@@ -308,7 +308,7 @@ describe('getApiUser', () => {
       sub: 'no-email-user',
       role: 'authenticated',
       aud: 'authenticated',
-      iss: 'beak-gaming-platform',
+      iss: 'joolie-boolie-platform',
     })
       .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
       .setIssuedAt(now)
@@ -332,7 +332,7 @@ describe('getApiUser', () => {
       email: 'nosub@test.com',
       role: 'authenticated',
       aud: 'authenticated',
-      iss: 'beak-gaming-platform',
+      iss: 'joolie-boolie-platform',
     })
       .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
       .setIssuedAt(now)

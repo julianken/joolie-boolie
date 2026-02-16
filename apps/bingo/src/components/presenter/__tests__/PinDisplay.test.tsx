@@ -192,7 +192,7 @@ describe('PinDisplay', () => {
   });
 
   describe('Visual design', () => {
-    it('has senior-friendly large font sizes', () => {
+    it('has accessible large font sizes', () => {
       render(<PinDisplay pin="1234" />);
 
       const pinElement = screen.getByLabelText('PIN: 1234');

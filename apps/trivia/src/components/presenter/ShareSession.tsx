@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 import {
   generateSessionLink,
   getParticipantCounts,
   getSessionState,
   type SessionState,
-} from '@beak-gaming/sync';
+} from '@joolie-boolie/sync';
 
 // =============================================================================
 // TYPES

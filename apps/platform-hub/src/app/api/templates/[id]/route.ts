@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiUser } from '@beak-gaming/auth';
+import { getApiUser } from '@joolie-boolie/auth';
 
 const bingoUrl = process.env.NEXT_PUBLIC_BINGO_URL || 'http://localhost:3000';
 const triviaUrl = process.env.NEXT_PUBLIC_TRIVIA_URL || 'http://localhost:3001';

@@ -48,7 +48,7 @@ function TriviaIcon() {
 const games = [
   {
     id: 'bingo',
-    title: 'Beak Bingo',
+    title: 'Joolie Boolie Bingo',
     description:
       'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers and automatic ball calling.',
     href: process.env.NEXT_PUBLIC_BINGO_URL
@@ -60,7 +60,7 @@ const games = [
   },
   {
     id: 'trivia',
-    title: 'Trivia Night',
+    title: 'Trivia',
     description:
       'Team-based trivia with presenter controls. Great for group entertainment with customizable categories and scoring.',
     href: process.env.NEXT_PUBLIC_TRIVIA_URL
@@ -98,11 +98,11 @@ export default function HomePage() {
               id="hero-heading"
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6"
             >
-              Beak Gaming Platform
+              Joolie Boolie Platform
             </h1>
 
             <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Fun, accessible games designed for retirement communities.
+              Fun, accessible games designed for groups and communities.
               <br className="hidden sm:block" />
               <span className="text-primary font-semibold">
                 Easy to run. Fun to play.

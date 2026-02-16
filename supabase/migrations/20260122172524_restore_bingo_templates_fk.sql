@@ -7,13 +7,21 @@
 DELETE FROM public.bingo_templates
 WHERE user_id = '00000000-0000-0000-0000-000000000000';
 
--- Step 2: Restore the foreign key constraint
--- This ensures all templates must reference a valid profile
-ALTER TABLE public.bingo_templates
-  ADD CONSTRAINT bingo_templates_user_id_fkey
-  FOREIGN KEY (user_id)
-  REFERENCES public.profiles(id)
-  ON DELETE CASCADE;
+-- Step 2: Restore the foreign key constraint (if missing)
+-- The inline REFERENCES in create_bingo_templates already creates this constraint,
+-- so this is a no-op on fresh databases. Only needed if FK was manually dropped.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bingo_templates_user_id_fkey'
+  ) THEN
+    ALTER TABLE public.bingo_templates
+      ADD CONSTRAINT bingo_templates_user_id_fkey
+      FOREIGN KEY (user_id)
+      REFERENCES public.profiles(id)
+      ON DELETE CASCADE;
+  END IF;
+END $$;
 
 -- Verification queries (run separately to verify):
 --

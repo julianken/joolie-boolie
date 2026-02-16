@@ -1,12 +1,12 @@
-This is a very solid business idea, and you're in a unique position because you actually understand how retirement communities work in real life, not just on paper. Below is a clear, practical, "big-picture + technical" report written from a software engineer + retirement-community operations perspective that your son can use as a foundation.
+This is a very solid business idea, and you're in a unique position because you actually understand how groups and communities work in real life, not just on paper. Below is a clear, practical, "big-picture + technical" report written from a software engineer + retirement-community operations perspective that your son can use as a foundation.
 
-📊 Digital Bingo Platform for Retirement Communities
+📊 Digital Bingo Platform for Groups and Communities
 
 A Practical Software & Business Blueprint
 
 1. The Problem This Solves (Very Important)
 
-Most retirement communities:
+Most groups and communities:
 
 Don't want USB drives, licensing keys, or one-device limitations
 Need something simple, reliable, and big-screen friendly
@@ -27,7 +27,7 @@ Risk of losing files or compatibility issues
 A cloud-based, web-accessible Bingo system designed specifically for:
 
 Retirement communities
-Senior-friendly visuals
+Accessible visuals
 Large screens
 Simple controls
 Monthly subscription access
@@ -74,7 +74,7 @@ Option to pause / repeat last number
 
 🔊 Audio & Accessibility
 
-Critical for senior audiences:
+Critical for audiences:
 
 Clear voice callouts (text-to-speech)
 Volume control
@@ -100,7 +100,7 @@ Frontend (what users see):
 
 React or Vue.js
 Full-screen responsive design
-Big-button UI (senior-friendly)
+Big-button UI (accessible)
 
 Backend (logic & subscriptions):
 
@@ -175,7 +175,7 @@ America 250 themed games (😉 you know!)
 Most software is built by people who:
 
 Have never run Bingo
-Have never worked with seniors
+Have never worked with users
 Don't understand AV systems
 
 You bring:

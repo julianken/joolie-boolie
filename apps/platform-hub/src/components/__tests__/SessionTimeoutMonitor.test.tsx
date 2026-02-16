@@ -9,8 +9,8 @@ vi.mock('next/navigation', () => ({
   usePathname: vi.fn(),
 }));
 
-// Mock @beak-gaming/auth hooks
-vi.mock('@beak-gaming/auth', () => ({
+// Mock @joolie-boolie/auth hooks
+vi.mock('@joolie-boolie/auth', () => ({
   useSession: vi.fn(),
 }));
 
@@ -29,7 +29,7 @@ describe('SessionTimeoutMonitor', () => {
     mockUsePathname.mockReturnValue('/dashboard');
 
     // Dynamic import to ensure mock is applied
-    const authHooks = await import('@beak-gaming/auth');
+    const authHooks = await import('@joolie-boolie/auth');
     mockUseSession = authHooks.useSession as ReturnType<typeof vi.fn>;
   });
 

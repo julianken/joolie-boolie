@@ -23,7 +23,7 @@
 
 ### 1.1 Purpose
 
-This document guides internal beta testers through User Acceptance Testing (UAT) of the Beak Gaming Platform. Beta testing validates that the platform meets the needs of retirement community activity coordinators for running Bingo and Trivia games.
+This document guides internal beta testers through User Acceptance Testing (UAT) of the Joolie Boolie Platform. Beta testing validates that the platform meets the needs of group and community activity coordinators for running Bingo and Trivia games.
 
 ### 1.2 Scope
 
@@ -55,8 +55,8 @@ Before testing:
 | Environment | URL | Purpose |
 |-------------|-----|---------|
 | **Development** | localhost:3000-3002 | Local testing |
-| **Staging** | staging.beakgaming.com | Pre-production testing |
-| **Production** | *.beakgaming.com | Live beta (TBD) |
+| **Staging** | staging.joolieboolie.com | Pre-production testing |
+| **Production** | *.joolieboolie.com | Live beta (TBD) |
 
 ---
 
@@ -510,12 +510,12 @@ When providing feedback, categorize as:
 ### 5.3 Feedback Submission
 
 **Primary Channel:** GitHub Issues
-- Repository: `beak-gaming-platform`
+- Repository: `joolie-boolie-platform`
 - Label: `beta-feedback`
 - Use template provided
 
 **Alternative:** Email
-- Send to: beta@beakgaming.com (placeholder)
+- Send to: beta@joolieboolie.com (placeholder)
 - Subject: `[Beta Feedback] [Category] Summary`
 
 **Quick Feedback:** In-app
@@ -676,9 +676,9 @@ Only happens with "British Slang" voice pack.
 
 | App | Local | Staging |
 |-----|-------|---------|
-| Bingo | localhost:3000 | staging-bingo.beakgaming.com |
-| Trivia | localhost:3001 | staging-trivia.beakgaming.com |
-| Hub | localhost:3002 | staging-hub.beakgaming.com |
+| Bingo | localhost:3000 | staging-bingo.joolieboolie.com |
+| Trivia | localhost:3001 | staging-trivia.joolieboolie.com |
+| Hub | localhost:3002 | staging-hub.joolieboolie.com |
 
 ### Contacts
 
@@ -706,4 +706,4 @@ Only happens with "British Slang" voice pack.
 
 **Thank you for participating in beta testing!**
 
-Your feedback is crucial for making Beak Gaming Platform ready for retirement communities.
+Your feedback is crucial for making Joolie Boolie Platform ready for groups and communities.

@@ -8,16 +8,16 @@
 
 | Issue | Title | Agent | Status | Branch | PR | Checks | Notes |
 |-------|-------|-------|--------|--------|----|----|-------|
-| BEA-313 | Infrastructure: Sharding & CI | Agent-1 | ✅ MERGED | `e2e-wave/BEA-313-infrastructure-sharding-ci` | [#192](https://github.com/julianken/beak-gaming-platform/pull/192) | ✅ Passed | Infrastructure complete |
+| BEA-313 | Infrastructure: Sharding & CI | Agent-1 | ✅ MERGED | `e2e-wave/BEA-313-infrastructure-sharding-ci` | [#192](https://github.com/julianken/joolie-boolie-platform/pull/192) | ✅ Passed | Infrastructure complete |
 
 ## Wave 2: PRs Created - CI Running
 
 | Issue | Title | Agent | Status | Branch | PR | Checks | Tests |
 |-------|-------|-------|--------|--------|----|----|-------|
-| BEA-314 | Auth Flow E2E Tests | Agent-2 | 🟢 PR Open | `e2e-wave/BEA-314-auth-flow-e2e-tests` | [#194](https://github.com/julianken/beak-gaming-platform/pull/194) | 🔵 Running | 24 tests |
-| BEA-315 | Dashboard & Profile E2E | Agent-3 | 🟢 PR Open | `e2e-wave/BEA-315-dashboard-profile-e2e` | [#193](https://github.com/julianken/beak-gaming-platform/pull/193) | 🔵 Running | 18 tests |
-| BEA-316 | Cross-App SSO E2E | Agent-5 | 🟢 PR Open | `e2e-wave/BEA-316-cross-app-sso-e2e` | [#195](https://github.com/julianken/beak-gaming-platform/pull/195) | ⏳ Queued | 22 tests |
-| BEA-318 | Accessibility & Security | Agent-4 | 🟢 PR Open | `e2e-wave/BEA-318-accessibility-security-e2e` | [#196](https://github.com/julianken/beak-gaming-platform/pull/196) | 🔵 Running | 25 tests |
+| BEA-314 | Auth Flow E2E Tests | Agent-2 | 🟢 PR Open | `e2e-wave/BEA-314-auth-flow-e2e-tests` | [#194](https://github.com/julianken/joolie-boolie-platform/pull/194) | 🔵 Running | 24 tests |
+| BEA-315 | Dashboard & Profile E2E | Agent-3 | 🟢 PR Open | `e2e-wave/BEA-315-dashboard-profile-e2e` | [#193](https://github.com/julianken/joolie-boolie-platform/pull/193) | 🔵 Running | 18 tests |
+| BEA-316 | Cross-App SSO E2E | Agent-5 | 🟢 PR Open | `e2e-wave/BEA-316-cross-app-sso-e2e` | [#195](https://github.com/julianken/joolie-boolie-platform/pull/195) | ⏳ Queued | 22 tests |
+| BEA-318 | Accessibility & Security | Agent-4 | 🟢 PR Open | `e2e-wave/BEA-318-accessibility-security-e2e` | [#196](https://github.com/julianken/joolie-boolie-platform/pull/196) | 🔵 Running | 25 tests |
 
 ## Wave 3: Deferred to Phase 3
 
@@ -45,7 +45,7 @@
 
 **Problem:** `useAuth must be used within an AuthProvider` error blocking all PRs
 
-**Solution:** Added `@beak-gaming/testing` package and created test-utils wrapper
+**Solution:** Added `@joolie-boolie/testing` package and created test-utils wrapper
 
 **Files Changed:**
 - `apps/platform-hub/package.json` - Added testing devDependency
@@ -59,10 +59,10 @@
 
 | PR | Issue | Tests | CI Status | Linear Status |
 |----|-------|-------|-----------|---------------|
-| [#193](https://github.com/julianken/beak-gaming-platform/pull/193) | BEA-315 | 18 | 🔵 Build Running | Open |
-| [#194](https://github.com/julianken/beak-gaming-platform/pull/194) | BEA-314 | 24 | 🔵 Build Running | Open |
-| [#195](https://github.com/julianken/beak-gaming-platform/pull/195) | BEA-316 | 22 | ⏳ Build Queued | Open |
-| [#196](https://github.com/julianken/beak-gaming-platform/pull/196) | BEA-318 | 25 | 🔵 Build Running | Open |
+| [#193](https://github.com/julianken/joolie-boolie-platform/pull/193) | BEA-315 | 18 | 🔵 Build Running | Open |
+| [#194](https://github.com/julianken/joolie-boolie-platform/pull/194) | BEA-314 | 24 | 🔵 Build Running | Open |
+| [#195](https://github.com/julianken/joolie-boolie-platform/pull/195) | BEA-316 | 22 | ⏳ Build Queued | Open |
+| [#196](https://github.com/julianken/joolie-boolie-platform/pull/196) | BEA-318 | 25 | 🔵 Build Running | Open |
 
 ## Key Metrics
 
@@ -84,12 +84,12 @@
 
 ## Agent Output Files
 
-- Agent-1 (BEA-313): `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/a8baa4b.output` ✅ Complete
-- Agent-2 (BEA-314): `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/adb68bf.output` ✅ Complete
-- Agent-3 (BEA-315): `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/aa85354.output` ✅ Complete
-- Agent-4 (BEA-318): `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/a792800.output` ✅ Complete
-- Agent-5 (BEA-316): `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/aff615c.output` ✅ Complete
-- Agent-6 (Platform-Hub Fix): `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/a94cdb5.output` ✅ Complete
+- Agent-1 (BEA-313): `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/a8baa4b.output` ✅ Complete
+- Agent-2 (BEA-314): `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/adb68bf.output` ✅ Complete
+- Agent-3 (BEA-315): `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/aa85354.output` ✅ Complete
+- Agent-4 (BEA-318): `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/a792800.output` ✅ Complete
+- Agent-5 (BEA-316): `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/aff615c.output` ✅ Complete
+- Agent-6 (Platform-Hub Fix): `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/a94cdb5.output` ✅ Complete
 
 ---
 

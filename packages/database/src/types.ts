@@ -1,5 +1,5 @@
 /**
- * Database types for the Beak Gaming Platform
+ * Database types for the Joolie Boolie Platform
  *
  * These types can be auto-generated using:
  * npx supabase gen types typescript --project-id <project-id> > src/types.ts

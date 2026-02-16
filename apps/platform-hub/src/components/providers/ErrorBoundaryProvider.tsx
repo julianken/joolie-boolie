@@ -1,12 +1,12 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { ErrorBoundary, logError, configureErrorLogger } from '@beak-gaming/error-tracking';
+import { ErrorBoundary, logError, configureErrorLogger } from '@joolie-boolie/error-tracking';
 
 // Configure error logger for Platform Hub
 if (typeof window !== 'undefined') {
   configureErrorLogger({
-    appName: 'BeakGaming',
+    appName: 'JoolieBoolie',
     enableConsole: process.env.NODE_ENV !== 'production',
     environment: process.env.NODE_ENV,
   });

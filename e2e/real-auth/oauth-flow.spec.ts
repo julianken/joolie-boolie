@@ -112,9 +112,9 @@ test.describe('OAuth 2.1 Authorization Code Flow', () => {
     const header = JSON.parse(Buffer.from(tokenParts[0], 'base64url').toString());
     expect(header.alg).toBe('HS256');
 
-    // Decode payload — should have beak-gaming-platform issuer
+    // Decode payload — should have joolie-boolie-platform issuer
     const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64url').toString());
-    expect(payload.iss).toBe('beak-gaming-platform');
+    expect(payload.iss).toBe('joolie-boolie-platform');
     expect(payload.role).toBe('authenticated');
     expect(payload.aud).toBe('authenticated');
     expect(payload.email).toBe(realTestUser.email);
@@ -217,7 +217,7 @@ test.describe('OAuth 2.1 Authorization Code Flow', () => {
     expect(newHeader.alg).toBe('HS256');
 
     const newPayload = JSON.parse(Buffer.from(newParts[1], 'base64url').toString());
-    expect(newPayload.iss).toBe('beak-gaming-platform');
+    expect(newPayload.iss).toBe('joolie-boolie-platform');
     expect(newPayload.email).toBe(realTestUser.email);
 
     // =========================================================================

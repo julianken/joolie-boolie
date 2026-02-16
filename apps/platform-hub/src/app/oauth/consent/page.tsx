@@ -52,7 +52,7 @@ function isValidAuthorizationDetails(data: unknown): data is AuthorizationDetail
  * - Complete error handling
  * - Loading states
  * - Redirects unauthenticated users to login
- * - Senior-friendly design
+ * - Accessible design
  * - WCAG 2.1 AA accessible
  */
 export default function ConsentPage(props: ConsentPageProps) {

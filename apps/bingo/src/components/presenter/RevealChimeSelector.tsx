@@ -2,8 +2,8 @@
 
 import { useId, useState, useCallback } from 'react';
 import { RevealChimeType, REVEAL_CHIME_OPTIONS } from '@/types';
-import { Button } from "@beak-gaming/ui";
-import { Slider } from '@beak-gaming/ui';
+import { Button } from "@joolie-boolie/ui";
+import { Slider } from '@joolie-boolie/ui';
 import { useAudioStore } from '@/stores/audio-store';
 
 export interface RevealChimeSelectorProps {

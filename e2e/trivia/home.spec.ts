@@ -8,11 +8,11 @@ test.describe('Trivia Home Page', () => {
   });
 
   test('displays the main title', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /trivia night/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /trivia/i })).toBeVisible();
   });
 
   test('shows description text', async ({ page }) => {
-    await expect(page.getByText(/trivia system|retirement communities/i)).toBeVisible();
+    await expect(page.getByText(/trivia system|groups and communities/i)).toBeVisible();
   });
 
   test('has Start Trivia button that links to presenter view', async ({ page }) => {
@@ -44,7 +44,7 @@ test.describe('Trivia Home Page', () => {
     await expect(main).toBeVisible();
   });
 
-  test('buttons have senior-friendly sizes', async ({ page }) => {
+  test('buttons have accessible sizes', async ({ page }) => {
     const startButton = page.getByRole('link', { name: /start trivia/i });
     const box = await startButton.boundingBox();
 

@@ -82,7 +82,7 @@ function mapAuthError(error: unknown): AuthError {
  * @example
  * ```typescript
  * // app/layout.tsx
- * import { AuthProvider } from '@beak-gaming/auth';
+ * import { AuthProvider } from '@joolie-boolie/auth';
  *
  * export default function RootLayout({ children }) {
  *   return (

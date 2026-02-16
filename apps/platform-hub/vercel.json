@@ -3,10 +3,10 @@
   "version": 2,
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@beak-gaming/platform-hub...",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@joolie-boolie/platform-hub...",
   "outputDirectory": ".next",
   "env": {
-    "TURBO_TEAM": "beak-gaming",
+    "TURBO_TEAM": "joolie-boolie",
     "TURBO_REMOTE_ONLY": "true"
   },
   "crons": [
@@ -22,12 +22,12 @@
   "redirects": [
     {
       "source": "/bingo",
-      "destination": "https://bingo.beak-gaming.com",
+      "destination": "https://bingo.joolie-boolie.com",
       "permanent": false
     },
     {
       "source": "/trivia",
-      "destination": "https://trivia.beak-gaming.com",
+      "destination": "https://trivia.joolie-boolie.com",
       "permanent": false
     }
   ]

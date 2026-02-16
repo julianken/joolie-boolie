@@ -9,7 +9,7 @@ import {
   getActiveAudioCount,
   SOUND_EFFECT_PATHS,
 } from '../audio-store';
-import { mockAudio } from '@beak-gaming/testing';
+import { mockAudio } from '@joolie-boolie/testing';
 
 describe('audio-store', () => {
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;

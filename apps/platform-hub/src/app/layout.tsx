@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Header, Footer } from '@/components';
 import { ErrorBoundaryProvider } from '@/components/providers/ErrorBoundaryProvider';
-import { AuthProvider } from '@beak-gaming/auth';
-import { ToastProvider } from '@beak-gaming/ui';
+import { AuthProvider } from '@joolie-boolie/auth';
+import { ToastProvider } from '@joolie-boolie/ui';
 import { validateEnvironment } from '@/lib/env-validation';
 import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
 import { SessionTimeoutMonitor } from '@/components/SessionTimeoutMonitor';
@@ -28,22 +28,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Beak Gaming Platform',
+  title: 'Joolie Boolie Platform',
   description:
-    'Fun, accessible games designed for retirement communities - Bingo, Trivia, and more',
-  keywords: ['bingo', 'trivia', 'games', 'retirement', 'senior', 'accessible'],
+    'Fun, accessible games designed for groups and communities - Bingo, Trivia, and more',
+  keywords: ['bingo', 'trivia', 'games', 'community', 'accessible', 'inclusive'],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Beak Gaming Platform',
+    title: 'Joolie Boolie Platform',
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
-    title: 'Beak Gaming Platform',
-    description: 'Fun, accessible games designed for retirement communities',
+    title: 'Joolie Boolie Platform',
+    description: 'Fun, accessible games designed for groups and communities',
     type: 'website',
   },
 };

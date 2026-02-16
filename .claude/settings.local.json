@@ -216,7 +216,8 @@
       "mcp__claude-mem__search",
       "mcp__claude-mem__timeline",
       "mcp__claude-mem__get_observations",
-      "mcp__claude-mem____IMPORTANT"
+      "mcp__claude-mem____IMPORTANT",
+      "Skill(commit-commands:commit)"
     ]
   },
   "enabledPlugins": {

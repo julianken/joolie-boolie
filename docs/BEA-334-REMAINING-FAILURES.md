@@ -187,7 +187,7 @@ Display page fails to load when opened in offline mode.
 #### Error:
 ```
 Error: expect(locator).toBeVisible failed
-Locator: getByText(/beak bingo/i)
+Locator: getByText(/joolie boolie bingo/i)
 Expected: visible
 Timeout: 10000ms
 Error: element(s) not found
@@ -207,7 +207,7 @@ Error: element(s) not found
 // Presenter clicks "Open Display"
 // → Opens http://localhost:3000/display?session=A3B7K9
 // → Display page loads via BroadcastChannel sync (no network needed)
-// → Shows "Beak Bingo" heading
+// → Shows "Joolie Boolie Bingo" heading
 ```
 
 #### Debugging Steps:
@@ -263,7 +263,7 @@ expect(focused).toMatch(/BUTTON|SELECT/);
 **Option C: Use FocusTrap** (BEST ACCESSIBILITY)
 ```typescript
 // Wrap modal content in focus trap
-import { FocusTrap } from '@beak-gaming/ui';
+import { FocusTrap } from '@joolie-boolie/ui';
 
 <Modal>
   <FocusTrap>

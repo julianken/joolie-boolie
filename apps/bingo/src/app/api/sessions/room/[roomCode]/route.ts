@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@beak-gaming/database/server';
-import { getGameSessionByRoomCode } from '@beak-gaming/database/tables';
+import { createClient } from '@joolie-boolie/database/server';
+import { getGameSessionByRoomCode } from '@joolie-boolie/database/tables';
 
 export async function GET(
   request: NextRequest,

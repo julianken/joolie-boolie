@@ -1,10 +1,10 @@
-# Beak Gaming Platform - Project Overview
+# Joolie Boolie Platform - Project Overview
 
 ## Purpose
-A unified gaming platform for retirement communities featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
+A unified gaming platform for groups and communities featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
 
 ## Design Philosophy
-- Senior-friendly UI (min 18px body text, high contrast, 44x44px touch targets)
+- Accessible UI (min 18px body text, high contrast, 44x44px touch targets)
 - Audience display optimized for projector/large TV
 - Dual-screen system (host controls + audience display)
 

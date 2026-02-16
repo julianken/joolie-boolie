@@ -1,15 +1,15 @@
-# @beak-gaming/testing
+# @joolie-boolie/testing
 
 **Status:** ✅ Production Ready (100% Complete)
 
-Shared test utilities and mocks for the Beak Gaming Platform. Provides mock implementations for BroadcastChannel, Audio, and Supabase, plus jest-dom matchers. Enables consistent testing patterns across all apps and packages.
+Shared test utilities and mocks for the Joolie Boolie Platform. Provides mock implementations for BroadcastChannel, Audio, and Supabase, plus jest-dom matchers. Enables consistent testing patterns across all apps and packages.
 
 ## Installation
 
 ```json
 {
   "devDependencies": {
-    "@beak-gaming/testing": "workspace:*"
+    "@joolie-boolie/testing": "workspace:*"
   },
   "peerDependencies": {
     "@testing-library/react": "^15.0.0",
@@ -24,16 +24,16 @@ The package provides multiple export paths for different use cases:
 
 ```typescript
 // Main export - includes mocks and helpers
-import { mockBroadcastChannel, createMockSupabaseClient } from '@beak-gaming/testing';
+import { mockBroadcastChannel, createMockSupabaseClient } from '@joolie-boolie/testing';
 
 // Mocks only
-import { mockAudio, MockBroadcastChannel } from '@beak-gaming/testing/mocks';
+import { mockAudio, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
 
 // Jest-dom setup (add to vitest setupFiles)
-import '@beak-gaming/testing/setup';
+import '@joolie-boolie/testing/setup';
 
 // Helpers (for future expansion)
-import { HELPERS_PLACEHOLDER } from '@beak-gaming/testing/helpers';
+import { HELPERS_PLACEHOLDER } from '@joolie-boolie/testing/helpers';
 ```
 
 ## Features
@@ -53,7 +53,7 @@ import { HELPERS_PLACEHOLDER } from '@beak-gaming/testing/helpers';
 Mock for the BroadcastChannel API used in dual-screen synchronization.
 
 ```typescript
-import { mockBroadcastChannel, MockBroadcastChannel } from '@beak-gaming/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
 
 // In your test setup
 beforeEach(() => {
@@ -85,7 +85,7 @@ test('syncs state between windows', () => {
 Mock for the HTML5 Audio API used in sound playback.
 
 ```typescript
-import { mockAudio, MockAudio, createMockAudio } from '@beak-gaming/testing/mocks';
+import { mockAudio, MockAudio, createMockAudio } from '@joolie-boolie/testing/mocks';
 
 // In your test setup
 beforeEach(() => {
@@ -113,7 +113,7 @@ test('tracks audio behavior', () => {
 Mock for Supabase client and authentication.
 
 ```typescript
-import { createMockSupabaseClient, createMockUser, createMockSession } from '@beak-gaming/testing/mocks';
+import { createMockSupabaseClient, createMockUser, createMockSession } from '@joolie-boolie/testing/mocks';
 
 // Create mock users
 test('creates users', () => {
@@ -158,7 +158,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['@beak-gaming/testing/setup'],
+    setupFiles: ['@joolie-boolie/testing/setup'],
   },
 });
 ```
@@ -169,7 +169,7 @@ Create app-specific test setup files if needed:
 
 ```typescript
 // apps/my-game/src/test/setup.ts
-import { mockBroadcastChannel, MockBroadcastChannel, mockAudio } from '@beak-gaming/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel, mockAudio } from '@joolie-boolie/testing/mocks';
 
 beforeEach(() => {
   mockBroadcastChannel();
@@ -192,7 +192,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: [
-      '@beak-gaming/testing/setup',
+      '@joolie-boolie/testing/setup',
       './src/test/setup.ts',  // Optional: app-specific setup
     ],
   },
@@ -272,7 +272,7 @@ Then export from a central location:
 
 ```typescript
 // apps/my-game/src/test/mocks/index.ts
-export * from '@beak-gaming/testing/mocks';
+export * from '@joolie-boolie/testing/mocks';
 export { mockMyService } from './my-mock';
 ```
 
@@ -291,12 +291,12 @@ Planned utilities:
 | **apps/bingo** | ✅ Integrated | BroadcastChannel, Audio, jest-dom |
 | **apps/trivia** | ✅ Integrated | BroadcastChannel, Audio, jest-dom |
 | **apps/platform-hub** | ✅ Integrated | jest-dom, Supabase (partial) |
-| **@beak-gaming/sync** | ✅ Integrated | BroadcastChannel for testing |
-| **@beak-gaming/ui** | ✅ Integrated | jest-dom for component tests |
+| **@joolie-boolie/sync** | ✅ Integrated | BroadcastChannel for testing |
+| **@joolie-boolie/ui** | ✅ Integrated | jest-dom for component tests |
 
 ## Related Packages
 
-- [`@beak-gaming/sync`](../sync/README.md) - Uses BroadcastChannel mock for sync tests
+- [`@joolie-boolie/sync`](../sync/README.md) - Uses BroadcastChannel mock for sync tests
 - All apps use these mocks for testing
 
 ## Related Documentation

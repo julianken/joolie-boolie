@@ -14,7 +14,7 @@ BEGIN
   -- Check if test user already exists
   SELECT id INTO test_user_id
   FROM auth.users
-  WHERE email = 'e2e-test@beak-gaming.test';
+  WHERE email = 'e2e-test@joolie-boolie.test';
 
   -- Only create if user doesn't exist
   IF test_user_id IS NULL THEN
@@ -40,7 +40,7 @@ BEGIN
     VALUES (
       gen_random_uuid(),
       '00000000-0000-0000-0000-000000000000',
-      'e2e-test@beak-gaming.test',
+      'e2e-test@joolie-boolie.test',
       -- Password: TestPassword123!
       -- This is the bcrypt hash for 'TestPassword123!' using Supabase's default bcrypt config
       crypt('TestPassword123!', gen_salt('bf')),
@@ -68,8 +68,8 @@ BEGIN
     )
     ON CONFLICT (id) DO NOTHING;
 
-    RAISE NOTICE 'Created E2E test user: e2e-test@beak-gaming.test';
+    RAISE NOTICE 'Created E2E test user: e2e-test@joolie-boolie.test';
   ELSE
-    RAISE NOTICE 'E2E test user already exists: e2e-test@beak-gaming.test';
+    RAISE NOTICE 'E2E test user already exists: e2e-test@joolie-boolie.test';
   END IF;
 END $$;

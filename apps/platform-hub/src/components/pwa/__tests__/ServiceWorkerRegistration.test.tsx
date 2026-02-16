@@ -328,7 +328,7 @@ describe('ServiceWorkerRegistration', () => {
       });
     });
 
-    it('should have senior-friendly button sizes (min 44x44px)', () => {
+    it('should have accessible button sizes (min 44x44px)', () => {
       const updateButton = screen.getByRole('button', { name: /update/i });
       const dismissButton = screen.getByRole('button', { name: /later/i });
 

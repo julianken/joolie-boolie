@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AudioSettingsPanel } from '../AudioSettingsPanel';
 import { useAudioStore, AUDIO_DEFAULTS } from '@/stores/audio-store';
-import { mockAudio } from '@beak-gaming/testing';
+import { mockAudio } from '@joolie-boolie/testing';
 
 // =============================================================================
 // Mock SpeechSynthesisUtterance

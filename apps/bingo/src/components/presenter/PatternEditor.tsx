@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useId, useEffect } from 'react';
 import { BingoPattern, PatternCell } from '@/types';
-import { Button } from "@beak-gaming/ui";
+import { Button } from "@joolie-boolie/ui";
 import { Input } from '@/components/ui/Input';
 
 // Constants for the 5x5 grid
@@ -44,7 +44,7 @@ function generatePatternId(): string {
 
 /**
  * Visual pattern editor with a 5x5 clickable grid.
- * Senior-friendly with large click targets (44x44px cells) and high contrast.
+ * Accessible with large click targets (44x44px cells) and high contrast.
  */
 export function PatternEditor({
   initialPattern = null,

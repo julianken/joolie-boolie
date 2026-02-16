@@ -104,11 +104,11 @@ describe('DashboardLayout', () => {
   it('should render children when E2E auth cookies are present', async () => {
     // Mock E2E cookies present
     mockCookieStore.get.mockImplementation((name: string) => {
-      if (name === 'beak_access_token') {
-        return { name: 'beak_access_token', value: 'e2e-test-token' };
+      if (name === 'jb_access_token') {
+        return { name: 'jb_access_token', value: 'e2e-test-token' };
       }
-      if (name === 'beak_user_id') {
-        return { name: 'beak_user_id', value: 'e2e-test-user-id' };
+      if (name === 'jb_user_id') {
+        return { name: 'jb_user_id', value: 'e2e-test-user-id' };
       }
       return undefined;
     });

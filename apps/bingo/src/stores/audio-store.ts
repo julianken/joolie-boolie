@@ -579,7 +579,7 @@ export const useAudioStore = create<AudioStore>()(
       },
     }),
     {
-      name: 'beak-bingo-audio',
+      name: 'jb-bingo-audio',
       partialize: (state) => ({
         enabled: state.enabled,
         voiceVolume: state.voiceVolume,

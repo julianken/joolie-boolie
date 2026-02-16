@@ -39,11 +39,11 @@ async function registerClients() {
   console.log(`   Consent page: ${PLATFORM_HUB_URL}/oauth/consent\n`);
 
   // Register Bingo
-  console.log('📝 Creating Beak Bingo client...');
+  console.log('📝 Creating Joolie Boolie Bingo client...');
   const bingoResult = await supabase.auth.admin.oauth.createClient({
     redirect_uris: [
       'http://localhost:3000/auth/callback',
-      'https://bingo.beak-gaming.com/auth/callback'
+      'https://bingo.joolie-boolie.com/auth/callback'
     ],
     consent_page_url: `${PLATFORM_HUB_URL}/oauth/consent`,
     client_type: 'public'
@@ -59,11 +59,11 @@ async function registerClients() {
   console.log('');
 
   // Register Trivia
-  console.log('📝 Creating Trivia Night client...');
+  console.log('📝 Creating Trivia client...');
   const triviaResult = await supabase.auth.admin.oauth.createClient({
     redirect_uris: [
       'http://localhost:3001/auth/callback',
-      'https://trivia.beak-gaming.com/auth/callback'
+      'https://trivia.joolie-boolie.com/auth/callback'
     ],
     consent_page_url: `${PLATFORM_HUB_URL}/oauth/consent`,
     client_type: 'public'

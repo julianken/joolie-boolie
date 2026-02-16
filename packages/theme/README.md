@@ -1,8 +1,8 @@
-# @beak-gaming/theme
+# @joolie-boolie/theme
 
 **Status:** ✅ Production Ready (100% Complete)
 
-Senior-friendly design tokens and CSS variables for the Beak Gaming Platform. Provides a comprehensive design system with 10+ color themes, accessibility-focused font sizes (18px minimum), and WCAG-compliant touch targets (44px minimum).
+Accessible design tokens and CSS variables for the Joolie Boolie Platform. Provides a comprehensive design system with 10+ color themes, accessibility-focused font sizes (18px minimum), and WCAG-compliant touch targets (44px minimum).
 
 ## Current Status
 
@@ -24,7 +24,7 @@ Apps copy the shared base tokens and add their own extensions. When the design s
 
 - ✅ **10+ Color Themes** - Comprehensive color system with semantic tokens
 - ✅ **Dark Mode Support** - System preference + class-based dark mode
-- ✅ **Senior-Friendly Typography** - 18px minimum body text, large display sizes up to 128px
+- ✅ **Accessible Typography** - 18px minimum body text, large display sizes up to 128px
 - ✅ **Accessible Touch Targets** - 44px minimum (WCAG AAA), up to 64px for large buttons
 - ✅ **TypeScript Tokens** - Programmatic access to design values
 - ✅ **Tailwind Integration** - CSS variables mapped to Tailwind utilities
@@ -36,7 +36,7 @@ Apps copy the shared base tokens and add their own extensions. When the design s
 ```json
 {
   "dependencies": {
-    "@beak-gaming/theme": "workspace:*"
+    "@joolie-boolie/theme": "workspace:*"
   }
 }
 ```
@@ -49,7 +49,7 @@ Import the reference CSS to see the canonical design system:
 
 ```css
 /* Reference only - apps should maintain their own globals.css */
-@import "@beak-gaming/theme/globals.css";
+@import "@joolie-boolie/theme/globals.css";
 ```
 
 ### TypeScript Tokens
@@ -57,7 +57,7 @@ Import the reference CSS to see the canonical design system:
 Use programmatic access to design tokens:
 
 ```typescript
-import { colors, fontSizes, touchTargets } from '@beak-gaming/theme';
+import { colors, fontSizes, touchTargets } from '@joolie-boolie/theme';
 
 // colors.primary = 'var(--primary)'
 // fontSizes.base = '1.125rem' (18px)
@@ -81,7 +81,7 @@ import { colors, fontSizes, touchTargets } from '@beak-gaming/theme';
 | `--border` | `#d1d5db` | `#334155` | Borders |
 | `--muted` | `#6b7280` | `#94a3b8` | Muted text |
 
-### Font Sizes (Senior-Friendly)
+### Font Sizes (Accessible)
 
 All sizes meet WCAG accessibility guidelines with 18px minimum body text:
 
@@ -198,11 +198,11 @@ export type TouchTargetSize = keyof typeof touchTargets;
 | **apps/bingo** | ✅ Integrated | Full theme system + custom ball colors |
 | **apps/trivia** | ✅ Integrated | Full theme system + custom team colors |
 | **apps/platform-hub** | ✅ Integrated | Full theme system |
-| **@beak-gaming/ui** | ✅ Required | All components use theme CSS variables |
+| **@joolie-boolie/ui** | ✅ Required | All components use theme CSS variables |
 
 ## Related Packages
 
-- [`@beak-gaming/ui`](../ui/README.md) - UI components that consume these design tokens
+- [`@joolie-boolie/ui`](../ui/README.md) - UI components that consume these design tokens
 - All apps maintain their own `globals.css` with app-specific extensions
 
 ## Related Documentation

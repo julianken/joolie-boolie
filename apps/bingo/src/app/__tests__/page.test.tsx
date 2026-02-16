@@ -18,7 +18,7 @@ vi.mock('@/components/stats', () => ({
 
 vi.mock('@/components/auth/LoginButton', () => ({
   LoginButton: () => (
-    <button data-testid="login-button">Sign in with Beak Gaming</button>
+    <button data-testid="login-button">Sign in with Joolie Boolie</button>
   ),
 }));
 
@@ -104,8 +104,8 @@ describe('Home Page (BEA-422)', () => {
       const element = await Home();
       render(element);
 
-      expect(screen.getByText('Beak Bingo')).toBeInTheDocument();
-      expect(screen.getByText(/modern bingo for retirement communities/i)).toBeInTheDocument();
+      expect(screen.getByText('Joolie Boolie Bingo')).toBeInTheDocument();
+      expect(screen.getByText(/modern bingo for groups and communities/i)).toBeInTheDocument();
     });
 
     it('should render features section', async () => {
@@ -117,7 +117,7 @@ describe('Home Page (BEA-422)', () => {
       const element = await Home();
       render(element);
 
-      expect(screen.getByText('Designed for Seniors')).toBeInTheDocument();
+      expect(screen.getByText('Designed for Everyone')).toBeInTheDocument();
       expect(screen.getByText('75-Ball Bingo')).toBeInTheDocument();
       expect(screen.getByText('Large Text')).toBeInTheDocument();
       expect(screen.getByText('Dual Screen')).toBeInTheDocument();
@@ -162,7 +162,7 @@ describe('Home Page (BEA-422)', () => {
       const element = await Home();
       render(element);
 
-      expect(screen.getByText(/beak gaming platform/i)).toBeInTheDocument();
+      expect(screen.getByText(/joolie boolie platform/i)).toBeInTheDocument();
     });
   });
 });

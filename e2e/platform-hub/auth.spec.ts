@@ -34,7 +34,7 @@ const BASE_URL = ''; // Use relative URLs with Playwright baseURL
  * Generate unique email for each test run to avoid conflicts
  */
 function generateTestEmail(): string {
-  return `e2e-test+${Date.now()}@beak-gaming.test`;
+  return `e2e-test+${Date.now()}@joolie-boolie.test`;
 }
 
 test.describe('@critical Platform Hub Authentication', () => {
@@ -66,14 +66,14 @@ test.describe('@critical Platform Hub Authentication', () => {
       await expect(page.locator('a[href="/forgot-password"]').first()).toBeVisible();
     });
 
-    // NOTE: This test uses a real test user (e2e-test@beak-gaming.test) that exists in Supabase
+    // NOTE: This test uses a real test user (e2e-test@joolie-boolie.test) that exists in Supabase
     // with a confirmed email. It does NOT use mocks, so the beforeEach hook's mock setup
     // doesn't interfere. The mocks only intercept browser-level Supabase calls, not the
     // server-side Platform Hub login API.
     test('user can log in with valid credentials @critical', async ({ page }) => {
       // Use pre-existing test user (exists in real Supabase with confirmed email)
       // This tests the login flow without requiring signup mocking
-      const email = 'e2e-test@beak-gaming.test';
+      const email = 'e2e-test@joolie-boolie.test';
       const password = 'TestPassword123!';
 
       // Navigate to login page

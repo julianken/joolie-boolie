@@ -1,15 +1,15 @@
-# @beak-gaming/ui
+# @joolie-boolie/ui
 
 **Status:** ✅ Production Ready (100% Complete)
 
-Shared UI components for the Beak Gaming Platform. Provides 6 senior-friendly components (Button, Toggle, Slider, Card, Modal, Toast) designed with large touch targets, high contrast, and clear focus states.
+Shared UI components for the Joolie Boolie Platform. Provides 6 accessible components (Button, Toggle, Slider, Card, Modal, Toast) designed with large touch targets, high contrast, and clear focus states.
 
 ## Installation
 
 ```json
 {
   "dependencies": {
-    "@beak-gaming/ui": "workspace:*"
+    "@joolie-boolie/ui": "workspace:*"
   }
 }
 ```
@@ -19,7 +19,7 @@ Shared UI components for the Beak Gaming Platform. Provides 6 senior-friendly co
 ## Features
 
 - ✅ **6 Core Components** - Button, Toggle, Slider, Card, Modal, Toast
-- ✅ **Senior-Friendly Design** - 44px minimum touch targets, WCAG AAA contrast
+- ✅ **Accessible Design** - 44px minimum touch targets, WCAG AAA contrast
 - ✅ **Accessibility** - ARIA labels, keyboard navigation, focus management
 - ✅ **Tailwind CSS 4** - Styled with utility classes using theme CSS variables
 - ✅ **TypeScript** - Full type definitions for all components
@@ -31,7 +31,7 @@ Shared UI components for the Beak Gaming Platform. Provides 6 senior-friendly co
 A versatile button component with multiple variants and sizes.
 
 ```tsx
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 // Primary action
 <Button variant="primary" size="lg" onClick={handleClick}>
@@ -78,7 +78,7 @@ import { Button } from '@beak-gaming/ui';
 An accessible toggle switch for boolean settings.
 
 ```tsx
-import { Toggle } from '@beak-gaming/ui';
+import { Toggle } from '@joolie-boolie/ui';
 
 <Toggle
   checked={audioEnabled}
@@ -109,7 +109,7 @@ import { Toggle } from '@beak-gaming/ui';
 A range slider with label and value display.
 
 ```tsx
-import { Slider } from '@beak-gaming/ui';
+import { Slider } from '@joolie-boolie/ui';
 
 <Slider
   value={speed}
@@ -156,9 +156,9 @@ import { Slider } from '@beak-gaming/ui';
 
 ## Design Principles
 
-### Senior-Friendly Design
+### Accessible Design
 
-All components follow accessibility best practices for older adults:
+All components follow accessibility best practices for all users:
 
 1. **Large Touch Targets**: Minimum 44x44px (WCAG 2.1 AAA)
 2. **High Contrast**: All text meets WCAG AAA contrast ratios
@@ -167,7 +167,7 @@ All components follow accessibility best practices for older adults:
 
 ### CSS Variables
 
-Components use CSS variables from `@beak-gaming/theme`:
+Components use CSS variables from `@joolie-boolie/theme`:
 
 ```css
 /* Primary button uses */
@@ -215,8 +215,8 @@ export { Slider, type SliderProps } from './slider';
 
 ## Related Packages
 
-- [`@beak-gaming/theme`](../theme/README.md) - CSS variables and design tokens used by all components
-- [`@beak-gaming/testing`](../testing/README.md) - Test utilities for component testing
+- [`@joolie-boolie/theme`](../theme/README.md) - CSS variables and design tokens used by all components
+- [`@joolie-boolie/testing`](../testing/README.md) - Test utilities for component testing
 
 ## Related Documentation
 

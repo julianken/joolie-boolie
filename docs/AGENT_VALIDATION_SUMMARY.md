@@ -24,7 +24,7 @@ Four specialized agents independently analyzed the OAuth integration initiative 
 1. Platform Hub for user auth and cross-game features
 2. Apps keep their own APIs with shared middleware
 3. Use Supabase Auth instead of custom OAuth server
-4. Enhance existing `@beak-gaming/auth` instead of creating new packages
+4. Enhance existing `@joolie-boolie/auth` instead of creating new packages
 
 **Architecture:**
 ```
@@ -52,8 +52,8 @@ Bingo + Trivia (OAuth clients with protected routes)
 **Verdict:** HALT AND REDESIGN
 
 **Gap Analysis:** PARTIALLY JUSTIFIED
-- ✅ `@beak-gaming/auth` exists with ~2,000 LOC and 34 exports
-- ✅ `@beak-gaming/database` exists with ~10,600 LOC and 268 exports
+- ✅ `@joolie-boolie/auth` exists with ~2,000 LOC and 34 exports
+- ✅ `@joolie-boolie/database` exists with ~10,600 LOC and 268 exports
 - ❌ **Critical Misunderstanding:** Plan assumes Supabase can be OAuth server (initially thought incorrect, but proven correct by Simplifier agent's documentation fetch)
 
 **37% Inflation Claim:** UNABLE TO VERIFY
@@ -109,7 +109,7 @@ Fetched official Supabase documentation proving **Supabase DOES provide OAuth 2.
 **Unnecessary Features:**
 - Custom OAuth endpoints (Supabase provides)
 - Redis session storage (Supabase manages sessions)
-- `@beak-gaming/oauth-client` package (use supabase-js)
+- `@joolie-boolie/oauth-client` package (use supabase-js)
 - Custom PKCE validation (Supabase handles)
 - Token introspection endpoint (Supabase provides)
 - OAuth metadata discovery (Supabase provides)
@@ -231,7 +231,7 @@ Based on agent consensus, eliminate these from Linear:
 - ❌ Custom `/api/oauth/authorize` endpoint (use Supabase's)
 - ❌ Custom `/api/oauth/token` endpoint (use Supabase's)
 - ❌ Custom PKCE validation logic (Supabase handles)
-- ❌ `@beak-gaming/oauth-client` package (use supabase-js)
+- ❌ `@joolie-boolie/oauth-client` package (use supabase-js)
 - ❌ Redis session storage (Supabase manages sessions)
 - ❌ Token introspection endpoint (use Supabase's)
 - ❌ OAuth metadata/discovery endpoint (Supabase provides)
@@ -290,7 +290,7 @@ Based on agent consensus, eliminate these from Linear:
 
 - Using Supabase OAuth (production-tested by thousands of apps)
 - Building only consent UI (standard OAuth flow)
-- Integrating with existing `@beak-gaming/auth`
+- Integrating with existing `@joolie-boolie/auth`
 - Token validation via JWKS endpoint
 
 ### Medium Risk ⚠️

@@ -28,7 +28,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Copyright */}
             <p className="text-lg text-muted-foreground text-center md:text-left">
-              &copy; {currentYear} Beak Gaming Platform. All rights reserved.
+              &copy; {currentYear} Joolie Boolie Platform. All rights reserved.
             </p>
 
             {/* Links */}
@@ -82,7 +82,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
 
           {/* Accessibility note */}
           <p className="mt-6 text-base text-muted-foreground/70 text-center">
-            Designed with accessibility in mind for retirement communities.
+            Designed with accessibility in mind for groups and communities.
           </p>
         </div>
       </footer>

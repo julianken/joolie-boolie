@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Question, QuestionCategory } from '@/types';
-import type { TriviaQuestion } from '@beak-gaming/database/types';
+import type { TriviaQuestion } from '@joolie-boolie/database/types';
 
 /**
  * Letter-to-index mapping for correctAnswers conversion.

@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { AuthProvider } from '@beak-gaming/auth';
-import { createMockSupabaseClient } from '@beak-gaming/testing';
+import { AuthProvider } from '@joolie-boolie/auth';
+import { createMockSupabaseClient } from '@joolie-boolie/testing';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Create a default mock Supabase client for tests

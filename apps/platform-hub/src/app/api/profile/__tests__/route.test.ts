@@ -32,7 +32,7 @@ vi.mock('@/lib/supabase/server', () => ({
 vi.mock('@/lib/e2e-profile-store', () => ({
   getE2EProfile: vi.fn(() => ({
     facility_name: 'E2E Test Facility',
-    email: 'e2e-test@beak-gaming.test',
+    email: 'e2e-test@joolie-boolie.test',
   })),
 }));
 

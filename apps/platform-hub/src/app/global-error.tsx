@@ -16,7 +16,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log to console in all environments for global errors
-    console.error('[Beak Gaming] Global error:', {
+    console.error('[Joolie Boolie] Global error:', {
       message: error.message,
       digest: error.digest,
       stack: error.stack,
@@ -74,7 +74,7 @@ export default function GlobalError({
                 lineHeight: 1.2,
               }}
             >
-              Beak Gaming has stopped working
+              Joolie Boolie has stopped working
             </h1>
 
             {/* Message */}

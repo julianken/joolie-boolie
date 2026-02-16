@@ -6,9 +6,6 @@
 #   supabase stop     # Stops local Supabase
 #   supabase status   # Shows connection details (URLs, keys)
 
-[project]
-id = "beak-gaming-platform"
-
 [api]
 enabled = true
 port = 54321

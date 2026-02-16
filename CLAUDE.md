@@ -22,9 +22,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Context
 
-**Beak Gaming Platform** - A unified gaming platform for retirement communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
+**Joolie Boolie Platform** - A unified gaming platform for groups and communities, featuring Bingo, Trivia, and future games. Built as a Turborepo monorepo with shared packages.
 
-**Design:** Senior-friendly (min 18px body, high contrast, 44x44px touch targets). Audience display optimized for projector/large TV.
+**Design:** Accessible (min 18px body, high contrast, 44x44px touch targets). Audience display optimized for projector/large TV.
 
 ### Current State
 
@@ -63,6 +63,16 @@ pnpm clean                # Clean all build artifacts
 pnpm test:e2e             # Build + run E2E tests
 pnpm test:e2e:summary     # Show E2E pass/fail counts
 ```
+
+### Production Test Account
+
+Credentials for manual QA against the deployed Vercel apps are stored locally (gitignored):
+
+```
+.secrets/prod-test-account.json
+```
+
+Structure: `{ email, password, supabase_user_id, urls: { platform_hub, bingo, trivia }, notes }`
 
 ### Environment Variables
 

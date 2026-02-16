@@ -8,7 +8,7 @@ export interface ClientInfoProps {
  * ClientInfo - Displays OAuth client application details
  *
  * Shows client name, logo, description, and redirect URI
- * Senior-friendly design with large fonts and clear layout
+ * Accessible design with large fonts and clear layout
  */
 export function ClientInfo({ client }: ClientInfoProps) {
   return (

@@ -243,14 +243,14 @@ Production code contains hardcoded localhost URLs that will fail in production d
 // Before (broken):
 const bingoUrl = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000/play'
-  : 'https://bingo.beakgaming.com/play';
+  : 'https://bingo.joolieboolie.com/play';
 
 // After (correct):
 const bingoUrl = `${process.env.NEXT_PUBLIC_BINGO_URL}/play`;
 
 // Environment variables required:
-// NEXT_PUBLIC_BINGO_URL=https://bingo.beakgaming.com
-// NEXT_PUBLIC_TRIVIA_URL=https://trivia.beakgaming.com
+// NEXT_PUBLIC_BINGO_URL=https://bingo.joolieboolie.com
+// NEXT_PUBLIC_TRIVIA_URL=https://trivia.joolieboolie.com
 ```
 
 **Files to Update:**
@@ -638,7 +638,7 @@ RLS policies for audit log table may reference columns that don't exist, prevent
 **Location:** `packages/ui/src/button.tsx`
 
 **Description:**
-The shared Button component in `@beak-gaming/ui` does not include `aria-busy` attribute that app-level Button implementations have.
+The shared Button component in `@joolie-boolie/ui` does not include `aria-busy` attribute that app-level Button implementations have.
 
 **Impact:**
 - Accessibility regression

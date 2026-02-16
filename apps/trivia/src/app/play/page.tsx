@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game-keyboard';
 import { useSync } from '@/hooks/use-sync';
-import { useSessionRecovery, useAutoSync } from '@beak-gaming/sync';
+import { useSessionRecovery, useAutoSync } from '@joolie-boolie/sync';
 import {
   generateSecurePin,
   generateShortSessionId,
@@ -24,7 +24,7 @@ import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
 import { TeamManager } from '@/components/presenter/TeamManager';
 import { OpenDisplayButton as _OpenDisplayButton } from '@/components/presenter/OpenDisplayButton';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
-import { ThemeSelector } from '@beak-gaming/ui';
+import { ThemeSelector } from '@joolie-boolie/ui';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
 import { KeyboardShortcutsModal } from '@/components/ui/KeyboardShortcutsModal';
 import { RoomSetupModal } from '@/components/presenter/RoomSetupModal';
@@ -37,7 +37,7 @@ import { SaveQuestionSetModal } from '@/components/presenter/SaveQuestionSetModa
 import { CategoryFilterCompact } from '@/components/presenter/CategoryFilter';
 import { filterQuestionsByCategory } from '@/lib/categories';
 import type { QuestionCategory } from '@/types';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 import { serializeTriviaState, deserializeTriviaState } from '@/lib/state/serializer';
 
 export default function PlayPage() {
@@ -580,7 +580,7 @@ export default function PlayPage() {
           <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Trivia Night
+              Trivia
             </h1>
             <p className="text-lg text-muted-foreground">Presenter View</p>
           </div>

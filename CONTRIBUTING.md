@@ -1,6 +1,6 @@
-# Contributing to Beak Gaming Platform
+# Contributing to Joolie Boolie Platform
 
-Thank you for your interest in contributing to the Beak Gaming Platform!
+Thank you for your interest in contributing to the Joolie Boolie Platform!
 
 ## Development Setup
 
@@ -15,7 +15,7 @@ Thank you for your interest in contributing to the Beak Gaming Platform!
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd beak-gaming-platform
+cd joolie-boolie-platform
 
 # Install dependencies
 pnpm install
@@ -150,12 +150,12 @@ lib/game/
 ### Writing Tests
 
 - Test pure functions directly
-- Mock browser APIs using `@beak-gaming/testing`
+- Mock browser APIs using `@joolie-boolie/testing`
 - Reset stores between tests
 
 ```typescript
 import { resetAllStores } from '@/test/helpers/store';
-import { mockBroadcastChannel, MockBroadcastChannel } from '@beak-gaming/testing';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing';
 
 beforeEach(() => {
   resetAllStores();
@@ -245,7 +245,7 @@ function callNextBall(state: GameState): GameState {
 }
 ```
 
-## Senior-Friendly Design
+## Accessible Design
 
 ### Accessibility Requirements
 

@@ -13,7 +13,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState, useEffect } from 'react';
 import PlayPage from '../page';
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 import {
   getStoredPin,
   storePin,
@@ -90,7 +90,7 @@ vi.mock('@/hooks/use-sync', () => ({
   useSync: () => ({ isConnected: false }),
 }));
 
-vi.mock('@beak-gaming/sync', () => ({
+vi.mock('@joolie-boolie/sync', () => ({
   useSessionRecovery: () => {
     // Create a proper React hook that simulates the recovery lifecycle
     const [isRecovering, setIsRecovering] = useState(true);

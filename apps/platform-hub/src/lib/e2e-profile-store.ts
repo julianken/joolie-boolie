@@ -16,7 +16,7 @@ const e2eProfileStore = new Map<string, E2EProfile>();
 // Default profile for E2E tests
 const DEFAULT_E2E_PROFILE: E2EProfile = {
   facility_name: 'E2E Test Facility',
-  email: 'e2e-test@beak-gaming.test',
+  email: 'e2e-test@joolie-boolie.test',
 };
 
 export function getE2EProfile(userId: string): E2EProfile {

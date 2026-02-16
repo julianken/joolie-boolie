@@ -270,8 +270,8 @@ describe('GET /api/oauth/authorize', () => {
     beforeEach(() => {
       process.env.E2E_TESTING = 'true';
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'e2e-access-token' };
-        if (name === 'beak_user_id') return { value: 'e2e-test-user-00000000-0000-0000-0000-000000000000' };
+        if (name === 'jb_access_token') return { value: 'e2e-access-token' };
+        if (name === 'jb_user_id') return { value: 'e2e-test-user-00000000-0000-0000-0000-000000000000' };
         return undefined;
       });
     });
@@ -340,8 +340,8 @@ describe('GET /api/oauth/authorize', () => {
     it('should NOT enter E2E mode when user ID does not match E2E test user', async () => {
       process.env.E2E_TESTING = 'true';
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'some-token' };
-        if (name === 'beak_user_id') return { value: 'regular-user-id' };
+        if (name === 'jb_access_token') return { value: 'some-token' };
+        if (name === 'jb_user_id') return { value: 'regular-user-id' };
         return undefined;
       });
 

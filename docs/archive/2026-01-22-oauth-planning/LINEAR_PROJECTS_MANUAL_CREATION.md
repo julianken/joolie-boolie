@@ -8,7 +8,7 @@ Complete specifications for all 15 projects across 3 initiatives, organized by *
 
 ## Team Information
 
-- **Team Name:** Beak-gaming
+- **Team Name:** Joolie-Boolie
 - **Team ID:** `4deac7af-714d-4231-8910-e97c8cb1cd34`
 
 ---
@@ -22,7 +22,7 @@ Complete specifications for all 15 projects across 3 initiatives, organized by *
 **Why First:** Everything else depends on this infrastructure
 
 ### 2. Initiative 2: Infrastructure & Shared Packages
-**Purpose:** Build the @beak-gaming/oauth-client package and complete shared infrastructure
+**Purpose:** Build the @joolie-boolie/oauth-client package and complete shared infrastructure
 **Why Second:** Apps need this package to integrate with the OAuth server
 
 ### 3. Initiative 3: Core Apps as OAuth Clients
@@ -187,7 +187,7 @@ Build UI for creating, editing, and deleting templates
 **Approximate Scope:** 15-18 issues
 
 **Summary:**
-Build facility-level features for retirement community staff
+Build facility-level features for group and community staff
 
 **Key Deliverables:**
 - **Facility Management:** Profile, add/remove staff, role assignment
@@ -206,7 +206,7 @@ Complete shared packages and infrastructure. **DO THIS SECOND.**
 
 **Approximate Scope:** 57-73 issues
 
-### Project 2.1: @beak-gaming/oauth-client Package ⚡ CRITICAL
+### Project 2.1: @joolie-boolie/oauth-client Package ⚡ CRITICAL
 
 **Priority:** High (2)
 **Status:** Planned
@@ -231,7 +231,7 @@ Centralized OAuth 2.1 client package with flows, hooks, middleware, and token ma
 
 ---
 
-### Project 2.2: @beak-gaming/game-engine Completion
+### Project 2.2: @joolie-boolie/game-engine Completion
 
 **Priority:** Medium (3)
 **Status:** Planned
@@ -264,8 +264,8 @@ Complete game-engine package with state machine, round management, timers, and t
 Bug fixes and optimizations for auth and database packages
 
 **Key Deliverables:**
-- @beak-gaming/auth: Bug fixes, additional helper utilities
-- @beak-gaming/database: Performance optimizations, edge case handling
+- @joolie-boolie/auth: Bug fixes, additional helper utilities
+- @joolie-boolie/database: Performance optimizations, edge case handling
 
 **Dependencies:** OAuth integration in apps for testing
 
@@ -337,7 +337,7 @@ Transform Bingo into an OAuth client that authenticates through Platform Hub
 
 **Dependencies:**
 - Project 1.1 (OAuth Server Setup) - MUST BE COMPLETE
-- Project 2.1 (@beak-gaming/oauth-client package) - MUST BE COMPLETE
+- Project 2.1 (@joolie-boolie/oauth-client package) - MUST BE COMPLETE
 - Projects 1.3-1.5 (Hub API endpoints)
 
 ---
@@ -361,7 +361,7 @@ Transform Trivia into an OAuth client that authenticates through Platform Hub
 
 **Dependencies:**
 - Project 1.1 (OAuth Server Setup) - MUST BE COMPLETE
-- Project 2.1 (@beak-gaming/oauth-client package) - MUST BE COMPLETE
+- Project 2.1 (@joolie-boolie/oauth-client package) - MUST BE COMPLETE
 - Projects 1.3-1.5 (Hub API endpoints)
 
 ---
@@ -390,7 +390,7 @@ Transform Trivia into an OAuth client that authenticates through Platform Hub
 The fastest path to getting apps working with OAuth:
 
 1. **Project 1.1** (OAuth Server Setup) ← Start here
-2. **Project 2.1** (@beak-gaming/oauth-client Package) ← Build in parallel with 1.2-1.5
+2. **Project 2.1** (@joolie-boolie/oauth-client Package) ← Build in parallel with 1.2-1.5
 3. **Projects 1.2-1.5** (Hub APIs) ← Can work on these while Project 2.1 is in progress
 4. **Project 3.1 & 3.2** (Bingo & Trivia OAuth integration) ← Only after 1.1, 2.1, and 1.3-1.5 are done
 5. **Projects 1.6-1.8** (Dashboard, Templates, Admin) ← Can be done in parallel with or after apps

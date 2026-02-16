@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     // Access token cookie (expires with token)
     // Use sameSite: 'lax' for same-origin OAuth flows (not cross-origin)
-    cookieStore.set('beak_access_token', tokens.access_token, {
+    cookieStore.set('jb_access_token', tokens.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     // Refresh token cookie (long-lived, typically 30 days)
     if (tokens.refresh_token) {
-      cookieStore.set('beak_refresh_token', tokens.refresh_token, {
+      cookieStore.set('jb_refresh_token', tokens.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     }
 
     // User ID cookie (for client-side access)
-    cookieStore.set('beak_user_id', userId, {
+    cookieStore.set('jb_user_id', userId, {
       httpOnly: false, // Allow client-side access
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

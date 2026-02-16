@@ -172,7 +172,7 @@ describe('Offline Mode Integration', () => {
   describe('BroadcastChannel Sync', () => {
     it('uses offline session ID for channel name', () => {
       const sessionId = 'GHI789';
-      const expectedChannelName = `beak-bingo-sync-offline-${sessionId}`;
+      const expectedChannelName = `jb-bingo-sync-offline-${sessionId}`;
 
       // Verify channel naming convention
       expect(sessionId).toMatch(/^[A-Z0-9]{6}$/);
@@ -184,8 +184,8 @@ describe('Offline Mode Integration', () => {
       const session1 = 'ABC123';
       const session2 = 'XYZ789';
 
-      const channel1 = `beak-bingo-sync-offline-${session1}`;
-      const channel2 = `beak-bingo-sync-offline-${session2}`;
+      const channel1 = `jb-bingo-sync-offline-${session1}`;
+      const channel2 = `jb-bingo-sync-offline-${session2}`;
 
       // Different sessions should have different channels
       expect(channel1).not.toBe(channel2);

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Beak Bingo** - A cloud-based, web-accessible Bingo system designed for retirement communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
+**Joolie Boolie Bingo** - A cloud-based, web-accessible Bingo system designed for groups and communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
 
 **Current State:** Fully functional with audio, patterns, themes, and dual-screen sync.
 
@@ -186,7 +186,7 @@ src/
 
 ## Design Requirements
 
-- **Senior-friendly:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
+- **Accessible:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
 - **Audience display:** Optimized for projector/large TV, readable from back of room
 - **Keyboard shortcuts:** Space=roll, P=pause, R=reset, U=undo, M=mute
 

@@ -90,8 +90,8 @@ export async function GET(request: NextRequest) {
     // Check for E2E testing mode via SSO cookies
     // This allows tests to bypass Supabase session when Login API sets E2E cookies
     const cookieStore = await cookies();
-    const beakAccessToken = cookieStore.get('beak_access_token')?.value;
-    const beakUserId = cookieStore.get('beak_user_id')?.value;
+    const beakAccessToken = cookieStore.get('jb_access_token')?.value;
+    const beakUserId = cookieStore.get('jb_user_id')?.value;
 
     // Determine if this is an E2E test session
     const isE2ETestSession =

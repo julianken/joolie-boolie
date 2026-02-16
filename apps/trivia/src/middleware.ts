@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { shouldRefreshToken, refreshTokens } from '@beak-gaming/auth';
+import { shouldRefreshToken, refreshTokens } from '@joolie-boolie/auth';
 
 /**
  * Next.js Middleware for Route Protection
@@ -125,7 +125,7 @@ async function verifyAccessToken(token: string): Promise<boolean> {
   if (sessionSecret) {
     try {
       await jwtVerify(token, sessionSecret, {
-        issuer: 'beak-gaming-platform',
+        issuer: 'joolie-boolie-platform',
         audience: 'authenticated',
       });
       return true;
@@ -172,10 +172,10 @@ function createResponseWithRefreshedTokens(
   const response = NextResponse.next();
 
   // Access token: 1 hour
-  response.cookies.set('beak_access_token', accessToken, getCookieOptions(3600));
+  response.cookies.set('jb_access_token', accessToken, getCookieOptions(3600));
 
   // Refresh token: 30 days
-  response.cookies.set('beak_refresh_token', refreshToken, getCookieOptions(30 * 24 * 3600));
+  response.cookies.set('jb_refresh_token', refreshToken, getCookieOptions(30 * 24 * 3600));
 
   return response;
 }
@@ -185,9 +185,9 @@ function createResponseWithRefreshedTokens(
  */
 function clearAuthCookies(response: NextResponse) {
   const cookieOptions = getCookieOptions(0);
-  response.cookies.set('beak_access_token', '', cookieOptions);
-  response.cookies.set('beak_refresh_token', '', cookieOptions);
-  response.cookies.set('beak_user_id', '', { ...cookieOptions, httpOnly: false });
+  response.cookies.set('jb_access_token', '', cookieOptions);
+  response.cookies.set('jb_refresh_token', '', cookieOptions);
+  response.cookies.set('jb_user_id', '', { ...cookieOptions, httpOnly: false });
 }
 
 export async function middleware(request: NextRequest) {
@@ -199,8 +199,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check for access token in httpOnly cookie (using cross-app SSO cookie name)
-  const accessToken = request.cookies.get('beak_access_token')?.value;
-  const refreshToken = request.cookies.get('beak_refresh_token')?.value;
+  const accessToken = request.cookies.get('jb_access_token')?.value;
+  const refreshToken = request.cookies.get('jb_refresh_token')?.value;
 
   if (!accessToken) {
     // No token - redirect to login with return path stored
@@ -208,7 +208,7 @@ export async function middleware(request: NextRequest) {
     const response = NextResponse.redirect(loginUrl);
 
     // Store the requested path for post-auth redirect
-    response.cookies.set('beak_return_to', pathname, {
+    response.cookies.set('jb_return_to', pathname, {
       path: '/',
       maxAge: 300, // 5 minutes - expires quickly for security
       httpOnly: false, // Client-side JS needs to read this

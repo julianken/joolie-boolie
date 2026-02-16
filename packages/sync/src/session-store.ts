@@ -69,10 +69,10 @@ export interface RecentSession {
 // =============================================================================
 
 /** localStorage key for session state */
-const SESSION_STATE_KEY = 'beak-session-state';
+const SESSION_STATE_KEY = 'jb-session-state';
 
 /** localStorage key for recent sessions */
-const RECENT_SESSIONS_KEY = 'beak-recent-sessions';
+const RECENT_SESSIONS_KEY = 'jb-recent-sessions';
 
 /** Maximum number of recent sessions to store */
 const MAX_RECENT_SESSIONS = 10;

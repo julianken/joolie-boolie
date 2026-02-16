@@ -1,5 +1,5 @@
 {
-  "name": "@beak-gaming/database",
+  "name": "@joolie-boolie/database",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -42,7 +42,7 @@
     }
   },
   "devDependencies": {
-    "@beak-gaming/testing": "workspace:*",
+    "@joolie-boolie/testing": "workspace:*",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22",
     "@types/react": "^19",

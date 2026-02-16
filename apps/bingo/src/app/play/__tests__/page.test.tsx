@@ -10,7 +10,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import PlayPage from '../page';
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 import {
   generateSecurePin,
   generateShortSessionId,
@@ -62,7 +62,7 @@ vi.mock('@/hooks/use-sync', () => ({
   useSync: () => ({ isConnected: false }),
 }));
 
-vi.mock('@beak-gaming/sync', () => ({
+vi.mock('@joolie-boolie/sync', () => ({
   useSessionRecovery: () => ({
     isRecovering: false,
     isRecovered: false,
@@ -244,7 +244,7 @@ describe('PlayPage - Session ID Strategy', () => {
 
       // Should still render without crashing
       await waitFor(() => {
-        expect(screen.getByText('Beak Bingo')).toBeInTheDocument();
+        expect(screen.getByText('Joolie Boolie Bingo')).toBeInTheDocument();
       });
     });
   });

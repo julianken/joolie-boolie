@@ -65,9 +65,9 @@ This script:
 source .env.e2e
 
 # Start each server on its isolated port
-PORT=$BINGO_PORT pnpm --filter @beak-gaming/bingo dev &
-PORT=$TRIVIA_PORT pnpm --filter @beak-gaming/trivia dev &
-PORT=$HUB_PORT pnpm --filter @beak-gaming/platform-hub dev &
+PORT=$BINGO_PORT pnpm --filter @joolie-boolie/bingo dev &
+PORT=$TRIVIA_PORT pnpm --filter @joolie-boolie/trivia dev &
+PORT=$HUB_PORT pnpm --filter @joolie-boolie/platform-hub dev &
 ```
 
 ## Running E2E Tests

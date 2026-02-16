@@ -3,12 +3,12 @@ import { GET, PATCH, DELETE } from '../route';
 import { NextRequest } from 'next/server';
 
 // Mock the Supabase server client
-vi.mock('@beak-gaming/database/server', () => ({
+vi.mock('@joolie-boolie/database/server', () => ({
   createClient: vi.fn(),
 }));
 
 // Mock the database functions
-vi.mock('@beak-gaming/database/tables', () => ({
+vi.mock('@joolie-boolie/database/tables', () => ({
   getBingoTemplate: vi.fn(),
   updateBingoTemplate: vi.fn(),
   deleteBingoTemplate: vi.fn(),
@@ -16,18 +16,18 @@ vi.mock('@beak-gaming/database/tables', () => ({
   AUTO_CALL_INTERVAL_MAX: 30000,
 }));
 
-vi.mock('@beak-gaming/database/errors', () => ({
+vi.mock('@joolie-boolie/database/errors', () => ({
   isDatabaseError: vi.fn(),
 }));
 
-import { createClient } from '@beak-gaming/database/server';
+import { createClient } from '@joolie-boolie/database/server';
 import {
   getBingoTemplate,
   updateBingoTemplate,
   deleteBingoTemplate,
-} from '@beak-gaming/database/tables';
-import { isDatabaseError } from '@beak-gaming/database/errors';
-import type { BingoTemplate } from '@beak-gaming/database/types';
+} from '@joolie-boolie/database/tables';
+import { isDatabaseError } from '@joolie-boolie/database/errors';
+import type { BingoTemplate } from '@joolie-boolie/database/types';
 
 describe('GET /api/templates/[id]', () => {
   const mockCreateClient = createClient as ReturnType<typeof vi.fn>;

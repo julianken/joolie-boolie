@@ -34,7 +34,7 @@ const mockTriviaTemplates = [
     game: 'trivia',
     id: 'trivia-template-1',
     user_id: 'e2e-user-id',
-    name: 'Movie Trivia Night',
+    name: 'Movie Trivia',
     questions: [{ id: 1, text: 'Sample question', answer: 'Sample answer' }],
     rounds_count: 3,
     questions_per_round: 5,
@@ -88,7 +88,7 @@ test.describe('@critical Platform Hub Templates', () => {
       await authenticatedPage.goto('/dashboard/templates');
       await expect(authenticatedPage.locator('h1').first()).toContainText('Templates');
       await expect(authenticatedPage.getByText('Friday Night Bingo')).toBeVisible();
-      await expect(authenticatedPage.getByText('Movie Trivia Night')).toBeVisible();
+      await expect(authenticatedPage.getByText('Movie Trivia')).toBeVisible();
     });
 
     test('filter tabs show counts @high', async ({ authenticatedPage }) => {
@@ -105,7 +105,7 @@ test.describe('@critical Platform Hub Templates', () => {
       await expect(authenticatedPage.getByText('Friday Night Bingo')).toBeVisible();
       await authenticatedPage.getByRole('button', { name: /bingo \(/i }).click();
       await expect(authenticatedPage.getByText('Friday Night Bingo')).toBeVisible();
-      await expect(authenticatedPage.getByText('Movie Trivia Night')).not.toBeVisible();
+      await expect(authenticatedPage.getByText('Movie Trivia')).not.toBeVisible();
     });
 
     test('empty state shows @medium', async ({ authenticatedPage }) => {

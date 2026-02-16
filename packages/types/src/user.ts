@@ -1,5 +1,5 @@
 /**
- * User-related types shared across the Beak Gaming Platform.
+ * User-related types shared across the Joolie Boolie Platform.
  */
 
 import type { Timestamps } from './game';
@@ -26,7 +26,7 @@ export interface User {
  * Extended user profile with additional platform-specific fields.
  */
 export interface UserProfile extends User, Timestamps {
-  /** Name of the user's facility (e.g., retirement community name) */
+  /** Name of the user's facility (e.g., group and community name) */
   facilityName: string | null;
   /** URL to the user's custom logo */
   logoUrl: string | null;

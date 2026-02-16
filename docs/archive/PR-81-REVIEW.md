@@ -2,7 +2,7 @@
 
 **Reviewer:** Claude Sonnet 4.5
 **Date:** 2026-01-20
-**PR Link:** https://github.com/julianken/beak-gaming-platform/pull/81
+**PR Link:** https://github.com/julianken/joolie-boolie-platform/pull/81
 
 ---
 
@@ -229,7 +229,7 @@ Enhance documentation with practical usage examples:
  *
  * @example
  * ```typescript
- * import { signToken, createSessionToken } from '@beak-gaming/database';
+ * import { signToken, createSessionToken } from '@joolie-boolie/database';
  *
  * const token = createSessionToken('sess-123', 'ABC123', 'bingo');
  * const secret = process.env.SESSION_TOKEN_SECRET!;
@@ -326,7 +326,7 @@ Once the export issue is fixed, these functions are ready for integration in:
 
 ```typescript
 // In API route (e.g., apps/bingo/app/api/game-session/route.ts)
-import { verifyAndDecodeToken } from '@beak-gaming/database';
+import { verifyAndDecodeToken } from '@joolie-boolie/database';
 
 export async function GET(request: Request) {
   const token = request.headers.get('X-Session-Token');
@@ -364,7 +364,7 @@ export async function GET(request: Request) {
 3. **Verify exports work:**
    ```bash
    # In another package, test the import
-   import { signToken, verifyAndDecodeToken } from '@beak-gaming/database';
+   import { signToken, verifyAndDecodeToken } from '@joolie-boolie/database';
    ```
 
 ### Optional (but recommended):

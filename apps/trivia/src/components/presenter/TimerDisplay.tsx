@@ -51,7 +51,7 @@ function getProgressColor(remaining: number, duration: number): string {
 /**
  * Timer display component for the presenter view.
  * Shows countdown with visual urgency indicators and optional controls.
- * Senior-friendly with large text (min 24px for time display).
+ * Accessible with large text (min 24px for time display).
  */
 export function TimerDisplay({
   showControls = true,

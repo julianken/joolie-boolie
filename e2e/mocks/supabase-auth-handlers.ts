@@ -505,7 +505,7 @@ async function handlePlatformHubLogin(route: Route, request: Request): Promise<v
   // Set cookies to simulate Platform Hub's SSO cookie behavior
   const cookies = [
     {
-      name: 'beak_access_token',
+      name: 'jb_access_token',
       value: session.access_token,
       path: '/',
       httpOnly: true,
@@ -513,7 +513,7 @@ async function handlePlatformHubLogin(route: Route, request: Request): Promise<v
       expires: session.expires_at,
     },
     {
-      name: 'beak_refresh_token',
+      name: 'jb_refresh_token',
       value: session.refresh_token,
       path: '/',
       httpOnly: true,
@@ -521,7 +521,7 @@ async function handlePlatformHubLogin(route: Route, request: Request): Promise<v
       expires: session.expires_at + (30 * 24 * 60 * 60), // 30 days
     },
     {
-      name: 'beak_user_id',
+      name: 'jb_user_id',
       value: user.id,
       path: '/',
       httpOnly: false,

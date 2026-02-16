@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '../theme-selector';
-import type { ThemeMode } from '@beak-gaming/types';
+import type { ThemeMode } from '@joolie-boolie/types';
 
 describe('ThemeSelector', () => {
   const defaultProps = {
@@ -208,7 +208,7 @@ describe('ThemeSelector', () => {
   });
 
   describe('styling', () => {
-    it('should have minimum 44px height for senior-friendly design', () => {
+    it('should have minimum 44px height for accessible design', () => {
       render(<ThemeSelector {...defaultProps} />);
 
       const presenterSelect = screen.getByLabelText('Presenter');

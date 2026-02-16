@@ -11,7 +11,7 @@ This revised plan simplifies OAuth integration by leveraging Supabase's built-in
 
 **Key Changes from Original Plan:**
 - ❌ **Removed:** Custom OAuth server implementation (29 issues)
-- ❌ **Removed:** `@beak-gaming/oauth-client` package (12-15 issues)
+- ❌ **Removed:** `@joolie-boolie/oauth-client` package (12-15 issues)
 - ❌ **Removed:** Redis session storage infrastructure
 - ✅ **Added:** Leverage Supabase OAuth 2.1 server (native)
 - ✅ **Added:** Lightweight consent UI (3-4 issues)
@@ -71,7 +71,7 @@ https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json  # JWKS endpoint
 │  • POST /api/oauth/deny    - Deny authorization               │
 └──────────────────────────────────────────────────────────────┘
                                 ↓
-                    Uses @beak-gaming/auth package
+                    Uses @joolie-boolie/auth package
                                 ↓
 ┌──────────────────────────────────────────────────────────────┐
 │               Supabase OAuth 2.1 Server (Built-in)            │
@@ -200,22 +200,22 @@ curl -s https://iivxpjhmnalsuvpdzgza.supabase.co/auth/v1/.well-known/openid-conf
 
 2. **Register Bingo Client:**
    - Click: "New OAuth Client" or "Register Client"
-   - Client Name: `Beak Bingo`
+   - Client Name: `Joolie Boolie Bingo`
    - Client Type: `Public` (no client secret)
    - Redirect URIs:
      - Dev: `http://localhost:3000/auth/callback`
-     - Prod: `https://bingo.beakgaming.com/auth/callback`
+     - Prod: `https://bingo.joolieboolie.com/auth/callback`
    - Allowed Scopes: `openid`, `email`, `profile`
    - Grant Types: `authorization_code`, `refresh_token`
    - Save and copy `client_id`
 
 3. **Register Trivia Client:**
    - Click: "New OAuth Client"
-   - Client Name: `Trivia Night`
+   - Client Name: `Trivia`
    - Client Type: `Public` (no client secret)
    - Redirect URIs:
      - Dev: `http://localhost:3001/auth/callback`
-     - Prod: `https://trivia.beakgaming.com/auth/callback`
+     - Prod: `https://trivia.joolieboolie.com/auth/callback`
    - Allowed Scopes: `openid`, `email`, `profile`
    - Grant Types: `authorization_code`, `refresh_token`
    - Save and copy `client_id`
@@ -283,23 +283,23 @@ grep OAUTH apps/trivia/.env.local
    - Configured Authorization Path: `/oauth/consent`
    - Settings saved successfully
 
-2. **Beak Bingo Client Registered:**
-   - Client Name: `Beak Bingo`
+2. **Joolie Boolie Bingo Client Registered:**
+   - Client Name: `Joolie Boolie Bingo`
    - Client ID: `0d87a03a-d90a-4ccc-a46b-85fdd8d53c21`
    - Client Type: Public (PKCE-enabled, no client secret)
    - Redirect URIs:
      - `http://localhost:3000/auth/callback`
-     - `https://bingo.beakgaming.com/auth/callback`
+     - `https://bingo.joolieboolie.com/auth/callback`
    - Registration Type: Manual
    - Created: 21 Jan, 2026
 
-3. **Trivia Night Client Registered:**
-   - Client Name: `Trivia Night`
+3. **Trivia Client Registered:**
+   - Client Name: `Trivia`
    - Client ID: `0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936`
    - Client Type: Public (PKCE-enabled, no client secret)
    - Redirect URIs:
      - `http://localhost:3001/auth/callback`
-     - `https://trivia.beakgaming.com/auth/callback`
+     - `https://trivia.joolieboolie.com/auth/callback`
    - Registration Type: Manual
    - Created: 21 Jan, 2026
 
@@ -339,7 +339,7 @@ grep OAUTH apps/trivia/.env.local
 4. **BEA-303: Create OAuth Consent Page UI**
    - File: `apps/platform-hub/src/app/oauth/consent/page.tsx`
    - Display client name, requested scopes, user info
-   - Senior-friendly design (large fonts, clear CTA buttons)
+   - Accessible design (large fonts, clear CTA buttons)
    - Show "Allow" and "Deny" buttons
    - Handle missing/invalid authorization_id in URL
    - Redirect to error page if user not logged in
@@ -584,7 +584,7 @@ export default function OAuthCallback() {
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { createClient } from '@beak-gaming/auth';
+import { createClient } from '@joolie-boolie/auth';
 
 export default function ConsentPage() {
   const searchParams = useSearchParams();
@@ -708,7 +708,7 @@ export async function middleware(request: NextRequest) {
 
   if (!accessToken) {
     // Redirect to Platform Hub login
-    const loginUrl = new URL('https://platform-hub.beakgaming.com/login');
+    const loginUrl = new URL('https://platform-hub.joolieboolie.com/login');
     loginUrl.searchParams.set('redirect', request.url);
     return NextResponse.redirect(loginUrl);
   }
@@ -728,7 +728,7 @@ export async function middleware(request: NextRequest) {
     return response;
   } catch (error) {
     // Token invalid or expired - redirect to login
-    const loginUrl = new URL('https://platform-hub.beakgaming.com/login');
+    const loginUrl = new URL('https://platform-hub.joolieboolie.com/login');
     loginUrl.searchParams.set('redirect', request.url);
     return NextResponse.redirect(loginUrl);
   }
@@ -848,7 +848,7 @@ NEXT_PUBLIC_OAUTH_REDIRECT_URI=http://localhost:3001/auth/callback
 |--------|--------------|--------------|--------|
 | **Total Issues** | 154-190 issues | 12-15 issues | -92% |
 | **OAuth Server** | Build custom (29 issues) | Use Supabase native | -29 issues |
-| **Client Package** | Build @beak-gaming/oauth-client | Use @supabase/supabase-js | -15 issues |
+| **Client Package** | Build @joolie-boolie/oauth-client | Use @supabase/supabase-js | -15 issues |
 | **Infrastructure** | Redis for sessions | None (Supabase handles) | -Redis |
 | **Custom Endpoints** | 6+ (authorize, token, introspect, etc.) | 1 (consent UI only) | -5 endpoints |
 | **Security Complexity** | High (PKCE impl, JWT signing, token rotation) | Low (Supabase handles) | -Security risk |
@@ -864,7 +864,7 @@ NEXT_PUBLIC_OAUTH_REDIRECT_URI=http://localhost:3001/auth/callback
 ### Risk 2: Session Cookie Domain Issues
 **Mitigation:**
 - Development: Use localhost for all apps (session cookies work)
-- Production: Use subdomains (hub.beakgaming.com, bingo.beakgaming.com) with shared cookie domain
+- Production: Use subdomains (hub.joolieboolie.com, bingo.joolieboolie.com) with shared cookie domain
 
 ### Risk 3: Token Refresh Complexity
 **Mitigation:** Supabase automatically handles refresh token rotation. Implement refresh logic in middleware before token expiration.
@@ -914,8 +914,8 @@ http://localhost:3000/auth/callback/  ❌ (trailing slash)
 https://localhost:3000/auth/callback  ❌ (https in dev)
 
 # Production
-https://bingo.beakgaming.com/auth/callback   ✅
-http://bingo.beakgaming.com/auth/callback    ❌ (http in prod)
+https://bingo.joolieboolie.com/auth/callback   ✅
+http://bingo.joolieboolie.com/auth/callback    ❌ (http in prod)
 ```
 
 #### Error: "invalid_request - missing code_challenge"
@@ -959,7 +959,7 @@ http://bingo.beakgaming.com/auth/callback    ❌ (http in prod)
 **Cause:** Cookie domain configuration issue
 **Fix:**
 1. Development: Expected behavior (localhost cookies are app-specific)
-2. Production: Verify shared cookie domain (`.beakgaming.com`)
+2. Production: Verify shared cookie domain (`.joolieboolie.com`)
 3. Check cookies are set with `SameSite=Lax` and `Secure=true` (prod only)
 
 ---

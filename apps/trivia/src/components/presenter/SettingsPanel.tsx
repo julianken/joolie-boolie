@@ -1,6 +1,6 @@
 'use client';
 
-import { Toggle, Slider } from '@beak-gaming/ui';
+import { Toggle, Slider } from '@joolie-boolie/ui';
 import type { GameStatus, Team } from '@/types';
 import type { TeamSetup, SettingsState } from '@/stores/settings-store';
 import { SETTINGS_RANGES } from '@/stores/settings-store';

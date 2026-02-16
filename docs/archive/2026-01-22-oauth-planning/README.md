@@ -25,7 +25,7 @@ During January 2026, four specialized agents (Architect, Code Reviewer, Code Sim
 
 **Original Plan Assumed:**
 - Build custom OAuth 2.1 authorization server from scratch (29 issues)
-- Create `@beak-gaming/oauth-client` package (12-15 issues)
+- Create `@joolie-boolie/oauth-client` package (12-15 issues)
 - Deploy Redis cluster for session storage
 - Implement custom PKCE validation logic
 - Build custom JWT signing/verification
@@ -99,7 +99,7 @@ The project now maintains these OAuth-related documents:
 ### Architect Agent Verdict
 **Modified Option A - Distributed APIs with Centralized Auth**
 - Use Supabase Auth instead of custom OAuth server
-- Enhance existing `@beak-gaming/auth` instead of creating new packages
+- Enhance existing `@joolie-boolie/auth` instead of creating new packages
 - Platform Hub for user auth UI + consent screen
 
 ### Code Reviewer Agent Verdict

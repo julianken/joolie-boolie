@@ -13,7 +13,7 @@ export interface WelcomeHeaderProps extends HTMLAttributes<HTMLElement> {
 
 /**
  * WelcomeHeader - Displays a personalized welcome message for authenticated users.
- * Designed for senior users with large, readable text.
+ * Designed for users with large, readable text.
  */
 export const WelcomeHeader = forwardRef<HTMLElement, WelcomeHeaderProps>(
   ({ userName, userEmail, isLoading = false, className = '', ...props }, ref) => {
@@ -53,7 +53,7 @@ export const WelcomeHeader = forwardRef<HTMLElement, WelcomeHeaderProps>(
                 {getGreeting()}, {displayName}!
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground">
-                Welcome to your Beak Gaming dashboard. Ready to play?
+                Welcome to your Joolie Boolie dashboard. Ready to play?
               </p>
             </div>
           )}

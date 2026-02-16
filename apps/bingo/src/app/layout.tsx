@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { ErrorBoundaryProvider } from "@/components/providers/ErrorBoundaryProvider";
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,13 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Beak Bingo",
-  description: "Cloud-based Bingo system for retirement communities",
+  title: "Joolie Boolie Bingo",
+  description: "Cloud-based Bingo system for groups and communities",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Beak Bingo",
+    title: "Joolie Boolie Bingo",
   },
   formatDetection: {
     telephone: false,

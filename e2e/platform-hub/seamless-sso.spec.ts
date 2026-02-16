@@ -32,7 +32,7 @@ test.describe('@critical Seamless SSO - Auto-Approve Flow', () => {
    * Flow:
    * 1. Login to Platform Hub
    * 2. Navigate to Bingo app
-   * 3. Initiate OAuth flow via "Sign in with Beak Gaming"
+   * 3. Initiate OAuth flow via "Sign in with Joolie Boolie"
    * 4. Verify: NO consent screen (auto-approved as first-party)
    * 5. Verify: Redirected back with tokens in cookies
    * 6. Verify: Can access protected /play route
@@ -47,14 +47,14 @@ test.describe('@critical Seamless SSO - Auto-Approve Flow', () => {
 
     // Verify SSO cookies are set
     const hubCookies = await page.context().cookies();
-    const hasAccessToken = hubCookies.some((c) => c.name === 'beak_access_token');
-    const hasUserId = hubCookies.some((c) => c.name === 'beak_user_id');
+    const hasAccessToken = hubCookies.some((c) => c.name === 'jb_access_token');
+    const hasUserId = hubCookies.some((c) => c.name === 'jb_user_id');
     expect(hasAccessToken).toBe(true);
     expect(hasUserId).toBe(true);
 
     // Step 2: Start OAuth flow from Bingo (as authenticated user)
     await page.goto(BINGO_URL);
-    await page.click('button:has-text("Sign in with Beak Gaming")');
+    await page.click('button:has-text("Sign in with Joolie Boolie")');
 
     // Step 3: Should redirect to Hub for OAuth (already authenticated)
     // For first-party apps with is_first_party=true, should auto-approve
@@ -89,7 +89,7 @@ test.describe('@critical Seamless SSO - Auto-Approve Flow', () => {
     // Need to copy cookies to Bingo domain since ports are different origins
     const allCookies = await page.context().cookies();
     const bingoAccessToken = allCookies.find(
-      (c) => c.name === 'beak_access_token' && c.domain === 'localhost'
+      (c) => c.name === 'jb_access_token' && c.domain === 'localhost'
     );
     expect(bingoAccessToken).toBeDefined();
 
@@ -119,7 +119,7 @@ test.describe('@critical Seamless SSO - Auto-Approve Flow', () => {
 
     // Start OAuth flow from Trivia
     await page.goto(TRIVIA_URL);
-    await page.click('button:has-text("Sign in with Beak Gaming")');
+    await page.click('button:has-text("Sign in with Joolie Boolie")');
 
     // Wait for OAuth redirect
     await page.waitForURL(/localhost:\d+/, { timeout: 10000 });
@@ -169,7 +169,7 @@ test.describe('@high Cross-App SSO', () => {
     // Copy SSO cookies to Trivia domain
     const cookies = await page.context().cookies();
     const ssoCookies = cookies.filter((c) =>
-      ['beak_access_token', 'beak_refresh_token', 'beak_user_id'].includes(c.name)
+      ['jb_access_token', 'jb_refresh_token', 'jb_user_id'].includes(c.name)
     );
 
     // Add cookies to Trivia domain
@@ -209,7 +209,7 @@ test.describe('@high Cross-App SSO', () => {
     // Copy SSO cookies to Bingo domain
     const cookies = await page.context().cookies();
     const ssoCookies = cookies.filter((c) =>
-      ['beak_access_token', 'beak_refresh_token', 'beak_user_id'].includes(c.name)
+      ['jb_access_token', 'jb_refresh_token', 'jb_user_id'].includes(c.name)
     );
 
     // Add cookies to Bingo domain
@@ -247,7 +247,7 @@ test.describe('@high Cross-App SSO', () => {
     // Copy SSO cookies to Hub domain
     const cookies = await page.context().cookies();
     const ssoCookies = cookies.filter((c) =>
-      ['beak_access_token', 'beak_refresh_token', 'beak_user_id'].includes(c.name)
+      ['jb_access_token', 'jb_refresh_token', 'jb_user_id'].includes(c.name)
     );
 
     await page.context().addCookies(
@@ -313,7 +313,7 @@ test.describe('@high Token Refresh Handling', () => {
     });
 
     // Should see the sign-in button (not authenticated state)
-    await expect(page.locator('button:has-text("Sign in with Beak Gaming")')).toBeVisible();
+    await expect(page.locator('button:has-text("Sign in with Joolie Boolie")')).toBeVisible();
   });
 
   /**
@@ -351,7 +351,7 @@ test.describe('@high Token Refresh Handling', () => {
     });
 
     // Should see the sign-in button (not authenticated state)
-    await expect(page.locator('button:has-text("Sign in with Beak Gaming")')).toBeVisible();
+    await expect(page.locator('button:has-text("Sign in with Joolie Boolie")')).toBeVisible();
   });
 });
 
@@ -381,7 +381,7 @@ test.describe('@high Session Persistence', () => {
     authenticatedBingoPage: page,
   }) => {
     const cookies = await page.context().cookies();
-    const accessTokenCookie = cookies.find((c) => c.name === 'beak_access_token');
+    const accessTokenCookie = cookies.find((c) => c.name === 'jb_access_token');
 
     expect(accessTokenCookie).toBeDefined();
     // Access token should be HttpOnly to prevent XSS attacks
@@ -395,7 +395,7 @@ test.describe('@high Session Persistence', () => {
     authenticatedBingoPage: page,
   }) => {
     const cookies = await page.context().cookies();
-    const userIdCookie = cookies.find((c) => c.name === 'beak_user_id');
+    const userIdCookie = cookies.find((c) => c.name === 'jb_user_id');
 
     expect(userIdCookie).toBeDefined();
     // User ID should NOT be HttpOnly so client can read it for UI

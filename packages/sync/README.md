@@ -1,8 +1,8 @@
-# @beak-gaming/sync
+# @joolie-boolie/sync
 
 **Status:** ✅ Production Ready (100% Complete)
 
-Dual-screen synchronization package for the Beak Gaming Platform. Provides BroadcastChannel-based communication between presenter and audience windows.
+Dual-screen synchronization package for the Joolie Boolie Platform. Provides BroadcastChannel-based communication between presenter and audience windows.
 
 ## Why Apps Have Their Own Implementations
 
@@ -22,7 +22,7 @@ Already included in the monorepo. Add to your app's dependencies:
 ```json
 {
   "dependencies": {
-    "@beak-gaming/sync": "workspace:*"
+    "@joolie-boolie/sync": "workspace:*"
   }
 }
 ```
@@ -32,7 +32,7 @@ Already included in the monorepo. Add to your app's dependencies:
 ### Basic Setup (Generic)
 
 ```typescript
-import { BroadcastSync, createSyncStore } from '@beak-gaming/sync';
+import { BroadcastSync, createSyncStore } from '@joolie-boolie/sync';
 
 // Create a typed broadcast sync instance
 interface MyGameState {
@@ -194,7 +194,7 @@ export function createMessageRouter(handlers: Partial<{
 The package provides a Zustand store factory for managing sync connection state:
 
 ```typescript
-import { createSyncStore } from '@beak-gaming/sync';
+import { createSyncStore } from '@joolie-boolie/sync';
 
 // Create a store instance for your app
 export const useSyncStore = createSyncStore();
@@ -217,7 +217,7 @@ function SyncStatus() {
 The generic `useSync` hook handles common sync patterns:
 
 ```typescript
-import { useSync } from '@beak-gaming/sync';
+import { useSync } from '@joolie-boolie/sync';
 
 function PresenterView() {
   const { isConnected, broadcastState } = useSync({
@@ -304,12 +304,12 @@ interface SyncState {
 | **apps/bingo** | ✅ Integrated | Dual-screen sync for presenter/audience views |
 | **apps/trivia** | ✅ Integrated | Dual-screen sync for presenter/audience views |
 | **apps/platform-hub** | ❌ Not Used | No dual-screen requirement |
-| **@beak-gaming/testing** | ✅ Integrated | MockBroadcastChannel for tests |
+| **@joolie-boolie/testing** | ✅ Integrated | MockBroadcastChannel for tests |
 
 ## Related Packages
 
-- [`@beak-gaming/types`](../types/README.md) - Shared type definitions including SyncMessage<T>
-- [`@beak-gaming/testing`](../testing/README.md) - BroadcastChannel mocks for testing
+- [`@joolie-boolie/types`](../types/README.md) - Shared type definitions including SyncMessage<T>
+- [`@joolie-boolie/testing`](../testing/README.md) - BroadcastChannel mocks for testing
 
 ## Related Documentation
 

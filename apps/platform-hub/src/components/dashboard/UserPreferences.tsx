@@ -1,7 +1,7 @@
 'use client';
 
 import { HTMLAttributes, forwardRef } from 'react';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 export interface UserPreferencesData {
   /** Preferred theme mode */
@@ -43,7 +43,7 @@ const defaultPreferences: UserPreferencesData = {
 
 /**
  * UserPreferences - Displays a summary of user preferences with quick access to settings.
- * Designed for senior users with clear labels and large touch targets.
+ * Designed for users with clear labels and large touch targets.
  */
 export const UserPreferences = forwardRef<HTMLElement, UserPreferencesProps>(
   ({ preferences, isLoading = false, className = '', ...props }, ref) => {

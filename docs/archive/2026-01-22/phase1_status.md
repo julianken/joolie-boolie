@@ -8,9 +8,9 @@
 
 | Issue | Title | Status | Branch | PR | Assignee | Notes |
 |-------|-------|--------|--------|-----|----------|-------|
-| BEA-289 | Create Bingo Template API Routes | ✅ Merged | phase1/bea-289-bingo-api | [#170](https://github.com/julianken/beak-gaming-platform/pull/170) | Eng Lead | 4 routes, 93.75%/98.14% coverage |
-| BEA-290 | Create Bingo Template UI Components | ✅ Merged | phase1/bea-290-ui-components | [#171](https://github.com/julianken/beak-gaming-platform/pull/171) | Eng Lead | 2 components, 21/21 tests passing |
-| BEA-291 | Integrate Templates into Bingo Room Setup | ✅ Merged | phase1/bea-291-room-setup-integration | [#172](https://github.com/julianken/beak-gaming-platform/pull/172) | Eng Lead | Room setup integration, ToastProvider added |
+| BEA-289 | Create Bingo Template API Routes | ✅ Merged | phase1/bea-289-bingo-api | [#170](https://github.com/julianken/joolie-boolie-platform/pull/170) | Eng Lead | 4 routes, 93.75%/98.14% coverage |
+| BEA-290 | Create Bingo Template UI Components | ✅ Merged | phase1/bea-290-ui-components | [#171](https://github.com/julianken/joolie-boolie-platform/pull/171) | Eng Lead | 2 components, 21/21 tests passing |
+| BEA-291 | Integrate Templates into Bingo Room Setup | ✅ Merged | phase1/bea-291-room-setup-integration | [#172](https://github.com/julianken/joolie-boolie-platform/pull/172) | Eng Lead | Room setup integration, ToastProvider added |
 
 ## Legend
 - 🔵 In Progress
@@ -47,12 +47,12 @@
   - Vercel bingo deployment restored to SUCCESS
 
 ## Guide Document
-[Template Management MVP - Implementation Guide](https://linear.app/beak-gaming/document/template-management-mvp-implementation-guide-5d27cac98be6)
+[Template Management MVP - Implementation Guide](https://linear.app/joolie-boolie/document/template-management-mvp-implementation-guide-5d27cac98be6)
 
 ## Linear Issues
-- [BEA-289](https://linear.app/beak-gaming/issue/BEA-289)
-- [BEA-290](https://linear.app/beak-gaming/issue/BEA-290)
-- [BEA-291](https://linear.app/beak-gaming/issue/BEA-291)
+- [BEA-289](https://linear.app/joolie-boolie/issue/BEA-289)
+- [BEA-290](https://linear.app/joolie-boolie/issue/BEA-290)
+- [BEA-291](https://linear.app/joolie-boolie/issue/BEA-291)
 
 ---
 Last updated: 2026-01-22T06:20 UTC

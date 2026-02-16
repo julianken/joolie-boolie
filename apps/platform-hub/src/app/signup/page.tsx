@@ -3,15 +3,15 @@ import Link from 'next/link';
 import { SignupForm } from '@/components';
 
 export const metadata: Metadata = {
-  title: 'Create Account - Beak Gaming Platform',
-  description: 'Create your Beak Gaming Platform account to start playing Bingo, Trivia, and more games.',
+  title: 'Create Account - Joolie Boolie Platform',
+  description: 'Create your Joolie Boolie Platform account to start playing Bingo, Trivia, and more games.',
 };
 
 // Force dynamic rendering to avoid build-time Supabase initialization
 export const dynamic = 'force-dynamic';
 
 /**
- * Signup Page - Senior-friendly registration page.
+ * Signup Page - Accessible registration page.
  *
  * Features:
  * - Large, clear layout
@@ -75,7 +75,7 @@ export default function SignupPage() {
         <p className="text-center text-base text-muted-foreground mt-8">
           Need help?{' '}
           <a
-            href="mailto:support@beakgaming.com"
+            href="mailto:support@joolieboolie.com"
             className="text-primary hover:text-primary/80 underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
           >
             Contact Support

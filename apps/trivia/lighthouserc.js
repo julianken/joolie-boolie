@@ -1,13 +1,13 @@
 /**
  * Lighthouse CI Configuration - Trivia App
  *
- * App-specific Lighthouse configuration for Trivia Night.
+ * App-specific Lighthouse configuration for Trivia.
  * Tests all critical user paths including presenter and audience views.
  *
  * Usage:
  *   pnpm lighthouse:trivia
  *   # or from monorepo root:
- *   pnpm --filter @beak-gaming/trivia lighthouse
+ *   pnpm --filter @joolie-boolie/trivia lighthouse
  */
 
 const path = require('path');
@@ -85,7 +85,7 @@ module.exports = {
           { minScore: lighthouseScores.performance / 100 },
         ],
         'categories:accessibility': [
-          'error', // Accessibility is critical for senior users
+          'error', // Accessibility is critical for users
           { minScore: lighthouseScores.accessibility / 100 },
         ],
         'categories:best-practices': [
@@ -93,7 +93,7 @@ module.exports = {
           { minScore: lighthouseScores.bestPractices / 100 },
         ],
 
-        // Accessibility audits (critical for senior users)
+        // Accessibility audits (critical for users)
         'color-contrast': 'error',
         'tap-targets': 'error',
         'font-size': 'error', // Large fonts are required

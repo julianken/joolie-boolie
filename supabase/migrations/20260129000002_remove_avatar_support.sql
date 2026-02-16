@@ -10,5 +10,17 @@ DROP POLICY IF EXISTS "Users can update own avatar" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete own avatar" ON storage.objects;
 DROP POLICY IF EXISTS "Avatars are publicly accessible" ON storage.objects;
 
--- Remove avatars storage bucket
-DELETE FROM storage.buckets WHERE id = 'avatars';
+-- Remove avatars storage bucket (use storage API-safe approach)
+-- On fresh databases the bucket doesn't exist; on migrated databases it may.
+-- Supabase blocks direct DELETE from storage.buckets, so use a DO block
+-- that catches the error gracefully.
+DO $$
+BEGIN
+  DELETE FROM storage.buckets WHERE id = 'avatars';
+EXCEPTION
+  WHEN insufficient_privilege THEN
+    -- Supabase trigger blocks direct deletion — bucket doesn't exist or can't be removed this way
+    NULL;
+  WHEN undefined_table THEN
+    NULL;
+END $$;

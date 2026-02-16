@@ -74,7 +74,7 @@ function validatePin(pin: string): string | null {
  * - Client-side validation with helpful error messages
  * - Loading state during submission
  * - Server error display
- * - Senior-friendly design (large fonts, high contrast, 44x44px touch targets)
+ * - Accessible design (large fonts, high contrast, 44x44px touch targets)
  * - Full accessibility (ARIA labels, focus management, keyboard navigation)
  *
  * @example

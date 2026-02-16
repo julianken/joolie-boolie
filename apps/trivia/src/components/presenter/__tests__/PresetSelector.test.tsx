@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { PresetSelector } from '../PresetSelector';
-import { ToastProvider } from "@beak-gaming/ui";
-import type { TriviaPreset } from '@beak-gaming/database/types';
+import { ToastProvider } from "@joolie-boolie/ui";
+import type { TriviaPreset } from '@joolie-boolie/database/types';
 
 global.fetch = vi.fn();
 

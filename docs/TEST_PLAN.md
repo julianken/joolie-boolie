@@ -3,7 +3,7 @@
 **Document Version:** 1.0
 **Created:** 2026-01-22
 **Status:** Active
-**Scope:** Beak Gaming Platform - Internal Beta Testing
+**Scope:** Joolie Boolie Platform - Internal Beta Testing
 
 ---
 
@@ -637,9 +637,9 @@ test('create, load, and delete template', async ({ page }) => {
 ### 6.2 Mock Infrastructure
 
 **Available Mocks:**
-- `@beak-gaming/testing/BroadcastChannelMock` - Sync testing
-- `@beak-gaming/testing/AudioMock` - Audio testing
-- `@beak-gaming/testing/SupabaseMock` - Database testing
+- `@joolie-boolie/testing/BroadcastChannelMock` - Sync testing
+- `@joolie-boolie/testing/AudioMock` - Audio testing
+- `@joolie-boolie/testing/SupabaseMock` - Database testing
 
 **Missing Mocks:**
 - OAuth flow mocks
@@ -691,7 +691,7 @@ jobs:
 ```sql
 -- Test user for E2E
 INSERT INTO auth.users (id, email) VALUES
-  ('test-user-id', 'test@beakgaming.com');
+  ('test-user-id', 'test@joolieboolie.com');
 
 -- Test templates
 INSERT INTO bingo_templates (id, user_id, name, pattern_id) VALUES

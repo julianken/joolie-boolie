@@ -3,7 +3,7 @@
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
 import { useSync } from '@/hooks/use-sync';
-import { useSessionRecovery, useAutoSync } from '@beak-gaming/sync';
+import { useSessionRecovery, useAutoSync } from '@joolie-boolie/sync';
 import {
   generateSecurePin,
   generateShortSessionId,
@@ -18,13 +18,13 @@ import { BingoBoard } from '@/components/presenter/BingoBoard';
 import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
 import { ControlPanel } from '@/components/presenter/ControlPanel';
 import { Toggle } from '@/components/ui/Toggle';
-import { Slider } from '@beak-gaming/ui';
+import { Slider } from '@joolie-boolie/ui';
 import { RoomSetupModal } from '@/components/presenter/RoomSetupModal';
-import { Button } from "@beak-gaming/ui";
+import { Button } from "@joolie-boolie/ui";
 import { VoiceSelector } from '@/components/ui/VoiceSelector';
 import { RollSoundSelector } from '@/components/presenter/RollSoundSelector';
 import { RevealChimeSelector } from '@/components/presenter/RevealChimeSelector';
-import { ThemeSelector } from '@beak-gaming/ui';
+import { ThemeSelector } from '@joolie-boolie/ui';
 import { useAudioPreload, useAudio } from '@/hooks/use-audio';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
@@ -543,7 +543,7 @@ export default function PlayPage() {
             {/* Title section */}
             <div className="flex-shrink-0">
               <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                Beak Bingo
+                Joolie Boolie Bingo
               </h1>
               <p className="text-lg text-muted-foreground">Presenter View</p>
             </div>

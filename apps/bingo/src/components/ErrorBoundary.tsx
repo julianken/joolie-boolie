@@ -13,7 +13,7 @@ interface State {
 }
 
 /**
- * ErrorBoundary - Catches runtime errors and displays a senior-friendly error UI.
+ * ErrorBoundary - Catches runtime errors and displays a accessible error UI.
  *
  * Usage:
  * ```tsx
@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      // Senior-friendly error UI
+      // Accessible error UI
       return (
         <div
           role="alert"
@@ -73,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </svg>
             </div>
 
-            {/* Error Title - Large text for seniors (text-3xl = ~30px) */}
+            {/* Error Title - Large text for everyone (text-3xl = ~30px) */}
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               Something Went Wrong
             </h1>

@@ -1,5 +1,5 @@
 /**
- * Error categories for the Beak Gaming Platform
+ * Error categories for the Joolie Boolie Platform
  */
 export type ErrorCategory =
   | 'network' // Network/API errors

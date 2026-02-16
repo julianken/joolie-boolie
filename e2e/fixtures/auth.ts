@@ -227,7 +227,7 @@ async function loginViaPlatformHub(
       // Using expect.toPass() for automatic retry with exponential backoff
       await playwrightExpect(async () => {
         const cookies = await page.context().cookies();
-        const hasToken = cookies.some((c) => c.name === 'beak_access_token');
+        const hasToken = cookies.some((c) => c.name === 'jb_access_token');
         playwrightExpect(hasToken).toBe(true);
       }).toPass({
         timeout: navigationTimeout,
@@ -287,7 +287,7 @@ async function loginViaPlatformHub(
 async function copySSOCookiesToDomain(page: Page, targetUrl: string): Promise<void> {
   const cookies = await page.context().cookies();
   const ssoCookies = cookies.filter((c) =>
-    ['beak_access_token', 'beak_refresh_token', 'beak_user_id'].includes(c.name)
+    ['jb_access_token', 'jb_refresh_token', 'jb_user_id'].includes(c.name)
   );
 
   if (ssoCookies.length > 0) {
@@ -375,7 +375,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
    */
   testUser: async ({}, use) => {
     await use({
-      email: process.env.TEST_USER_EMAIL || 'e2e-test@beak-gaming.test',
+      email: process.env.TEST_USER_EMAIL || 'e2e-test@joolie-boolie.test',
       password: process.env.TEST_USER_PASSWORD || 'TestPassword123!',
     });
   },
@@ -451,11 +451,11 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
         await Promise.race([dashboardPromise, rateLimitCheckPromise]);
 
         // Wait for SSO cookies to be set (required for Platform Hub pages)
-        // The login API sets beak_access_token and beak_user_id cookies
+        // The login API sets jb_access_token and jb_user_id cookies
         await playwrightExpect(async () => {
           const cookies = await page.context().cookies();
-          const hasAccessToken = cookies.some((c) => c.name === 'beak_access_token');
-          const hasUserId = cookies.some((c) => c.name === 'beak_user_id');
+          const hasAccessToken = cookies.some((c) => c.name === 'jb_access_token');
+          const hasUserId = cookies.some((c) => c.name === 'jb_user_id');
           playwrightExpect(hasAccessToken).toBe(true);
           playwrightExpect(hasUserId).toBe(true);
         }).toPass({
@@ -467,14 +467,14 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
         // This is a fallback in case the server-side cookies don't propagate correctly
         // Uses the E2E test user ID that matches the login API's E2E_TEST_USER_ID constant
         const existingCookies = await page.context().cookies();
-        const accessTokenCookie = existingCookies.find((c) => c.name === 'beak_access_token');
-        const userIdCookie = existingCookies.find((c) => c.name === 'beak_user_id');
+        const accessTokenCookie = existingCookies.find((c) => c.name === 'jb_access_token');
+        const userIdCookie = existingCookies.find((c) => c.name === 'jb_user_id');
 
         // If cookies exist but need to be reinforced for cross-origin access, add them explicitly
         if (accessTokenCookie && userIdCookie) {
           await page.context().addCookies([
             {
-              name: 'beak_access_token',
+              name: 'jb_access_token',
               value: accessTokenCookie.value,
               domain: 'localhost',
               path: '/',
@@ -483,7 +483,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
               sameSite: 'Lax',
             },
             {
-              name: 'beak_user_id',
+              name: 'jb_user_id',
               value: userIdCookie.value,
               domain: 'localhost',
               path: '/',
@@ -500,7 +500,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
           console.log('[Auth Fixture] Setting fallback E2E auth cookies');
           await page.context().addCookies([
             {
-              name: 'beak_access_token',
+              name: 'jb_access_token',
               value: e2eTestToken,
               domain: 'localhost',
               path: '/',
@@ -509,7 +509,7 @@ export const test = base.extend<AuthFixtures & GameAuthFixtures>({
               sameSite: 'Lax',
             },
             {
-              name: 'beak_user_id',
+              name: 'jb_user_id',
               value: e2eTestUserId,
               domain: 'localhost',
               path: '/',

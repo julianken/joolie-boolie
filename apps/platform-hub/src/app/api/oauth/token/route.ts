@@ -43,7 +43,7 @@ function getE2EJwtSecret(): Uint8Array {
 }
 
 const E2E_TEST_USER_ID = 'e2e-test-user-00000000-0000-0000-0000-000000000000';
-const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
+const E2E_TEST_EMAIL = 'e2e-test@joolie-boolie.test';
 import { tokenRotationLogger } from '@/lib/token-rotation';
 import {
   getE2EAuthorizationByCode,
@@ -401,7 +401,7 @@ async function handleAuthorizationCodeGrant(params: {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const jwtIssuer = supabaseJwtSecret
       ? `${supabaseUrl}/auth/v1`
-      : 'beak-gaming-platform';
+      : 'joolie-boolie-platform';
 
     const jwtSecret = new TextEncoder().encode(signingSecret);
     const now = Math.floor(Date.now() / 1000);
@@ -638,7 +638,7 @@ async function handleRefreshTokenGrant(params: {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const jwtIssuer = supabaseJwtSecret
       ? `${supabaseUrl}/auth/v1`
-      : 'beak-gaming-platform';
+      : 'joolie-boolie-platform';
 
     const jwtSecret = new TextEncoder().encode(signingSecret);
     const now = Math.floor(Date.now() / 1000);

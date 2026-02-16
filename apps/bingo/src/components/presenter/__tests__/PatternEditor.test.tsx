@@ -395,7 +395,7 @@ describe('PatternEditor', () => {
     });
   });
 
-  describe('senior-friendly design', () => {
+  describe('accessible design', () => {
     it('cells are minimum 44x44px', () => {
       render(<PatternEditor {...defaultProps} />);
       const cell = screen.getByRole('gridcell', { name: /B1/ });

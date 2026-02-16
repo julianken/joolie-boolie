@@ -382,7 +382,7 @@ ps aux | grep next-server  # Should show 6 servers (2 worktrees × 3 apps)
 - Deferred to Phase 2 if becomes issue
 
 **Single Test User:**
-- All tests use `e2e-test@beak-gaming.test`
+- All tests use `e2e-test@joolie-boolie.test`
 - `E2E_TESTING=true` bypass mitigates rate limits
 - Future: Unique test users per worktree if needed
 

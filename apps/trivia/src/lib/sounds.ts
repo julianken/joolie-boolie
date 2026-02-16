@@ -1,5 +1,5 @@
 /**
- * Sound Manager for Trivia Night
+ * Sound Manager for Trivia
  *
  * Handles sound effect playback with preloading, pooling, and Web Audio API support.
  * Similar to Bingo's audio system but tailored for trivia game events.

@@ -38,15 +38,15 @@ This document replaces the original LINEAR_PROJECTS_MANUAL_CREATION.md with a si
   - Token expiration set to 1 hour (3600s)
   - PKCE requirement enabled (S256)
   - Bingo client registered:
-    - Client name: "Beak Bingo"
+    - Client name: "Joolie Boolie Bingo"
     - Client type: Public (PKCE, no secret)
-    - Redirect URIs: `http://localhost:3000/auth/callback`, `https://bingo.beakgaming.com/auth/callback`
+    - Redirect URIs: `http://localhost:3000/auth/callback`, `https://bingo.joolieboolie.com/auth/callback`
     - Scopes: `openid email profile`
     - Client ID saved to `apps/bingo/.env.local`
   - Trivia client registered:
-    - Client name: "Trivia Night"
+    - Client name: "Trivia"
     - Client type: Public (PKCE, no secret)
-    - Redirect URIs: `http://localhost:3001/auth/callback`, `https://trivia.beakgaming.com/auth/callback`
+    - Redirect URIs: `http://localhost:3001/auth/callback`, `https://trivia.joolieboolie.com/auth/callback`
     - Scopes: `openid email profile`
     - Client ID saved to `apps/trivia/.env.local`
   - Both `.env.example` files updated with OAuth section
@@ -68,7 +68,7 @@ This document replaces the original LINEAR_PROJECTS_MANUAL_CREATION.md with a si
   - Displays client name and requested scopes
   - Shows logged-in user email
   - "Allow" and "Deny" buttons (44x44px minimum)
-  - Senior-friendly design (18px+ fonts, high contrast)
+  - Accessible design (18px+ fonts, high contrast)
   - Handles invalid/missing authorization_id
   - Redirects unauthenticated users to login
 
@@ -319,7 +319,7 @@ The following projects are **eliminated** in the revised plan:
 - ❌ **Project 1.1-1.4:** OAuth Server Implementation (29 issues)
   - Reason: Supabase provides OAuth server natively
 
-- ❌ **Project 2.1:** @beak-gaming/oauth-client Package (12-15 issues)
+- ❌ **Project 2.1:** @joolie-boolie/oauth-client Package (12-15 issues)
   - Reason: Use `@supabase/supabase-js` directly
 
 - ❌ **Project 1.5:** Redis Session Storage (4 issues)

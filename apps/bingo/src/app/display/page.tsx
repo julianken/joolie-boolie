@@ -3,12 +3,12 @@
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
-import { useSyncStore } from '@beak-gaming/sync';
+import { useSyncStore } from '@joolie-boolie/sync';
 import { useSync } from '@/hooks/use-sync';
 import { useFullscreen } from '@/hooks/use-fullscreen';
 import { isValidSessionId } from '@/lib/sync/session';
-import { isValidRoomCode } from '@beak-gaming/sync';
-import { RoomCodeDisplay } from '@beak-gaming/ui';
+import { isValidRoomCode } from '@joolie-boolie/sync';
+import { RoomCodeDisplay } from '@joolie-boolie/ui';
 import {
   LargeCurrentBall,
   AudienceBingoBoard,
@@ -299,7 +299,7 @@ function AudienceDisplay({
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              Beak Bingo
+              Joolie Boolie Bingo
             </h1>
             <p className="text-lg text-muted-foreground">Audience Display</p>
           </div>

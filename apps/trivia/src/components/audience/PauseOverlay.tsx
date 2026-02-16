@@ -11,7 +11,7 @@ export interface PauseOverlayProps {
 
 /**
  * Full-screen overlay shown when the game is paused.
- * Designed for senior-friendly readability on projector displays.
+ * Designed for accessible readability on projector displays.
  *
  * In emergency mode, shows a blank screen.
  * In normal pause mode, shows "Game Paused" message with frozen timer.

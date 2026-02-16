@@ -3,38 +3,38 @@ import { GET, POST } from '../route';
 import { NextRequest } from 'next/server';
 
 // Mock the auth utilities
-vi.mock('@beak-gaming/auth', () => ({
+vi.mock('@joolie-boolie/auth', () => ({
   getApiUser: vi.fn(),
   createAuthenticatedClient: vi.fn(),
 }));
 
 // Mock the database functions
-vi.mock('@beak-gaming/database/tables', () => ({
+vi.mock('@joolie-boolie/database/tables', () => ({
   listAllTriviaTemplates: vi.fn(),
   createTriviaTemplate: vi.fn(),
 }));
 
-vi.mock('@beak-gaming/database/errors', () => ({
+vi.mock('@joolie-boolie/database/errors', () => ({
   isDatabaseError: vi.fn(),
 }));
 
-import { getApiUser, createAuthenticatedClient } from '@beak-gaming/auth';
+import { getApiUser, createAuthenticatedClient } from '@joolie-boolie/auth';
 import {
   listAllTriviaTemplates,
   createTriviaTemplate,
-} from '@beak-gaming/database/tables';
-import { isDatabaseError } from '@beak-gaming/database/errors';
-import type { TriviaTemplate } from '@beak-gaming/database/types';
+} from '@joolie-boolie/database/tables';
+import { isDatabaseError } from '@joolie-boolie/database/errors';
+import type { TriviaTemplate } from '@joolie-boolie/database/types';
 
 const mockGetApiUser = getApiUser as ReturnType<typeof vi.fn>;
 const mockCreateAuthenticatedClient = createAuthenticatedClient as ReturnType<typeof vi.fn>;
 
 /**
- * Helper to create a mock request with beak_access_token cookie
+ * Helper to create a mock request with jb_access_token cookie
  */
 function createMockRequest(url: string, init?: { method?: string; body?: string }) {
   const request = new NextRequest(url, init);
-  request.cookies.set('beak_access_token', 'test-jwt-token');
+  request.cookies.set('jb_access_token', 'test-jwt-token');
   return request;
 }
 

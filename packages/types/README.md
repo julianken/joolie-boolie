@@ -1,8 +1,8 @@
-# @beak-gaming/types
+# @joolie-boolie/types
 
 **Status:** ✅ Production Ready (100% Complete)
 
-Comprehensive type-safe TypeScript definitions for the Beak Gaming Platform. Provides shared types for games, users, APIs, and dual-screen synchronization to ensure consistency across the monorepo and prevent type drift.
+Comprehensive type-safe TypeScript definitions for the Joolie Boolie Platform. Provides shared types for games, users, APIs, and dual-screen synchronization to ensure consistency across the monorepo and prevent type drift.
 
 ## Features
 
@@ -20,7 +20,7 @@ Comprehensive type-safe TypeScript definitions for the Beak Gaming Platform. Pro
 ```json
 {
   "dependencies": {
-    "@beak-gaming/types": "workspace:*"
+    "@joolie-boolie/types": "workspace:*"
   }
 }
 ```
@@ -30,7 +30,7 @@ Comprehensive type-safe TypeScript definitions for the Beak Gaming Platform. Pro
 ### 1. Game Types
 
 ```typescript
-import type { GameSession, GameStatus, GameType } from '@beak-gaming/types';
+import type { GameSession, GameStatus, GameType } from '@joolie-boolie/types';
 
 // Create a game session
 const session: GameSession = {
@@ -43,13 +43,13 @@ const session: GameSession = {
 
 // Check game type
 const gameType: GameType = 'bingo'; // 'bingo' | 'trivia'
-const displayName = GAME_TYPE_NAMES[gameType]; // 'Beak Bingo'
+const displayName = GAME_TYPE_NAMES[gameType]; // 'Joolie Boolie Bingo'
 ```
 
 ### 2. API Response Wrappers
 
 ```typescript
-import type { ApiResponse, PaginatedResponse } from '@beak-gaming/types';
+import type { ApiResponse, PaginatedResponse } from '@joolie-boolie/types';
 
 // Standard API response
 async function getProfile(userId: string): Promise<ApiResponse<UserProfile>> {
@@ -79,7 +79,7 @@ async function listTemplates(
 ### 3. Generic Sync Messages
 
 ```typescript
-import type { SyncMessage } from '@beak-gaming/types';
+import type { SyncMessage } from '@joolie-boolie/types';
 
 // Define custom message types
 type BingoSyncMessage =
@@ -117,7 +117,7 @@ function handleMessage(message: BingoSyncMessage) {
 ### 4. User and Session Types
 
 ```typescript
-import type { User, UserProfile, Session } from '@beak-gaming/types';
+import type { User, UserProfile, Session } from '@joolie-boolie/types';
 
 // Basic user
 const user: User = {
@@ -140,7 +140,7 @@ const profile: UserProfile = {
 ### 5. Extending Base Types
 
 ```typescript
-import type { GameSession, GameStatus, Timestamps } from '@beak-gaming/types';
+import type { GameSession, GameStatus, Timestamps } from '@joolie-boolie/types';
 
 // Extend base GameSession with game-specific fields
 interface BingoSession extends GameSession {
@@ -181,13 +181,13 @@ Extended game status for trivia that includes additional states beyond the base 
 ```typescript
 type GameType = 'bingo' | 'trivia';
 ```
-Available game types in the Beak Gaming Platform.
+Available game types in the Joolie Boolie Platform.
 
 #### `GAME_TYPE_NAMES`
 ```typescript
 const GAME_TYPE_NAMES: Record<GameType, string> = {
-  bingo: 'Beak Bingo',
-  trivia: 'Trivia Night',
+  bingo: 'Joolie Boolie Bingo',
+  trivia: 'Trivia',
 };
 ```
 Map of game types to their display names.
@@ -531,7 +531,7 @@ interface BingoSyncState extends BaseSyncState {
 While this package primarily exports type definitions, you can create type guards for runtime checks:
 
 ```typescript
-import type { GameType, GameStatus, ApiResponse } from '@beak-gaming/types';
+import type { GameType, GameStatus, ApiResponse } from '@joolie-boolie/types';
 
 // Game type guard
 function isValidGameType(value: unknown): value is GameType {
@@ -613,10 +613,10 @@ Every exported type includes comprehensive JSDoc comments with descriptions, exa
 
 ## Related Documentation
 
-- **Database Package**: `/Users/j/repos/beak-gaming-platform/packages/database/README.md` - Uses GameType, SessionStatus
-- **Sync Package**: `/Users/j/repos/beak-gaming-platform/packages/sync/README.md` - Re-exports and extends SyncMessage types
-- **Auth Package**: `/Users/j/repos/beak-gaming-platform/packages/auth/README.md` - Uses User, Session, AuthResponse
-- **Main CLAUDE.md**: `/Users/j/repos/beak-gaming-platform/CLAUDE.md` - Project overview and architecture
+- **Database Package**: `/Users/j/repos/joolie-boolie-platform/packages/database/README.md` - Uses GameType, SessionStatus
+- **Sync Package**: `/Users/j/repos/joolie-boolie-platform/packages/sync/README.md` - Re-exports and extends SyncMessage types
+- **Auth Package**: `/Users/j/repos/joolie-boolie-platform/packages/auth/README.md` - Uses User, Session, AuthResponse
+- **Main CLAUDE.md**: `/Users/j/repos/joolie-boolie-platform/CLAUDE.md` - Project overview and architecture
 
 ## Development
 

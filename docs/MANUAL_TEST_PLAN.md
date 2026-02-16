@@ -1,4 +1,4 @@
-# Manual Test Plan - Beak Gaming Platform
+# Manual Test Plan - Joolie Boolie Platform
 
 > **Purpose:** Human-readable test cases for manual verification using Playwright MCP browser tools.
 > This supplements the ~338 automated E2E tests with interactive validation of visual, audio, and cross-app flows.
@@ -6,7 +6,7 @@
 > **How to use:** Start dev servers (`pnpm dev`), then walk through each story using `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_evaluate`, and `browser_take_screenshot`.
 >
 > **Last executed:** 2026-02-14 (run 6) — **156 PASS, 0 BUGS, 0 NOT TESTABLE** (from 156 test cases). Full re-run confirmed all fixes stable plus 1 newly tested (4.3 #1 fake token rejection). All 3 bugs from run 2 fixed (BEA-503, BEA-504, BEA-505). All previously NOT TESTABLE items resolved (runs 4-5).
-> **Auth method:** Authenticated flows tested using `E2E_TESTING=true` mode with Playwright MCP. Login via Platform Hub with E2E credentials (`e2e-test@beak-gaming.test` / `TestPassword123!`), cookies shared across all ports on `localhost`.
+> **Auth method:** Authenticated flows tested using `E2E_TESTING=true` mode with Playwright MCP. Login via Platform Hub with E2E credentials (`e2e-test@joolie-boolie.test` / `TestPassword123!`), cookies shared across all ports on `localhost`.
 >
 > ### Execution History
 > | Date | Scope | Result |
@@ -26,7 +26,7 @@
 > | BEA-505 | Minor | Platform Hub: Profile API returns 500 for E2E users. | Fixed in PR #338 — graceful fallback for missing DB rows |
 >
 > ### Notes
-> - Template API returns E2E fixture data (2 templates: "E2E Trivia Night" + "E2E Bingo Classic") in E2E mode
+> - Template API returns E2E fixture data (2 templates: "E2E Trivia" + "E2E Bingo Classic") in E2E mode
 > - Playwright's Chromium doesn't inherit macOS dark mode; use `page.emulateMedia({ colorScheme: 'dark' })` to test System Default theme
 > - Trivia scoring controls (+/-) only appear during active gameplay (not during emergency pause)
 > - Presets and Question Set selectors only visible in pre-game setup area, not during gameplay
@@ -68,7 +68,7 @@ pnpm dev
 
 | # | Test Case | Steps |
 |---|-----------|-------|
-| 1 | Home page loads | Navigate to `localhost:3002`. Verify page title contains "Beak Gaming". Verify game cards for Bingo and Trivia are visible. |
+| 1 | Home page loads | Navigate to `localhost:3002`. Verify page title contains "Joolie Boolie". Verify game cards for Bingo and Trivia are visible. |
 | 2 | Game cards link correctly | Click the Bingo card. Verify it navigates to or opens `localhost:3000`. Go back. Click the Trivia card. Verify it navigates to `localhost:3001`. |
 | 3 | Header and footer render | Verify the Header component is visible at the top. Verify Footer is visible at the bottom. |
 | 4 | Security headers present | Run `browser_evaluate` with `fetch(window.location.href).then(r => Object.fromEntries(r.headers))`. Verify `x-frame-options`, `x-content-type-options`, `referrer-policy` headers exist. |
@@ -141,8 +141,8 @@ pnpm dev
 
 | # | Test Case | Steps |
 |---|-----------|-------|
-| 1 | Home page loads | Navigate to `localhost:3000`. Verify "Beak Bingo" branding is visible. Verify "Sign in with Beak Gaming" button exists. |
-| 2 | Sign in redirects to Hub | Click "Sign in with Beak Gaming". Verify redirect to `localhost:3002/login` (or `/api/oauth/authorize`). |
+| 1 | Home page loads | Navigate to `localhost:3000`. Verify "Joolie Boolie Bingo" branding is visible. Verify "Sign in with Joolie Boolie" button exists. |
+| 2 | Sign in redirects to Hub | Click "Sign in with Joolie Boolie". Verify redirect to `localhost:3002/login` (or `/api/oauth/authorize`). |
 | 3 | Play route protected | Navigate to `localhost:3000/play`. Verify redirect to home page (unauthenticated). |
 | 4 | Display route public | Navigate to `localhost:3000/display`. Verify the page loads (may show "invalid session" which is expected). |
 | 5 | Security headers | Run `browser_evaluate` to check response headers. Verify X-Frame-Options, X-Content-Type-Options, Referrer-Policy are present. |
@@ -269,7 +269,7 @@ pnpm dev
 
 | # | Test Case | Steps |
 |---|-----------|-------|
-| 1 | Home page loads | Navigate to `localhost:3001`. Verify "Trivia Night" branding is visible. Verify "Sign in" or "Play" buttons exist. |
+| 1 | Home page loads | Navigate to `localhost:3001`. Verify "Trivia" branding is visible. Verify "Sign in" or "Play" buttons exist. |
 | 2 | Sign in redirects to Hub | Click sign in. Verify redirect to `localhost:3002` (Platform Hub OAuth). |
 | 3 | Play route protected | Navigate to `localhost:3001/play`. Verify redirect to home (unauthenticated). |
 | 4 | Display route public | Navigate to `localhost:3001/display`. Verify page loads (may show waiting/invalid state). |
@@ -373,7 +373,7 @@ pnpm dev
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
 | 1 | Open display | Click "Open Display". Verify new window opens at `/display`. | **PASS** — Open Display button visible |
-| 2 | Waiting state | Before starting game, verify display shows "Trivia Night" branding and waiting state. | NOT TESTED |
+| 2 | Waiting state | Before starting game, verify display shows "Trivia" branding and waiting state. | NOT TESTED |
 | 3 | Question syncs | Start game. Press D to display a question. Verify question text and options appear on display. | NOT TESTED |
 | 4 | Scores sync | Adjust team scores. Verify display shows updated scoreboard. | NOT TESTED |
 | 5 | Timer syncs | If timer is enabled and visible, verify timer appears on display. | NOT TESTED |
@@ -460,7 +460,7 @@ pnpm dev
 
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
-| 1 | Bingo → Hub login | On Bingo (`localhost:3000`), click "Sign in with Beak Gaming". Verify redirect to Hub login (`localhost:3002`). | **PASS** — Verified in run 1: redirect to Hub OAuth |
+| 1 | Bingo → Hub login | On Bingo (`localhost:3000`), click "Sign in with Joolie Boolie". Verify redirect to Hub login (`localhost:3002`). | **PASS** — Verified in run 1: redirect to Hub OAuth |
 | 2 | Trivia → Hub login | On Trivia (`localhost:3001`), click sign in. Verify redirect to Hub login. | **PASS** — Verified in run 1 |
 | 3 | Hub login form | On Hub login page, verify form renders with email and password fields. | **PASS** — Email/password inputs + Sign In button confirmed |
 | 4 | Return path preservation | From Bingo /play (unauthenticated), verify return path is preserved in redirect URL. After login, should redirect back to Bingo /play. | NOT TESTED |
@@ -491,11 +491,11 @@ pnpm dev
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
 | 1 | Hub templates API | Navigate to `localhost:3002`. Run `browser_evaluate` with `fetch('/api/templates').then(r => r.json())`. Verify response has `templates` array. | **PASS** — Status 200, response has `templates` array with 2 entries. Re-confirmed run 6 |
-| 2 | Aggregates both games | Verify templates response includes entries from both Bingo and Trivia (or empty arrays if none exist). | **PASS** — Templates include "E2E Trivia Night" (trivia) and "E2E Bingo Classic" (bingo). Re-confirmed run 6 |
+| 2 | Aggregates both games | Verify templates response includes entries from both Bingo and Trivia (or empty arrays if none exist). | **PASS** — Templates include "E2E Trivia" (trivia) and "E2E Bingo Classic" (bingo). Re-confirmed run 6 |
 
 ---
 
-## 5. Accessibility & Senior-Friendly Design
+## 5. Accessibility & Accessible Design
 
 ### Story 5.1: Font Sizes and Touch Targets — **4 PASS, 1 NOT TESTED**
 

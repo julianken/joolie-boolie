@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Trivia Night** - A presenter-controlled trivia system for retirement communities. Part of the Beak Gaming Platform monorepo.
+**Trivia** - A presenter-controlled trivia system for groups and communities. Part of the Joolie Boolie Platform monorepo.
 
 **Current State:** Fully functional with team management, rounds, scoring, TTS, themes, and dual-screen sync.
 
@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Database | Supabase (PostgreSQL) - shared with platform |
 | Auth | OAuth 2.1 via Platform Hub (middleware-based JWT verification) |
 | State Management | Zustand |
-| Dual-Screen Sync | @beak-gaming/sync |
+| Dual-Screen Sync | @joolie-boolie/sync |
 | PWA | Serwist (Service Worker) |
 
 ## Implemented Features
@@ -75,10 +75,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Monorepo Structure
 
 This app uses shared packages from the monorepo:
-- `@beak-gaming/sync` - Dual-screen synchronization
-- `@beak-gaming/ui` - Shared UI components (Button, Toggle, Slider)
-- `@beak-gaming/theme` - Senior-friendly design tokens
-- `@beak-gaming/auth` - Auth utilities (token refresh, JWT verification)
+- `@joolie-boolie/sync` - Dual-screen synchronization
+- `@joolie-boolie/ui` - Shared UI components (Button, Toggle, Slider)
+- `@joolie-boolie/theme` - Accessible design tokens
+- `@joolie-boolie/auth` - Auth utilities (token refresh, JWT verification)
 
 ## Key Commands
 
@@ -149,7 +149,7 @@ src/
 
 ## Design Requirements
 
-- **Senior-friendly:** Large fonts (min 18px), high contrast, large click targets (min 44x44px)
+- **Accessible:** Large fonts (min 18px), high contrast, large click targets (min 44x44px)
 - **Dual-screen:** Presenter dashboard + audience projection
 - **Accessible:** Keyboard navigation, screen reader support
 - **Offline-capable:** PWA with service worker

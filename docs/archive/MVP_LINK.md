@@ -2,7 +2,7 @@
 
 This repository is implementing the Template Management MVP as defined in the Linear guide document:
 
-**[Template Management MVP - Implementation Guide](https://linear.app/beak-gaming/document/template-management-mvp-implementation-guide-5d27cac98be6)**
+**[Template Management MVP - Implementation Guide](https://linear.app/joolie-boolie/document/template-management-mvp-implementation-guide-5d27cac98be6)**
 
 ## MVP Issues
 

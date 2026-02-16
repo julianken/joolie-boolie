@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ControlPanel } from '../ControlPanel';
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 import type { ReactElement } from 'react';
 vi.mock('@/stores/game-store', () => ({
   useGameStore: vi.fn((selector) => {
