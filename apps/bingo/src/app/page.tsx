@@ -55,8 +55,29 @@ export default async function Home() {
                   Play
                 </Link>
               ) : (
-                // Not Signed In: Show only "Sign in with Joolie Boolie" button
-                <LoginButton returnTo={returnTo} />
+                // Not Signed In: Show "Sign in" (primary) + "Play as Guest" (secondary)
+                <>
+                  <LoginButton returnTo={returnTo} />
+                  <div className="flex flex-col items-center gap-2">
+                    <Link
+                      href="/play"
+                      className="
+                        inline-flex items-center justify-center
+                        min-h-[48px] px-8 py-3
+                        text-xl font-semibold
+                        bg-muted text-foreground
+                        rounded-xl
+                        hover:bg-muted/80 transition-colors
+                        focus:outline-none focus:ring-4 focus:ring-muted/50
+                      "
+                    >
+                      Play as Guest
+                    </Link>
+                    <p className="text-base text-muted-foreground">
+                      No account needed — play offline instantly
+                    </p>
+                  </div>
+                </>
               )}
             </div>
           </div>
