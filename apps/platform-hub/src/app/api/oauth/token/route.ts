@@ -437,8 +437,13 @@ async function handleAuthorizationCodeGrant(params: {
         '[Token Endpoint] Failed to store refresh token:',
         storeResult.error
       );
-      // Continue anyway - the token is valid, just won't support rotation
-      // In a stricter implementation, you might return an error here
+      return NextResponse.json(
+        {
+          error: 'server_error',
+          error_description: 'Failed to persist refresh token',
+        },
+        { status: 500 }
+      );
     }
 
     tokenRotationLogger.log({
@@ -494,6 +499,16 @@ async function handleRefreshTokenGrant(params: {
       {
         error: 'invalid_request',
         error_description: 'Missing refresh_token parameter',
+      },
+      { status: 400 }
+    );
+  }
+
+  if (!client_id) {
+    return NextResponse.json(
+      {
+        error: 'invalid_request',
+        error_description: 'Missing client_id parameter',
       },
       { status: 400 }
     );

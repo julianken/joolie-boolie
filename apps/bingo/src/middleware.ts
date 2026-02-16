@@ -28,6 +28,7 @@ import {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const PLATFORM_HUB_URL = process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002';
+const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID;
 
 // Production guard: E2E mode must never run in production
 if (process.env.E2E_TESTING === 'true' && process.env.NODE_ENV === 'production') {
@@ -206,7 +207,7 @@ export async function middleware(request: NextRequest) {
   if (refreshToken && shouldRefreshToken(accessToken)) {
     console.log('[Middleware] Token approaching expiry, attempting proactive refresh');
 
-    const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL);
+    const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
 
     if (result.success && result.accessToken && result.refreshToken) {
       console.log('[Middleware] Token refresh successful');
@@ -230,7 +231,7 @@ export async function middleware(request: NextRequest) {
     if (refreshToken) {
       console.log('[Middleware] Token expired, attempting refresh');
 
-      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL);
+      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
 
       if (result.success && result.accessToken && result.refreshToken) {
         console.log('[Middleware] Token refresh successful after expiry');
@@ -261,7 +262,7 @@ export async function middleware(request: NextRequest) {
     if (refreshToken) {
       console.log('[Middleware] Token invalid, attempting refresh');
 
-      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL);
+      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
 
       if (result.success && result.accessToken && result.refreshToken) {
         console.log('[Middleware] Token refresh successful after invalid token');

@@ -277,7 +277,7 @@ describe('CORS Middleware', () => {
       ]);
     });
 
-    it('should fallback to localhost defaults when not configured', () => {
+    it('should fallback to localhost defaults when not configured in non-production', () => {
       delete process.env.CORS_ALLOWED_ORIGINS;
 
       const consoleWarnSpy = vi
@@ -297,6 +297,32 @@ describe('CORS Middleware', () => {
       );
 
       consoleWarnSpy.mockRestore();
+    });
+
+    it('should throw error when CORS_ALLOWED_ORIGINS is not set in production', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      delete process.env.CORS_ALLOWED_ORIGINS;
+
+      expect(() => getConfiguredOrigins()).toThrow(
+        'CORS_ALLOWED_ORIGINS environment variable is required in production'
+      );
+
+      vi.unstubAllEnvs();
+    });
+
+    it('should throw error when CORS_ALLOWED_ORIGINS is empty string in production', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      process.env.CORS_ALLOWED_ORIGINS = '';
+
+      // Empty string after trim/filter produces no origins, but the env var IS set
+      // The check is for missing/unset, so empty string is treated as "set but empty"
+      // which will produce an empty array after parsing - not the production guard path
+      // The production guard fires only when originsEnv is falsy (undefined/null/empty)
+      expect(() => getConfiguredOrigins()).toThrow(
+        'CORS_ALLOWED_ORIGINS environment variable is required in production'
+      );
+
+      vi.unstubAllEnvs();
     });
 
     it('should trim whitespace from origins', () => {

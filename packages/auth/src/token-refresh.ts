@@ -57,11 +57,13 @@ export interface TokenRefreshResult {
  *
  * @param refreshToken - The refresh token to exchange for new tokens
  * @param platformHubUrl - Base URL of Platform Hub (e.g., http://localhost:3002)
+ * @param clientId - The OAuth client_id (required for token binding validation)
  * @returns Result object with new tokens or error details
  */
 export async function refreshTokens(
   refreshToken: string,
-  platformHubUrl: string
+  platformHubUrl: string,
+  clientId?: string
 ): Promise<TokenRefreshResult> {
   try {
     const response = await fetch(`${platformHubUrl}/api/oauth/token`, {
@@ -70,6 +72,7 @@ export async function refreshTokens(
       body: JSON.stringify({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
+        ...(clientId && { client_id: clientId }),
       }),
     });
 

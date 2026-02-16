@@ -249,6 +249,7 @@ describe('OAuth Token Endpoint', () => {
       const requestBody = {
         grant_type: 'refresh_token',
         refresh_token: 'rt_reused-token',
+        client_id: 'test-client-id',
       };
 
       const request = new NextRequest('http://localhost:3002/api/oauth/token', {
@@ -269,6 +270,7 @@ describe('OAuth Token Endpoint', () => {
     it('should return error for missing refresh_token', async () => {
       const requestBody = {
         grant_type: 'refresh_token',
+        client_id: 'test-client-id',
       };
 
       const request = new NextRequest('http://localhost:3002/api/oauth/token', {
@@ -285,6 +287,26 @@ describe('OAuth Token Endpoint', () => {
       expect(data.error_description).toContain('refresh_token');
     });
 
+    it('should return error for missing client_id on refresh_token grant', async () => {
+      const requestBody = {
+        grant_type: 'refresh_token',
+        refresh_token: 'rt_some-token',
+      };
+
+      const request = new NextRequest('http://localhost:3002/api/oauth/token', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe('invalid_request');
+      expect(data.error_description).toContain('client_id');
+    });
+
     it('should handle expired refresh token', async () => {
       // Mock expired token
       vi.mocked(refreshTokenStore.rotateRefreshToken).mockResolvedValue({
@@ -295,6 +317,7 @@ describe('OAuth Token Endpoint', () => {
       const requestBody = {
         grant_type: 'refresh_token',
         refresh_token: 'rt_expired-token',
+        client_id: 'test-client-id',
       };
 
       const request = new NextRequest('http://localhost:3002/api/oauth/token', {
@@ -320,6 +343,7 @@ describe('OAuth Token Endpoint', () => {
       const requestBody = {
         grant_type: 'refresh_token',
         refresh_token: 'rt_invalid-token',
+        client_id: 'test-client-id',
       };
 
       const request = new NextRequest('http://localhost:3002/api/oauth/token', {
@@ -382,6 +406,73 @@ describe('OAuth Token Endpoint', () => {
       expect(response.status).toBe(200);
       expect(data.access_token).toBeDefined();
       expect(data.refresh_token).toBe('rt_new-refresh-token-hash');
+    });
+  });
+
+  describe('POST /api/oauth/token - refresh token persistence', () => {
+    it('should return 500 when refresh token persistence fails during code exchange', async () => {
+      const { codeVerifier, codeChallenge } = generateTestPKCE();
+      const mockClientId = 'test-client-id';
+      const mockUserId = 'test-user-id-123';
+      const mockRedirectUri = 'http://localhost:3000/callback';
+
+      // Mock database returning a valid authorization
+      const mockEq = vi.fn().mockReturnThis();
+      mockDbClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: mockEq,
+        single: vi.fn().mockResolvedValue({
+          data: {
+            id: 'auth-id-1',
+            client_id: mockClientId,
+            user_id: mockUserId,
+            redirect_uri: mockRedirectUri,
+            scope: 'openid profile',
+            code_challenge: codeChallenge,
+            code_challenge_method: 'S256',
+            code_expires_at: new Date(Date.now() + 600000).toISOString(), // 10 min from now
+            status: 'approved',
+          },
+          error: null,
+        }),
+        update: vi.fn().mockReturnThis(),
+      });
+
+      // Mock user lookup
+      mockDbClient.auth.admin.getUserById.mockResolvedValue({
+        data: { user: { email: 'test@example.com' } },
+        error: null,
+      });
+
+      // Mock refresh token generation
+      vi.mocked(refreshTokenStore.generateRefreshToken).mockReturnValue('rt_test-token');
+
+      // Mock refresh token persistence FAILURE
+      vi.mocked(refreshTokenStore.storeRefreshToken).mockResolvedValue({
+        success: false,
+        error: 'Database connection failed',
+      });
+
+      const requestBody = {
+        grant_type: 'authorization_code',
+        code: 'valid-auth-code',
+        client_id: mockClientId,
+        redirect_uri: mockRedirectUri,
+        code_verifier: codeVerifier,
+      };
+
+      const request = new NextRequest('http://localhost:3002/api/oauth/token', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('server_error');
+      expect(data.error_description).toContain('persist');
     });
   });
 

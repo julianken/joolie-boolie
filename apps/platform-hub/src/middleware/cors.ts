@@ -28,6 +28,14 @@ function getAllowedOrigins(): string[] {
   const originsEnv = process.env.CORS_ALLOWED_ORIGINS;
 
   if (!originsEnv) {
+    // In production, CORS_ALLOWED_ORIGINS must be explicitly configured
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        '[CORS] CORS_ALLOWED_ORIGINS environment variable is required in production. ' +
+          'Set it to a comma-separated list of allowed origins (e.g., https://bingo.beak-gaming.com,https://trivia.beak-gaming.com).'
+      );
+    }
+
     console.warn(
       '[CORS] No CORS_ALLOWED_ORIGINS configured. Falling back to localhost defaults.'
     );
