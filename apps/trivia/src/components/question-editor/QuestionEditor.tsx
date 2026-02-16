@@ -290,7 +290,7 @@ export function QuestionEditor({
             {errors.question}
           </p>
         )}
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-base text-muted-foreground">
           {question.question.length}/{VALIDATION.QUESTION_MAX_LENGTH} characters
         </p>
       </div>
