@@ -26,19 +26,22 @@ if (!SUPABASE_SERVICE_ROLE_KEY) {
   process.exit(1);
 }
 
+// Platform Hub URL - use env var for production, fall back to localhost for E2E/dev
+const PLATFORM_HUB_URL = process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002';
+
 // OAuth client configurations
 const OAUTH_CLIENTS = [
   {
     id: '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21',
     name: 'Beak Bingo',
     redirect_uris: ['http://localhost:3000/auth/callback'],
-    consent_page_url: 'http://localhost:3002/oauth/consent',
+    consent_page_url: `${PLATFORM_HUB_URL}/oauth/consent`,
   },
   {
     id: '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936',
     name: 'Beak Trivia',
     redirect_uris: ['http://localhost:3001/auth/callback'],
-    consent_page_url: 'http://localhost:3002/oauth/consent',
+    consent_page_url: `${PLATFORM_HUB_URL}/oauth/consent`,
   },
 ];
 
