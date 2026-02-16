@@ -1,8 +1,8 @@
-# @beak-gaming/database
+# @joolie-boolie/database
 
 **Status:** ✅ Production Ready (98% Complete)
 
-Comprehensive type-safe database utilities for the Beak Gaming Platform. Provides Supabase client wrappers, CRUD helpers, React hooks, pagination, filtering, and table-specific utilities.
+Comprehensive type-safe database utilities for the Joolie Boolie. Provides Supabase client wrappers, CRUD helpers, React hooks, pagination, filtering, and table-specific utilities.
 
 ## Features
 
@@ -23,7 +23,7 @@ Comprehensive type-safe database utilities for the Beak Gaming Platform. Provide
 ```json
 {
   "dependencies": {
-    "@beak-gaming/database": "workspace:*"
+    "@joolie-boolie/database": "workspace:*"
   }
 }
 ```
@@ -34,12 +34,12 @@ Comprehensive type-safe database utilities for the Beak Gaming Platform. Provide
 
 ```tsx
 // Client component
-import { createBrowserClient } from '@beak-gaming/database';
+import { createBrowserClient } from '@joolie-boolie/database';
 
 const supabase = createBrowserClient();
 
 // Server component / API route
-import { createClient } from '@beak-gaming/database';
+import { createClient } from '@joolie-boolie/database';
 
 const supabase = await createClient();
 ```
@@ -47,7 +47,7 @@ const supabase = await createClient();
 ### 2. Use CRUD Helpers
 
 ```tsx
-import { getById, create, update, remove } from '@beak-gaming/database';
+import { getById, create, update, remove } from '@joolie-boolie/database';
 
 // Get by ID
 const profile = await getById(supabase, 'profiles', userId);
@@ -71,7 +71,7 @@ await remove(supabase, 'bingo_templates', templateId);
 ### 3. Use React Hooks
 
 ```tsx
-import { useQuery, useMutation } from '@beak-gaming/database';
+import { useQuery, useMutation } from '@joolie-boolie/database';
 
 function ProfileEditor() {
   // Query
@@ -113,7 +113,7 @@ import {
   listBingoTemplates,
   createGameSession,
   verifyPin,
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 
 // Get current user's profile
 const profile = await getCurrentProfile(supabase);
@@ -149,7 +149,7 @@ import {
   getCurrentUser,         // Get current authenticated user
   getSession,            // Get current session
   isAuthenticated,       // Check if user is authenticated
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Types
@@ -167,7 +167,7 @@ import type {
   BingoTemplate,         // Bingo template row type
   TriviaTemplate,        // Trivia template row type
   GameSession,           // Game session row type
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### CRUD Operations
@@ -189,7 +189,7 @@ import {
   count,        // Count records
   exists,       // Check if record exists
   upsert,       // Insert or update
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 **Example:**
@@ -218,7 +218,7 @@ import {
   MAX_PAGE_SIZE,      // 100
   type PaginationParams,
   type PaginatedResult,
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Filtering & Sorting
@@ -234,7 +234,7 @@ import {
   type FilterOperator,  // 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'in'
   type FilterCondition,
   type SortCondition,
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 **Example:**
@@ -273,7 +273,7 @@ import {
   useUpdateGameSessionState,     // Update session state
   useMarkSessionCompleted,       // Mark session complete
   useVerifyPin,                  // Verify PIN
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Profile Utilities
@@ -289,7 +289,7 @@ import {
   updateDefaultGameTitle,  // Update default game title
   updateLogoUrl,           // Update logo URL
   hasProfile,              // Check if user has profile
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Bingo Template Utilities
@@ -310,7 +310,7 @@ import {
   // Constants
   AUTO_CALL_INTERVAL_MIN,  // 5 seconds
   AUTO_CALL_INTERVAL_MAX,  // 30 seconds
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Trivia Template Utilities
@@ -340,7 +340,7 @@ import {
   QUESTIONS_PER_ROUND_MAX,      // 10
   TIMER_DURATION_MIN,           // 10 seconds
   TIMER_DURATION_MAX,           // 120 seconds
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Game Session Utilities
@@ -358,7 +358,7 @@ import {
   clearLocalSessions,
   type GameType,           // 'bingo' | 'trivia'
   type SessionStatus,      // 'active' | 'paused' | 'completed' | 'cancelled'
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 **Persistent Sessions (Database):**
@@ -372,7 +372,7 @@ import {
   resetFailedPinAttempts,
   markSessionCompleted,
   cleanupExpiredSessions,
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ### Session Tokens (JWT)
@@ -384,7 +384,7 @@ import {
   decodeSessionToken,    // Decode JWT string to token object
   isTokenExpired,        // Check if token is expired
   TOKEN_DURATION_MS,     // 24 hours
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 **Example:**
@@ -410,7 +410,7 @@ import {
   isLockedOut,           // Check if session is locked out
   MAX_ATTEMPTS,          // 5 attempts
   LOCKOUT_DURATION_MS,   // 15 minutes
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 **Example:**
@@ -432,7 +432,7 @@ if (isLockedOut(failedAttempts, lastFailedAt)) {
 Generate Next.js API routes for game sessions:
 
 ```typescript
-import { createSessionRoutes } from '@beak-gaming/database';
+import { createSessionRoutes } from '@joolie-boolie/database';
 
 // In app/api/sessions/route.ts
 const routes = createSessionRoutes({
@@ -468,7 +468,7 @@ import {
   isDatabaseError,          // Type guard
   mapSupabaseError,         // Convert Supabase errors
   withErrorHandling,        // Wrap function with error handling
-} from '@beak-gaming/database';
+} from '@joolie-boolie/database';
 ```
 
 ## Environment Variables
@@ -487,7 +487,7 @@ SESSION_TOKEN_SECRET=your-64-char-hex-string      # Generate with: openssl rand 
 ### Client Components
 
 ```tsx
-import { createBrowserClient, useQuery, listBingoTemplates } from '@beak-gaming/database';
+import { createBrowserClient, useQuery, listBingoTemplates } from '@joolie-boolie/database';
 
 function TemplateList() {
   const supabase = createBrowserClient();
@@ -513,7 +513,7 @@ function TemplateList() {
 ### Server Components
 
 ```tsx
-import { createClient, getCurrentProfile } from '@beak-gaming/database';
+import { createClient, getCurrentProfile } from '@joolie-boolie/database';
 
 async function ProfileCard() {
   const supabase = await createClient();
@@ -534,7 +534,7 @@ async function ProfileCard() {
 
 ```tsx
 // app/api/profiles/route.ts
-import { createClient, getCurrentProfile, updateProfile } from '@beak-gaming/database';
+import { createClient, getCurrentProfile, updateProfile } from '@joolie-boolie/database';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -574,6 +574,6 @@ export async function PATCH(request: Request) {
 
 ## Related Packages
 
-- `@beak-gaming/auth` - Authentication utilities and hooks
+- `@joolie-boolie/auth` - Authentication utilities and hooks
 - `@supabase/supabase-js` - Core Supabase client
 - `@supabase/ssr` - Server-side rendering utilities

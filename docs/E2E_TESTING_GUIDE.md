@@ -38,7 +38,7 @@ The `E2E_JWT_SECRET` environment variable is **required** when `E2E_TESTING=true
 - **Platform Hub** (`login/route.ts`, `token/route.ts`): Signs E2E test JWTs
 - **Bingo** (`middleware.ts`): Verifies E2E test JWTs
 - **Trivia** (`middleware.ts`): Verifies E2E test JWTs
-- **`@beak-gaming/auth`** (`api-auth.ts`): Verifies E2E test JWTs in API routes
+- **`@joolie-boolie/auth`** (`api-auth.ts`): Verifies E2E test JWTs in API routes
 
 **The same value must be set in all app `.env.local` files.** A suggested development value:
 ```

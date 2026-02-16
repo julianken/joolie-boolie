@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonButton } from '@beak-gaming/ui';
+import { Skeleton, SkeletonButton } from '@joolie-boolie/ui';
 
 /**
  * Loading skeleton for the Platform Hub home page.

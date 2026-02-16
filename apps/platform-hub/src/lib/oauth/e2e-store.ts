@@ -9,7 +9,7 @@
  */
 
 // E2E Testing constants (must match across all OAuth endpoints)
-export const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
+export const E2E_TEST_EMAIL = 'e2e-test@joolie-boolie.test';
 export const E2E_TEST_USER_ID = 'e2e-test-user-00000000-0000-0000-0000-000000000000';
 
 // E2E Mock OAuth clients (matches migration data)
@@ -17,19 +17,19 @@ export const E2E_TEST_USER_ID = 'e2e-test-user-00000000-0000-0000-0000-000000000
 export const E2E_MOCK_CLIENTS: Record<string, { id: string; name: string; redirect_uris: string[]; is_first_party: boolean }> = {
   '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21': {
     id: '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21',
-    name: 'Beak Bingo',
+    name: 'Bingo',
     redirect_uris: [
       'http://localhost:3000/auth/callback',
-      'https://bingo.beak-gaming.com/auth/callback',
+      'https://bingo.joolie-boolie.com/auth/callback',
     ],
     is_first_party: true,
   },
   '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936': {
     id: '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936',
-    name: 'Beak Trivia',
+    name: 'Trivia',
     redirect_uris: [
       'http://localhost:3001/auth/callback',
-      'https://trivia.beak-gaming.com/auth/callback',
+      'https://trivia.joolie-boolie.com/auth/callback',
     ],
     is_first_party: true,
   },

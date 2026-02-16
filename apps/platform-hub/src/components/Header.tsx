@@ -2,8 +2,8 @@
 
 import { HTMLAttributes, forwardRef } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@beak-gaming/auth';
-import { Button } from '@beak-gaming/ui';
+import { useAuth } from '@joolie-boolie/auth';
+import { Button } from '@joolie-boolie/ui';
 import { useRouter } from 'next/navigation';
 
 export interface HeaderProps extends HTMLAttributes<HTMLElement> {
@@ -13,7 +13,7 @@ export interface HeaderProps extends HTMLAttributes<HTMLElement> {
 
 /**
  * Header - Platform header with branding.
- * Simple, clean header designed for senior users.
+ * Simple, clean header designed for users.
  */
 export const Header = forwardRef<HTMLElement, HeaderProps>(
   ({ logoUrl: _logoUrl, className = '', ...props }, ref) => {
@@ -58,9 +58,9 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
           <Link
             href="/"
             className="flex items-center gap-4 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 rounded-lg p-2 -m-2"
-            aria-label="Beak Gaming Platform - Home"
+            aria-label="Joolie Boolie - Home"
           >
-            {/* Beak Logo - Simple bird icon */}
+            {/* Joolie Boolie Logo - Simple bird icon */}
             <div className="w-12 h-12 flex items-center justify-center bg-primary rounded-xl text-primary-foreground">
               <svg
                 className="w-8 h-8"
@@ -73,7 +73,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
             </div>
             <div>
               <span className="text-2xl font-bold text-foreground">
-                Beak Gaming
+                Joolie Boolie
               </span>
               <span className="hidden sm:block text-base text-muted-foreground">
                 Fun for Everyone

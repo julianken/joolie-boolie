@@ -1,9 +1,9 @@
-# Beak Bingo - Project Plan
+# Bingo - Project Plan
 
 ## Project Overview
 
-**Name:** Beak Bingo
-**Domain:** beak-bingo (TBD: .com, .io, .app)
+**Name:** Bingo
+**Domain:** jb-bingo (TBD: .com, .io, .app)
 **Access Model:** Free to play (no login required), optional accounts for saving templates
 **Future Monetization:** Ads and/or paid tier (keep architecture flexible)
 
@@ -14,12 +14,12 @@
 ### 1.1 Project Setup
 
 - [ ] Initialize Next.js project with TypeScript
-  - `npx create-next-app@latest beak-bingo --typescript --tailwind --eslint --app --src-dir`
+  - `npx create-next-app@latest jb-bingo --typescript --tailwind --eslint --app --src-dir`
 - [ ] Configure TypeScript (`tsconfig.json`)
   - Strict mode enabled
   - Path aliases (`@/components`, `@/lib`, etc.)
 - [ ] Configure Tailwind
-  - Custom color palette (senior-friendly, high contrast)
+  - Custom color palette (accessible, high contrast)
   - Custom font sizes (larger defaults)
   - Custom spacing scale
 - [ ] Set up project structure (folders per spec)
@@ -34,7 +34,7 @@
 
 ### 1.2 Supabase Setup
 
-- [ ] Create Supabase project (name: beak-bingo)
+- [ ] Create Supabase project (name: jb-bingo)
 - [ ] Configure auth settings
   - Enable email/password auth
   - Configure email templates (welcome, reset password)
@@ -167,7 +167,7 @@ Card generation and PDF printing moved to post-MVP. Facilities will use physical
 ### 3.2 Ball Reveal Chime
 
 - [ ] Source reveal chime sound effect
-  - Research nostalgic sounds for seniors (service bell, classic game show ding)
+  - Research nostalgic sounds for everyone (service bell, classic game show ding)
   - Consider: desk bell, Price is Right style ding, or simple attention chime
   - Purchase from AudioJungle, Epidemic Sound, or similar
 - [ ] Add chime audio files
@@ -492,9 +492,9 @@ Card generation and PDF printing moved to post-MVP. Facilities will use physical
 - [ ] Create `public/manifest.json`
   ```json
   {
-    "name": "Beak Bingo",
-    "short_name": "Beak Bingo",
-    "description": "Digital bingo caller for retirement communities",
+    "name": "Bingo",
+    "short_name": "Bingo",
+    "description": "Digital bingo caller for groups and communities",
     "start_url": "/play",
     "display": "standalone",
     "background_color": "#ffffff",

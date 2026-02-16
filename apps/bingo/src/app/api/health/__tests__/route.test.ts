@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '../route';
 
 // Mock the Supabase server client
-vi.mock('@beak-gaming/database/server', () => ({
+vi.mock('@joolie-boolie/database/server', () => ({
   createClient: vi.fn(),
 }));
 
-import { createClient } from '@beak-gaming/database/server';
+import { createClient } from '@joolie-boolie/database/server';
 
 describe('health endpoint', () => {
   const mockCreateClient = createClient as ReturnType<typeof vi.fn>;

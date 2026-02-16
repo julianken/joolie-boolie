@@ -243,7 +243,7 @@ describe('TemplateCard', () => {
     expect(badge).toHaveClass('bg-purple-100', 'text-purple-800', 'border-purple-200');
   });
 
-  it('should meet senior-friendly design requirements', () => {
+  it('should meet accessible design requirements', () => {
     render(
       <TemplateCard template={mockBingoTemplate} onDelete={mockOnDelete} />
     );

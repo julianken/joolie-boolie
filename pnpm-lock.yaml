@@ -53,25 +53,25 @@ importers:
 
   apps/bingo:
     dependencies:
-      '@beak-gaming/auth':
+      '@joolie-boolie/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@beak-gaming/database':
+      '@joolie-boolie/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@beak-gaming/error-tracking':
+      '@joolie-boolie/error-tracking':
         specifier: workspace:*
         version: link:../../packages/error-tracking
-      '@beak-gaming/game-engine':
+      '@joolie-boolie/game-engine':
         specifier: workspace:*
         version: link:../../packages/game-engine
-      '@beak-gaming/sync':
+      '@joolie-boolie/sync':
         specifier: workspace:*
         version: link:../../packages/sync
-      '@beak-gaming/theme':
+      '@joolie-boolie/theme':
         specifier: workspace:*
         version: link:../../packages/theme
-      '@beak-gaming/ui':
+      '@joolie-boolie/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@supabase/ssr':
@@ -85,7 +85,7 @@ importers:
         version: 6.1.3
       next:
         specifier: 16.1.3
-        version: 16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -105,7 +105,7 @@ importers:
         specifier: ^5.0.10
         version: 5.0.10(@types/react@19.2.8)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
-      '@beak-gaming/testing':
+      '@joolie-boolie/testing':
         specifier: workspace:*
         version: link:../../packages/testing
       '@next/bundle-analyzer':
@@ -177,16 +177,16 @@ importers:
 
   apps/platform-hub:
     dependencies:
-      '@beak-gaming/auth':
+      '@joolie-boolie/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@beak-gaming/error-tracking':
+      '@joolie-boolie/error-tracking':
         specifier: workspace:*
         version: link:../../packages/error-tracking
-      '@beak-gaming/theme':
+      '@joolie-boolie/theme':
         specifier: workspace:*
         version: link:../../packages/theme
-      '@beak-gaming/ui':
+      '@joolie-boolie/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@supabase/ssr':
@@ -209,7 +209,7 @@ importers:
         version: 4.0.0
       next:
         specifier: 16.1.3
-        version: 16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -229,7 +229,7 @@ importers:
         specifier: ^5.0.10
         version: 5.0.10(@types/react@19.2.8)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
-      '@beak-gaming/testing':
+      '@joolie-boolie/testing':
         specifier: workspace:*
         version: link:../../packages/testing
       '@next/bundle-analyzer':
@@ -292,25 +292,25 @@ importers:
 
   apps/trivia:
     dependencies:
-      '@beak-gaming/auth':
+      '@joolie-boolie/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@beak-gaming/database':
+      '@joolie-boolie/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@beak-gaming/error-tracking':
+      '@joolie-boolie/error-tracking':
         specifier: workspace:*
         version: link:../../packages/error-tracking
-      '@beak-gaming/game-engine':
+      '@joolie-boolie/game-engine':
         specifier: workspace:*
         version: link:../../packages/game-engine
-      '@beak-gaming/sync':
+      '@joolie-boolie/sync':
         specifier: workspace:*
         version: link:../../packages/sync
-      '@beak-gaming/theme':
+      '@joolie-boolie/theme':
         specifier: workspace:*
         version: link:../../packages/theme
-      '@beak-gaming/ui':
+      '@joolie-boolie/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@supabase/ssr':
@@ -324,7 +324,7 @@ importers:
         version: 6.1.3
       next:
         specifier: 16.1.3
-        version: 16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -344,7 +344,7 @@ importers:
         specifier: ^5.0.10
         version: 5.0.10(@types/react@19.2.8)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
-      '@beak-gaming/testing':
+      '@joolie-boolie/testing':
         specifier: workspace:*
         version: link:../../packages/testing
       '@next/bundle-analyzer':
@@ -418,12 +418,12 @@ importers:
         version: 6.1.3
       next:
         specifier: '>=14.0.0'
-        version: 16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: ^19.0.0
         version: 19.2.3
     devDependencies:
-      '@beak-gaming/testing':
+      '@joolie-boolie/testing':
         specifier: workspace:*
         version: link:../testing
       '@testing-library/jest-dom':
@@ -463,7 +463,7 @@ importers:
         specifier: ^2.90.1
         version: 2.90.1
     devDependencies:
-      '@beak-gaming/testing':
+      '@joolie-boolie/testing':
         specifier: workspace:*
         version: link:../testing
       '@testing-library/react':
@@ -483,7 +483,7 @@ importers:
         version: 27.4.0
       next:
         specifier: 16.1.3
-        version: 16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -558,7 +558,7 @@ importers:
         specifier: ^5.0.0
         version: 5.0.10(@types/react@19.2.8)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
-      '@beak-gaming/testing':
+      '@joolie-boolie/testing':
         specifier: workspace:*
         version: link:../testing
       '@testing-library/jest-dom':
@@ -632,7 +632,7 @@ importers:
 
   packages/ui:
     dependencies:
-      '@beak-gaming/types':
+      '@joolie-boolie/types':
         specifier: workspace:*
         version: link:../types
       react:
@@ -7284,7 +7284,7 @@ snapshots:
       '@swc/core': 1.15.11
       browserslist: 4.28.1
       kolorist: 1.8.0
-      next: 16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      next: 16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
       semver: 7.7.3
       serwist: 9.5.4(browserslist@4.28.1)(typescript@5.9.3)
@@ -8587,7 +8587,7 @@ snapshots:
       '@next/eslint-plugin-next': 16.1.3
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.2(jiti@2.6.1))
@@ -8614,7 +8614,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -8629,14 +8629,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -8651,7 +8651,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -9717,7 +9717,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  next@16.1.3(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  next@16.1.3(@babel/core@7.28.6)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@next/env': 16.1.3
       '@swc/helpers': 0.5.15
@@ -9726,7 +9726,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      styled-jsx: 5.1.6(react@19.2.3)
+      styled-jsx: 5.1.6(@babel/core@7.28.6)(react@19.2.3)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.3
       '@next/swc-darwin-x64': 16.1.3
@@ -10599,10 +10599,12 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(react@19.2.3):
+  styled-jsx@5.1.6(@babel/core@7.28.6)(react@19.2.3):
     dependencies:
       client-only: 0.0.1
       react: 19.2.3
+    optionalDependencies:
+      '@babel/core': 7.28.6
 
   supports-color@5.5.0:
     dependencies:

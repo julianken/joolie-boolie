@@ -206,8 +206,8 @@ test.describe('Room Setup Flow', () => {
       // doesn't register service workers. Without SW, browser has no cached assets to serve offline.
       //
       // To run this test:
-      // 1. pnpm --filter @beak-gaming/bingo build
-      // 2. pnpm --filter @beak-gaming/bingo start
+      // 1. pnpm --filter @joolie-boolie/bingo build
+      // 2. pnpm --filter @joolie-boolie/bingo start
       // 3. pnpm test:e2e --project=bingo-pwa
       //
       // Alternative: Create separate 'bingo-pwa' test project in playwright.config.ts
@@ -385,7 +385,7 @@ test.describe('Room Setup Flow', () => {
       await displayPage.waitForLoadState('networkidle');
 
       // Display should show bingo display
-      await expect(displayPage.getByText(/beak bingo/i)).toBeVisible({ timeout: 10000 });
+      await expect(displayPage.getByText(/joolie boolie bingo/i)).toBeVisible({ timeout: 10000 });
 
       // Both windows should be synced via BroadcastChannel
       // Verify room code is in URL
@@ -412,7 +412,7 @@ test.describe('Room Setup Flow', () => {
       await displayPage.waitForLoadState('networkidle');
 
       // Display should show bingo display
-      await expect(displayPage.getByText(/beak bingo/i)).toBeVisible({ timeout: 10000 });
+      await expect(displayPage.getByText(/joolie boolie bingo/i)).toBeVisible({ timeout: 10000 });
 
       // Verify offline session ID is in URL
       const displayUrl = displayPage.url();

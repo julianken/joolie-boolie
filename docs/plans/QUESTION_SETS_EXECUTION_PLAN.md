@@ -80,7 +80,7 @@ BEA-450 + BEA-455 → Merge PR #300
 **New JSON Structure:**
 ```json
 {
-  "name": "Trivia Night",
+  "name": "Trivia",
   "categories": [
     {
       "id": "science",

@@ -109,7 +109,7 @@ module.exports = {
         'unused-javascript': 'warn',
         'unused-css-rules': 'warn',
 
-        // Accessibility (important for senior users)
+        // Accessibility (important for users)
         'color-contrast': 'error',
         'tap-targets': 'error',
         'font-size': 'warn',

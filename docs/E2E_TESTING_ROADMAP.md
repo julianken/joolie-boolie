@@ -42,12 +42,12 @@
 
 | Issue | Title | Tests | Priority | Status | Notes |
 |-------|-------|-------|----------|--------|-------|
-| [BEA-313](https://linear.app/beak-gaming/issue/BEA-313) | Infrastructure: Sharding & CI | N/A | 🔴 High | Ready | **Start here** - enables all others |
-| [BEA-314](https://linear.app/beak-gaming/issue/BEA-314) | Auth Flow E2E Tests | 18-20 | 🔴 Urgent | Blocked | Login, signup, logout, forgot password |
-| [BEA-315](https://linear.app/beak-gaming/issue/BEA-315) | Dashboard & Profile E2E | 18 | 🔴 High | Blocked | Dashboard, settings, profile update |
-| [BEA-316](https://linear.app/beak-gaming/issue/BEA-316) | Cross-App SSO E2E | 22 | 🔴 High | Blocked | OAuth flow, consent, multi-app testing |
-| [BEA-318](https://linear.app/beak-gaming/issue/BEA-318) | Accessibility & Security | 18-19 | 🟡 Medium | Blocked | A11y, rate limiting, XSS prevention |
-| [BEA-317](https://linear.app/beak-gaming/issue/BEA-317) | Template CRUD E2E | ~~8~~ | 🟡 Medium | **DEFERRED** | ⚠️ Template UI doesn't exist yet |
+| [BEA-313](https://linear.app/joolie-boolie/issue/BEA-313) | Infrastructure: Sharding & CI | N/A | 🔴 High | Ready | **Start here** - enables all others |
+| [BEA-314](https://linear.app/joolie-boolie/issue/BEA-314) | Auth Flow E2E Tests | 18-20 | 🔴 Urgent | Blocked | Login, signup, logout, forgot password |
+| [BEA-315](https://linear.app/joolie-boolie/issue/BEA-315) | Dashboard & Profile E2E | 18 | 🔴 High | Blocked | Dashboard, settings, profile update |
+| [BEA-316](https://linear.app/joolie-boolie/issue/BEA-316) | Cross-App SSO E2E | 22 | 🔴 High | Blocked | OAuth flow, consent, multi-app testing |
+| [BEA-318](https://linear.app/joolie-boolie/issue/BEA-318) | Accessibility & Security | 18-19 | 🟡 Medium | Blocked | A11y, rate limiting, XSS prevention |
+| [BEA-317](https://linear.app/joolie-boolie/issue/BEA-317) | Template CRUD E2E | ~~8~~ | 🟡 Medium | **DEFERRED** | ⚠️ Template UI doesn't exist yet |
 
 ## 🚧 Missing Features (Phase 3)
 
@@ -170,4 +170,4 @@ test('feature name @critical', async ({ page }) => {
 
 ---
 
-**Questions?** Check the [full plan](./LINEAR_E2E_PROJECT_PLAN.md) or [Linear project](https://linear.app/beak-gaming/project/e2e-testing-coverage-29726dba5b2f).
+**Questions?** Check the [full plan](./LINEAR_E2E_PROJECT_PLAN.md) or [Linear project](https://linear.app/joolie-boolie/project/e2e-testing-coverage-29726dba5b2f).

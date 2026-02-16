@@ -99,7 +99,7 @@ export function InstallPrompt() {
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">Install Trivia Night</h3>
+          <h3 className="font-semibold text-gray-900">Install Trivia</h3>
           <p className="text-base text-gray-600 mt-1">
             Add to your home screen for quick access and offline play.
           </p>

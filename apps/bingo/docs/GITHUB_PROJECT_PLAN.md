@@ -356,7 +356,7 @@ Create a new modal component for room setup with three options: Create New Game,
 - [ ] Design three-option layout (Create/Join/Offline)
 - [ ] Add form for joining existing room (PIN input)
 - [ ] Add close/dismiss functionality
-- [ ] Style for senior-friendly UI (large text, high contrast)
+- [ ] Style for accessible UI (large text, high contrast)
 - [ ] Add accessibility features (keyboard navigation, ARIA labels)
 - [ ] Add visual icons for each option
 
@@ -983,5 +983,5 @@ The implementation is complete when:
 
 ---
 
-*Project: Beak Gaming Platform - Bingo*
+*Project: Joolie Boolie - Bingo*
 *Epic: Simplified Room Creation Flow*

@@ -4,15 +4,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiUser, createAuthenticatedClient } from '@beak-gaming/auth';
+import { getApiUser, createAuthenticatedClient } from '@joolie-boolie/auth';
 import {
   listAllBingoTemplates,
   createBingoTemplate,
   AUTO_CALL_INTERVAL_MIN,
   AUTO_CALL_INTERVAL_MAX,
-} from '@beak-gaming/database/tables';
-import { isDatabaseError } from '@beak-gaming/database/errors';
-import type { BingoTemplateInsert } from '@beak-gaming/database/types';
+} from '@joolie-boolie/database/tables';
+import { isDatabaseError } from '@joolie-boolie/database/errors';
+import type { BingoTemplateInsert } from '@joolie-boolie/database/types';
 
 /**
  * GET /api/templates

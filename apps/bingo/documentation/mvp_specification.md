@@ -2,9 +2,9 @@
 
 ## Overview
 
-A cloud-based, web-accessible Bingo system designed for retirement communities. Replaces USB-based solutions like Game Show Mania ($395) with a modern PWA that works offline, supports dual-screen presentation, and provides admin accounts for saved configurations.
+A cloud-based, web-accessible Bingo system designed for groups and communities. Replaces USB-based solutions like Game Show Mania ($395) with a modern PWA that works offline, supports dual-screen presentation, and provides admin accounts for saved configurations.
 
-**Target User:** Activity directors and presenters at retirement communities
+**Target User:** Activity directors and presenters at groups and communities
 
 **Primary Differentiators vs. Free Alternatives (Let's Play Bingo):**
 - Dual-screen support (presenter controls + audience display)
@@ -367,7 +367,7 @@ bingo-project/
 
 ## UI/UX Requirements
 
-**Senior-Friendly Design:**
+**Accessible Design:**
 - Large fonts (minimum 18px body, larger for game displays)
 - High contrast (dark text on light backgrounds, or vice versa)
 - Large click targets (minimum 44x44px buttons)
@@ -430,7 +430,7 @@ bingo-project/
 
 ## Decisions Made
 
-1. **Project name:** Beak Bingo
+1. **Project name:** Bingo
 2. **Audio voices:** Multiple selectable options (3-4 voices: male/female, professional/warm)
 3. **Logo upload limits:** Max 2MB, jpg/png/webp
 4. **Access model:** Free to play (no login required), optional accounts for saving templates

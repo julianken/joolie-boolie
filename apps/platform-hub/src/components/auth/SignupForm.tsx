@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
-import { Button } from '@beak-gaming/ui';
-import { useAuth } from '@beak-gaming/auth';
+import { Button } from '@joolie-boolie/ui';
+import { useAuth } from '@joolie-boolie/auth';
 
 interface FormErrors {
   name?: string;
@@ -14,7 +14,7 @@ interface FormErrors {
 }
 
 /**
- * SignupForm - Senior-friendly registration form.
+ * SignupForm - Accessible registration form.
  *
  * Features:
  * - Large fonts and buttons for accessibility

@@ -331,7 +331,7 @@ describe('TimerDisplay', () => {
     });
   });
 
-  describe('senior-friendly design', () => {
+  describe('accessible design', () => {
     it('should have large time display text (text-5xl)', () => {
       render(<TimerDisplay />);
 

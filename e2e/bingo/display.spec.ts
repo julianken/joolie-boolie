@@ -30,7 +30,7 @@ test.describe('Bingo Display Page', () => {
 
     // Check display page content
     await expect(displayPage.getByText(/audience display/i)).toBeVisible();
-    await expect(displayPage.getByRole('heading', { name: /beak bingo/i })).toBeVisible();
+    await expect(displayPage.getByRole('heading', { name: /joolie boolie bingo/i })).toBeVisible();
   });
 
   test('shows waiting state when no game started', async ({ authenticatedBingoPage: page }) => {

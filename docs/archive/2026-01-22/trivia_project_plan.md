@@ -1,10 +1,10 @@
-# Trivia Night - Project Plan
+# Trivia - Project Plan
 
 ## Project Overview
 
-**Name:** Trivia Night
-**Part of:** Beak Gaming Platform monorepo
-**Purpose:** Presenter-controlled trivia system for retirement communities
+**Name:** Trivia
+**Part of:** Joolie Boolie monorepo
+**Purpose:** Presenter-controlled trivia system for groups and communities
 **Access Model:** Free to play (no login required for MVP), optional accounts for future custom questions
 
 ---
@@ -336,9 +336,9 @@ The sections below document the complete feature set for reference after MVP is 
 
 - [ ] Verify trivia app structure in monorepo
 - [ ] Verify shared package dependencies:
-  - `@beak-gaming/sync` - Dual-screen synchronization
-  - `@beak-gaming/ui` - Button, Toggle, Slider components
-  - `@beak-gaming/theme` - Senior-friendly design tokens
+  - `@joolie-boolie/sync` - Dual-screen synchronization
+  - `@joolie-boolie/ui` - Button, Toggle, Slider components
+  - `@joolie-boolie/theme` - Accessible design tokens
 - [ ] Configure TypeScript paths (`@/components`, `@/lib`, etc.)
 - [ ] Set up `.env.local` for environment variables
 - [ ] Create `.env.example` with required variables
@@ -686,7 +686,7 @@ Copy from bingo with trivia-specific channel name:
   - Minimal "Paused" text
   - For emergencies only
 
-#### 6.3 Shared UI (from @beak-gaming/ui)
+#### 6.3 Shared UI (from @joolie-boolie/ui)
 
 - [ ] Verify Button component works
 - [ ] Verify Toggle component works **[DEFERRED: no toggles in MVP]**
@@ -701,7 +701,7 @@ Copy from bingo with trivia-specific channel name:
 - [ ] Hero section with app description
 - [ ] "Start Game" button
 - [ ] Feature highlights **[DEFERRED: simple landing for MVP]**
-- [ ] Senior-friendly design
+- [ ] Accessible design
 
 #### 7.2 Presenter Page (`src/app/play/page.tsx`)
 
@@ -809,7 +809,7 @@ Copy from bingo with trivia-specific channel name:
 - [x] Minimum 48px font for audience display (in MVP)
 - [x] High contrast colors (WCAG AA) (in MVP via theme)
 - [x] Large click targets (44x44px minimum) (in MVP via theme)
-- [x] Senior-friendly color palette from @beak-gaming/theme (in MVP)
+- [x] Accessible color palette from @joolie-boolie/theme (in MVP)
 
 #### 10.2 Keyboard Navigation
 
@@ -970,7 +970,7 @@ src/hooks/use-audio.ts
 |------|------------|
 | Scope creep | Strict MVP: 5 questions, no timer, no TTS, no settings UI |
 | Sync bugs | Copy bingo's tested BroadcastChannel code |
-| Font too small | Use @beak-gaming/theme, test on projector |
+| Font too small | Use @joolie-boolie/theme, test on projector |
 | Timer drift | Timer deferred to post-MVP; when added, runs in presenter only |
 | No tests = bugs | Basic engine tests in MVP, expand coverage post-MVP |
 | Answer amendment bugs | Feature deferred to post-MVP |

@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { ErrorBoundary, logError, configureErrorLogger } from '@beak-gaming/error-tracking';
+import { ErrorBoundary, logError, configureErrorLogger } from '@joolie-boolie/error-tracking';
 
 // Configure error logger for Trivia app
 if (typeof window !== 'undefined') {
@@ -67,7 +67,7 @@ export function ErrorBoundaryProvider({ children }: ErrorBoundaryProviderProps) 
 
             {/* Message */}
             <p className="text-xl text-red-700 mb-6 leading-relaxed">
-              We ran into a problem with Trivia Night.
+              We ran into a problem with Trivia.
               Let us try to fix that for you.
             </p>
 

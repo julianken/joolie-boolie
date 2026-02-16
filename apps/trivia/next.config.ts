@@ -5,16 +5,16 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 const nextConfig: NextConfig = {
   serverExternalPackages: ["esbuild-wasm"],
   transpilePackages: [
-    '@beak-gaming/sync',
-    '@beak-gaming/ui',
-    '@beak-gaming/theme',
-    '@beak-gaming/auth',
-    '@beak-gaming/database',
+    '@joolie-boolie/sync',
+    '@joolie-boolie/ui',
+    '@joolie-boolie/theme',
+    '@joolie-boolie/auth',
+    '@joolie-boolie/database',
   ],
   turbopack: {
     resolveAlias: {
-      '@beak-gaming/database/api': '../../packages/database/src/api/index.ts',
-      '@beak-gaming/database/tables': '../../packages/database/src/tables/index.ts',
+      '@joolie-boolie/database/api': '../../packages/database/src/api/index.ts',
+      '@joolie-boolie/database/tables': '../../packages/database/src/tables/index.ts',
     },
   },
 async rewrites() {

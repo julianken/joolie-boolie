@@ -51,21 +51,19 @@ FOR INSERT
 TO service_role
 WITH CHECK (true);
 
--- Policy: Admins can read all logs (adjust based on your admin role logic)
--- Note: You may want to create a custom role or use a specific user_id check
-CREATE POLICY "Admins can read audit logs"
+-- Policy: Service role can read all logs (admin reads via API with service_role key)
+CREATE POLICY "Service role can read audit logs"
+ON oauth_audit_log
+FOR SELECT
+TO service_role
+USING (true);
+
+-- Policy: Users can read their own audit log entries
+CREATE POLICY "Users can read own audit logs"
 ON oauth_audit_log
 FOR SELECT
 TO authenticated
-USING (
-  -- Example: Allow if user has admin role in profiles table
-  -- Adjust this based on your authorization model
-  EXISTS (
-    SELECT 1 FROM profiles
-    WHERE profiles.user_id = auth.uid()
-    AND profiles.role = 'admin'
-  )
-);
+USING (user_id = auth.uid());
 
 -- Function to delete audit logs older than 90 days (retention policy)
 CREATE OR REPLACE FUNCTION delete_old_audit_logs()

@@ -5,7 +5,7 @@
 -- ============================================================================
 -- Table: facilities
 -- ============================================================================
--- Represents physical facilities/retirement communities in the platform
+-- Represents physical facilities/groups and communities in the platform
 CREATE TABLE public.facilities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE public.facilities (
 );
 
 -- Add table comment
-COMMENT ON TABLE public.facilities IS 'Retirement communities and facilities that use the Beak Gaming Platform';
+COMMENT ON TABLE public.facilities IS 'Communities and groups that use the Joolie Boolie';
 COMMENT ON COLUMN public.facilities.is_active IS 'Soft delete flag - inactive facilities are hidden but not deleted';
 
 -- Indexes
@@ -85,9 +85,9 @@ CREATE INDEX user_roles_is_active_idx ON public.user_roles(is_active);
 CREATE INDEX user_roles_expires_at_idx ON public.user_roles(expires_at) WHERE expires_at IS NOT NULL;
 CREATE INDEX user_roles_assigned_by_idx ON public.user_roles(assigned_by);
 
--- Composite index for role checks
-CREATE INDEX user_roles_active_lookup_idx ON public.user_roles(user_id, role, facility_id, is_active)
-  WHERE is_active = true AND (expires_at IS NULL OR expires_at > now());
+-- Composite index for role checks (expiry filtered at query time, not in index)
+CREATE INDEX user_roles_active_lookup_idx ON public.user_roles(user_id, role, facility_id)
+  WHERE is_active = true;
 
 -- ============================================================================
 -- Helper Functions
@@ -390,8 +390,8 @@ CREATE TRIGGER update_user_roles_updated_at
 
 -- Insert sample facilities
 INSERT INTO public.facilities (id, name, address, contact_email, contact_phone) VALUES
-  ('11111111-1111-1111-1111-111111111111', 'Sunny Acres Retirement Community', '123 Elder Lane, Springfield, IL 62701', 'contact@sunnyacres.example.com', '555-0101'),
-  ('22222222-2222-2222-2222-222222222222', 'Golden Years Senior Living', '456 Wisdom Way, Portland, OR 97201', 'info@goldenyears.example.com', '555-0102'),
+  ('11111111-1111-1111-1111-111111111111', 'Sunny Acres Community Center', '123 Oak Lane, Springfield, IL 62701', 'contact@sunnyacres.example.com', '555-0101'),
+  ('22222222-2222-2222-2222-222222222222', 'Golden Years Community Center', '456 Wisdom Way, Portland, OR 97201', 'info@goldenyears.example.com', '555-0102'),
   ('33333333-3333-3333-3333-333333333333', 'Serenity Gardens', '789 Peaceful Drive, Austin, TX 78701', 'hello@serenitygardens.example.com', '555-0103');
 
 COMMENT ON COLUMN public.facilities.id IS 'Sample facilities use deterministic UUIDs for testing';

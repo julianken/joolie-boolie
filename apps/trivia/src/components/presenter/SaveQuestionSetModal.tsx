@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useId, useMemo } from 'react';
-import { Modal } from "@beak-gaming/ui";
+import { Modal } from "@joolie-boolie/ui";
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from "@beak-gaming/ui";
+import { useToast } from "@joolie-boolie/ui";
 import { questionsToTriviaQuestions } from '@/lib/questions/conversion';
 
 export interface SaveQuestionSetModalProps {

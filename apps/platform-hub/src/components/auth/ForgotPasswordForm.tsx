@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
-import { Button } from '@beak-gaming/ui';
-import { useAuth } from '@beak-gaming/auth';
+import { Button } from '@joolie-boolie/ui';
+import { useAuth } from '@joolie-boolie/auth';
 
 interface FormErrors {
   email?: string;
@@ -11,7 +11,7 @@ interface FormErrors {
 }
 
 /**
- * ForgotPasswordForm - Senior-friendly password reset request form.
+ * ForgotPasswordForm - Accessible password reset request form.
  *
  * Features:
  * - Large fonts and buttons for accessibility

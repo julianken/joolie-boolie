@@ -7,14 +7,14 @@ describe('HomePage', () => {
     it('renders the main heading', () => {
       render(<HomePage />);
       expect(
-        screen.getByRole('heading', { name: 'Beak Gaming Platform', level: 1 })
+        screen.getByRole('heading', { name: 'Joolie Boolie', level: 1 })
       ).toBeInTheDocument();
     });
 
     it('renders the tagline', () => {
       render(<HomePage />);
       expect(
-        screen.getByText(/Fun, accessible games designed for retirement communities/)
+        screen.getByText(/Fun, accessible games designed for groups and communities/)
       ).toBeInTheDocument();
     });
 
@@ -43,9 +43,9 @@ describe('HomePage', () => {
       expect(screen.getByRole('list', { name: 'Available games' })).toBeInTheDocument();
     });
 
-    it('renders Beak Bingo card', () => {
+    it('renders Bingo card', () => {
       render(<HomePage />);
-      expect(screen.getByText('Beak Bingo')).toBeInTheDocument();
+      expect(screen.getByText('Bingo')).toBeInTheDocument();
     });
 
     it('renders Bingo description', () => {
@@ -55,9 +55,9 @@ describe('HomePage', () => {
       ).toBeInTheDocument();
     });
 
-    it('renders Trivia Night card', () => {
+    it('renders Trivia card', () => {
       render(<HomePage />);
-      expect(screen.getByText('Trivia Night')).toBeInTheDocument();
+      expect(screen.getByText('Trivia')).toBeInTheDocument();
     });
 
     it('renders Trivia description', () => {

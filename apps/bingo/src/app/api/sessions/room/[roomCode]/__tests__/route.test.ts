@@ -1,19 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '../route';
 import { NextRequest } from 'next/server';
-import type { TypedSupabaseClient } from '@beak-gaming/database/client';
+import type { TypedSupabaseClient } from '@joolie-boolie/database/client';
 
 // Mock dependencies
-vi.mock('@beak-gaming/database/server', () => ({
+vi.mock('@joolie-boolie/database/server', () => ({
   createClient: vi.fn(),
 }));
 
-vi.mock('@beak-gaming/database/tables', () => ({
+vi.mock('@joolie-boolie/database/tables', () => ({
   getGameSessionByRoomCode: vi.fn(),
 }));
 
-import { createClient } from '@beak-gaming/database/server';
-import { getGameSessionByRoomCode } from '@beak-gaming/database/tables';
+import { createClient } from '@joolie-boolie/database/server';
+import { getGameSessionByRoomCode } from '@joolie-boolie/database/tables';
 
 describe('/api/sessions/room/[roomCode] endpoint', () => {
   const mockCreateClient = createClient as ReturnType<typeof vi.fn>;

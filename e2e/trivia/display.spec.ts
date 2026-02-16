@@ -49,7 +49,7 @@ test.describe('Trivia Audience Display', () => {
 
       // Check display page content
       await expect(displayPage.getByText(/audience display/i)).toBeVisible();
-      await expect(displayPage.getByRole('heading', { name: /trivia night/i })).toBeVisible();
+      await expect(displayPage.getByRole('heading', { name: /trivia/i })).toBeVisible();
     });
 
     test('shows waiting state when game not started', async ({ authenticatedTriviaPage: page }) => {
@@ -620,7 +620,7 @@ test.describe('Trivia Audience Display', () => {
       await displayPage.setViewportSize({ width: 1920, height: 1080 });
 
       // Content should be visible
-      await expect(displayPage.getByRole('heading', { name: /trivia night/i })).toBeVisible();
+      await expect(displayPage.getByRole('heading', { name: /trivia/i })).toBeVisible();
     });
 
     test('adapts to medium viewport', async ({ authenticatedTriviaPage: page }) => {
@@ -636,7 +636,7 @@ test.describe('Trivia Audience Display', () => {
       await displayPage.setViewportSize({ width: 1024, height: 768 });
 
       // Content should be visible
-      await expect(displayPage.getByRole('heading', { name: /trivia night/i })).toBeVisible();
+      await expect(displayPage.getByRole('heading', { name: /trivia/i })).toBeVisible();
     });
   });
 });

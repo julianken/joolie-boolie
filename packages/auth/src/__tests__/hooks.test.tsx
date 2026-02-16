@@ -6,7 +6,7 @@ import { AuthProvider } from '../components/auth-provider';
 import { useAuth } from '../hooks/use-auth';
 import { useSession } from '../hooks/use-session';
 import { useUser } from '../hooks/use-user';
-import { createMockSupabaseClient, createMockSession } from '@beak-gaming/testing/mocks';
+import { createMockSupabaseClient, createMockSession } from '@joolie-boolie/testing/mocks';
 
 // Create mock client
 let mockClient: ReturnType<typeof createMockSupabaseClient>;

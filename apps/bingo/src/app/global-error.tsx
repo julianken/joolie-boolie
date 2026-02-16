@@ -16,7 +16,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log to console in all environments for global errors
-    console.error('[Beak Bingo] Global error:', {
+    console.error('[Bingo] Global error:', {
       message: error.message,
       digest: error.digest,
       stack: error.stack,
@@ -74,7 +74,7 @@ export default function GlobalError({
                 lineHeight: 1.2,
               }}
             >
-              Beak Bingo has stopped working
+              Bingo has stopped working
             </h1>
 
             {/* Message */}

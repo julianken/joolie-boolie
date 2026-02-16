@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, FormEvent, useEffect } from 'react';
-import { Modal, Input, Button } from '@beak-gaming/ui';
+import { Modal, Input, Button } from '@joolie-boolie/ui';
 import { TemplateSelector } from './TemplateSelector';
 
 export interface RoomSetupModalProps {

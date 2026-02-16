@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Button } from "@beak-gaming/ui";
+import { Button } from "@joolie-boolie/ui";
 
 export interface PinDisplayProps {
   /** The room PIN to display */
@@ -20,7 +20,7 @@ export interface PinDisplayProps {
  * In offline mode, displays the session ID instead.
  *
  * Design:
- * - Large PIN display (36-48px) for senior-friendly readability
+ * - Large PIN display (36-48px) for accessible readability
  * - High contrast for visibility
  * - Clear labeling
  * - Copy button with visual feedback

@@ -38,7 +38,7 @@ async function globalSetup() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const testEmail = 'real-auth-test@beak-gaming.test';
+  const testEmail = 'real-auth-test@joolie-boolie.test';
 
   try {
     const { data, error } = await supabase.auth.admin.listUsers();

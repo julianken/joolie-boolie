@@ -255,7 +255,7 @@ If production builds cause issues:
 
 ## References
 
-- Linear Issue: https://linear.app/beak-gaming/issue/BEA-407
+- Linear Issue: https://linear.app/joolie-boolie/issue/BEA-407
 - Playwright Config: `/playwright.config.ts`
 - E2E Guide: `/docs/E2E_TESTING_GUIDE.md`
 - CI Workflow: `.github/workflows/` (if re-enabled)

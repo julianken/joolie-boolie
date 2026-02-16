@@ -114,7 +114,7 @@ describe('POST /api/auth/sync-session', () => {
       });
     });
 
-    it('should set beak_access_token cookie with httpOnly', async () => {
+    it('should set jb_access_token cookie with httpOnly', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 1800;
       mockJwtDecode.mockReturnValue({
         sub: 'user-123',
@@ -129,7 +129,7 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
       expect(accessTokenCall).toBeDefined();
       expect(accessTokenCall![1]).toBe('jwt-token');
@@ -140,7 +140,7 @@ describe('POST /api/auth/sync-session', () => {
       });
     });
 
-    it('should set beak_refresh_token cookie when refreshToken is provided', async () => {
+    it('should set jb_refresh_token cookie when refreshToken is provided', async () => {
       mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
 
       const request = createSyncRequest({
@@ -151,7 +151,7 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const refreshTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_refresh_token'
+        (call: unknown[]) => call[0] === 'jb_refresh_token'
       );
       expect(refreshTokenCall).toBeDefined();
       expect(refreshTokenCall![1]).toBe('my-refresh-token');
@@ -161,7 +161,7 @@ describe('POST /api/auth/sync-session', () => {
       });
     });
 
-    it('should NOT set beak_refresh_token cookie when refreshToken is absent', async () => {
+    it('should NOT set jb_refresh_token cookie when refreshToken is absent', async () => {
       mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
 
       const request = createSyncRequest({
@@ -171,12 +171,12 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const refreshTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_refresh_token'
+        (call: unknown[]) => call[0] === 'jb_refresh_token'
       );
       expect(refreshTokenCall).toBeUndefined();
     });
 
-    it('should set beak_user_id cookie as non-httpOnly', async () => {
+    it('should set jb_user_id cookie as non-httpOnly', async () => {
       mockJwtDecode.mockReturnValue({ sub: 'user-xyz', exp: Math.floor(Date.now() / 1000) + 3600 });
 
       const request = createSyncRequest({
@@ -187,7 +187,7 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const userIdCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_user_id'
+        (call: unknown[]) => call[0] === 'jb_user_id'
       );
       expect(userIdCall).toBeDefined();
       expect(userIdCall![1]).toBe('user-xyz');
@@ -209,7 +209,7 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
       // maxAge should be close to 7200
       const maxAge = (accessTokenCall![2] as Record<string, number>).maxAge;
@@ -229,7 +229,7 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
       expect((accessTokenCall![2] as Record<string, number>).maxAge).toBe(0);
     });
@@ -269,7 +269,7 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
       expect((accessTokenCall![2] as Record<string, number>).maxAge).toBe(3600);
     });
@@ -304,13 +304,13 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
       expect(accessTokenCall![2]).toMatchObject({ secure: true });
     });
 
     it('should set cookie domain when COOKIE_DOMAIN is configured', async () => {
-      process.env.COOKIE_DOMAIN = '.beak-gaming.com';
+      process.env.COOKIE_DOMAIN = '.joolie-boolie.com';
       mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
 
       const request = createSyncRequest({
@@ -321,13 +321,13 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
-      expect(accessTokenCall![2]).toMatchObject({ domain: '.beak-gaming.com' });
+      expect(accessTokenCall![2]).toMatchObject({ domain: '.joolie-boolie.com' });
     });
 
     it('should trim COOKIE_DOMAIN whitespace', async () => {
-      process.env.COOKIE_DOMAIN = '  .beak-gaming.com  ';
+      process.env.COOKIE_DOMAIN = '  .joolie-boolie.com  ';
       mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
 
       const request = createSyncRequest({
@@ -338,9 +338,9 @@ describe('POST /api/auth/sync-session', () => {
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
-      expect(accessTokenCall![2]).toMatchObject({ domain: '.beak-gaming.com' });
+      expect(accessTokenCall![2]).toMatchObject({ domain: '.joolie-boolie.com' });
     });
   });
 

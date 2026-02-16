@@ -15,7 +15,7 @@ import type { Template } from '@/app/api/templates/route';
 export const dynamic = 'force-dynamic';
 
 // E2E Testing constants (must match login API route)
-const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
+const E2E_TEST_EMAIL = 'e2e-test@joolie-boolie.test';
 
 /**
  * Fetch recent templates from aggregation API
@@ -170,7 +170,7 @@ function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
   return [
     {
       id: 'bingo',
-      title: 'Beak Bingo',
+      title: 'Bingo',
       description:
         'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers.',
       href: process.env.NEXT_PUBLIC_BINGO_URL
@@ -183,7 +183,7 @@ function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
     },
     {
       id: 'trivia',
-      title: 'Trivia Night',
+      title: 'Trivia',
       description:
         'Team-based trivia with presenter controls. Great for group entertainment with customizable categories.',
       href: process.env.NEXT_PUBLIC_TRIVIA_URL
@@ -198,9 +198,9 @@ function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
 }
 
 export const metadata = {
-  title: 'Dashboard | Beak Gaming Platform',
+  title: 'Dashboard | Joolie Boolie',
   description:
-    'Your Beak Gaming dashboard - quick access to games, recent sessions, and settings',
+    'Your Joolie Boolie dashboard - quick access to games, recent sessions, and settings',
 };
 
 /**
@@ -280,10 +280,10 @@ export default async function DashboardPage() {
   // Check for E2E auth via custom SSO cookie (set by /api/auth/login in E2E mode)
   // This allows E2E tests to bypass real Supabase auth and avoid rate limits
   const cookieStore = await cookies();
-  const e2eToken = cookieStore.get('beak_access_token');
-  const e2eUserId = cookieStore.get('beak_user_id');
+  const e2eToken = cookieStore.get('jb_access_token');
+  const e2eUserId = cookieStore.get('jb_user_id');
 
-  // E2E Testing Mode: beak_access_token is set by E2E login API
+  // E2E Testing Mode: jb_access_token is set by E2E login API
   // Check for E2E cookie BEFORE Supabase auth to avoid unnecessary API calls
   if (e2eToken && e2eUserId) {
     // E2E user is authenticated - use mock user data

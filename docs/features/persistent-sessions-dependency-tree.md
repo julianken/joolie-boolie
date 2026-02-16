@@ -1,7 +1,7 @@
 # Persistent Sessions Feature - Dependency Tree & Issue Structure
 
 **Feature Epic:** Persistent, Rejoinable Game Sessions
-**GitHub Repo:** julianken/beak-gaming-platform
+**GitHub Repo:** julianken/joolie-boolie-platform
 **Plan Document:** [persistent-sessions-refined.md](./persistent-sessions-refined.md)
 
 ---
@@ -911,7 +911,7 @@ Audit and improve accessibility of all session-related UI.
 - [ ] Keyboard navigation works throughout
 - [ ] Screen reader announcements for state changes
 - [ ] Color contrast meets WCAG AA
-- [ ] Touch targets ≥44x44px (senior-friendly)
+- [ ] Touch targets ≥44x44px (accessible)
 - [ ] Error messages associated with form fields
 
 **ELI5:**

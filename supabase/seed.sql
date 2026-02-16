@@ -11,7 +11,7 @@
  */
 
 -- Create E2E test user for Playwright tests
--- Email: e2e-test@beak-gaming.test
+-- Email: e2e-test@joolie-boolie.test
 -- Password: TestPassword123!
 --
 -- This uses Supabase Auth's admin API to create the user with a known password.
@@ -24,7 +24,7 @@ BEGIN
   -- Check if test user already exists
   SELECT id INTO test_user_id
   FROM auth.users
-  WHERE email = 'e2e-test@beak-gaming.test';
+  WHERE email = 'e2e-test@joolie-boolie.test';
 
   -- Only create if user doesn't exist
   IF test_user_id IS NULL THEN
@@ -50,7 +50,7 @@ BEGIN
     VALUES (
       gen_random_uuid(),
       '00000000-0000-0000-0000-000000000000',
-      'e2e-test@beak-gaming.test',
+      'e2e-test@joolie-boolie.test',
       -- Password: TestPassword123!
       -- This is the bcrypt hash for 'TestPassword123!' using Supabase's default bcrypt config
       -- Generated with: SELECT crypt('TestPassword123!', gen_salt('bf'))
@@ -79,14 +79,14 @@ BEGIN
     )
     ON CONFLICT (id) DO NOTHING;
 
-    RAISE NOTICE 'Created E2E test user: e2e-test@beak-gaming.test';
+    RAISE NOTICE 'Created E2E test user: e2e-test@joolie-boolie.test';
   ELSE
-    RAISE NOTICE 'E2E test user already exists: e2e-test@beak-gaming.test';
+    RAISE NOTICE 'E2E test user already exists: e2e-test@joolie-boolie.test';
   END IF;
 END $$;
 
 -- Create real-auth test user for local Supabase E2E tests
--- Email: real-auth-test@beak-gaming.test
+-- Email: real-auth-test@joolie-boolie.test
 -- Password: RealAuthTest123!
 --
 -- This user is used by the `real-auth` Playwright project which runs against
@@ -102,7 +102,7 @@ BEGIN
   -- Check if real-auth test user already exists
   SELECT id INTO real_auth_user_id
   FROM auth.users
-  WHERE email = 'real-auth-test@beak-gaming.test';
+  WHERE email = 'real-auth-test@joolie-boolie.test';
 
   -- Only create if user doesn't exist
   IF real_auth_user_id IS NULL THEN
@@ -127,7 +127,7 @@ BEGIN
     VALUES (
       gen_random_uuid(),
       '00000000-0000-0000-0000-000000000000',
-      'real-auth-test@beak-gaming.test',
+      'real-auth-test@joolie-boolie.test',
       crypt('RealAuthTest123!', gen_salt('bf')),
       NOW(),
       NOW(),
@@ -153,8 +153,8 @@ BEGIN
     )
     ON CONFLICT (id) DO NOTHING;
 
-    RAISE NOTICE 'Created real-auth test user: real-auth-test@beak-gaming.test';
+    RAISE NOTICE 'Created real-auth test user: real-auth-test@joolie-boolie.test';
   ELSE
-    RAISE NOTICE 'Real-auth test user already exists: real-auth-test@beak-gaming.test';
+    RAISE NOTICE 'Real-auth test user already exists: real-auth-test@joolie-boolie.test';
   END IF;
 END $$;

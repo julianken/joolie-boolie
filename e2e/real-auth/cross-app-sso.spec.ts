@@ -73,7 +73,7 @@ test.describe('Cross-App SSO', () => {
 
     // Verify SSO cookies exist
     const hubCookies = await page.context().cookies();
-    const accessToken = hubCookies.find((c) => c.name === 'beak_access_token');
+    const accessToken = hubCookies.find((c) => c.name === 'jb_access_token');
     expect(accessToken).toBeTruthy();
 
     // Step 2: Refresh the Hub page — should stay on dashboard (not redirect to login)
@@ -85,7 +85,7 @@ test.describe('Cross-App SSO', () => {
 
     // Step 3: Copy cookies and verify Bingo accepts them after "refresh" (new navigation)
     const ssoCookies = hubCookies.filter((c) =>
-      ['beak_access_token', 'beak_refresh_token', 'beak_user_id'].includes(c.name)
+      ['jb_access_token', 'jb_refresh_token', 'jb_user_id'].includes(c.name)
     );
 
     // Add cookies for Bingo domain

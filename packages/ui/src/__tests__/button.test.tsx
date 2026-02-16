@@ -55,7 +55,7 @@ describe('Button', () => {
       expect(button.className).toContain('min-h-[64px]');
     });
 
-    it('should meet minimum 44px height for senior-friendly design (sm)', () => {
+    it('should meet minimum 44px height for accessible design (sm)', () => {
       render(<Button size="sm">Small</Button>);
       const button = screen.getByRole('button');
       expect(button.className).toContain('min-h-[44px]');

@@ -77,8 +77,8 @@ export async function POST(request: NextRequest) {
 
     // Check for E2E test session via SSO cookies
     const cookieStore = await cookies();
-    const beakUserId = cookieStore.get('beak_user_id')?.value;
-    const beakAccessToken = cookieStore.get('beak_access_token')?.value;
+    const beakUserId = cookieStore.get('jb_user_id')?.value;
+    const beakAccessToken = cookieStore.get('jb_access_token')?.value;
 
     const isE2ESession =
       process.env.E2E_TESTING === 'true' &&

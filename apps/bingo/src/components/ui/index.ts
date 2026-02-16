@@ -1,8 +1,8 @@
-export { Button } from '@beak-gaming/ui';
-export type { ButtonProps } from '@beak-gaming/ui';
+export { Button } from '@joolie-boolie/ui';
+export type { ButtonProps } from '@joolie-boolie/ui';
 
 export { Toggle } from './Toggle';
 export type { ToggleProps } from './Toggle';
 
-// Slider is now exported from @beak-gaming/ui shared package
-// Import from '@beak-gaming/ui' instead of this module
+// Slider is now exported from @joolie-boolie/ui shared package
+// Import from '@joolie-boolie/ui' instead of this module

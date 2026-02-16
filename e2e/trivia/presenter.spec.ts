@@ -16,7 +16,7 @@ test.describe('Trivia Presenter View', () => {
 
   test.describe('Page Structure', () => {
     test('displays presenter view header', async ({ authenticatedTriviaPage: page }) => {
-      await expect(page.getByRole('heading', { name: /trivia night/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /trivia/i })).toBeVisible();
       await expect(page.getByText(/presenter view/i)).toBeVisible();
     });
 

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Senior-friendly high contrast color palette */
+/* Accessible high contrast color palette */
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
@@ -102,7 +102,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Senior-friendly font sizes (minimum 18px for body text) */
+  /* Accessible font sizes (minimum 18px for body text) */
   --text-base: 1.125rem;       /* 18px - new base */
   --text-lg: 1.25rem;          /* 20px */
   --text-xl: 1.5rem;           /* 24px */

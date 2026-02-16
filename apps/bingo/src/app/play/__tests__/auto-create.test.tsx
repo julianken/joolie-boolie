@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PlayPage from '../page';
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 import {
   getStoredOfflineSessionId,
   clearStoredOfflineSessionId,
@@ -59,7 +59,7 @@ vi.mock('@/hooks/use-sync', () => ({
 
 const mockClearToken = vi.fn();
 
-vi.mock('@beak-gaming/sync', () => ({
+vi.mock('@joolie-boolie/sync', () => ({
   useSessionRecovery: () => ({
     isRecovering: false,
     isRecovered: false,

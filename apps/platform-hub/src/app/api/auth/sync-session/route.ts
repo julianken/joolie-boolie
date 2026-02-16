@@ -6,7 +6,7 @@
  * (e.g., rate limiting, server issues) but client-side Supabase auth succeeds.
  *
  * The client sends the access_token and refresh_token from the Supabase session,
- * and this endpoint verifies the JWT signature before setting the beak_* cookies
+ * and this endpoint verifies the JWT signature before setting the jb_* cookies
  * for middleware verification.
  *
  * Verification chain:
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const cookieDomain = process.env.COOKIE_DOMAIN?.trim() || undefined;
 
     // Set cross-app SSO cookies
-    cookieStore.set('beak_access_token', accessToken, {
+    cookieStore.set('jb_access_token', accessToken, {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax',
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
 
     if (refreshToken) {
-      cookieStore.set('beak_refresh_token', refreshToken, {
+      cookieStore.set('jb_refresh_token', refreshToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // User ID cookie (for client-side access)
-    cookieStore.set('beak_user_id', userId, {
+    cookieStore.set('jb_user_id', userId, {
       httpOnly: false,
       secure: isProduction,
       sameSite: 'lax',

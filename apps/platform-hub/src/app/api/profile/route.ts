@@ -11,7 +11,7 @@ import { getE2EProfile } from '@/lib/e2e-profile-store';
  * - `email` comes from `auth.users` via `supabase.auth.getUser()`
  *
  * E2E Testing:
- * - Detects E2E mode via cookies: beak_access_token, beak_user_id
+ * - Detects E2E mode via cookies: jb_access_token, jb_user_id
  * - Returns profile data from in-memory store in E2E mode
  *
  * @returns {Object} Profile data with facility_name, email
@@ -19,8 +19,8 @@ import { getE2EProfile } from '@/lib/e2e-profile-store';
 export async function GET() {
   // Check for E2E auth via custom SSO cookie (set by /api/auth/login in E2E mode)
   const cookieStore = await cookies();
-  const e2eToken = cookieStore.get('beak_access_token');
-  const e2eUserId = cookieStore.get('beak_user_id');
+  const e2eToken = cookieStore.get('jb_access_token');
+  const e2eUserId = cookieStore.get('jb_user_id');
 
   // E2E Testing Mode: Use in-memory profile store
   const isE2ETesting =

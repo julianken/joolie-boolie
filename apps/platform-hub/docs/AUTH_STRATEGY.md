@@ -2,22 +2,22 @@
 
 ## Executive Summary
 
-**Recommended Approach: Option A - Use @beak-gaming/auth package**
+**Recommended Approach: Option A - Use @joolie-boolie/auth package**
 
-The `@beak-gaming/auth` package is production-ready, already integrated in the app's root layout, and provides all necessary authentication functionality for the LoginForm. This is the optimal solution.
+The `@joolie-boolie/auth` package is production-ready, already integrated in the app's root layout, and provides all necessary authentication functionality for the LoginForm. This is the optimal solution.
 
 ## Analysis
 
 ### Current State
 
-1. **AuthProvider is already configured** in `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/app/layout.tsx` (line 6, 40)
-2. **LoginForm exists** at `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/components/auth/LoginForm.tsx` with placeholder implementation
-3. **Login page exists** at `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/app/login/page.tsx`
-4. **@beak-gaming/auth** is in dependencies and exports 40+ utilities including `useAuth`, `useUser`, `useSession`, and `AuthProvider`
+1. **AuthProvider is already configured** in `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/app/layout.tsx` (line 6, 40)
+2. **LoginForm exists** at `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/components/auth/LoginForm.tsx` with placeholder implementation
+3. **Login page exists** at `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/app/login/page.tsx`
+4. **@joolie-boolie/auth** is in dependencies and exports 40+ utilities including `useAuth`, `useUser`, `useSession`, and `AuthProvider`
 
 ### Options Evaluation
 
-#### ✅ Option A: Use @beak-gaming/auth package (RECOMMENDED)
+#### ✅ Option A: Use @joolie-boolie/auth package (RECOMMENDED)
 
 **Pros:**
 - Already in dependencies (`package.json` line 17)
@@ -40,7 +40,7 @@ The `@beak-gaming/auth` package is production-ready, already integrated in the a
 - Uses existing `lib/supabase/client.ts`
 
 **Cons:**
-- Duplicates code already in @beak-gaming/auth
+- Duplicates code already in @joolie-boolie/auth
 - Violates DRY principle
 - Requires manual error handling
 - Not reusable across other components
@@ -70,11 +70,11 @@ The `@beak-gaming/auth` package is production-ready, already integrated in the a
 
 ### Step 1: Update LoginForm to use useAuth()
 
-**File:** `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/components/auth/LoginForm.tsx`
+**File:** `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/components/auth/LoginForm.tsx`
 
 **Changes needed:**
 
-1. Import `useAuth` hook from `@beak-gaming/auth`
+1. Import `useAuth` hook from `@joolie-boolie/auth`
 2. Replace the `onSubmit` prop pattern with direct hook usage
 3. Remove the placeholder error handling
 4. Use the hook's built-in `isLoading` and `error` states
@@ -85,7 +85,7 @@ Use Next.js `useRouter` to redirect after successful authentication.
 
 ### Step 3: No additional API routes needed
 
-The @beak-gaming/auth package handles all communication with Supabase directly. No BFF routes are needed for authentication.
+The @joolie-boolie/auth package handles all communication with Supabase directly. No BFF routes are needed for authentication.
 
 ## Code Example
 
@@ -97,8 +97,8 @@ Here's the recommended implementation for LoginForm:
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@beak-gaming/ui';
-import { useAuth } from '@beak-gaming/auth';
+import { Button } from '@joolie-boolie/ui';
+import { useAuth } from '@joolie-boolie/auth';
 
 export interface LoginFormProps {
   /** Optional redirect URL after successful login */
@@ -297,12 +297,12 @@ LoginForm.displayName = 'LoginForm';
 
 ### Imports needed:
 ```tsx
-import { useAuth } from '@beak-gaming/auth';
+import { useAuth } from '@joolie-boolie/auth';
 import { useRouter } from 'next/navigation';
 ```
 
 ### No new package dependencies needed:
-- `@beak-gaming/auth` - Already in `package.json`
+- `@joolie-boolie/auth` - Already in `package.json`
 - `next` - Already in `package.json`
 
 ## Environment Variables
@@ -354,7 +354,7 @@ These should already be configured since the `AuthProvider` is wrapped in the ro
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LoginForm } from './LoginForm';
-import { AuthProvider } from '@beak-gaming/auth';
+import { AuthProvider } from '@joolie-boolie/auth';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -433,8 +433,8 @@ Once basic auth is working:
 
 ## References
 
-- **Auth Package README:** `/Users/j/repos/beak-gaming-platform/packages/auth/README.md`
-- **Auth Package Exports:** `/Users/j/repos/beak-gaming-platform/packages/auth/src/index.ts`
-- **useAuth Hook:** `/Users/j/repos/beak-gaming-platform/packages/auth/src/hooks/use-auth.ts`
-- **AuthProvider:** `/Users/j/repos/beak-gaming-platform/packages/auth/src/components/auth-provider.tsx`
-- **Current LoginForm:** `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/components/auth/LoginForm.tsx`
+- **Auth Package README:** `/Users/j/repos/joolie-boolie-platform/packages/auth/README.md`
+- **Auth Package Exports:** `/Users/j/repos/joolie-boolie-platform/packages/auth/src/index.ts`
+- **useAuth Hook:** `/Users/j/repos/joolie-boolie-platform/packages/auth/src/hooks/use-auth.ts`
+- **AuthProvider:** `/Users/j/repos/joolie-boolie-platform/packages/auth/src/components/auth-provider.tsx`
+- **Current LoginForm:** `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/components/auth/LoginForm.tsx`

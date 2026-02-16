@@ -114,7 +114,7 @@ N/A - Infrastructure change, no UI impact
 
 ## Links
 
-- **Linear Issue:** [BEA-407](https://linear.app/beak-gaming/issue/BEA-407)
+- **Linear Issue:** [BEA-407](https://linear.app/joolie-boolie/issue/BEA-407)
 - **Implementation Plan:** `/docs/plans/bea-407-e2e-stability-fix.md`
 - **Verification Checklist:** `/docs/plans/bea-407-verification-checklist.md`
 - **Implementation Summary:** `/docs/plans/bea-407-implementation-summary.md`

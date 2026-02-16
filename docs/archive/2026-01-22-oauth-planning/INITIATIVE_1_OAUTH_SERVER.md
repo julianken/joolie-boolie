@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Transform Platform Hub into a centralized OAuth 2.1 authorization server that provides secure authentication and authorization for all Beak Gaming Platform applications. This initiative establishes the foundation for a production-ready multi-tenant gaming platform with proper session management, security controls, and developer-friendly integration patterns.
+Transform Platform Hub into a centralized OAuth 2.1 authorization server that provides secure authentication and authorization for all Joolie Boolie applications. This initiative establishes the foundation for a production-ready multi-tenant gaming platform with proper session management, security controls, and developer-friendly integration patterns.
 
 ## Current Status
 
@@ -12,10 +12,10 @@ Transform Platform Hub into a centralized OAuth 2.1 authorization server that pr
 - **Last Updated:** 2026-01-21
 
 ### Quick Links
-- [All Initiative 1 Issues](https://linear.app/beak-gaming/initiative/initiative-1)
-- [Project 1.1-1.4: OAuth Server Setup](https://linear.app/beak-gaming/project/oauth-server-setup-configuration)
-- [Project 1.5: Bingo OAuth Integration](https://linear.app/beak-gaming/project/bingo-oauth-client-integration)
-- [Project 1.6: Trivia OAuth Integration](https://linear.app/beak-gaming/project/trivia-oauth-client-integration)
+- [All Initiative 1 Issues](https://linear.app/joolie-boolie/initiative/initiative-1)
+- [Project 1.1-1.4: OAuth Server Setup](https://linear.app/joolie-boolie/project/oauth-server-setup-configuration)
+- [Project 1.5: Bingo OAuth Integration](https://linear.app/joolie-boolie/project/bingo-oauth-client-integration)
+- [Project 1.6: Trivia OAuth Integration](https://linear.app/joolie-boolie/project/trivia-oauth-client-integration)
 
 ### Blockers
 - None (this is the foundational initiative)
@@ -600,7 +600,7 @@ This initiative is complete when:
 
 ## Related Documents
 
-- [Master Plan: Beak Gaming Platform](link-to-master-plan)
+- [Master Plan: Joolie Boolie](link-to-master-plan)
 - [AI Agent Guide: OAuth Development](link-to-agent-guide)
 - [LINEAR_PROJECTS_MANUAL_CREATION.md](../docs/LINEAR_PROJECTS_MANUAL_CREATION.md)
 - [Pull Request Template](../.github/PULL_REQUEST_TEMPLATE.md)

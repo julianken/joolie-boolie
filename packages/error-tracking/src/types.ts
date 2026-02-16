@@ -1,11 +1,11 @@
 /**
- * @beak-gaming/error-tracking types
+ * @joolie-boolie/error-tracking types
  *
  * Centralized type definitions for the error tracking package.
  */
 
 /**
- * Error categories for the Beak Gaming Platform
+ * Error categories for the Joolie Boolie
  */
 export type ErrorCategory =
   | 'network' // Network/API errors

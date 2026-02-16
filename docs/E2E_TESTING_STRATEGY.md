@@ -1,4 +1,4 @@
-# Beak Gaming Platform - E2E Testing Strategy
+# Joolie Boolie - E2E Testing Strategy
 
 **Document Version:** 1.0.0
 **Created:** January 23, 2026
@@ -10,7 +10,7 @@
 
 ### 1.1 Current State Assessment
 
-The Beak Gaming Platform has **288 E2E test cases** across 13 spec files covering Bingo and Trivia applications. However, these tests are **currently DISABLED in CI** due to:
+The Joolie Boolie has **288 E2E test cases** across 13 spec files covering Bingo and Trivia applications. However, these tests are **currently DISABLED in CI** due to:
 
 - **Execution time:** 17+ minutes (target: <5 minutes)
 - **Reliability issues:** Tests not yet stable enough for CI enforcement
@@ -148,14 +148,14 @@ The Beak Gaming Platform has **288 E2E test cases** across 13 spec files coverin
 
 **Current State:** API route exists at `/api/auth/logout` but no UI button
 
-**Location:** `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/components/Header.tsx`
+**Location:** `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/components/Header.tsx`
 
 **Required Changes:**
 
 ```tsx
 // Add to Header.tsx navigation
 // 1. Import useAuth hook
-import { useAuth } from '@beak-gaming/auth';
+import { useAuth } from '@joolie-boolie/auth';
 
 // 2. Add logout handler and conditional rendering
 const Header = () => {
@@ -191,8 +191,8 @@ const Header = () => {
 **Current State:** `LoginButton` component exists but is not rendered in main game UI
 
 **Locations:**
-- `/Users/j/repos/beak-gaming-platform/apps/bingo/src/components/auth/LoginButton.tsx` (exists)
-- `/Users/j/repos/beak-gaming-platform/apps/trivia/src/components/auth/LoginButton.tsx` (exists)
+- `/Users/j/repos/joolie-boolie-platform/apps/bingo/src/components/auth/LoginButton.tsx` (exists)
+- `/Users/j/repos/joolie-boolie-platform/apps/trivia/src/components/auth/LoginButton.tsx` (exists)
 
 **Required Changes:**
 
@@ -283,7 +283,7 @@ type AuthFixtures = {
 export const test = base.extend<AuthFixtures>({
   testUser: async ({}, use) => {
     use({
-      email: 'e2e-test@beak-gaming.test',
+      email: 'e2e-test@joolie-boolie.test',
       password: 'TestPassword123!',
     });
   },
@@ -599,10 +599,10 @@ e2e/
 
 ### 8.3 Related Documentation
 
-- `/Users/j/repos/beak-gaming-platform/CLAUDE.md` - Project overview
-- `/Users/j/repos/beak-gaming-platform/docs/MASTER_PLAN.md` - MVP roadmap
-- `/Users/j/repos/beak-gaming-platform/playwright.config.ts` - Current E2E config
-- `/Users/j/repos/beak-gaming-platform/.github/workflows/e2e.yml` - CI workflow (disabled)
+- `/Users/j/repos/joolie-boolie-platform/CLAUDE.md` - Project overview
+- `/Users/j/repos/joolie-boolie-platform/docs/MASTER_PLAN.md` - MVP roadmap
+- `/Users/j/repos/joolie-boolie-platform/playwright.config.ts` - Current E2E config
+- `/Users/j/repos/joolie-boolie-platform/.github/workflows/e2e.yml` - CI workflow (disabled)
 
 ---
 

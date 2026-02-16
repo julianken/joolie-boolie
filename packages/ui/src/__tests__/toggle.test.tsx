@@ -115,7 +115,7 @@ describe('Toggle', () => {
       expect(toggle.className).toContain('bg-muted');
     });
 
-    it('should have minimum height of 44px for senior-friendly design', () => {
+    it('should have minimum height of 44px for accessible design', () => {
       render(<Toggle {...defaultProps} />);
       const wrapper = screen.getByText('Test Toggle').parentElement;
       expect(wrapper?.className).toContain('min-h-[44px]');

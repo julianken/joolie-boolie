@@ -73,7 +73,7 @@ export default function NotFound() {
                 href={bingoUrl}
                 className="text-lg text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1"
               >
-                Beak Bingo
+                Bingo
               </a>
             </li>
             <li>
@@ -81,7 +81,7 @@ export default function NotFound() {
                 href={triviaUrl}
                 className="text-lg text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1"
               >
-                Trivia Night
+                Trivia
               </a>
             </li>
           </ul>

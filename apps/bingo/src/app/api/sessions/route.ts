@@ -1,6 +1,6 @@
-import { createSessionRoutes } from '@beak-gaming/database/api';
-import { createClient } from '@beak-gaming/database/server';
-import { getApiUser } from '@beak-gaming/auth';
+import { createSessionRoutes } from '@joolie-boolie/database/api';
+import { createClient } from '@joolie-boolie/database/server';
+import { getApiUser } from '@joolie-boolie/auth';
 
 const routes = createSessionRoutes({
   gameType: 'bingo',

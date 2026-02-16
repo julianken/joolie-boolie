@@ -4,7 +4,7 @@ import {
   shouldRefreshToken,
   isTokenExpired,
   refreshTokens,
-} from '@beak-gaming/auth';
+} from '@joolie-boolie/auth';
 
 /**
  * Next.js Middleware for Route Protection
@@ -128,7 +128,7 @@ async function verifyAccessToken(token: string): Promise<boolean> {
   if (sessionSecret) {
     try {
       await jwtVerify(token, sessionSecret, {
-        issuer: 'beak-gaming-platform',
+        issuer: 'joolie-boolie-platform',
         audience: 'authenticated',
       });
       return true;
@@ -169,9 +169,9 @@ function getCookieOptions(maxAge: number) {
  */
 function clearAuthCookies(response: NextResponse) {
   const cookieOptions = getCookieOptions(0);
-  response.cookies.set('beak_access_token', '', cookieOptions);
-  response.cookies.set('beak_refresh_token', '', cookieOptions);
-  response.cookies.set('beak_user_id', '', { ...cookieOptions, httpOnly: false });
+  response.cookies.set('jb_access_token', '', cookieOptions);
+  response.cookies.set('jb_refresh_token', '', cookieOptions);
+  response.cookies.set('jb_user_id', '', { ...cookieOptions, httpOnly: false });
 }
 
 export async function middleware(request: NextRequest) {
@@ -183,8 +183,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check for access token in httpOnly cookie (using cross-app SSO cookie name)
-  const accessToken = request.cookies.get('beak_access_token')?.value;
-  const refreshToken = request.cookies.get('beak_refresh_token')?.value;
+  const accessToken = request.cookies.get('jb_access_token')?.value;
+  const refreshToken = request.cookies.get('jb_refresh_token')?.value;
 
   if (!accessToken) {
     // No token - redirect to login with return path stored
@@ -192,7 +192,7 @@ export async function middleware(request: NextRequest) {
     const response = NextResponse.redirect(loginUrl);
 
     // Store the requested path for post-auth redirect
-    response.cookies.set('beak_return_to', pathname, {
+    response.cookies.set('jb_return_to', pathname, {
       path: '/',
       maxAge: 300, // 5 minutes - expires quickly for security
       httpOnly: false, // Client-side JS needs to read this
@@ -216,8 +216,8 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.next();
       const maxAge = 3600; // 1 hour
 
-      response.cookies.set('beak_access_token', result.accessToken, getCookieOptions(maxAge));
-      response.cookies.set('beak_refresh_token', result.refreshToken, getCookieOptions(maxAge));
+      response.cookies.set('jb_access_token', result.accessToken, getCookieOptions(maxAge));
+      response.cookies.set('jb_refresh_token', result.refreshToken, getCookieOptions(maxAge));
 
       return response;
     } else {
@@ -240,8 +240,8 @@ export async function middleware(request: NextRequest) {
         const response = NextResponse.next();
         const maxAge = 3600; // 1 hour
 
-        response.cookies.set('beak_access_token', result.accessToken, getCookieOptions(maxAge));
-        response.cookies.set('beak_refresh_token', result.refreshToken, getCookieOptions(maxAge));
+        response.cookies.set('jb_access_token', result.accessToken, getCookieOptions(maxAge));
+        response.cookies.set('jb_refresh_token', result.refreshToken, getCookieOptions(maxAge));
 
         return response;
       }
@@ -271,8 +271,8 @@ export async function middleware(request: NextRequest) {
         const response = NextResponse.next();
         const maxAge = 3600; // 1 hour
 
-        response.cookies.set('beak_access_token', result.accessToken, getCookieOptions(maxAge));
-        response.cookies.set('beak_refresh_token', result.refreshToken, getCookieOptions(maxAge));
+        response.cookies.set('jb_access_token', result.accessToken, getCookieOptions(maxAge));
+        response.cookies.set('jb_refresh_token', result.refreshToken, getCookieOptions(maxAge));
 
         return response;
       }

@@ -1,17 +1,17 @@
 /**
  * Sync-related types for the dual-screen system.
  *
- * This module re-exports relevant types from @beak-gaming/sync
+ * This module re-exports relevant types from @joolie-boolie/sync
  * and adds platform-specific sync types.
  */
 
 // =============================================================================
-// RE-EXPORTS FROM @beak-gaming/sync
+// RE-EXPORTS FROM @joolie-boolie/sync
 // =============================================================================
 
 // Note: These types are re-exported for convenience.
-// The canonical definitions live in @beak-gaming/sync.
-// Import from @beak-gaming/sync directly if you need the full sync package.
+// The canonical definitions live in @joolie-boolie/sync.
+// Import from @joolie-boolie/sync directly if you need the full sync package.
 
 /**
  * Sync role in the dual-screen system.

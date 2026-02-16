@@ -1,8 +1,8 @@
-# @beak-gaming/auth
+# @joolie-boolie/auth
 
 **Status:** ✅ Production Ready (95% Complete)
 
-Comprehensive Supabase authentication wrappers for the Beak Gaming Platform. Provides React components, hooks, and utilities for implementing user authentication across all apps.
+Comprehensive Supabase authentication wrappers for the Joolie Boolie. Provides React components, hooks, and utilities for implementing user authentication across all apps.
 
 ## Features
 
@@ -19,7 +19,7 @@ Comprehensive Supabase authentication wrappers for the Beak Gaming Platform. Pro
 ```json
 {
   "dependencies": {
-    "@beak-gaming/auth": "workspace:*"
+    "@joolie-boolie/auth": "workspace:*"
   }
 }
 ```
@@ -30,7 +30,7 @@ Comprehensive Supabase authentication wrappers for the Beak Gaming Platform. Pro
 
 ```tsx
 // app/layout.tsx
-import { AuthProvider } from '@beak-gaming/auth';
+import { AuthProvider } from '@joolie-boolie/auth';
 
 export default function RootLayout({ children }) {
   return (
@@ -49,7 +49,7 @@ export default function RootLayout({ children }) {
 
 ```tsx
 // components/UserProfile.tsx
-import { useAuth, useUser } from '@beak-gaming/auth';
+import { useAuth, useUser } from '@joolie-boolie/auth';
 
 export function UserProfile() {
   const { signOut } = useAuth();
@@ -71,7 +71,7 @@ export function UserProfile() {
 
 ```tsx
 // app/dashboard/layout.tsx
-import { ProtectedRoute } from '@beak-gaming/auth';
+import { ProtectedRoute } from '@joolie-boolie/auth';
 
 export default function DashboardLayout({ children }) {
   return (
@@ -90,7 +90,7 @@ export default function DashboardLayout({ children }) {
 Root authentication provider component. Manages auth state and provides context to child components.
 
 ```tsx
-import { AuthProvider } from '@beak-gaming/auth';
+import { AuthProvider } from '@joolie-boolie/auth';
 
 <AuthProvider>
   <App />
@@ -104,7 +104,7 @@ import { AuthProvider } from '@beak-gaming/auth';
 Wrapper component that redirects unauthenticated users.
 
 ```tsx
-import { ProtectedRoute } from '@beak-gaming/auth';
+import { ProtectedRoute } from '@joolie-boolie/auth';
 
 <ProtectedRoute redirectTo="/login">
   <Dashboard />
@@ -120,7 +120,7 @@ import { ProtectedRoute } from '@beak-gaming/auth';
 Wrapper component that redirects authenticated users.
 
 ```tsx
-import { GuestOnly } from '@beak-gaming/auth';
+import { GuestOnly } from '@joolie-boolie/auth';
 
 <GuestOnly redirectTo="/dashboard">
   <LoginForm />
@@ -135,7 +135,7 @@ import { GuestOnly } from '@beak-gaming/auth';
 Higher-order component for protecting components.
 
 ```tsx
-import { withAuth } from '@beak-gaming/auth';
+import { withAuth } from '@joolie-boolie/auth';
 
 const ProtectedComponent = withAuth(MyComponent, {
   redirectTo: '/login',
@@ -149,7 +149,7 @@ const ProtectedComponent = withAuth(MyComponent, {
 Access authentication actions and state.
 
 ```tsx
-import { useAuth } from '@beak-gaming/auth';
+import { useAuth } from '@joolie-boolie/auth';
 
 function LoginForm() {
   const { signIn, signUp, signOut, isLoading, error } = useAuth();
@@ -175,7 +175,7 @@ function LoginForm() {
 Access current session data.
 
 ```tsx
-import { useSession } from '@beak-gaming/auth';
+import { useSession } from '@joolie-boolie/auth';
 
 function SessionInfo() {
   const { session, isLoading, error } = useSession();
@@ -195,7 +195,7 @@ function SessionInfo() {
 Access current user data.
 
 ```tsx
-import { useUser } from '@beak-gaming/auth';
+import { useUser } from '@joolie-boolie/auth';
 
 function UserGreeting() {
   const { user, isLoading } = useUser();
@@ -218,7 +218,7 @@ function UserGreeting() {
 Create a browser-side Supabase client for client components.
 
 ```tsx
-import { createClient } from '@beak-gaming/auth';
+import { createClient } from '@joolie-boolie/auth';
 
 const supabase = createClient();
 ```
@@ -227,7 +227,7 @@ const supabase = createClient();
 Get the singleton browser client instance.
 
 ```tsx
-import { getClient } from '@beak-gaming/auth';
+import { getClient } from '@joolie-boolie/auth';
 
 const supabase = getClient();
 ```
@@ -236,7 +236,7 @@ const supabase = getClient();
 Reset the singleton client instance (useful for testing).
 
 ```tsx
-import { resetClient } from '@beak-gaming/auth';
+import { resetClient } from '@joolie-boolie/auth';
 
 resetClient();
 ```
@@ -254,7 +254,7 @@ import type {
   SignUpCredentials, // Sign-up parameters
   OAuthProvider,     // OAuth provider types
   AuthConfig,        // Configuration options
-} from '@beak-gaming/auth';
+} from '@joolie-boolie/auth';
 ```
 
 ## Server-Side Usage
@@ -333,6 +333,6 @@ This package provides **client-side authentication utilities only**. For server-
 
 ## Related Packages
 
-- `@beak-gaming/database` - Database utilities and hooks
+- `@joolie-boolie/database` - Database utilities and hooks
 - `@supabase/supabase-js` - Core Supabase client
 - `@supabase/ssr` - Server-side rendering utilities

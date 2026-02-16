@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useMemo } from 'react';
-import { useSyncStore, type SyncRole } from '@beak-gaming/sync';
+import { useSyncStore, type SyncRole } from '@joolie-boolie/sync';
 import { useGameStore } from '@/stores/game-store';
-import { BroadcastSync, type SyncMessage } from '@beak-gaming/sync';
+import { BroadcastSync, type SyncMessage } from '@joolie-boolie/sync';
 import { getChannelName } from '@/lib/sync/session';
 import { GameState, BingoBall, BingoPattern, ThemeMode, AudioSettingsPayload, ThemePayload } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';

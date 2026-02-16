@@ -16,7 +16,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log to console in all environments for global errors
-    console.error('[Trivia Night] Global error:', {
+    console.error('[Trivia] Global error:', {
       message: error.message,
       digest: error.digest,
       stack: error.stack,
@@ -74,7 +74,7 @@ export default function GlobalError({
                 lineHeight: 1.2,
               }}
             >
-              Trivia Night has stopped working
+              Trivia has stopped working
             </h1>
 
             {/* Message */}

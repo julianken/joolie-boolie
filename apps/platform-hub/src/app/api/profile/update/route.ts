@@ -16,8 +16,8 @@ export async function POST(request: Request) {
 
     // Check for E2E auth via custom SSO cookie (set by /api/auth/login in E2E mode)
     const cookieStore = await cookies();
-    const e2eToken = cookieStore.get('beak_access_token');
-    const e2eUserId = cookieStore.get('beak_user_id');
+    const e2eToken = cookieStore.get('jb_access_token');
+    const e2eUserId = cookieStore.get('jb_user_id');
 
     // E2E Testing Mode: Use in-memory profile store
     const isE2ETesting =

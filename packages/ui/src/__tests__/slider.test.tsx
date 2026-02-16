@@ -138,7 +138,7 @@ describe('Slider', () => {
     });
   });
 
-  describe('senior-friendly design', () => {
+  describe('accessible design', () => {
     it('should have visible thumb for easy interaction', () => {
       const { container } = render(<Slider {...defaultProps} />);
       // SliderThumb is rendered with 32x32 inline styles for accessibility
@@ -149,7 +149,7 @@ describe('Slider', () => {
     it('should have label with large readable text', () => {
       render(<Slider {...defaultProps} label="Volume" />);
       const label = screen.getByText('Volume');
-      // Label should have text-lg class for senior-friendly readability
+      // Label should have text-lg class for accessible readability
       expect(label.className).toContain('text-lg');
     });
   });

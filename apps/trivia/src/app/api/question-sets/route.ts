@@ -4,13 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiUser, createAuthenticatedClient } from '@beak-gaming/auth';
+import { getApiUser, createAuthenticatedClient } from '@joolie-boolie/auth';
 import {
   listAllTriviaQuestionSets,
   createTriviaQuestionSet,
-} from '@beak-gaming/database/tables';
-import { isDatabaseError } from '@beak-gaming/database/errors';
-import type { TriviaQuestionSetInsert, TriviaQuestion } from '@beak-gaming/database/types';
+} from '@joolie-boolie/database/tables';
+import { isDatabaseError } from '@joolie-boolie/database/errors';
+import type { TriviaQuestionSetInsert, TriviaQuestion } from '@joolie-boolie/database/types';
 
 /**
  * Validates trivia questions structure

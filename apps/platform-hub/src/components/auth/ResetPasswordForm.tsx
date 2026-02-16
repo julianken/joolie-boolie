@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 export interface ResetPasswordFormProps {
   onSuccess?: () => void;

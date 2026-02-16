@@ -39,7 +39,7 @@ function CallbackHandler() {
 
         // Validate state parameter (CSRF protection)
         // Using cross-app SSO prefix for consistency
-        const storedState = sessionStorage.getItem(`beak_oauth_state_${state}`);
+        const storedState = sessionStorage.getItem(`jb_oauth_state_${state}`);
         if (!storedState || storedState !== state) {
           console.error('State mismatch - possible CSRF attack');
           setError('Security validation failed');
@@ -48,7 +48,7 @@ function CallbackHandler() {
         }
 
         // Retrieve code_verifier from sessionStorage
-        const codeVerifier = sessionStorage.getItem(`beak_pkce_verifier_${state}`);
+        const codeVerifier = sessionStorage.getItem(`jb_pkce_verifier_${state}`);
         if (!codeVerifier) {
           console.error('Missing code_verifier in sessionStorage');
           setError('Session expired - please try again');
@@ -74,12 +74,12 @@ function CallbackHandler() {
         }
 
         // Clean up sessionStorage
-        sessionStorage.removeItem(`beak_pkce_verifier_${state}`);
-        sessionStorage.removeItem(`beak_oauth_state_${state}`);
+        sessionStorage.removeItem(`jb_pkce_verifier_${state}`);
+        sessionStorage.removeItem(`jb_oauth_state_${state}`);
 
         // Redirect to original destination or home
-        const returnTo = sessionStorage.getItem('beak_oauth_return_to') || '/';
-        sessionStorage.removeItem('beak_oauth_return_to');
+        const returnTo = sessionStorage.getItem('jb_oauth_return_to') || '/';
+        sessionStorage.removeItem('jb_oauth_return_to');
         router.push(returnTo);
       } catch (err) {
         console.error('OAuth callback error:', err);

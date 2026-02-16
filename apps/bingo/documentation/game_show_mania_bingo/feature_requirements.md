@@ -31,7 +31,7 @@ Based on what Game Show Mania offers and what facilities expect:
 - [ ] Optional sound effects (ball drop, winner celebration)
 
 ### Display
-- [ ] Large, readable numbers (seniors with vision issues)
+- [ ] Large, readable numbers (users with vision issues)
 - [ ] High contrast mode option
 - [ ] Fullscreen mode
 - [ ] Called numbers board (show all called numbers)

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useSession } from '@beak-gaming/auth';
+import { useSession } from '@joolie-boolie/auth';
 
 /**
  * SessionTimeoutMonitor - Monitors session state and redirects to login when session expires.
@@ -12,7 +12,7 @@ import { useSession } from '@beak-gaming/auth';
  * - Redirects to login page with "session_expired" query parameter
  * - Preserves current path as redirect URL for seamless re-login
  * - Prevents redirect loops (doesn't redirect from login/signup/public pages)
- * - Senior-friendly: Uses clear messaging and simple UX
+ * - Accessible: Uses clear messaging and simple UX
  *
  * Implementation:
  * This component implements Option A (MVP) from BEA-320:

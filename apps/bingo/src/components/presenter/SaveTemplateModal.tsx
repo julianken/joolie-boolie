@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useId } from 'react';
-import { Modal } from "@beak-gaming/ui";
+import { Modal } from "@joolie-boolie/ui";
 import { useGameStore } from '@/stores/game-store';
 import { useAudioStore } from '@/stores/audio-store';
-import { useToast } from "@beak-gaming/ui";
+import { useToast } from "@joolie-boolie/ui";
 
 export interface SaveTemplateModalProps {
   isOpen: boolean;

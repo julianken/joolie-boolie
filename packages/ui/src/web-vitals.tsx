@@ -244,7 +244,7 @@ export function useWebVitals(config: WebVitalsConfig = {}): void {
  * @example
  * ```tsx
  * // In your root layout.tsx
- * import { WebVitals } from '@beak-gaming/ui';
+ * import { WebVitals } from '@joolie-boolie/ui';
  *
  * export default function RootLayout({ children }) {
  *   return (

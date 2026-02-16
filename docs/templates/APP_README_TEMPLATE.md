@@ -15,7 +15,7 @@
 │   4. Delete this instruction block before committing                        │
 │                                                                              │
 │ PLACEHOLDERS TO REPLACE:                                                     │
-│   [APP_NAME]           - Full app name (e.g., "Beak Bingo")                │
+│   [APP_NAME]           - Full app name (e.g., "Bingo")                │
 │   [APP_SLUG]           - Directory name (e.g., "bingo")                     │
 │   [PORT]               - Dev server port (e.g., "3000")                     │
 │   [STATUS]             - Current status (e.g., "✅ Production Ready (85%)") │
@@ -50,7 +50,7 @@
 <!--
   DESCRIPTION INSTRUCTIONS:
   - Write 1-2 sentences describing what this app does
-  - Mention the target audience (e.g., "designed for retirement communities")
+  - Mention the target audience (e.g., "designed for groups and communities")
   - Highlight the key differentiator or use case
   - Example: "A cloud-based, web-accessible Bingo system designed for retirement
     communities. Replaces USB-based solutions with a modern PWA that works offline."
@@ -346,12 +346,12 @@ pnpm vitest src/lib/[MODULE]/__tests__/[FILE].test.ts
 
 This app depends on the following shared packages:
 
-- [`@beak-gaming/sync`](../../packages/sync/README.md) - [Brief description of usage]
-- [`@beak-gaming/ui`](../../packages/ui/README.md) - [Brief description of usage]
-- [`@beak-gaming/theme`](../../packages/theme/README.md) - [Brief description of usage]
-- [`@beak-gaming/database`](../../packages/database/README.md) - [Brief description of usage]
-- [`@beak-gaming/auth`](../../packages/auth/README.md) - [Brief description of usage]
-- [`@beak-gaming/[PACKAGE_NAME]`](../../packages/[PACKAGE_NAME]/README.md) - [Brief description of usage]
+- [`@joolie-boolie/sync`](../../packages/sync/README.md) - [Brief description of usage]
+- [`@joolie-boolie/ui`](../../packages/ui/README.md) - [Brief description of usage]
+- [`@joolie-boolie/theme`](../../packages/theme/README.md) - [Brief description of usage]
+- [`@joolie-boolie/database`](../../packages/database/README.md) - [Brief description of usage]
+- [`@joolie-boolie/auth`](../../packages/auth/README.md) - [Brief description of usage]
+- [`@joolie-boolie/[PACKAGE_NAME]`](../../packages/[PACKAGE_NAME]/README.md) - [Brief description of usage]
 
 ## Integration Status
 
@@ -404,11 +404,11 @@ This app depends on the following shared packages:
   DESIGN REQUIREMENTS INSTRUCTIONS:
   - List key design principles and constraints
   - Include accessibility requirements
-  - Mention senior-friendly considerations if applicable
+  - Mention accessible considerations if applicable
   - Keep these high-level, not implementation details
 -->
 
-- **Senior-friendly:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
+- **Accessible:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
 - **Audience display:** Optimized for projector/large TV, readable from back of room
 - **Touch targets:** Minimum 44x44px for all interactive elements
 - **Color contrast:** WCAG AA compliant for text and interactive elements

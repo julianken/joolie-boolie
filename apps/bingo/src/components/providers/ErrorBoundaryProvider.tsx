@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { ErrorBoundary, logError, configureErrorLogger } from '@beak-gaming/error-tracking';
+import { ErrorBoundary, logError, configureErrorLogger } from '@joolie-boolie/error-tracking';
 
 // Configure error logger for Bingo app
 if (typeof window !== 'undefined') {

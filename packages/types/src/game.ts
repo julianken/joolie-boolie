@@ -1,5 +1,5 @@
 /**
- * Common game-related types shared across the Beak Gaming Platform.
+ * Common game-related types shared across the Joolie Boolie.
  *
  * These types represent the core concepts that are common to all games
  * in the platform (bingo, trivia, etc.).
@@ -25,7 +25,7 @@ export type TriviaGameStatus = GameStatus | 'setup' | 'between_rounds';
 // =============================================================================
 
 /**
- * Available game types in the Beak Gaming Platform.
+ * Available game types in the Joolie Boolie.
  */
 export type GameType = 'bingo' | 'trivia';
 
@@ -33,8 +33,8 @@ export type GameType = 'bingo' | 'trivia';
  * Map of game types to their display names.
  */
 export const GAME_TYPE_NAMES: Record<GameType, string> = {
-  bingo: 'Beak Bingo',
-  trivia: 'Trivia Night',
+  bingo: 'Bingo',
+  trivia: 'Trivia',
 } as const;
 
 // =============================================================================

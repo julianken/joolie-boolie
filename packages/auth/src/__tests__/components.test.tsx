@@ -4,7 +4,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import type { SupabaseClient, Session } from '@supabase/supabase-js';
 import { AuthProvider, AuthContext } from '../components/auth-provider';
 import { ProtectedRoute, withAuth, GuestOnly } from '../components/protected-route';
-import { createMockSupabaseClient, createMockSession } from '@beak-gaming/testing/mocks';
+import { createMockSupabaseClient, createMockSession } from '@joolie-boolie/testing/mocks';
 
 // Create mock client
 let mockClient: ReturnType<typeof createMockSupabaseClient>;

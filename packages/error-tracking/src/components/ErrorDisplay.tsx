@@ -33,7 +33,7 @@ export interface ErrorDisplayProps {
 }
 
 /**
- * Senior-friendly error display component
+ * Accessible error display component
  *
  * Features:
  * - Large, readable text (min 18px)

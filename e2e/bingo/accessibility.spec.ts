@@ -195,7 +195,7 @@ test.describe('Bingo Accessibility', () => {
 
         const box = await button.boundingBox();
         if (box) {
-          // Senior-friendly design requires 44x44px minimum
+          // Accessible design requires 44x44px minimum
           expect(box.width).toBeGreaterThanOrEqual(44);
           expect(box.height).toBeGreaterThanOrEqual(44);
         }

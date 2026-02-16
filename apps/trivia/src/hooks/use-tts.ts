@@ -268,7 +268,7 @@ export function useTTS(): UseTTSReturn {
   );
 
   const announceGameOver = useCallback(() => {
-    speak('Game over! Thank you for playing Trivia Night.');
+    speak('Game over! Thank you for playing Trivia.');
   }, [speak]);
 
   return {

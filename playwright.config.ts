@@ -62,7 +62,7 @@ console.log(`  Hub: http://localhost:${portConfig.hubPort}`);
 export { portConfig };
 
 /**
- * Playwright configuration for Beak Gaming Platform E2E tests.
+ * Playwright configuration for Joolie Boolie E2E tests.
  *
  * Configured with projects for:
  * - Bingo app (dynamic port, default 3000)
@@ -119,7 +119,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         baseURL: `http://localhost:${portConfig.bingoPort}`,
-        /* Viewport optimized for testing senior-friendly UI */
+        /* Viewport optimized for testing accessible UI */
         viewport: { width: 1280, height: 720 },
       },
     },
@@ -201,7 +201,7 @@ export default defineConfig({
   webServer: isCI
     ? [
         {
-          command: 'pnpm --filter @beak-gaming/bingo start',
+          command: 'pnpm --filter @joolie-boolie/bingo start',
           url: `http://localhost:${portConfig.bingoPort}`,
           reuseExistingServer: false,
           timeout: 120 * 1000,
@@ -210,7 +210,7 @@ export default defineConfig({
           env: { E2E_TESTING: 'true', E2E_JWT_SECRET: process.env.E2E_JWT_SECRET ?? 'e2e-test-secret-key-that-is-at-least-32-characters-long', PORT: String(portConfig.bingoPort) },
         },
         {
-          command: 'pnpm --filter @beak-gaming/trivia start',
+          command: 'pnpm --filter @joolie-boolie/trivia start',
           url: `http://localhost:${portConfig.triviaPort}`,
           reuseExistingServer: false,
           timeout: 120 * 1000,
@@ -219,7 +219,7 @@ export default defineConfig({
           env: { E2E_TESTING: 'true', E2E_JWT_SECRET: process.env.E2E_JWT_SECRET ?? 'e2e-test-secret-key-that-is-at-least-32-characters-long', PORT: String(portConfig.triviaPort) },
         },
         {
-          command: 'pnpm --filter @beak-gaming/platform-hub start',
+          command: 'pnpm --filter @joolie-boolie/platform-hub start',
           url: `http://localhost:${portConfig.hubPort}`,
           reuseExistingServer: false,
           timeout: 120 * 1000,

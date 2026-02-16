@@ -122,7 +122,7 @@ The presenter page code expects these API routes that don't exist yet:
 - Customize for Trivia-specific needs
 
 **Steps:**
-1. Use `@beak-gaming/database` package functions:
+1. Use `@joolie-boolie/database` package functions:
    - `createGameSession(supabase, { ... })`
    - `getGameSession(supabase, sessionId)`
    - `updateGameSession(supabase, sessionId, { ... })`

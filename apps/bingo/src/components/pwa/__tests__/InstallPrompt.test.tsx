@@ -67,7 +67,7 @@ describe('InstallPrompt', () => {
     const { container } = render(<InstallPrompt />);
 
     expect(container).toBeEmptyDOMElement();
-    expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
   });
 
   it('does not show when app is already installed (standalone mode)', () => {
@@ -79,7 +79,7 @@ describe('InstallPrompt', () => {
 
     render(<InstallPrompt />);
 
-    expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
   });
 
   describe('beforeinstallprompt event handling', () => {
@@ -94,7 +94,7 @@ describe('InstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install Beak Bingo')).toBeInTheDocument();
+        expect(screen.getByText('Install Bingo')).toBeInTheDocument();
       });
 
       expect(
@@ -179,7 +179,7 @@ describe('InstallPrompt', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Install' }));
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+        expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
       });
     });
 
@@ -206,7 +206,7 @@ describe('InstallPrompt', () => {
       // After dismissal, the deferred prompt is cleared
       // Component should eventually hide since deferredPrompt becomes null
       await waitFor(() => {
-        expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+        expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
       });
     });
   });
@@ -222,13 +222,13 @@ describe('InstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install Beak Bingo')).toBeInTheDocument();
+        expect(screen.getByText('Install Bingo')).toBeInTheDocument();
       });
 
       fireEvent.click(screen.getByRole('button', { name: 'Not now' }));
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+        expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
       });
     });
 
@@ -263,7 +263,7 @@ describe('InstallPrompt', () => {
       });
 
       // Should not show because sessionStorage has dismissal flag
-      expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+      expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
     });
   });
 
@@ -279,7 +279,7 @@ describe('InstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install Beak Bingo')).toBeInTheDocument();
+        expect(screen.getByText('Install Bingo')).toBeInTheDocument();
       });
 
       // Trigger appinstalled event
@@ -289,7 +289,7 @@ describe('InstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+        expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
       });
     });
 
@@ -311,7 +311,7 @@ describe('InstallPrompt', () => {
         handler?.(installEvent);
       });
 
-      expect(screen.queryByText('Install Beak Bingo')).not.toBeInTheDocument();
+      expect(screen.queryByText('Install Bingo')).not.toBeInTheDocument();
     });
   });
 
@@ -326,7 +326,7 @@ describe('InstallPrompt', () => {
       });
 
       await waitFor(() => {
-        const container = screen.getByText('Install Beak Bingo').closest('div.fixed');
+        const container = screen.getByText('Install Bingo').closest('div.fixed');
         expect(container).toHaveClass('fixed', 'bottom-4', 'left-4');
       });
     });

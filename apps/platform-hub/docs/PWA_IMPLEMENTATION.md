@@ -7,8 +7,8 @@ Platform Hub app now has full Progressive Web App support with native Turbopack 
 ## Components
 
 ### 1. PWA Manifest (`/public/manifest.json`)
-- **Name:** "Beak Gaming Platform"
-- **Short name:** "Beak Platform"
+- **Name:** "Joolie Boolie"
+- **Short name:** "Joolie Boolie"
 - **Theme color:** #1e40af (blue-700)
 - **Background color:** #0f172a (slate-900)
 - **Display:** standalone
@@ -38,7 +38,7 @@ React component that:
 - Registers service worker in production only
 - Detects updates and shows update prompt
 - Handles skipWaiting for seamless updates
-- Provides senior-friendly UI (44x44px buttons, 18px+ text)
+- Provides accessible UI (44x44px buttons, 18px+ text)
 - Handles controller changes with reload
 - Prevents duplicate reloads
 
@@ -48,7 +48,7 @@ React component that:
 - Update detection and prompts
 - User interactions
 - Controller change handling
-- Senior-friendly UI verification
+- Accessible UI verification
 
 ### 4. Next.js Configuration (`/next.config.ts`)
 - `serverExternalPackages: ["esbuild-wasm"]` for Serwist Turbopack compilation
@@ -126,9 +126,9 @@ Deploy to Vercel or other production environment:
    - Run Lighthouse in DevTools
    - Check PWA score and recommendations
 
-## Senior-Friendly Design
+## Accessible Design
 
-All PWA UI components follow senior-friendly design principles:
+All PWA UI components follow accessible design principles:
 
 - **Minimum touch targets:** 44x44px buttons
 - **Large readable text:** 18px+ (text-lg or larger)
@@ -166,7 +166,7 @@ Platform Hub PWA implementation matches bingo and trivia apps:
 - ✅ Same ServiceWorkerRegistration component pattern
 - ✅ Same manifest structure
 - ✅ Same test coverage approach
-- ✅ Same senior-friendly design principles
+- ✅ Same accessible design principles
 
 **Differences:**
 - Cache strategies tailored to Platform Hub (auth APIs, dashboard pages)
@@ -184,5 +184,5 @@ Platform Hub PWA implementation is complete and production-ready. All acceptance
 - ✅ Manifest linked in layout
 - ✅ Service worker caches appropriate resources
 - ✅ Works offline after first visit
-- ✅ Senior-friendly design patterns
+- ✅ Accessible design patterns
 - ✅ Comprehensive test coverage (16/16 tests passing)

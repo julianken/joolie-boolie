@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Beak Gaming Platform Hub** - The central entry point for the Beak Gaming Platform. Provides game selection, authentication, and user dashboard.
+**Joolie Boolie Hub** - The central entry point for the Joolie Boolie. Provides game selection, authentication, and user dashboard.
 
 **Current State:** OAuth 2.1 server complete (3,479 lines). Game selector UI complete. User dashboard and settings pages implemented.
 
@@ -21,7 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |-------|------------|
 | Framework | Next.js (App Router) |
 | Frontend | React + Tailwind CSS |
-| Auth | Supabase Auth via @beak-gaming/auth (planned) |
+| Auth | Supabase Auth via @joolie-boolie/auth (planned) |
 | Email | Resend SMTP (bypasses Supabase 2 emails/hour limit) |
 
 ## Implemented Features
@@ -54,9 +54,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Shared Packages
 
-- `@beak-gaming/ui` - Shared UI components (planned usage)
-- `@beak-gaming/theme` - Senior-friendly design tokens (planned usage)
-- `@beak-gaming/auth` - Supabase authentication (planned usage)
+- `@joolie-boolie/ui` - Shared UI components (planned usage)
+- `@joolie-boolie/theme` - Accessible design tokens (planned usage)
+- `@joolie-boolie/auth` - Supabase authentication (planned usage)
 
 ## Key Commands
 
@@ -130,16 +130,16 @@ None - all core routes implemented.
 
 | Service | URL |
 |---------|-----|
-| Platform Hub | `https://beak-gaming.com` |
-| Bingo | `https://bingo.beak-gaming.com` |
-| Trivia | `https://trivia.beak-gaming.com` |
-| OAuth Consent Page | `https://beak-gaming.com/oauth/consent` |
+| Platform Hub | `https://joolie-boolie.com` |
+| Bingo | `https://bingo.joolie-boolie.com` |
+| Trivia | `https://trivia.joolie-boolie.com` |
+| OAuth Consent Page | `https://joolie-boolie.com/oauth/consent` |
 
 ### `NEXT_PUBLIC_PLATFORM_HUB_URL` Environment Variable
 
 The `NEXT_PUBLIC_PLATFORM_HUB_URL` env var controls the base URL used for OAuth `consent_page_url` when registering OAuth clients. This ensures Supabase redirects users to the correct consent page during the OAuth flow.
 
-- **Production (Vercel):** Set to `https://beak-gaming.com`
+- **Production (Vercel):** Set to `https://joolie-boolie.com`
 - **Local development / E2E:** Falls back to `http://localhost:3002` if not set
 
 Used by:

@@ -3,7 +3,7 @@
  * Runs once before all tests to validate test environment.
  *
  * NOTE: Test user creation is handled manually via Supabase dashboard.
- * Expected test user: e2e-test@beak-gaming.test
+ * Expected test user: e2e-test@joolie-boolie.test
  *
  * Environment variables are loaded from .env file by Playwright's config.
  */
@@ -28,7 +28,7 @@ async function globalSetup() {
   }
 
   console.log('[E2E Setup] ✓ Environment validated');
-  console.log('[E2E Setup] ✓ Test user expected: e2e-test@beak-gaming.test');
+  console.log('[E2E Setup] ✓ Test user expected: e2e-test@joolie-boolie.test');
 
   // Health check servers before running tests
   // Port config is shared with playwright.config.ts via e2e/utils/port-config.ts

@@ -1,7 +1,7 @@
 {
-  "name": "Trivia Night - Beak Gaming",
+  "name": "Trivia - Joolie Boolie",
   "short_name": "Trivia",
-  "description": "Presenter-controlled trivia for retirement communities",
+  "description": "Presenter-controlled trivia for groups and communities",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",

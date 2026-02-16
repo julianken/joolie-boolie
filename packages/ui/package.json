@@ -1,5 +1,5 @@
 {
-  "name": "@beak-gaming/ui",
+  "name": "@joolie-boolie/ui",
   "version": "0.2.0",
   "private": true,
   "main": "./src/index.ts",
@@ -31,7 +31,7 @@
     "vitest": "^4.0.17"
   },
   "dependencies": {
-    "@beak-gaming/types": "workspace:*",
+    "@joolie-boolie/types": "workspace:*",
     "react-aria-components": "^1.14.0",
     "web-vitals": "^5.1.0"
   }

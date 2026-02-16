@@ -143,7 +143,7 @@ describe('POST /api/auth/login', () => {
 
     it('should bypass Supabase auth for E2E test email', async () => {
       const request = createLoginRequest({
-        email: 'e2e-test@beak-gaming.test',
+        email: 'e2e-test@joolie-boolie.test',
         password: 'any-password',
       });
 
@@ -154,7 +154,7 @@ describe('POST /api/auth/login', () => {
       expect(data.success).toBe(true);
       expect(data.user).toEqual({
         id: 'e2e-test-user-00000000-0000-0000-0000-000000000000',
-        email: 'e2e-test@beak-gaming.test',
+        email: 'e2e-test@joolie-boolie.test',
       });
 
       // Should NOT call Supabase auth
@@ -163,19 +163,19 @@ describe('POST /api/auth/login', () => {
 
     it('should set SSO cookies in E2E mode', async () => {
       const request = createLoginRequest({
-        email: 'e2e-test@beak-gaming.test',
+        email: 'e2e-test@joolie-boolie.test',
         password: 'any-password',
       });
 
       await POST(request);
 
-      // Should set beak_access_token, beak_refresh_token, beak_user_id
+      // Should set jb_access_token, jb_refresh_token, jb_user_id
       expect(mockCookieStore.set).toHaveBeenCalledTimes(3);
 
       const cookieCalls = mockCookieStore.set.mock.calls;
 
-      // beak_access_token
-      expect(cookieCalls[0][0]).toBe('beak_access_token');
+      // jb_access_token
+      expect(cookieCalls[0][0]).toBe('jb_access_token');
       expect(cookieCalls[0][1]).toBe('mock-e2e-access-token-jwt');
       expect(cookieCalls[0][2]).toMatchObject({
         httpOnly: true,
@@ -183,12 +183,12 @@ describe('POST /api/auth/login', () => {
         path: '/',
       });
 
-      // beak_refresh_token
-      expect(cookieCalls[1][0]).toBe('beak_refresh_token');
+      // jb_refresh_token
+      expect(cookieCalls[1][0]).toBe('jb_refresh_token');
       expect(cookieCalls[1][1]).toBe('e2e-test-refresh-token');
 
-      // beak_user_id
-      expect(cookieCalls[2][0]).toBe('beak_user_id');
+      // jb_user_id
+      expect(cookieCalls[2][0]).toBe('jb_user_id');
       expect(cookieCalls[2][1]).toBe('e2e-test-user-00000000-0000-0000-0000-000000000000');
       expect(cookieCalls[2][2]).toMatchObject({
         httpOnly: false, // client-side accessible
@@ -231,13 +231,13 @@ describe('POST /api/auth/login', () => {
             refresh_token: 'real-refresh',
             expires_in: 3600,
           },
-          user: { id: 'user-123', email: 'e2e-test@beak-gaming.test' },
+          user: { id: 'user-123', email: 'e2e-test@joolie-boolie.test' },
         },
         error: null,
       });
 
       const request = createLoginRequest({
-        email: 'e2e-test@beak-gaming.test',
+        email: 'e2e-test@joolie-boolie.test',
         password: 'password',
       });
 
@@ -298,13 +298,13 @@ describe('POST /api/auth/login', () => {
 
       await POST(request);
 
-      // beak_access_token, beak_refresh_token, beak_user_id
+      // jb_access_token, jb_refresh_token, jb_user_id
       // Plus any cookies that createServerClient's setAll callback sets
       const setCalls = mockCookieStore.set.mock.calls;
       const cookieNames = setCalls.map((call: unknown[]) => call[0]);
-      expect(cookieNames).toContain('beak_access_token');
-      expect(cookieNames).toContain('beak_refresh_token');
-      expect(cookieNames).toContain('beak_user_id');
+      expect(cookieNames).toContain('jb_access_token');
+      expect(cookieNames).toContain('jb_refresh_token');
+      expect(cookieNames).toContain('jb_user_id');
     });
 
     it('should return 401 when Supabase auth fails', async () => {
@@ -392,7 +392,7 @@ describe('POST /api/auth/login', () => {
 
       const setCalls = mockCookieStore.set.mock.calls;
       const refreshCookieCall = setCalls.find(
-        (call: unknown[]) => call[0] === 'beak_refresh_token'
+        (call: unknown[]) => call[0] === 'jb_refresh_token'
       );
       expect(refreshCookieCall).toBeUndefined();
     });
@@ -438,33 +438,33 @@ describe('POST /api/auth/login', () => {
       process.env.E2E_TESTING = 'true';
 
       const request = createLoginRequest({
-        email: 'e2e-test@beak-gaming.test',
+        email: 'e2e-test@joolie-boolie.test',
         password: 'any',
       });
 
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
       expect(accessTokenCall![2]).toMatchObject({ secure: true });
     });
 
     it('should set cookie domain when COOKIE_DOMAIN is configured', async () => {
-      process.env.COOKIE_DOMAIN = '.beak-gaming.com';
+      process.env.COOKIE_DOMAIN = '.joolie-boolie.com';
       process.env.E2E_TESTING = 'true';
 
       const request = createLoginRequest({
-        email: 'e2e-test@beak-gaming.test',
+        email: 'e2e-test@joolie-boolie.test',
         password: 'any',
       });
 
       await POST(request);
 
       const accessTokenCall = mockCookieStore.set.mock.calls.find(
-        (call: unknown[]) => call[0] === 'beak_access_token'
+        (call: unknown[]) => call[0] === 'jb_access_token'
       );
-      expect(accessTokenCall![2]).toMatchObject({ domain: '.beak-gaming.com' });
+      expect(accessTokenCall![2]).toMatchObject({ domain: '.joolie-boolie.com' });
     });
   });
 

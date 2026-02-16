@@ -1,11 +1,11 @@
 'use client';
 
 import { useId, useReducer, useState, useEffect, useRef } from 'react';
-import { Modal } from '@beak-gaming/ui';
-import { useToast } from '@beak-gaming/ui';
+import { Modal } from '@joolie-boolie/ui';
+import { useToast } from '@joolie-boolie/ui';
 import { DEFAULT_CATEGORIES } from '@/lib/categories';
 import type { QuestionCategory } from '@/types';
-import type { TriviaQuestion, TriviaQuestionSet } from '@beak-gaming/database/types';
+import type { TriviaQuestion, TriviaQuestionSet } from '@joolie-boolie/database/types';
 import {
   editorReducer,
   createInitialState,

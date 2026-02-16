@@ -3,8 +3,8 @@
  *
  * Note: These tests use Playwright auth fixtures to create authenticated sessions.
  *
- * The auth fixture handles login and sets required SSO cookies (beak_access_token,
- * beak_user_id) for Platform Hub protected routes.
+ * The auth fixture handles login and sets required SSO cookies (jb_access_token,
+ * jb_user_id) for Platform Hub protected routes.
  */
 
 import { test, expect } from '../fixtures/auth';
@@ -67,7 +67,7 @@ test.describe('Platform Hub Dashboard @high', () => {
 
     // Extract display name from heading
     const headingText = await welcomeHeading.textContent();
-    // Should contain user name (e2e-test based on email e2e-test@beak-gaming.test)
+    // Should contain user name (e2e-test based on email e2e-test@joolie-boolie.test)
     expect(headingText).toMatch(/e2e-test|guest/i);
   });
 
@@ -76,7 +76,7 @@ test.describe('Platform Hub Dashboard @high', () => {
   }) => {
     // Check for Bingo card
     await expect(
-      authenticatedPage.getByRole('heading', { name: /beak bingo/i, level: 3 })
+      authenticatedPage.getByRole('heading', { name: /joolie boolie bingo/i, level: 3 })
     ).toBeVisible();
     await expect(
       authenticatedPage.getByText(/classic 75-ball bingo/i)
@@ -85,7 +85,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     // Check for Trivia card
     await expect(
       authenticatedPage.getByRole('heading', {
-        name: /trivia night/i,
+        name: /trivia/i,
         level: 3,
       })
     ).toBeVisible();
@@ -99,7 +99,7 @@ test.describe('Platform Hub Dashboard @high', () => {
   }) => {
     // Find Bingo link by exact aria-label (case sensitive)
     const bingoLink = authenticatedPage.getByRole('link', {
-      name: 'Play Beak Bingo',
+      name: 'Play Bingo',
     });
     await expect(bingoLink).toBeVisible();
 
@@ -112,7 +112,7 @@ test.describe('Platform Hub Dashboard @high', () => {
   }) => {
     // Find Trivia link by exact aria-label (case sensitive)
     const triviaLink = authenticatedPage.getByRole('link', {
-      name: 'Play Trivia Night',
+      name: 'Play Trivia',
     });
     await expect(triviaLink).toBeVisible();
 
@@ -139,7 +139,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     // Game cards should show play statistics
     // Look for "sessions" or "played" indicators
     const bingoCard = authenticatedPage.locator('article').filter({
-      hasText: 'Beak Bingo',
+      hasText: 'Bingo',
     });
     await expect(bingoCard).toBeVisible();
 
@@ -149,7 +149,7 @@ test.describe('Platform Hub Dashboard @high', () => {
 
     // Verify Trivia card has stats too
     const triviaCard = authenticatedPage.locator('article').filter({
-      hasText: 'Trivia Night',
+      hasText: 'Trivia',
     });
     await expect(triviaCard).toBeVisible();
     const triviaStats = await triviaCard.textContent();
@@ -180,7 +180,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     await page.goto(`${HUB_URL}/login`);
 
     // Fill credentials
-    await page.fill('input[name="email"]', 'e2e-test@beak-gaming.test');
+    await page.fill('input[name="email"]', 'e2e-test@joolie-boolie.test');
     await page.fill('input[name="password"]', 'TestPassword123!');
 
     // Submit

@@ -17,7 +17,7 @@ import { SyncRole } from './types';
 // =============================================================================
 
 /**
- * Supported game types in the Beak Gaming Platform.
+ * Supported game types in the Joolie Boolie.
  */
 export type GameType = 'bingo' | 'trivia';
 
@@ -285,5 +285,5 @@ export function getRoleFromUrl(): SyncRole | null {
  * This ensures different sessions don't interfere with each other.
  */
 export function createChannelName(gameType: GameType, sessionId: string): string {
-  return `beak-${gameType}-${sessionId}`;
+  return `jb-${gameType}-${sessionId}`;
 }

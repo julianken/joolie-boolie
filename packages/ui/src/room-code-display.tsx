@@ -36,7 +36,7 @@ export interface RoomCodeDisplayProps {
  * - Optional QR code button
  * - Optional sync status indicator (saving, last saved time)
  * - Fully accessible with ARIA labels and keyboard support
- * - Senior-friendly design with high contrast
+ * - Accessible design with high contrast
  *
  * @example
  * ```tsx

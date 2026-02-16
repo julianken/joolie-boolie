@@ -1,8 +1,8 @@
-# Beak Bingo
+# Bingo
 
 **Status:** ✅ Production Ready (85% Complete)
 
-A cloud-based, web-accessible Bingo system designed for retirement communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
+A cloud-based, web-accessible Bingo system designed for groups and communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
 
 ## Features
 
@@ -17,7 +17,7 @@ A cloud-based, web-accessible Bingo system designed for retirement communities. 
 - ✅ **Fullscreen Mode** - Optimized for projector/large TV displays
 - ✅ **Room Creation** - Online (Supabase) and offline (localStorage) modes with PIN security
 - ✅ **Keyboard Shortcuts** - Space, P, R, U, M for quick control
-- 🚧 **User Authentication** - Integration with @beak-gaming/auth (pending)
+- 🚧 **User Authentication** - Integration with @joolie-boolie/auth (pending)
 - 🚧 **Saved Game Templates** - Store favorite patterns and settings (pending)
 
 ## Quick Start
@@ -208,22 +208,22 @@ pnpm vitest src/lib/game/__tests__/engine.test.ts
 
 This app depends on the following shared packages:
 
-- [`@beak-gaming/sync`](../../packages/sync/README.md) - BroadcastChannel dual-screen synchronization
-- [`@beak-gaming/ui`](../../packages/ui/README.md) - Button, Toggle, Slider, Card, Modal, Toast components
-- [`@beak-gaming/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing)
-- [`@beak-gaming/database`](../../packages/database/README.md) - Type-safe Supabase client wrappers (268 exports)
-- [`@beak-gaming/auth`](../../packages/auth/README.md) - Supabase authentication wrappers (34 exports) - *not yet integrated*
-- [`@beak-gaming/game-engine`](../../packages/game-engine/README.md) - Abstract game state machine (partial usage)
-- [`@beak-gaming/testing`](../../packages/testing/README.md) - BroadcastChannel and Audio mocks for tests
+- [`@joolie-boolie/sync`](../../packages/sync/README.md) - BroadcastChannel dual-screen synchronization
+- [`@joolie-boolie/ui`](../../packages/ui/README.md) - Button, Toggle, Slider, Card, Modal, Toast components
+- [`@joolie-boolie/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing)
+- [`@joolie-boolie/database`](../../packages/database/README.md) - Type-safe Supabase client wrappers (268 exports)
+- [`@joolie-boolie/auth`](../../packages/auth/README.md) - Supabase authentication wrappers (34 exports) - *not yet integrated*
+- [`@joolie-boolie/game-engine`](../../packages/game-engine/README.md) - Abstract game state machine (partial usage)
+- [`@joolie-boolie/testing`](../../packages/testing/README.md) - BroadcastChannel and Audio mocks for tests
 
 ## Integration Status
 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | **Database** | ✅ Integrated | Session tokens, CRUD helpers, API factories |
-| **Authentication** | ❌ Not Integrated | @beak-gaming/auth ready but not wired up |
+| **Authentication** | ❌ Not Integrated | @joolie-boolie/auth ready but not wired up |
 | **PWA** | ✅ Complete | Service worker, audio caching, offline gameplay |
-| **Dual-Screen Sync** | ✅ Complete | BroadcastChannel API via @beak-gaming/sync |
+| **Dual-Screen Sync** | ✅ Complete | BroadcastChannel API via @joolie-boolie/sync |
 | **Audio System** | ✅ Complete | Voice packs, roll sounds, volume controls, pooling |
 | **Theme System** | ✅ Complete | 10+ themes, light/dark mode, persistence |
 | **Testing** | ✅ Complete | Vitest, Testing Library, BroadcastChannel mocks |
@@ -237,7 +237,7 @@ This app depends on the following shared packages:
 
 ## Future Work
 
-- [ ] User authentication via @beak-gaming/auth
+- [ ] User authentication via @joolie-boolie/auth
 - [ ] Saved game templates (backend storage)
 - [ ] Pattern editor UI
 - [ ] Voice pack selection UI improvements
@@ -246,7 +246,7 @@ This app depends on the following shared packages:
 
 ## Design Requirements
 
-- **Senior-friendly:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
+- **Accessible:** Large fonts (min 18px body), high contrast, large click targets (min 44x44px)
 - **Audience display:** Optimized for projector/large TV, readable from back of room
 - **Touch targets:** Minimum 44x44px for all interactive elements
 - **Color contrast:** WCAG AA compliant for text and interactive elements

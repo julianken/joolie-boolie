@@ -103,7 +103,7 @@ export class ErrorBoundary extends Component<
 }
 
 /**
- * Default fallback component with senior-friendly design
+ * Default fallback component with accessible design
  */
 function DefaultErrorFallback({
   error,

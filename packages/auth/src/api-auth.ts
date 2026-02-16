@@ -5,7 +5,7 @@
  * (Bingo, Trivia). Replaces the broken `supabase.auth.getUser()` pattern
  * which requires Supabase session cookies that don't exist in the OAuth flow.
  *
- * The Platform Hub OAuth flow sets `beak_access_token` cookies containing
+ * The Platform Hub OAuth flow sets `jb_access_token` cookies containing
  * JWTs signed with either SUPABASE_JWT_SECRET or SESSION_TOKEN_SECRET.
  * These utilities verify those JWTs and create RLS-compatible Supabase
  * clients that pass the JWT as an Authorization header.
@@ -74,7 +74,7 @@ function getVerificationChain(): Array<{ secret: Uint8Array; issuer: string }> {
   if (sessionTokenSecret) {
     chain.push({
       secret: new TextEncoder().encode(sessionTokenSecret),
-      issuer: 'beak-gaming-platform',
+      issuer: 'joolie-boolie-platform',
     });
   }
 
@@ -82,7 +82,7 @@ function getVerificationChain(): Array<{ secret: Uint8Array; issuer: string }> {
 }
 
 /**
- * Authenticate an API request by verifying the `beak_access_token` JWT cookie.
+ * Authenticate an API request by verifying the `jb_access_token` JWT cookie.
  *
  * Tries the verification chain: E2E secret -> SUPABASE_JWT_SECRET -> SESSION_TOKEN_SECRET.
  * Returns the user identity (id + email) if the token is valid, or null if not.
@@ -92,7 +92,7 @@ function getVerificationChain(): Array<{ secret: Uint8Array; issuer: string }> {
  *
  * @example
  * ```ts
- * import { getApiUser, createAuthenticatedClient } from '@beak-gaming/auth';
+ * import { getApiUser, createAuthenticatedClient } from '@joolie-boolie/auth';
  *
  * export async function GET(request: NextRequest) {
  *   const user = await getApiUser(request);
@@ -100,7 +100,7 @@ function getVerificationChain(): Array<{ secret: Uint8Array; issuer: string }> {
  *     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  *   }
  *   const supabase = createAuthenticatedClient(
- *     request.cookies.get('beak_access_token')!.value
+ *     request.cookies.get('jb_access_token')!.value
  *   );
  *   // Use supabase client with RLS enforced via auth.uid()...
  * }
@@ -109,7 +109,7 @@ function getVerificationChain(): Array<{ secret: Uint8Array; issuer: string }> {
 export async function getApiUser(request: {
   cookies: { get: (name: string) => { value: string } | undefined };
 }): Promise<ApiUser | null> {
-  const token = request.cookies.get('beak_access_token')?.value;
+  const token = request.cookies.get('jb_access_token')?.value;
   if (!token) return null;
 
   const chain = getVerificationChain();

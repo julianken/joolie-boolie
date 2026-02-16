@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Beak Gaming Platform's E2E testing infrastructure has fundamental issues causing test failures and false success reports. After comprehensive analysis from three parallel investigations (Infrastructure, Workflow, Technical), this document provides a prioritized, actionable plan to achieve reliable E2E testing.
+The Joolie Boolie's E2E testing infrastructure has fundamental issues causing test failures and false success reports. After comprehensive analysis from three parallel investigations (Infrastructure, Workflow, Technical), this document provides a prioritized, actionable plan to achieve reliable E2E testing.
 
 ### Current State
 
@@ -54,7 +54,7 @@ Error: strict mode violation: getByText(/offline session/i) resolved to 2 elemen
 ```
 
 **Files to Modify:**
-- `/Users/j/repos/beak-gaming-platform/e2e/bingo/room-setup.spec.ts`
+- `/Users/j/repos/joolie-boolie-platform/e2e/bingo/room-setup.spec.ts`
 
 **Specific Changes:**
 
@@ -89,7 +89,7 @@ expect(focused).toBe('BUTTON'); // Actually 'SELECT'
 ```
 
 **Files to Modify:**
-- `/Users/j/repos/beak-gaming-platform/e2e/bingo/room-setup.spec.ts` (line ~499)
+- `/Users/j/repos/joolie-boolie-platform/e2e/bingo/room-setup.spec.ts` (line ~499)
 
 **Option A - Update Test Expectation (Fastest):**
 ```typescript
@@ -136,7 +136,7 @@ Error: page.reload: net::ERR_INTERNET_DISCONNECTED
 **Already Done:** Looking at the test file, these tests are already marked with `test.skip`. Verify they have proper skip comments.
 
 **Files to Verify:**
-- `/Users/j/repos/beak-gaming-platform/e2e/bingo/room-setup.spec.ts` lines 189, 442
+- `/Users/j/repos/joolie-boolie-platform/e2e/bingo/room-setup.spec.ts` lines 189, 442
 
 **Ensure Skip Comments Are Clear:**
 ```typescript
@@ -165,8 +165,8 @@ pnpm test:e2e --headed -g "should persist offline session in localStorage"
 The offline session save effect in `apps/bingo/src/app/play/page.tsx` may have timing issues.
 
 **Files to Investigate:**
-- `/Users/j/repos/beak-gaming-platform/apps/bingo/src/app/play/page.tsx` (lines 244-260)
-- `/Users/j/repos/beak-gaming-platform/apps/bingo/src/lib/session/serializer.ts`
+- `/Users/j/repos/joolie-boolie-platform/apps/bingo/src/app/play/page.tsx` (lines 244-260)
+- `/Users/j/repos/joolie-boolie-platform/apps/bingo/src/lib/session/serializer.ts`
 
 **Likely Fix Pattern:**
 ```typescript
@@ -209,7 +209,7 @@ pnpm test:e2e -g "should persist offline session in localStorage"
 curl -X POST 'https://iivxpjhmnalsuvpdzgza.supabase.co/auth/v1/token?grant_type=password' \
   -H 'apikey: sb_publishable_LvRIpm-i3o17HecBwfQckg_wTVe8WPM' \
   -H 'Content-Type: application/json' \
-  -d '{"email":"e2e-test@beak-gaming.test","password":"TestPassword123!"}'
+  -d '{"email":"e2e-test@joolie-boolie.test","password":"TestPassword123!"}'
 ```
 
 **If User Missing, Create via Supabase Dashboard or SQL:**
@@ -231,7 +231,7 @@ INSERT INTO auth.users (
 VALUES (
   gen_random_uuid(),
   '00000000-0000-0000-0000-000000000000',
-  'e2e-test@beak-gaming.test',
+  'e2e-test@joolie-boolie.test',
   crypt('TestPassword123!', gen_salt('bf')),
   now(),
   now(),
@@ -298,7 +298,7 @@ import { test, expect } from '../fixtures/auth';
 export const test = base.extend<AuthFixtures & GameAuthFixtures>({
   testUser: async ({}, use) => {
     await use({
-      email: process.env.TEST_USER_EMAIL || 'e2e-test@beak-gaming.test',
+      email: process.env.TEST_USER_EMAIL || 'e2e-test@joolie-boolie.test',
       password: process.env.TEST_USER_PASSWORD || 'TestPassword123!',
     });
   },
@@ -344,7 +344,7 @@ USING (is_public = true);
 **Solution:** Add test mode header that bypasses rate limiting.
 
 **Files to Modify:**
-- `/Users/j/repos/beak-gaming-platform/apps/platform-hub/src/middleware.ts`
+- `/Users/j/repos/joolie-boolie-platform/apps/platform-hub/src/middleware.ts`
 
 **Implementation:**
 ```typescript
@@ -420,7 +420,7 @@ useEffect(() => {
 
 ### 3.1 Update PR Template with E2E Checklist (Priority: P1)
 
-**File:** `/Users/j/repos/beak-gaming-platform/.github/PULL_REQUEST_TEMPLATE.md`
+**File:** `/Users/j/repos/joolie-boolie-platform/.github/PULL_REQUEST_TEMPLATE.md`
 
 **Add Section:**
 ```markdown
@@ -459,7 +459,7 @@ Test Results Summary:
 
 ### 3.2 Create E2E Verification Script (Priority: P2)
 
-**File:** `/Users/j/repos/beak-gaming-platform/scripts/verify-e2e.sh`
+**File:** `/Users/j/repos/joolie-boolie-platform/scripts/verify-e2e.sh`
 
 ```bash
 #!/bin/bash
@@ -572,7 +572,7 @@ Already present in CLAUDE.md, but enhance the section:
 
 Update the subagent workflow skill to enforce E2E:
 
-**File:** `/Users/j/repos/beak-gaming-platform/.claude/skills/subagent-workflow/SKILL.md`
+**File:** `/Users/j/repos/joolie-boolie-platform/.claude/skills/subagent-workflow/SKILL.md`
 
 **Add E2E Enforcement Section:**
 ```markdown

@@ -17,7 +17,7 @@ export interface AvatarProps extends HTMLAttributes<HTMLDivElement> {
  * Avatar component with fallback to initials
  *
  * Displays user avatar image or falls back to colored circle with initials.
- * Follows senior-friendly design with clear visibility.
+ * Follows accessible design with clear visibility.
  */
 export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
   ({ src, name = '', size = 'md', alt, className = '', ...props }, ref) => {

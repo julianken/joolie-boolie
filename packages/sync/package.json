@@ -1,5 +1,5 @@
 {
-  "name": "@beak-gaming/sync",
+  "name": "@joolie-boolie/sync",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -19,7 +19,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
-    "@beak-gaming/testing": "workspace:*",
+    "@joolie-boolie/testing": "workspace:*",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19",

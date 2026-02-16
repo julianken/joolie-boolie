@@ -60,8 +60,8 @@ Examples:
 
 ### Directory Structure
 ```
-/Users/j/repos/beak-gaming-platform/           # Main repo
-/Users/j/repos/beak-gaming-platform-worktrees/ # Worktree root
+/Users/j/repos/joolie-boolie-platform/           # Main repo
+/Users/j/repos/joolie-boolie-platform-worktrees/ # Worktree root
   ├── worktree-110-secure-generation/
   ├── worktree-115-room-modal/
   ├── worktree-111-session-id-strategy/
@@ -70,12 +70,12 @@ Examples:
 
 ### Worktree Creation Command
 ```bash
-git worktree add ../beak-gaming-platform-worktrees/worktree-<issue>-<slug> -b issue-<issue>-<slug>
+git worktree add ../joolie-boolie-platform-worktrees/worktree-<issue>-<slug> -b issue-<issue>-<slug>
 ```
 
 ### Cleanup Command
 ```bash
-git worktree remove ../beak-gaming-platform-worktrees/worktree-<issue>-<slug>
+git worktree remove ../joolie-boolie-platform-worktrees/worktree-<issue>-<slug>
 git branch -D issue-<issue>-<slug>
 ```
 
@@ -96,7 +96,7 @@ gh issue edit <issue_number> --add-assignee "@me"
 ### Step 3: Create Worktree
 ```bash
 # From main repo directory
-git worktree add ../beak-gaming-platform-worktrees/worktree-<issue>-<slug> -b issue-<issue>-<slug>
+git worktree add ../joolie-boolie-platform-worktrees/worktree-<issue>-<slug> -b issue-<issue>-<slug>
 ```
 
 ### Step 4: Dispatch Background Agent
@@ -105,7 +105,7 @@ git worktree add ../beak-gaming-platform-worktrees/worktree-<issue>-<slug> -b is
 Task(
   subagent_type="general-purpose",
   description="Implement issue #<number>",
-  prompt="Navigate to /Users/j/repos/beak-gaming-platform-worktrees/worktree-<issue>-<slug>
+  prompt="Navigate to /Users/j/repos/joolie-boolie-platform-worktrees/worktree-<issue>-<slug>
 
 Read the issue details from GitHub:
 gh issue view <issue_number>
@@ -204,8 +204,8 @@ gh issue close <issue_number> --comment "Completed in PR #<pr_number>"
 
 ### Step 6: Cleanup Worktree
 ```bash
-cd /Users/j/repos/beak-gaming-platform
-git worktree remove ../beak-gaming-platform-worktrees/worktree-<issue>-<slug>
+cd /Users/j/repos/joolie-boolie-platform
+git worktree remove ../joolie-boolie-platform-worktrees/worktree-<issue>-<slug>
 ```
 
 ---
@@ -271,7 +271,7 @@ WHILE (incomplete issues exist):
 
 **Task 1.1: Create worktree root directory**
 ```bash
-mkdir -p /Users/j/repos/beak-gaming-platform-worktrees
+mkdir -p /Users/j/repos/joolie-boolie-platform-worktrees
 ```
 
 **Task 1.2: Verify all issues exist**
@@ -283,7 +283,7 @@ done
 
 **Task 1.3: Check current branch and ensure clean state**
 ```bash
-cd /Users/j/repos/beak-gaming-platform
+cd /Users/j/repos/joolie-boolie-platform
 git status
 git pull origin main
 ```
@@ -294,7 +294,7 @@ git pull origin main
 
 Create worktree:
 ```bash
-git worktree add ../beak-gaming-platform-worktrees/worktree-110-secure-generation -b issue-110-secure-generation
+git worktree add ../joolie-boolie-platform-worktrees/worktree-110-secure-generation -b issue-110-secure-generation
 ```
 
 Assign issue:
@@ -309,7 +309,7 @@ Task(
   description="Implement #110 secure generation",
   prompt="You are implementing Issue #110: Create Secure Generation Utilities
 
-Working directory: /Users/j/repos/beak-gaming-platform-worktrees/worktree-110-secure-generation
+Working directory: /Users/j/repos/joolie-boolie-platform-worktrees/worktree-110-secure-generation
 
 Read the full issue:
 gh issue view 110
@@ -357,7 +357,7 @@ EOF
 
 Create worktree:
 ```bash
-git worktree add ../beak-gaming-platform-worktrees/worktree-115-room-modal -b issue-115-room-modal
+git worktree add ../joolie-boolie-platform-worktrees/worktree-115-room-modal -b issue-115-room-modal
 ```
 
 Assign issue:
@@ -372,7 +372,7 @@ Task(
   description="Implement #115 room modal",
   prompt="You are implementing Issue #115: Create Room Setup Modal Component
 
-Working directory: /Users/j/repos/beak-gaming-platform-worktrees/worktree-115-room-modal
+Working directory: /Users/j/repos/joolie-boolie-platform-worktrees/worktree-115-room-modal
 
 Read the full issue:
 gh issue view 115
@@ -380,7 +380,7 @@ gh issue view 115
 Implementation requirements:
 1. Create: apps/bingo/src/components/presenter/RoomSetupModal.tsx
 2. Three options: Create New Game, Join Existing, Play Offline
-3. Senior-friendly UI (large text, high contrast, 44x44px touch targets)
+3. Accessible UI (large text, high contrast, 44x44px touch targets)
 4. Accessibility (keyboard nav, ARIA labels)
 5. Write component tests
 
@@ -433,8 +433,8 @@ Merge:
 ```bash
 gh pr merge <pr_number> --squash --delete-branch
 gh issue close 110 --comment "Completed in PR #<pr_number>"
-cd /Users/j/repos/beak-gaming-platform
-git worktree remove ../beak-gaming-platform-worktrees/worktree-110-secure-generation
+cd /Users/j/repos/joolie-boolie-platform
+git worktree remove ../joolie-boolie-platform-worktrees/worktree-110-secure-generation
 git pull origin main
 ```
 

@@ -223,7 +223,7 @@ test.describe('Trivia Session Flow', () => {
       await displayPage.waitForLoadState('networkidle');
       await waitForDualScreenSync(displayPage);
 
-      await expect(displayPage.getByText(/trivia night/i)).toBeVisible({ timeout: 10000 });
+      await expect(displayPage.getByText(/trivia/i)).toBeVisible({ timeout: 10000 });
 
       await clickButton(page, /start game/i);
       await expect(page.getByText(/playing/i).first()).toBeVisible();
@@ -263,7 +263,7 @@ test.describe('Trivia Session Flow', () => {
         await plusButton.click();
       }
 
-      await expect(displayPage.getByText(/trivia night/i)).toBeVisible({ timeout: 10000 });
+      await expect(displayPage.getByText(/trivia/i)).toBeVisible({ timeout: 10000 });
 
       await displayPage.close();
     });
@@ -292,7 +292,7 @@ test.describe('Trivia Session Flow', () => {
 
       await expect(async () => {
         const displayContent = await displayPage.locator('main').textContent();
-        const hasBranding = displayContent?.includes('Trivia Night');
+        const hasBranding = displayContent?.includes('Trivia');
         expect(hasBranding).toBe(true);
       }).toPass({ timeout: 10000 });
 
@@ -476,7 +476,7 @@ test.describe('Trivia Session Flow', () => {
 
       await displayPage.waitForLoadState('networkidle');
 
-      await expect(displayPage.getByText(/trivia night/i)).toBeVisible({ timeout: 10000 });
+      await expect(displayPage.getByText(/trivia/i)).toBeVisible({ timeout: 10000 });
 
       const displayUrl = displayPage.url();
       expect(displayUrl).toContain('/display?offline=');

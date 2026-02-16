@@ -1,5 +1,5 @@
 /**
- * API request and response types shared across the Beak Gaming Platform.
+ * API request and response types shared across the Joolie Boolie.
  *
  * These types provide a consistent interface for all API interactions.
  */

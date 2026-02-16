@@ -1,7 +1,7 @@
 /**
  * Game Statistics Types
  *
- * Shared types for tracking game statistics across all games in the Beak Gaming Platform.
+ * Shared types for tracking game statistics across all games in the Joolie Boolie.
  */
 
 // =============================================================================
@@ -160,8 +160,8 @@ export interface TriviaStatistics extends BaseGameStatistics {
  * Storage keys for localStorage persistence.
  */
 export const STORAGE_KEYS = {
-  BINGO_STATS: 'beak-gaming:bingo-statistics',
-  TRIVIA_STATS: 'beak-gaming:trivia-statistics',
+  BINGO_STATS: 'jb:bingo-statistics',
+  TRIVIA_STATS: 'jb:trivia-statistics',
 } as const;
 
 /**

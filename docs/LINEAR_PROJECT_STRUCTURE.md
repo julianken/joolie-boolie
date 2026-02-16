@@ -1,4 +1,4 @@
-# Linear Project Structure - Beak Gaming Platform
+# Linear Project Structure - Joolie Boolie
 
 **Document Version:** 1.0
 **Created:** 2026-01-22
@@ -49,8 +49,8 @@
 ### Linear Organization Model
 
 ```
-Workspace: Beak Gaming
-├── Team: BEA (Beak Engineering)
+Workspace: Joolie Boolie
+├── Team: BEA (Joolie Boolie Engineering)
 ├── Initiative: MVP Launch (Strategic)
 │   ├── Project: Security Remediation (Critical)
 │   ├── Project: Test Fixes (Critical)
@@ -307,10 +307,10 @@ Labels are organized into groups with consistent prefixes:
 | `app:bingo` | Blue (#3B82F6) | Bingo app |
 | `app:trivia` | Green (#22C55E) | Trivia app |
 | `app:platform-hub` | Purple (#A855F7) | Platform Hub |
-| `pkg:auth` | Orange (#F97316) | @beak-gaming/auth package |
-| `pkg:database` | Yellow (#EAB308) | @beak-gaming/database package |
-| `pkg:ui` | Pink (#EC4899) | @beak-gaming/ui package |
-| `pkg:sync` | Cyan (#06B6D4) | @beak-gaming/sync package |
+| `pkg:auth` | Orange (#F97316) | @joolie-boolie/auth package |
+| `pkg:database` | Yellow (#EAB308) | @joolie-boolie/database package |
+| `pkg:ui` | Pink (#EC4899) | @joolie-boolie/ui package |
+| `pkg:sync` | Cyan (#06B6D4) | @joolie-boolie/sync package |
 | `db:supabase` | Emerald (#10B981) | Database-level changes |
 
 #### Status Labels (Optional, workflow-based)
@@ -629,7 +629,7 @@ Related:
 
 ```yaml
 Issue ID: MED-1
-Title: Extract duplicate OAuth client code to @beak-gaming/auth package
+Title: Extract duplicate OAuth client code to @joolie-boolie/auth package
 Project: Code Consolidation
 Type: Tech Debt
 Severity: Medium
@@ -654,15 +654,15 @@ Description: |
   ## Solution
   1. Create `packages/auth/src/oauth-client.ts` with shared code
   2. Parameterize app-specific values (app name, storage keys)
-  3. Export from `@beak-gaming/auth` package
+  3. Export from `@joolie-boolie/auth` package
   4. Update Bingo to import from package
   5. Update Trivia to import from package
   6. Delete duplicate files from apps
 
   ## Acceptance Criteria
-  - [ ] Single OAuth client implementation in @beak-gaming/auth
-  - [ ] Bingo imports from @beak-gaming/auth
-  - [ ] Trivia imports from @beak-gaming/auth
+  - [ ] Single OAuth client implementation in @joolie-boolie/auth
+  - [ ] Bingo imports from @joolie-boolie/auth
+  - [ ] Trivia imports from @joolie-boolie/auth
   - [ ] No duplicate auth files in apps
   - [ ] All OAuth tests pass
   - [ ] OAuth flow works end-to-end in both apps
@@ -681,8 +681,8 @@ Description: |
   # Expected: Function defined in package
 
   # Verify apps use package
-  grep -r "@beak-gaming/auth" apps/bingo/src/
-  grep -r "@beak-gaming/auth" apps/trivia/src/
+  grep -r "@joolie-boolie/auth" apps/bingo/src/
+  grep -r "@joolie-boolie/auth" apps/trivia/src/
   # Expected: Import statements found
   ```
 
@@ -1209,7 +1209,7 @@ find apps -name "[filename]"
 
 | ID | Title | Severity | Type | Component | Blocks |
 |----|-------|----------|------|-----------|--------|
-| MED-1 | Extract OAuth to @beak-gaming/auth | Medium | Tech Debt | pkg:auth | none |
+| MED-1 | Extract OAuth to @joolie-boolie/auth | Medium | Tech Debt | pkg:auth | none |
 | MED-2 | Consolidate Toast component | Medium | Tech Debt | pkg:ui | none |
 | MED-3 | Consolidate Button/Modal | Medium | Tech Debt | pkg:ui | none |
 | MED-4 | Complete Platform Hub dashboard | Medium | Feature | app:platform-hub | none |

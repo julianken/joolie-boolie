@@ -47,7 +47,7 @@ export interface RealAuthFixtures {
 async function copySSOCookiesToDomain(page: Page, targetUrl: string): Promise<void> {
   const cookies = await page.context().cookies();
   const ssoCookies = cookies.filter((c) =>
-    ['beak_access_token', 'beak_refresh_token', 'beak_user_id'].includes(c.name)
+    ['jb_access_token', 'jb_refresh_token', 'jb_user_id'].includes(c.name)
   );
 
   if (ssoCookies.length > 0) {
@@ -111,7 +111,7 @@ async function loginViaPlatformHub(
   // Wait for SSO cookies to be set
   await playwrightExpect(async () => {
     const cookies = await page.context().cookies();
-    const hasToken = cookies.some((c) => c.name === 'beak_access_token');
+    const hasToken = cookies.some((c) => c.name === 'jb_access_token');
     playwrightExpect(hasToken).toBe(true);
   }).toPass({
     timeout: 10_000,
@@ -157,7 +157,7 @@ async function dismissRoomSetupModal(page: Page): Promise<void> {
 export const test = base.extend<RealAuthFixtures>({
   realTestUser: async ({}, use) => {
     await use({
-      email: 'real-auth-test@beak-gaming.test',
+      email: 'real-auth-test@joolie-boolie.test',
       password: 'RealAuthTest123!',
     });
   },

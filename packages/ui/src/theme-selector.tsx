@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useCallback } from 'react';
-import type { ThemeMode } from '@beak-gaming/types';
+import type { ThemeMode } from '@joolie-boolie/types';
 
 /**
  * Theme option for the selector dropdown.
@@ -44,7 +44,7 @@ export interface ThemeSelectorProps {
  *
  * @example
  * ```tsx
- * import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '@beak-gaming/ui';
+ * import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '@joolie-boolie/ui';
  * import { useThemeStore } from '@/stores/theme-store';
  *
  * function SettingsPanel() {

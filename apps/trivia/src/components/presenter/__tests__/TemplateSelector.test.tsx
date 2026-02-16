@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { TemplateSelector } from '../TemplateSelector';
-import { ToastProvider } from "@beak-gaming/ui";
-import type { TriviaTemplate } from '@beak-gaming/database/types';
+import { ToastProvider } from "@joolie-boolie/ui";
+import type { TriviaTemplate } from '@joolie-boolie/database/types';
 
 // Mock fetch globally
 global.fetch = vi.fn();

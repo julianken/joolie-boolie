@@ -6,7 +6,7 @@
  *
  * @example
  * ```ts
- * import { createServerClient } from '@beak-gaming/database/server';
+ * import { createServerClient } from '@joolie-boolie/database/server';
  *
  * export async function GET() {
  *   const supabase = await createServerClient();
@@ -80,7 +80,7 @@ function validateEnvVariables(): { url: string; anonKey: string } {
  * @example
  * ```ts
  * // In an API route
- * import { createServerClient } from '@beak-gaming/database/server';
+ * import { createServerClient } from '@joolie-boolie/database/server';
  *
  * export async function GET() {
  *   const supabase = await createServerClient();
@@ -132,7 +132,7 @@ export async function createServerClient() {
  * @example
  * ```ts
  * // In a server-only admin script
- * import { createServiceRoleClient } from '@beak-gaming/database/server';
+ * import { createServiceRoleClient } from '@joolie-boolie/database/server';
  *
  * const adminClient = createServiceRoleClient();
  * // Can perform any database operation, bypassing RLS

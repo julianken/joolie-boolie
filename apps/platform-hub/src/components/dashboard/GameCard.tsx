@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, forwardRef, AnchorHTMLAttributes } from 'react';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 export interface DashboardGameCardProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
@@ -24,7 +24,7 @@ export interface DashboardGameCardProps
 /**
  * DashboardGameCard - A compact card for quick access to games from the dashboard.
  * Shows game info with last played status and quick launch button.
- * Designed for senior users with large touch targets and clear visual hierarchy.
+ * Designed for users with large touch targets and clear visual hierarchy.
  */
 export const DashboardGameCard = forwardRef<HTMLAnchorElement, DashboardGameCardProps>(
   (

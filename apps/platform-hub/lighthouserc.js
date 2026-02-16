@@ -7,7 +7,7 @@
  * Usage:
  *   pnpm lighthouse:hub
  *   # or from monorepo root:
- *   pnpm --filter @beak-gaming/platform-hub lighthouse
+ *   pnpm --filter @joolie-boolie/platform-hub lighthouse
  */
 
 const path = require('path');

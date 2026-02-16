@@ -10,9 +10,9 @@
 
 | Task | Type | Status | Branch | PR | Agent | Notes |
 |------|------|--------|--------|----|----|-------|
-| BEA-TMP-4 | Backend | ✅ Merged | `phase2/bea-tmp-4-trivia-api-routes` | [#173](https://github.com/julianken/beak-gaming-platform/pull/173) | ad12104 | Merged as 25713da - 29 tests passing |
-| BEA-TMP-5 | Frontend | ✅ Merged | `phase2/bea-tmp-5-trivia-ui-components` | [#174](https://github.com/julianken/beak-gaming-platform/pull/174) | aec7c30 | Merged as ce82239 - 23 tests (18 passing) |
-| BEA-TMP-6 | Integration | ✅ Merged | `phase2/bea-tmp-6-trivia-integration` | [#175](https://github.com/julianken/beak-gaming-platform/pull/175) | a0cf411 | Merged as b586049 - 3 integration tests passing |
+| BEA-TMP-4 | Backend | ✅ Merged | `phase2/bea-tmp-4-trivia-api-routes` | [#173](https://github.com/julianken/joolie-boolie-platform/pull/173) | ad12104 | Merged as 25713da - 29 tests passing |
+| BEA-TMP-5 | Frontend | ✅ Merged | `phase2/bea-tmp-5-trivia-ui-components` | [#174](https://github.com/julianken/joolie-boolie-platform/pull/174) | aec7c30 | Merged as ce82239 - 23 tests (18 passing) |
+| BEA-TMP-6 | Integration | ✅ Merged | `phase2/bea-tmp-6-trivia-integration` | [#175](https://github.com/julianken/joolie-boolie-platform/pull/175) | a0cf411 | Merged as b586049 - 3 integration tests passing |
 
 **Legend**:
 - ⚪ Blocked (waiting on dependencies)
@@ -120,7 +120,7 @@ BEA-TMP-5 (UI Components) ┘
 - UI: `/apps/bingo/src/components/presenter/SaveTemplateModal.tsx`
 - Integration: `/apps/bingo/src/components/presenter/RoomSetupModal.tsx`
 
-**Database Package**: `@beak-gaming/database`
+**Database Package**: `@joolie-boolie/database`
 - Functions: `createTriviaTemplate`, `listAllTriviaTemplates`, `updateTriviaTemplate`, `deleteTriviaTemplate`, etc.
 - Location: `/packages/database/src/tables/trivia-templates.ts`
 
@@ -196,8 +196,8 @@ BEA-TMP-5 (UI Components) ┘
 ### Technical Achievements
 
 - ✅ Question conversion between database and app formats (no bugs!)
-- ✅ Proper type safety with @beak-gaming/database types
-- ✅ Senior-friendly UI (large fonts, touch targets, high contrast)
+- ✅ Proper type safety with @joolie-boolie/database types
+- ✅ Accessible UI (large fonts, touch targets, high contrast)
 - ✅ Comprehensive error handling and loading states
 - ✅ Follows established patterns from Bingo implementation
 - ✅ No unit conversion bugs (learned from Bingo Phase 1)

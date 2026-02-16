@@ -1,7 +1,7 @@
 /**
- * @beak-gaming/types
+ * @joolie-boolie/types
  *
- * Shared TypeScript types for the Beak Gaming Platform.
+ * Shared TypeScript types for the Joolie Boolie.
  *
  * This package provides common types used across the monorepo, including:
  * - Game types (GameStatus, GameType, GameSession)
@@ -10,11 +10,11 @@
  * - Sync types (SyncRole, SyncMessage)
  *
  * @example
- * import type { GameStatus, ApiResponse, User } from '@beak-gaming/types';
+ * import type { GameStatus, ApiResponse, User } from '@joolie-boolie/types';
  *
  * // Or import from specific modules:
- * import type { GameSession } from '@beak-gaming/types/game';
- * import type { PaginatedResponse } from '@beak-gaming/types/api';
+ * import type { GameSession } from '@joolie-boolie/types/game';
+ * import type { PaginatedResponse } from '@joolie-boolie/types/api';
  */
 
 // =============================================================================

@@ -16,8 +16,8 @@ vi.mock('@/stores/game-store', () => ({
 }));
 
 // Mock the toast
-vi.mock('@beak-gaming/ui', async () => {
-  const actual = await vi.importActual('@beak-gaming/ui');
+vi.mock('@joolie-boolie/ui', async () => {
+  const actual = await vi.importActual('@joolie-boolie/ui');
   return {
     ...actual,
     useToast: () => ({

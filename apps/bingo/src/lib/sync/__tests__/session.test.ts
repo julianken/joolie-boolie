@@ -71,7 +71,7 @@ describe('session', () => {
   describe('getChannelName', () => {
     it('returns prefixed channel name', () => {
       const sessionId = '550e8400-e29b-41d4-a716-446655440000';
-      expect(getChannelName(sessionId)).toBe('beak-bingo-sync-550e8400-e29b-41d4-a716-446655440000');
+      expect(getChannelName(sessionId)).toBe('jb-bingo-sync-550e8400-e29b-41d4-a716-446655440000');
     });
 
     it('creates different channel names for different sessions', () => {
@@ -87,7 +87,7 @@ describe('session', () => {
     it('always starts with the prefix', () => {
       const sessionId = generateSessionId();
       const channelName = getChannelName(sessionId);
-      expect(channelName.startsWith('beak-bingo-sync-')).toBe(true);
+      expect(channelName.startsWith('jb-bingo-sync-')).toBe(true);
     });
 
     it('includes the full session ID', () => {

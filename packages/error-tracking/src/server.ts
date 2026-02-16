@@ -1,5 +1,5 @@
 /**
- * @beak-gaming/error-tracking - Server Module
+ * @joolie-boolie/error-tracking - Server Module
  *
  * Server-side error tracking for Next.js API routes and Server Components.
  * Provides context-aware error capture with request information.
@@ -32,7 +32,7 @@ const defaultConfig: ErrorTrackerConfig = {
   enableConsole: process.env.NODE_ENV !== 'production',
   minSeverity: 'low',
   environment: process.env.NODE_ENV ?? 'development',
-  appName: 'BeakGaming',
+  appName: 'JoolieBoolie',
   debug: false,
 };
 

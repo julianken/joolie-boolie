@@ -14,7 +14,7 @@ import type { AuthConfig, CookieStore } from './types';
  * ```typescript
  * // In a Server Component or API route
  * import { cookies } from 'next/headers';
- * import { createServerSupabaseClient } from '@beak-gaming/auth/server';
+ * import { createServerSupabaseClient } from '@joolie-boolie/auth/server';
  *
  * export async function GET() {
  *   const cookieStore = await cookies();
@@ -68,7 +68,7 @@ export function createServerSupabaseClient(
  * ```typescript
  * // In a Server Component
  * import { cookies } from 'next/headers';
- * import { createAsyncServerClient } from '@beak-gaming/auth/server';
+ * import { createAsyncServerClient } from '@joolie-boolie/auth/server';
  *
  * export default async function Page() {
  *   const supabase = await createAsyncServerClient(() => cookies());

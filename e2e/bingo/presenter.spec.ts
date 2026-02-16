@@ -15,7 +15,7 @@ test.describe('Bingo Presenter View', () => {
   });
 
   test('displays presenter view header @medium', async ({ authenticatedBingoPage: page }) => {
-    await expect(page.getByRole('heading', { name: /beak bingo/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /joolie boolie bingo/i })).toBeVisible();
     await expect(page.getByText(/presenter view/i)).toBeVisible();
   });
 

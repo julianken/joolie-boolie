@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide explains how the Beak Gaming Platform integrates with Linear for product management and issue tracking.
+This guide explains how the Joolie Boolie integrates with Linear for product management and issue tracking.
 
 ## Integration Methods
 
@@ -162,7 +162,7 @@ Workspace (organization-level)
 
 ## Monorepo Organization Strategy
 
-### Recommended Structure for Beak Gaming Platform
+### Recommended Structure for Joolie Boolie
 
 Given our Turborepo monorepo with multiple apps (Bingo, Trivia, Platform Hub) and shared packages, here's the recommended Linear organization:
 
@@ -171,14 +171,14 @@ Given our Turborepo monorepo with multiple apps (Bingo, Trivia, Platform Hub) an
 Create teams aligned with your monorepo structure:
 
 1. **Platform Team** - Platform Hub, shared infrastructure
-2. **Bingo Team** - Beak Bingo app
-3. **Trivia Team** - Trivia Night app
+2. **Bingo Team** - Bingo app
+3. **Trivia Team** - Trivia app
 4. **Packages Team** - Shared packages (sync, ui, theme, auth, database, game-engine)
 5. **DevOps Team** - CI/CD, deployment, infrastructure
 
 Alternatively, for smaller teams, use a single team with labels:
 
-**Beak Gaming** (single team)
+**Joolie Boolie** (single team)
 - Use labels to differentiate: `app:bingo`, `app:trivia`, `app:hub`, `pkg:sync`, `pkg:ui`, etc.
 
 #### Label Taxonomy
@@ -232,7 +232,7 @@ Create a consistent label structure:
 Use projects for major initiatives:
 
 1. **V1.0 Launch** - Initial platform release
-2. **Accessibility Improvements** - Senior-friendly enhancements
+2. **Accessibility Improvements** - Accessible enhancements
 3. **Mobile Optimization** - Touch and mobile experience
 4. **New Game: Trivia** - Trivia game development
 5. **New Game: Bingo** - Bingo game development
@@ -400,7 +400,7 @@ LINEAR_WEBHOOK_SECRET=your_webhook_secret
 
 ## Next Steps
 
-1. Create Linear workspace for Beak Gaming Platform
+1. Create Linear workspace for Joolie Boolie
 2. Set up teams according to monorepo structure
 3. Configure label taxonomy
 4. Create initial projects for V1.0 work

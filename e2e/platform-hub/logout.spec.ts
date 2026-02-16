@@ -55,7 +55,7 @@ test.describe('Platform Hub Logout @critical', () => {
     await expect(async () => {
       const cookiesBefore = await authenticatedPage.context().cookies();
       const hasAccessToken = cookiesBefore.some(
-        (c) => c.name === 'beak_access_token' && c.value !== ''
+        (c) => c.name === 'jb_access_token' && c.value !== ''
       );
       expect(hasAccessToken).toBe(true);
     }).toPass({ timeout: 5000 });
@@ -73,7 +73,7 @@ test.describe('Platform Hub Logout @critical', () => {
     await expect(async () => {
       const cookiesAfter = await authenticatedPage.context().cookies();
       const accessToken = cookiesAfter.find(
-        (c) => c.name === 'beak_access_token'
+        (c) => c.name === 'jb_access_token'
       );
       // Cookie should either be absent or have empty value (maxAge=0 clears it)
       if (accessToken) {

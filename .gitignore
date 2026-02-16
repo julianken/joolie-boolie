@@ -43,6 +43,9 @@ pnpm-debug.log*
 # Bundle analyzer
 .next/analyze
 
+# Secrets (local-only credentials, never commit)
+.secrets/
+
 # Misc
 .vercel
 .worktrees

@@ -1,12 +1,12 @@
-# @beak-gaming/error-tracking
+# @joolie-boolie/error-tracking
 
-Lightweight error tracking abstraction for Beak Gaming Platform. Provides console logging for development and a pluggable backend system for production (Sentry-compatible).
+Lightweight error tracking abstraction for Joolie Boolie. Provides console logging for development and a pluggable backend system for production (Sentry-compatible).
 
 ## Features
 
 - Zero external dependencies in development mode
 - Pluggable backend system for production error services
-- React Error Boundary with senior-friendly UI
+- React Error Boundary with accessible UI
 - Server-side error tracking for API routes
 - Breadcrumb tracking for debugging context
 - Automatic error categorization
@@ -19,7 +19,7 @@ This package is included in the monorepo. Add it to your app's dependencies:
 ```json
 {
   "dependencies": {
-    "@beak-gaming/error-tracking": "workspace:*"
+    "@joolie-boolie/error-tracking": "workspace:*"
   }
 }
 ```
@@ -33,7 +33,7 @@ import {
   initErrorTracking,
   captureError,
   AppError
-} from '@beak-gaming/error-tracking';
+} from '@joolie-boolie/error-tracking';
 
 // Initialize at app startup
 initErrorTracking({
@@ -68,7 +68,7 @@ import {
   ErrorBoundary,
   useErrorHandler,
   ErrorTrackingProvider
-} from '@beak-gaming/error-tracking/react';
+} from '@joolie-boolie/error-tracking/react';
 
 // Wrap your app with error boundary
 function App() {
@@ -111,7 +111,7 @@ import {
   captureServerError,
   ServerAppError,
   createErrorResponse
-} from '@beak-gaming/error-tracking/server';
+} from '@joolie-boolie/error-tracking/server';
 
 export async function GET(request: Request) {
   try {
@@ -138,7 +138,7 @@ throw new ServerAppError('User not authorized', {
 ### Initialization
 
 ```typescript
-import { initErrorTracking } from '@beak-gaming/error-tracking';
+import { initErrorTracking } from '@joolie-boolie/error-tracking';
 
 initErrorTracking({
   appName: 'bingo',           // App identifier
@@ -155,7 +155,7 @@ initErrorTracking({
 ### Error Capture
 
 ```typescript
-import { captureError, captureMessage, AppError } from '@beak-gaming/error-tracking';
+import { captureError, captureMessage, AppError } from '@joolie-boolie/error-tracking';
 
 // Capture any error
 captureError(error, {
@@ -202,7 +202,7 @@ const error = new AppError('Invalid ball number', {
 ### Breadcrumbs
 
 ```typescript
-import { addBreadcrumb } from '@beak-gaming/error-tracking';
+import { addBreadcrumb } from '@joolie-boolie/error-tracking';
 
 // Track user actions for debugging
 addBreadcrumb({
@@ -220,7 +220,7 @@ import {
   useErrorHandler,
   useAsyncError,
   useTrackInteraction,
-} from '@beak-gaming/error-tracking/react';
+} from '@joolie-boolie/error-tracking/react';
 
 // Component error handling
 const { reportError, throwError, addBreadcrumb } = useErrorHandler('MyComponent');
@@ -239,7 +239,7 @@ track('cell_clicked', { cellId: 5 });
 ### Custom Backend
 
 ```typescript
-import { setErrorBackend, type ErrorBackend } from '@beak-gaming/error-tracking';
+import { setErrorBackend, type ErrorBackend } from '@joolie-boolie/error-tracking';
 
 const customBackend: ErrorBackend = {
   init(config) {
@@ -269,7 +269,7 @@ setErrorBackend(customBackend);
 ```typescript
 // Note: Requires @sentry/nextjs to be installed separately
 import * as Sentry from '@sentry/nextjs';
-import { setErrorBackend } from '@beak-gaming/error-tracking';
+import { setErrorBackend } from '@joolie-boolie/error-tracking';
 
 const sentryBackend: ErrorBackend = {
   init(config) {
@@ -304,15 +304,15 @@ setErrorBackend(sentryBackend);
 
 | Export | Description |
 |--------|-------------|
-| `@beak-gaming/error-tracking` | Main exports (client + React) |
-| `@beak-gaming/error-tracking/client` | Browser-only exports |
-| `@beak-gaming/error-tracking/server` | Server-side exports |
-| `@beak-gaming/error-tracking/react` | React components and hooks |
-| `@beak-gaming/error-tracking/types` | TypeScript types only |
+| `@joolie-boolie/error-tracking` | Main exports (client + React) |
+| `@joolie-boolie/error-tracking/client` | Browser-only exports |
+| `@joolie-boolie/error-tracking/server` | Server-side exports |
+| `@joolie-boolie/error-tracking/react` | React components and hooks |
+| `@joolie-boolie/error-tracking/types` | TypeScript types only |
 
 ## Design Guidelines
 
-The error UI components follow senior-friendly design:
+The error UI components follow accessible design:
 
 - Minimum 18px font size
 - High contrast colors
@@ -332,6 +332,6 @@ pnpm test:coverage
 
 ## Related Packages
 
-- `@beak-gaming/sync` - Dual-screen synchronization
-- `@beak-gaming/auth` - Authentication
-- `@beak-gaming/ui` - Shared UI components
+- `@joolie-boolie/sync` - Dual-screen synchronization
+- `@joolie-boolie/auth` - Authentication
+- `@joolie-boolie/ui` - Shared UI components

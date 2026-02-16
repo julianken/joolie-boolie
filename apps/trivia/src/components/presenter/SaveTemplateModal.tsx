@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useId } from 'react';
-import { Modal } from "@beak-gaming/ui";
+import { Modal } from "@joolie-boolie/ui";
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from "@beak-gaming/ui";
+import { useToast } from "@joolie-boolie/ui";
 import type { Question } from '@/types';
-import type { TriviaQuestion } from '@beak-gaming/database/types';
+import type { TriviaQuestion } from '@joolie-boolie/database/types';
 
 export interface SaveTemplateModalProps {
   isOpen: boolean;

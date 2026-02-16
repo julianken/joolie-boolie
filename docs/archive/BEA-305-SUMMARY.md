@@ -55,8 +55,8 @@ const triviaUrl = process.env.NEXT_PUBLIC_TRIVIA_URL || 'http://localhost:3001';
 ## Environment Variables Used
 
 These were already documented in `apps/platform-hub/.env.example`:
-- `NEXT_PUBLIC_BINGO_URL` - Base URL for Bingo app (e.g., `https://bingo.beakgaming.com`)
-- `NEXT_PUBLIC_TRIVIA_URL` - Base URL for Trivia app (e.g., `https://trivia.beakgaming.com`)
+- `NEXT_PUBLIC_BINGO_URL` - Base URL for Bingo app (e.g., `https://bingo.joolieboolie.com`)
+- `NEXT_PUBLIC_TRIVIA_URL` - Base URL for Trivia app (e.g., `https://trivia.joolieboolie.com`)
 
 **No changes to `.env.example` were needed** - the variables were already there, just not being used!
 
@@ -79,28 +79,28 @@ pnpm build
 1. ✅ **Fixed hardcoded URLs** - All 3 files updated with env var pattern
 2. ✅ **Environment variable examples** - Already present in `.env.example`
 3. ✅ **Build verification** - `pnpm build` succeeds
-4. ✅ **Pull Request created** - [PR #177](https://github.com/julianken/beak-gaming-platform/pull/177)
+4. ✅ **Pull Request created** - [PR #177](https://github.com/julianken/joolie-boolie-platform/pull/177)
 5. ✅ **Linear issue updated** - BEA-305 → "In Review" with PR link
 
 ## Git Details
 
 **Branch:** `wave2/BEA-305-fix-urls`
 **Commit:** `26fe18e81533405dda98bf03eaf5151e3e718ec4`
-**PR:** https://github.com/julianken/beak-gaming-platform/pull/177
-**Linear:** https://linear.app/beak-gaming/issue/BEA-305
+**PR:** https://github.com/julianken/joolie-boolie-platform/pull/177
+**Linear:** https://linear.app/joolie-boolie/issue/BEA-305
 
 ## Impact
 
 **Before this fix:**
 - Platform Hub assumed all apps would be deployed on the same domain
-- Production URLs like `/bingo/play` would fail if Bingo is on `bingo.beakgaming.com`
+- Production URLs like `/bingo/play` would fail if Bingo is on `bingo.joolieboolie.com`
 - No flexibility for multi-domain deployment
 
 **After this fix:**
 - Each app can be deployed to its own domain
 - Environment variables control cross-app navigation
 - Localhost fallbacks ensure dev environment works without configuration
-- Deployment-ready for separate domains (bingo.beakgaming.com, trivia.beakgaming.com)
+- Deployment-ready for separate domains (bingo.joolieboolie.com, trivia.joolieboolie.com)
 
 ## Next Steps
 

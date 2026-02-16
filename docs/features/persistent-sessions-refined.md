@@ -16,7 +16,7 @@ This plan has been refined based on comprehensive code analysis and simplificati
 - 🔒 **Enhanced security** with HMAC-signed tokens
 - ⚡ **Explicit sync timing** (2s debounce for state, immediate for critical events)
 - 🧹 **Consolidated session systems** (removed overlap between 3 different implementations)
-- 📦 **Moved components to @beak-gaming/ui** (zero duplication between apps)
+- 📦 **Moved components to @joolie-boolie/ui** (zero duplication between apps)
 - 🏗️ **Route handler factory** (shared API route implementation)
 
 ---
@@ -62,7 +62,7 @@ Currently:
 │                                                                 │
 │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐   │
 │  │ RoomCodeDisplay│  │ Game Controls │  │ SyncStatus          │   │
-│  │ (@beak/ui)     │  │               │  │                    │   │
+│  │ (@joolie-boolie/ui)     │  │               │  │                    │   │
 │  └──────────────┘  └──────────────┘  └────────────────────┘   │
 │                                                                 │
 │                    Zustand Store + Middleware                   │
@@ -85,7 +85,7 @@ Currently:
 
 **Key Changes from Original:**
 - Clear separation: BroadcastChannel (immediate), localStorage (UI prefs only), Database (game state)
-- All session modals in `@beak-gaming/ui` (not duplicated in apps)
+- All session modals in `@joolie-boolie/ui` (not duplicated in apps)
 - Sequence numbers prevent race conditions
 
 ---
@@ -681,7 +681,7 @@ export function createSessionRoutes(config: SessionRouteConfig) {
 
 ```typescript
 // apps/bingo/src/app/api/sessions/route.ts
-import { createSessionRoutes } from '@beak-gaming/database/api';
+import { createSessionRoutes } from '@joolie-boolie/database/api';
 import { createClient } from '@/lib/supabase/server';
 
 const routes = createSessionRoutes({
@@ -699,7 +699,7 @@ export const GET = routes.GET;
 
 ```typescript
 // apps/bingo/src/app/api/sessions/[roomCode]/verify-pin/route.ts
-import { createSessionRoutes } from '@beak-gaming/database/api';
+import { createSessionRoutes } from '@joolie-boolie/database/api';
 import { createClient } from '@/lib/supabase/server';
 
 const routes = createSessionRoutes({
@@ -1112,7 +1112,7 @@ apps/trivia/src/
 | Component | Original Plan | Refined Plan | Savings |
 |-----------|---------------|--------------|---------|
 | API Routes | ~800 lines (2 apps × 400) | ~400 lines (shared factory) | **50%** |
-| UI Components | ~600 lines (2 apps × 300) | ~300 lines (@beak/ui) | **50%** |
+| UI Components | ~600 lines (2 apps × 300) | ~300 lines (@joolie-boolie/ui) | **50%** |
 | Auto-sync Logic | ~400 lines (2 apps × 200) | ~200 lines (shared hook) | **50%** |
 | Session Systems | 3 overlapping files (~900 lines) | 2 clear files (~600 lines) | **33%** |
 | **Total** | **~2,700 lines** | **~1,500 lines** | **44%** |
@@ -1187,7 +1187,7 @@ apps/trivia/src/
 ## Success Criteria (Updated)
 
 1. ✅ **Zero API route duplication** between bingo and trivia apps
-2. ✅ **Shared UI components** in `@beak-gaming/ui` package
+2. ✅ **Shared UI components** in `@joolie-boolie/ui` package
 3. ✅ **Single session system** with clear database/localStorage separation
 4. ✅ **HMAC-signed tokens** prevent client-side tampering
 5. ✅ **Explicit sync timing** (2s debounce for state, immediate for critical events)
@@ -1238,8 +1238,8 @@ apps/trivia/src/
 ### Required Before Implementation
 - ✅ Supabase project configured
 - ✅ Database migrations system working
-- ✅ `@beak-gaming/database` package functional
-- ✅ `@beak-gaming/ui` package set up
+- ✅ `@joolie-boolie/database` package functional
+- ✅ `@joolie-boolie/ui` package set up
 
 ### Environment Variables Needed
 ```bash
@@ -1280,7 +1280,7 @@ Generate secret: `node -e "console.log(require('crypto').randomBytes(32).toStrin
 ### What Stayed the Same
 
 - ✅ Database schema (with sequence_number addition)
-- ✅ Room code format (bird-themed, senior-friendly)
+- ✅ Room code format (bird-themed, accessible)
 - ✅ PIN security (SHA-256, 5 attempts, 15 min lockout)
 - ✅ User stories (all satisfied)
 - ✅ BFF pattern (Next.js API routes)

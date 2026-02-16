@@ -54,7 +54,7 @@ const e2eTemplateStore: E2ETemplate[] = [
     game: 'trivia',
     id: 'e2e-trivia-template-1',
     user_id: 'e2e-test-user',
-    name: 'E2E Trivia Night',
+    name: 'E2E Trivia',
     questions: [
       { text: 'What is 2+2?', answer: '4', category: 'general_knowledge', type: 'short_answer' },
       { text: 'What color is the sky?', answer: 'Blue', category: 'science', type: 'short_answer' },

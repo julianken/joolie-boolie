@@ -135,7 +135,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 All E2E tests share:
 - A single Supabase project
-- A single test user (`e2e-test@beak-gaming.test`)
+- A single test user (`e2e-test@joolie-boolie.test`)
 - No per-worktree database isolation
 
 ### 1.5 Worktree Usage (from SKILL.md)
@@ -167,7 +167,7 @@ Only ONE set of dev servers can run at a time.
 
 **Scenario:**
 ```
-Main Repo (~/repos/beak-gaming-platform)
+Main Repo (~/repos/joolie-boolie-platform)
 ├── pnpm dev → Starts servers on 3000, 3001, 3002
 ├── pnpm test:e2e → Tests against 3000, 3001, 3002 ✓
 
@@ -207,7 +207,7 @@ Worktree 2 (~/repos/wt-BEA-331-trivia-fix)
 ```typescript
 testUser: async ({}, use) => {
   await use({
-    email: process.env.TEST_USER_EMAIL || 'e2e-test@beak-gaming.test',
+    email: process.env.TEST_USER_EMAIL || 'e2e-test@joolie-boolie.test',
     password: process.env.TEST_USER_PASSWORD || 'TestPassword123!',
   });
 },
@@ -277,7 +277,7 @@ Currently mitigated by:
 │  └─────────────────────────────────────────────────────────────┘   │
 │                                                                      │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  MAIN REPO: ~/repos/beak-gaming-platform                    │   │
+│  │  MAIN REPO: ~/repos/joolie-boolie-platform                    │   │
 │  │  (Regular dev setup, ports 3000-3002, shared Supabase)      │   │
 │  └─────────────────────────────────────────────────────────────┘   │
 │                                                                      │
@@ -415,7 +415,7 @@ services:
 
 networks:
   default:
-    name: beak-e2e-${WORKTREE_ID:-main}
+    name: jb-e2e-${WORKTREE_ID:-main}
 ```
 
 ### 3.4 Dockerfile for Development
@@ -448,7 +448,7 @@ ARG APP
 ENV APP=${APP}
 
 # Run the specified app in dev mode
-CMD ["sh", "-c", "pnpm --filter @beak-gaming/${APP} dev"]
+CMD ["sh", "-c", "pnpm --filter @joolie-boolie/${APP} dev"]
 ```
 
 ### 3.5 Dynamic Playwright Configuration
@@ -642,7 +642,7 @@ cd ~/repos/wt-BEA-331
 pnpm test:run
 
 # Back to main: Run E2E for worktree 1 code
-cd ~/repos/beak-gaming-platform
+cd ~/repos/joolie-boolie-platform
 git checkout wt-BEA-330-branch
 pnpm dev
 pnpm test:e2e
@@ -678,17 +678,17 @@ pnpm test:e2e
 # Worktree 1
 cd ~/repos/wt-BEA-330
 export E2E_PORT_BASE=3100
-PORT=3100 pnpm --filter @beak-gaming/bingo dev &
-PORT=3101 pnpm --filter @beak-gaming/trivia dev &
-PORT=3102 pnpm --filter @beak-gaming/platform-hub dev &
+PORT=3100 pnpm --filter @joolie-boolie/bingo dev &
+PORT=3101 pnpm --filter @joolie-boolie/trivia dev &
+PORT=3102 pnpm --filter @joolie-boolie/platform-hub dev &
 pnpm test:e2e
 
 # Worktree 2 (different terminal)
 cd ~/repos/wt-BEA-331
 export E2E_PORT_BASE=3200
-PORT=3200 pnpm --filter @beak-gaming/bingo dev &
-PORT=3201 pnpm --filter @beak-gaming/trivia dev &
-PORT=3202 pnpm --filter @beak-gaming/platform-hub dev &
+PORT=3200 pnpm --filter @joolie-boolie/bingo dev &
+PORT=3201 pnpm --filter @joolie-boolie/trivia dev &
+PORT=3202 pnpm --filter @joolie-boolie/platform-hub dev &
 pnpm test:e2e
 ```
 
@@ -907,7 +907,7 @@ Within a single Playwright run, tests are already parallel (`fullyParallel: true
 3. **Add locking mechanism** (optional):
    ```bash
    # In scripts/run-e2e.sh
-   LOCKFILE="/tmp/beak-e2e.lock"
+   LOCKFILE="/tmp/jb-e2e.lock"
    if [ -f "$LOCKFILE" ]; then
      echo "E2E tests already running. Waiting..."
      while [ -f "$LOCKFILE" ]; do sleep 5; done

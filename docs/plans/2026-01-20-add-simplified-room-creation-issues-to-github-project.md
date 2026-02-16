@@ -23,7 +23,7 @@
 Before starting, verify:
 - [ ] GitHub CLI is authenticated: `gh auth status`
 - [ ] Can access the project: `gh project view 1 --owner julianken`
-- [ ] Repository context: Currently in `beak-gaming-platform` repo
+- [ ] Repository context: Currently in `joolie-boolie-platform` repo
 - [ ] Source document exists: `apps/bingo/docs/GITHUB_PROJECT_PLAN.md`
 
 ---
@@ -59,9 +59,9 @@ Expected: Output showing the repository URL
 
 **Step 2: Extract owner and repo name**
 
-The issues should be created in the `beak-gaming-platform` repository.
+The issues should be created in the `joolie-boolie-platform` repository.
 - Owner: `julianken` (or extracted from remote URL)
-- Repo: `beak-gaming-platform`
+- Repo: `joolie-boolie-platform`
 
 **Step 3: Verify repository access**
 
@@ -101,7 +101,7 @@ Save the issue number from the output (e.g., `ISSUE_1=110`)
 
 Run:
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_1
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_1
 ```
 
 Expected: "Added item" confirmation
@@ -149,7 +149,7 @@ Expected: Comment added
 
 Run:
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_2
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_2
 ```
 
 Expected: "Added item" confirmation
@@ -185,7 +185,7 @@ gh issue comment $ISSUE_3 --body "**Dependencies:** #$ISSUE_2"
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_3
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_3
 ```
 
 ---
@@ -217,7 +217,7 @@ gh issue comment $ISSUE_4 --body "**Dependencies:** #$ISSUE_2"
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_4
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_4
 ```
 
 ---
@@ -249,7 +249,7 @@ gh issue comment $ISSUE_5 --body "**Dependencies:** #$ISSUE_2"
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_5
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_5
 ```
 
 ---
@@ -280,7 +280,7 @@ ISSUE_6=<number>
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_6
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_6
 ```
 
 ---
@@ -312,7 +312,7 @@ gh issue comment $ISSUE_7 --body "**Dependencies:** #$ISSUE_4"
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_7
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_7
 ```
 
 ---
@@ -344,7 +344,7 @@ gh issue comment $ISSUE_8 --body "**Dependencies:** #$ISSUE_3, #$ISSUE_5"
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_8
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_8
 ```
 
 ---
@@ -376,7 +376,7 @@ gh issue comment $ISSUE_9 --body "**Dependencies:** #$ISSUE_3, #$ISSUE_4, #$ISSU
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_9
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_9
 ```
 
 ---
@@ -409,7 +409,7 @@ gh issue comment $ISSUE_10 --body "**Dependencies:** All previous issues (#$ISSU
 **Step 3: Add to project**
 
 ```bash
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$ISSUE_10
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$ISSUE_10
 ```
 
 ---
@@ -455,7 +455,7 @@ gh issue create \
 
 ```bash
 EPIC_ISSUE=<number>
-gh project item-add 1 --owner julianken --url https://github.com/julianken/beak-gaming-platform/issues/$EPIC_ISSUE
+gh project item-add 1 --owner julianken --url https://github.com/julianken/joolie-boolie-platform/issues/$EPIC_ISSUE
 ```
 
 ---
@@ -517,7 +517,7 @@ set -e
 
 # Repository details
 OWNER="julianken"
-REPO="beak-gaming-platform"
+REPO="joolie-boolie-platform"
 PROJECT_NUMBER=1
 SOURCE_FILE="apps/bingo/docs/GITHUB_PROJECT_PLAN.md"
 

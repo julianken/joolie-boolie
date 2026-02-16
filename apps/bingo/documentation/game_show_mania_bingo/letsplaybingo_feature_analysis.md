@@ -399,13 +399,13 @@ Automatically saves and restores:
 Based on this analysis, our solution could differentiate by offering:
 
 1. **True dual-screen support** - Separate presenter controls and audience display
-2. **Simpler UI** - Focused on the retirement community use case, less overwhelming
+2. **Simpler UI** - Focused on the group and community use case, less overwhelming
 3. **Facility customization** - Logo, custom backgrounds, branded experience
 4. **Account system** - Login and access settings from any device
 5. **Curated patterns** - Organized by category, favorites, most-used
 6. **Integrated card generator** - Built into main flow, not separate page
 7. **Reliable support** - Known contact for when things go wrong
-8. **Purpose-built for seniors** - Larger default fonts, simpler controls, high contrast
+8. **Purpose-built for everyone** - Larger default fonts, simpler controls, high contrast
 
 ---
 

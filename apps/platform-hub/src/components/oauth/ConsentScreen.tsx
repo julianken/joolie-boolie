@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 import { ClientInfo } from './ClientInfo';
 import { ScopesList } from './ScopesList';
 import type { AuthorizationDetails } from '@/types/oauth';
@@ -147,7 +147,7 @@ export function ConsentScreen({
           </h1>
           <p className="text-xl text-muted-foreground">
             <span className="font-semibold">{details.client.name}</span> wants
-            to access your Beak Gaming account
+            to access your Joolie Boolie account
           </p>
         </div>
 

@@ -29,8 +29,8 @@
 ### ✅ BEA-300: Fix 32 Failing Tests (27 Bingo + 5 Trivia)
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 01:13 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/178 (MERGED)
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-300
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/178 (MERGED)
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-300
 - **Work Done**:
   - Main session: Fixed 5 Trivia TypeScript tests (GameStore mocks) - commit 8664ba7
   - Agent-6 (a706e86): Fixed 20 Bingo ToastProvider tests - commit d75f40b
@@ -42,31 +42,31 @@
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 00:36 UTC
 - **Agent**: Main session (manual)
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-297
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-297
 - **Result**: 201 lines deleted (test-login dirs removed)
 
 ### ✅ BEA-296: Restore FK constraint on bingo_templates.user_id
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 00:42 UTC
 - **Agent**: Main session (via Supabase MCP plugin)
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-296
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-296
 - **Result**: FK constraint restored, test data deleted
 
 ### ✅ BEA-298: Replace Math.random() with crypto.randomUUID()
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 01:22 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/176 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/176 (MERGED)
 - **Agent**: Agent-4 (a33a0b2) + reviewer agent (a38cb6f)
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-298
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-298
 - **Changes**: 7 additions, 1 deletion (offline-session.ts)
 - **Result**: Replaced Math.random() with crypto.getRandomValues() for cryptographically secure session IDs
 
 ### ✅ BEA-305: Fix hardcoded localhost URLs
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 01:21 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/177 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/177 (MERGED)
 - **Agent**: Agent-5 (afe3043) + reviewer agent (a20c567)
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-305
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-305
 - **Changes**: 18 additions, 16 deletions (3 Platform Hub files)
 - **Result**: Replaced hardcoded URLs with NEXT_PUBLIC_BINGO_URL and NEXT_PUBLIC_TRIVIA_URL environment variables
 
@@ -77,41 +77,41 @@
 ### ✅ BEA-299: Implement PBKDF2 for PIN hashing
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 04:19 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/179 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/179 (MERGED)
 - **Commit**: eb0b043
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-299
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-299
 - **Changes**: PBKDF2 with 100,000 iterations, constant-time comparison
 
 ### ✅ BEA-304: Add request size limits
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 04:32 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/181 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/181 (MERGED)
 - **Commit**: e99a46a
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-304
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-304
 - **Changes**: 100KB default, 1MB templates, 5MB uploads
 
 ### ✅ BEA-301: Enforce SESSION_TOKEN_SECRET requirement
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 04:32 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/182 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/182 (MERGED)
 - **Commit**: 5ffedc6
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-301
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-301
 - **Changes**: Startup validation, 64-char minimum
 
 ### ✅ BEA-302: Implement Redis rate limiting
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 04:34 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/180 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/180 (MERGED)
 - **Commit**: dc8e3cc
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-302
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-302
 - **Changes**: Upstash Redis integration, sliding window algorithm
 
 ### ✅ BEA-303: Configure CORS properly
 - **Status**: ✅ DONE
 - **Completed**: 2026-01-23 04:38 UTC
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/183 (MERGED)
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/183 (MERGED)
 - **Commit**: 919ba61
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-303
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-303
 - **Changes**: OAuth endpoint CORS, configurable origins
 
 ---
@@ -123,8 +123,8 @@
 - **Started**: 2026-01-23 05:53 UTC
 - **Completed**: 2026-01-23 06:04 UTC
 - **Agent**: Main session (took control after agent concurrency errors)
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/184
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-312
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/184
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-312
 - **Changes**:
   - Added `import { timingSafeEqual } from 'node:crypto'`
   - Replaced string comparison with constant-time buffer comparison
@@ -138,12 +138,12 @@
 - **Started**: 2026-01-23 05:53 UTC
 - **Completed**: 2026-01-23 06:12 UTC
 - **Agent**: Main session (took control after agent concurrency errors)
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/186
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-307
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/186
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-307
 - **Changes**:
   - Created `/packages/ui/src/toast.tsx` (351 lines) - byte-for-byte identical to app versions
   - Added Toast exports to `/packages/ui/src/index.ts`
-  - Updated imports in Bingo (11 files) and Trivia (5 files) from `@/components/ui/Toast` to `@beak-gaming/ui`
+  - Updated imports in Bingo (11 files) and Trivia (5 files) from `@/components/ui/Toast` to `@joolie-boolie/ui`
   - Deleted duplicate Toast files from both apps
 - **Impact**: Removes 700 lines of duplication (2 × 351 lines removed, 1 × 351 added + 9 lines exports)
 - **Net Change**: -693 lines
@@ -153,8 +153,8 @@
 - **Started**: 2026-01-23 05:53 UTC
 - **Completed**: 2026-01-23 06:01 UTC
 - **Agent**: a775206 (completed Part 1: SSO Implementation)
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/185
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-306
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/185
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-306
 - **Changes**:
   - Unified cookie names: `bingo_*/trivia_*` → `beak_*` (access_token, refresh_token, user_id)
   - Added cookie domain configuration: `NEXT_PUBLIC_COOKIE_DOMAIN` for production subdomain sharing
@@ -169,13 +169,13 @@
 - **Started**: 2026-01-23 05:53 UTC
 - **Completed**: 2026-01-23 06:25 UTC
 - **Agent**: Main session (took control after agent analysis complete)
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/187
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-308
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/187
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-308
 - **Changes**:
   - Added `aria-busy={loading}` to Button for screen reader support
   - Replaced Modal with portal-based version (createPortal, focus trap, Escape key, backdrop click)
   - Modal features: confirm/cancel footer, focus trap with Tab navigation, body scroll lock
-  - Updated imports in Bingo (9 files) and Trivia (1 file) from `@/components/ui/*` to `@beak-gaming/ui`
+  - Updated imports in Bingo (9 files) and Trivia (1 file) from `@/components/ui/*` to `@joolie-boolie/ui`
   - Deleted duplicate Button.tsx and Modal.tsx from both apps
 - **Files Modified**: 16 (10 import updates, 2 package components, 4 deletions)
 - **Impact**: Removes 537 lines of duplication (622 deleted - 82 added)
@@ -213,8 +213,8 @@
 - **Status**: ✅ PR CREATED (#188 - awaiting review)
 - **Completed**: 2026-01-23 07:24 UTC
 - **Agent**: Main session (took over after agent aa6b37d provided specs)
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/188
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-311
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/188
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-311
 - **Branch**: wave2d/BEA-311-logout-functionality
 - **Worktree**: `/Users/j/repos/wt-BEA-311-logout-functionality`
 - **Changes**:
@@ -232,8 +232,8 @@
 - **Started**: 2026-01-23 07:15 UTC
 - **Completed**: 2026-01-23 07:35 UTC
 - **Agent**: ae5fcee (provided specs) + Main session (executed implementation)
-- **PR**: https://github.com/julianken/beak-gaming-platform/pull/189
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-309
+- **PR**: https://github.com/julianken/joolie-boolie-platform/pull/189
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-309
 - **Branch**: wave2d/BEA-309-dashboard-real-data
 - **Worktree**: `/Users/j/repos/wt-BEA-309-dashboard-real-data`
 - **Changes**:
@@ -252,7 +252,7 @@
 - **Status**: ⚙️ IMPLEMENTATION CODE PROVIDED (no PR yet)
 - **Started**: 2026-01-23 07:15 UTC
 - **Agent**: a7e2165 (hit permission issues → provided complete code)
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-310
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-310
 - **Branch**: wave2d/BEA-310-profile-management
 - **Worktree**: `/Users/j/repos/wt-BEA-310-profile-management`
 - **Complete Code Provided**:
@@ -320,7 +320,7 @@
 - **Agent**: ae5fcee (background)
 - **Worktree**: ../wt-BEA-309-dashboard-real-data
 - **Branch**: wave2d/BEA-309-dashboard-real-data
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-309
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-309
 - **Problem**: Dashboard displays hardcoded placeholder data instead of real user information
 - **Current State**:
   - Placeholder user: `{ name: 'Activity Director', email: 'activities@sunnydale.com' }`
@@ -340,7 +340,7 @@
 - **Agent**: ac96682 (background)
 - **Worktree**: ../wt-BEA-310-profile-management
 - **Branch**: wave2d/BEA-310-profile-management
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-310
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-310
 - **Problem**: Platform Hub has no profile management functionality. Users cannot view or edit their profile after signup
 - **Missing**:
   - No `/profile` or `/settings` route (dashboard links to it = 404)
@@ -359,13 +359,13 @@
 - **Agent**: aa6b37d (background)
 - **Worktree**: ../wt-BEA-311-logout-functionality
 - **Branch**: wave2d/BEA-311-logout-functionality
-- **Linear**: https://linear.app/beak-gaming/issue/BEA-311
+- **Linear**: https://linear.app/joolie-boolie/issue/BEA-311
 - **Problem**: No logout functionality exists in any app. Users can log in but cannot log out. **Users are currently trapped in their sessions.**
 - **Missing**:
   - No logout buttons in UI (Bingo, Trivia, Platform Hub)
   - No `/api/auth/logout` routes
   - No session cleanup on logout
-- **Note**: `@beak-gaming/auth` package has full `signOut()` implementation, but apps don't expose it to users
+- **Note**: `@joolie-boolie/auth` package has full `signOut()` implementation, but apps don't expose it to users
 - **Scope**:
   - Create `/api/auth/logout` route in each app
   - Clear httpOnly cookies (beak_access_token, beak_refresh_token, beak_user_id)
@@ -379,7 +379,7 @@
 ## Completed Pull Requests
 
 ### PR #178: test: fix 32 failing tests (BEA-300)
-- **URL**: https://github.com/julianken/beak-gaming-platform/pull/178
+- **URL**: https://github.com/julianken/joolie-boolie-platform/pull/178
 - **Status**: ✅ **MERGED** (2026-01-23 01:13 UTC)
 - **Changes**: 3 commits fixing 32 tests (5 Trivia + 27 Bingo)
   - 8664ba7: Fix Trivia TypeScript errors (main session)
@@ -389,7 +389,7 @@
 - **Review**: Agent-8 (ad865bd)
 
 ### PR #176: security: replace Math.random() with crypto.randomUUID() (BEA-298)
-- **URL**: https://github.com/julianken/beak-gaming-platform/pull/176
+- **URL**: https://github.com/julianken/joolie-boolie-platform/pull/176
 - **Status**: ✅ **MERGED** (2026-01-23 01:22 UTC)
 - **Changes**: 7 additions, 1 deletion (offline-session.ts)
 - **Security Impact**: Cryptographically secure session ID generation
@@ -397,7 +397,7 @@
 - **Review**: Agent reviewer (a38cb6f)
 
 ### PR #177: fix: replace hardcoded localhost URLs with env vars (BEA-305)
-- **URL**: https://github.com/julianken/beak-gaming-platform/pull/177
+- **URL**: https://github.com/julianken/joolie-boolie-platform/pull/177
 - **Status**: ✅ **MERGED** (2026-01-23 01:21 UTC)
 - **Changes**: 18 additions, 16 deletions (3 Platform Hub files)
 - **Deployment Impact**: Enables multi-domain deployment

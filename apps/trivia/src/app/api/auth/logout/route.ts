@@ -12,8 +12,8 @@ export async function POST() {
     const cookieStore = await cookies();
 
     // Get tokens BEFORE clearing cookies (for revocation)
-    const accessToken = cookieStore.get('beak_access_token')?.value;
-    const refreshToken = cookieStore.get('beak_refresh_token')?.value;
+    const accessToken = cookieStore.get('jb_access_token')?.value;
+    const refreshToken = cookieStore.get('jb_refresh_token')?.value;
 
     // Revoke tokens with Supabase if they exist
     if ((accessToken || refreshToken) && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -36,9 +36,9 @@ export async function POST() {
       maxAge: 0,
     };
 
-    cookieStore.set('beak_access_token', '', cookieOptions);
-    cookieStore.set('beak_refresh_token', '', cookieOptions);
-    cookieStore.set('beak_user_id', '', cookieOptions);
+    cookieStore.set('jb_access_token', '', cookieOptions);
+    cookieStore.set('jb_refresh_token', '', cookieOptions);
+    cookieStore.set('jb_user_id', '', cookieOptions);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,4 +1,4 @@
-// @canonical - Trivia uses this local OAuth implementation (NOT @beak/auth package)
+// @canonical - Trivia uses this local OAuth implementation (NOT @joolie-boolie/auth package)
 /**
  * OAuth 2.1 Client for Trivia App
  * Handles authorization code flow with PKCE
@@ -29,9 +29,9 @@ export async function startOAuthFlow(returnTo?: string): Promise<void> {
 
   // Store return URL for post-auth redirect (before generating state)
   if (returnTo) {
-    sessionStorage.setItem('beak_oauth_return_to', returnTo);
+    sessionStorage.setItem('jb_oauth_return_to', returnTo);
   } else {
-    sessionStorage.removeItem('beak_oauth_return_to');
+    sessionStorage.removeItem('jb_oauth_return_to');
   }
 
   // Generate PKCE parameters
@@ -48,8 +48,8 @@ export async function startOAuthFlow(returnTo?: string): Promise<void> {
   // Store code_verifier and state in sessionStorage for callback
   // Use state-specific keys to prevent collisions in multi-tab scenarios
   // Using cross-app SSO prefix for consistency
-  sessionStorage.setItem(`beak_pkce_verifier_${state}`, codeVerifier);
-  sessionStorage.setItem(`beak_oauth_state_${state}`, state);
+  sessionStorage.setItem(`jb_pkce_verifier_${state}`, codeVerifier);
+  sessionStorage.setItem(`jb_oauth_state_${state}`, state);
 
   // Build authorization URL with CSRF state parameter
   const params = new URLSearchParams({

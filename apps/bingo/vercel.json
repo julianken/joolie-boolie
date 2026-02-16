@@ -3,10 +3,10 @@
   "version": 2,
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@beak-gaming/bingo...",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@joolie-boolie/bingo...",
   "outputDirectory": ".next",
   "env": {
-    "TURBO_TEAM": "beak-gaming",
+    "TURBO_TEAM": "joolie-boolie",
     "TURBO_REMOTE_ONLY": "true"
   },
   "headers": [

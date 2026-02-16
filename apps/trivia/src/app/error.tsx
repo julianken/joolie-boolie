@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { logError } from '@beak-gaming/error-tracking';
+import { logError } from '@joolie-boolie/error-tracking';
 
 export default function Error({
   error,
@@ -56,7 +56,7 @@ export default function Error({
 
         {/* Message */}
         <p className="text-xl text-red-700 mb-6 leading-relaxed">
-          We ran into a problem while loading Trivia Night.
+          We ran into a problem while loading Trivia.
           This might be temporary - please try again.
         </p>
 

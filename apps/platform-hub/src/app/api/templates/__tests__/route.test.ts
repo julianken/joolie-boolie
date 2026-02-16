@@ -7,7 +7,7 @@ import { NextRequest } from 'next/server';
 import { GET } from '../route';
 
 // Mock getApiUser
-vi.mock('@beak-gaming/auth', () => ({
+vi.mock('@joolie-boolie/auth', () => ({
   getApiUser: vi.fn().mockResolvedValue({ id: 'user-1', email: 'test@example.com' }),
 }));
 
@@ -26,7 +26,7 @@ describe('GET /api/templates', () => {
   });
 
   it('should return 401 when not authenticated', async () => {
-    const { getApiUser } = await import('@beak-gaming/auth');
+    const { getApiUser } = await import('@joolie-boolie/auth');
     vi.mocked(getApiUser).mockResolvedValueOnce(null);
 
     const response = await GET(createMockRequest());

@@ -152,8 +152,8 @@ describe('POST /api/oauth/deny', () => {
     beforeEach(() => {
       process.env.E2E_TESTING = 'true';
       mockCookieStore.get.mockImplementation((name: string) => {
-        if (name === 'beak_access_token') return { value: 'e2e-token' };
-        if (name === 'beak_user_id') return { value: 'e2e-test-user-00000000-0000-0000-0000-000000000000' };
+        if (name === 'jb_access_token') return { value: 'e2e-token' };
+        if (name === 'jb_user_id') return { value: 'e2e-test-user-00000000-0000-0000-0000-000000000000' };
         return undefined;
       });
     });

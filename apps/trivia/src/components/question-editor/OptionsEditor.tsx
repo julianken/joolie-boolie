@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 import type { QuestionType } from '@/types';
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 export interface OptionsEditorProps {
   questionType: QuestionType;

@@ -33,13 +33,13 @@ const PLATFORM_HUB_URL = process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://loc
 const OAUTH_CLIENTS = [
   {
     id: '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21',
-    name: 'Beak Bingo',
+    name: 'Bingo',
     redirect_uris: ['http://localhost:3000/auth/callback'],
     consent_page_url: `${PLATFORM_HUB_URL}/oauth/consent`,
   },
   {
     id: '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936',
-    name: 'Beak Trivia',
+    name: 'Trivia',
     redirect_uris: ['http://localhost:3001/auth/callback'],
     consent_page_url: `${PLATFORM_HUB_URL}/oauth/consent`,
   },

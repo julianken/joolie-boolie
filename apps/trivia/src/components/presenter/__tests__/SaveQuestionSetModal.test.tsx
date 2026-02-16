@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SaveQuestionSetModal } from '../SaveQuestionSetModal';
-import { ToastProvider } from "@beak-gaming/ui";
+import { ToastProvider } from "@joolie-boolie/ui";
 import type { Question } from '@/types';
 
 global.fetch = vi.fn();

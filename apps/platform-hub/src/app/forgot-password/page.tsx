@@ -3,15 +3,15 @@ import Link from 'next/link';
 import { ForgotPasswordForm } from '@/components';
 
 export const metadata: Metadata = {
-  title: 'Reset Password - Beak Gaming Platform',
-  description: 'Reset your Beak Gaming Platform password to regain access to your account.',
+  title: 'Reset Password - Joolie Boolie',
+  description: 'Reset your Joolie Boolie password to regain access to your account.',
 };
 
 // Force dynamic rendering to avoid build-time Supabase initialization
 export const dynamic = 'force-dynamic';
 
 /**
- * Forgot Password Page - Senior-friendly password reset page.
+ * Forgot Password Page - Accessible password reset page.
  *
  * Features:
  * - Large, clear layout
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
         <p className="text-center text-base text-muted-foreground mt-8">
           Need help?{' '}
           <a
-            href="mailto:support@beakgaming.com"
+            href="mailto:support@joolieboolie.com"
             className="text-primary hover:text-primary/80 underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
           >
             Contact Support

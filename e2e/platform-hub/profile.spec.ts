@@ -2,8 +2,8 @@
  * Profile & Settings E2E Tests
  *
  * Note: These tests use Playwright auth fixtures to create authenticated sessions.
- * The auth fixture handles login and sets required SSO cookies (beak_access_token,
- * beak_user_id) for Platform Hub protected routes.
+ * The auth fixture handles login and sets required SSO cookies (jb_access_token,
+ * jb_user_id) for Platform Hub protected routes.
  *
  * The settings page layout.tsx now checks for E2E SSO cookies before calling
  * Supabase auth, enabling these tests to run in E2E mode.
@@ -39,7 +39,7 @@ test.describe('Profile & Settings Management @high', () => {
     const emailInput = authenticatedPage.locator('input#email');
     await expect(emailInput).toBeVisible();
     const emailValue = await emailInput.inputValue();
-    expect(emailValue).toBe('e2e-test@beak-gaming.test');
+    expect(emailValue).toBe('e2e-test@joolie-boolie.test');
 
     // Facility name field should exist (may be empty for new users)
     const facilityInput = authenticatedPage.locator('input#facilityName');
@@ -65,7 +65,7 @@ test.describe('Profile & Settings Management @high', () => {
     // Update facility name
     const facilityInput = authenticatedPage.locator('input#facilityName');
     await facilityInput.clear();
-    await facilityInput.fill('Sunset Retirement Community');
+    await facilityInput.fill('Sunset Community Center');
 
     // Submit form
     const saveButton = authenticatedPage.getByRole('button', {

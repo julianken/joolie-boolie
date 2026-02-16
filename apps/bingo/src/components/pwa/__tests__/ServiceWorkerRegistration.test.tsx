@@ -183,7 +183,7 @@ describe('ServiceWorkerRegistration', () => {
       });
 
       expect(
-        screen.getByText('A new version of Beak Bingo is ready. Update now for the latest features.')
+        screen.getByText('A new version of Bingo is ready. Update now for the latest features.')
       ).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Update' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Later' })).toBeInTheDocument();

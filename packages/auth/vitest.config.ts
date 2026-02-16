@@ -5,7 +5,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['src/**/*.test.{ts,tsx}'],
-    setupFiles: ['@beak-gaming/testing/setup'],
+    setupFiles: ['@joolie-boolie/testing/setup'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

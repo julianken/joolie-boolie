@@ -3,7 +3,7 @@
  * Authenticates users and sets cross-app SSO cookies for Bingo/Trivia
  *
  * Supports E2E_TESTING mode to bypass Supabase auth and avoid rate limits.
- * When E2E_TESTING=true and email is 'e2e-test@beak-gaming.test',
+ * When E2E_TESTING=true and email is 'e2e-test@joolie-boolie.test',
  * generates a valid JWT locally without calling external services.
  */
 
@@ -18,7 +18,7 @@ if (process.env.E2E_TESTING === 'true' && process.env.NODE_ENV === 'production')
 }
 
 // E2E Testing constants
-const E2E_TEST_EMAIL = 'e2e-test@beak-gaming.test';
+const E2E_TEST_EMAIL = 'e2e-test@joolie-boolie.test';
 const E2E_TEST_USER_ID = 'e2e-test-user-00000000-0000-0000-0000-000000000000';
 
 // E2E Testing: Secret loaded from environment variable (never hardcoded)
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       const expiresIn = 3600; // 1 hour
 
       // Set cross-app SSO cookies (same as normal flow)
-      cookieStore.set('beak_access_token', accessToken, {
+      cookieStore.set('jb_access_token', accessToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       });
 
       // Refresh token (use a static value for E2E tests)
-      cookieStore.set('beak_refresh_token', 'e2e-test-refresh-token', {
+      cookieStore.set('jb_refresh_token', 'e2e-test-refresh-token', {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       });
 
       // User ID cookie (for client-side access)
-      cookieStore.set('beak_user_id', E2E_TEST_USER_ID, {
+      cookieStore.set('jb_user_id', E2E_TEST_USER_ID, {
         httpOnly: false, // Allow client-side access
         secure: isProduction,
         sameSite: 'lax',
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     // Set cross-app SSO cookies for Bingo/Trivia
     // (cookieStore and isProduction already initialized above)
     // Access token cookie (expires with token, typically 1 hour)
-    cookieStore.set('beak_access_token', data.session.access_token, {
+    cookieStore.set('jb_access_token', data.session.access_token, {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax',
@@ -221,7 +221,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
 
     // Refresh token cookie (long-lived, typically 30 days)
     if (data.session.refresh_token) {
-      cookieStore.set('beak_refresh_token', data.session.refresh_token, {
+      cookieStore.set('jb_refresh_token', data.session.refresh_token, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     }
 
     // User ID cookie (for client-side access)
-    cookieStore.set('beak_user_id', data.user.id, {
+    cookieStore.set('jb_user_id', data.user.id, {
       httpOnly: false, // Allow client-side access
       secure: isProduction,
       sameSite: 'lax',

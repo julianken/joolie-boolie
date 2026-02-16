@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ResetPasswordForm } from '@/components/auth';
-import { useAuth } from '@beak-gaming/auth';
+import { useAuth } from '@joolie-boolie/auth';
 
 export default function ResetPasswordPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -130,7 +130,7 @@ export default function ResetPasswordPage() {
           <p className="text-center text-base text-muted-foreground mt-8">
             Need help?{' '}
             <a
-              href="mailto:support@beakgaming.com"
+              href="mailto:support@joolieboolie.com"
               className="text-primary hover:text-primary/80 underline"
             >
               Contact Support
@@ -196,7 +196,7 @@ export default function ResetPasswordPage() {
         <p className="text-center text-base text-muted-foreground mt-8">
           Need help?{' '}
           <a
-            href="mailto:support@beakgaming.com"
+            href="mailto:support@joolieboolie.com"
             className="text-primary hover:text-primary/80 underline"
           >
             Contact Support

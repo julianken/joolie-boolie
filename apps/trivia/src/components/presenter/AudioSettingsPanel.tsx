@@ -1,6 +1,6 @@
 'use client';
 
-import { Toggle, Slider } from '@beak-gaming/ui';
+import { Toggle, Slider } from '@joolie-boolie/ui';
 import { useAudioStore } from '@/stores/audio-store';
 import {
   useTTS,

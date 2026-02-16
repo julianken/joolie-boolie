@@ -2,8 +2,8 @@
 
 import { useId, useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from "@beak-gaming/ui";
-import type { TriviaPreset } from '@beak-gaming/database/types';
+import { useToast } from "@joolie-boolie/ui";
+import type { TriviaPreset } from '@joolie-boolie/database/types';
 
 export interface PresetSelectorProps {
   disabled?: boolean;

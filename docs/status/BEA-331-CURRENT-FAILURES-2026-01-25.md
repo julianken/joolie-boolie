@@ -220,5 +220,5 @@ After all phases:
 ## References
 
 - Opus Investigation: Yesterday's 3-agent parallel analysis
-- Test Output: `/private/tmp/claude/-Users-j-repos-beak-gaming-platform/tasks/b9158ac.output`
+- Test Output: `/private/tmp/claude/-Users-j-repos-joolie-boolie-platform/tasks/b9158ac.output`
 - Test Summary: `pnpm test:e2e:summary`

@@ -1,13 +1,13 @@
-# @beak-gaming/game-engine
+# @joolie-boolie/game-engine
 
-Abstract game state machine for the Beak Gaming Platform. Provides a generic foundation for game state management that individual games can extend.
+Abstract game state machine for the Joolie Boolie. Provides a generic foundation for game state management that individual games can extend.
 
 ## Installation
 
 ```json
 {
   "dependencies": {
-    "@beak-gaming/game-engine": "workspace:*"
+    "@joolie-boolie/game-engine": "workspace:*"
   }
 }
 ```
@@ -17,7 +17,7 @@ Abstract game state machine for the Beak Gaming Platform. Provides a generic fou
 ### Basic State Transitions
 
 ```typescript
-import { transition, canTransition, type GameStatus } from '@beak-gaming/game-engine';
+import { transition, canTransition, type GameStatus } from '@joolie-boolie/game-engine';
 
 // Check if a transition is valid
 if (canTransition('idle', 'START_GAME')) {
@@ -56,7 +56,7 @@ Each game app extends the base types with game-specific state:
 
 ```typescript
 // apps/my-game/src/types/index.ts
-import type { GameStatus, BaseGameState } from '@beak-gaming/game-engine';
+import type { GameStatus, BaseGameState } from '@joolie-boolie/game-engine';
 
 // Extend the base game state
 export interface MyGameState extends BaseGameState {
@@ -79,7 +79,7 @@ export type MyGameAction =
 
 ```typescript
 // apps/my-game/src/lib/game/engine.ts
-import { transition, canTransition, type GameStatus } from '@beak-gaming/game-engine';
+import { transition, canTransition, type GameStatus } from '@joolie-boolie/game-engine';
 import type { MyGameState, MyGameAction } from '@/types';
 
 export function createInitialState(): MyGameState {

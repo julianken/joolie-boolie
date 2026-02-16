@@ -138,11 +138,11 @@ vi.mocked(useGameStore).mockImplementation(...)
 
 | Package | Status | Test Count |
 |---------|--------|------------|
-| @beak-gaming/auth | PASS | 58/58 |
-| @beak-gaming/database | PASS | 90%+ coverage |
-| @beak-gaming/sync | PASS | 95%+ coverage |
-| @beak-gaming/ui | PASS | 85%+ coverage |
-| @beak-gaming/testing | N/A | Mocks only |
+| @joolie-boolie/auth | PASS | 58/58 |
+| @joolie-boolie/database | PASS | 90%+ coverage |
+| @joolie-boolie/sync | PASS | 95%+ coverage |
+| @joolie-boolie/ui | PASS | 85%+ coverage |
+| @joolie-boolie/testing | N/A | Mocks only |
 
 ---
 
@@ -319,10 +319,10 @@ AND constraint_type = 'FOREIGN KEY';
 
 | Package | Available | Used |
 |---------|-----------|------|
-| @beak-gaming/auth | 34 exports | NOT USED in Bingo/Trivia |
-| @beak-gaming/ui | 15 components | Partial (Button, Modal duplicated) |
-| @beak-gaming/database | 268 exports | USED |
-| @beak-gaming/sync | 68 exports | USED |
+| @joolie-boolie/auth | 34 exports | NOT USED in Bingo/Trivia |
+| @joolie-boolie/ui | 15 components | Partial (Button, Modal duplicated) |
+| @joolie-boolie/database | 268 exports | USED |
+| @joolie-boolie/sync | 68 exports | USED |
 
 ### 3.3 Large Files Needing Refactor
 
@@ -451,7 +451,7 @@ const { data: recentGames } = useSWR('/api/sessions/recent', fetcher);
 ### 8.2 High Priority
 
 1. Add logout functionality
-2. Integrate @beak-gaming/auth package
+2. Integrate @joolie-boolie/auth package
 3. Remove code duplication
 4. Add health check to all apps
 

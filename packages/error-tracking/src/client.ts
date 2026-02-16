@@ -1,5 +1,5 @@
 /**
- * @beak-gaming/error-tracking - Browser Client
+ * @joolie-boolie/error-tracking - Browser Client
  *
  * Browser-side error tracking with support for multiple backends.
  * Lightweight by default (console only), with optional integration points for services like Sentry.
@@ -32,7 +32,7 @@ const defaultConfig: ErrorTrackerConfig = {
   enableConsole: typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production',
   minSeverity: 'low',
   environment: typeof process !== 'undefined' ? process.env?.NODE_ENV : 'development',
-  appName: 'BeakGaming',
+  appName: 'JoolieBoolie',
   debug: false,
 };
 

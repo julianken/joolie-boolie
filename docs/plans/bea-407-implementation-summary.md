@@ -233,7 +233,7 @@ If production builds cause issues:
 
 ## References
 
-- **Linear Issue:** https://linear.app/beak-gaming/issue/BEA-407
+- **Linear Issue:** https://linear.app/joolie-boolie/issue/BEA-407
 - **Playwright Config:** `/playwright.config.ts` (lines 320-349 show CI using production builds)
 - **E2E Guide:** `/docs/E2E_TESTING_GUIDE.md`
 - **Implementation Plan:** `/docs/plans/bea-407-e2e-stability-fix.md`

@@ -68,7 +68,7 @@ interface TriviaQuestion {
 
 ```json
 {
-  "name": "Trivia Night Week 1",
+  "name": "Trivia Week 1",
   "description": "Questions for January trivia event",
   "categories": [
     {

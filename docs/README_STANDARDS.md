@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Last Updated:** January 21, 2026
-**Applies To:** All apps and packages in the Beak Gaming Platform monorepo
+**Applies To:** All apps and packages in the Joolie Boolie monorepo
 
 ---
 
@@ -10,7 +10,7 @@
 
 ### Purpose
 
-This document defines the standards for writing and maintaining README files across the Beak Gaming Platform monorepo. Consistent documentation ensures that developers, contributors, and stakeholders can quickly understand each component's purpose, capabilities, and integration status.
+This document defines the standards for writing and maintaining README files across the Joolie Boolie monorepo. Consistent documentation ensures that developers, contributors, and stakeholders can quickly understand each component's purpose, capabilities, and integration status.
 
 ### Benefits of Consistent Documentation
 
@@ -70,7 +70,7 @@ Every README must begin with a status badge immediately after the title:
 ### Status Examples
 
 ```markdown
-# Beak Bingo
+# Bingo
 
 **Status:** ✅ Production Ready (85% Complete)
 
@@ -105,7 +105,7 @@ One paragraph explaining what the app does and who it's for.
 
 **Example:**
 ```markdown
-Full-featured 75-ball bingo game designed for retirement communities. Includes 29 patterns, dual-screen presenter/audience views, audio calling, customizable themes, and PWA support for offline play.
+Full-featured 75-ball bingo game designed for groups and communities. Includes 29 patterns, dual-screen presenter/audience views, audio calling, customizable themes, and PWA support for offline play.
 ```
 
 #### Section 3: Features
@@ -240,11 +240,11 @@ List which packages the app depends on.
 ## Shared Packages
 
 This app uses:
-- **@beak-gaming/sync** - Dual-screen synchronization
-- **@beak-gaming/ui** - UI components (Button, Toggle, Slider)
-- **@beak-gaming/theme** - Design tokens and CSS
-- **@beak-gaming/database** - Supabase client and utilities
-- **@beak-gaming/auth** - Authentication hooks and providers
+- **@joolie-boolie/sync** - Dual-screen synchronization
+- **@joolie-boolie/ui** - UI components (Button, Toggle, Slider)
+- **@joolie-boolie/theme** - Design tokens and CSS
+- **@joolie-boolie/database** - Supabase client and utilities
+- **@joolie-boolie/auth** - Authentication hooks and providers
 ```
 
 #### Section 10: Integration Status
@@ -316,7 +316,7 @@ Packages are located in `packages/` and represent shared libraries used across a
 #### Section 1: Title + Status Badge
 
 ```markdown
-# @beak-gaming/package-name
+# @joolie-boolie/package-name
 
 **Status:** ✅ Production Ready (100% Complete)
 ```
@@ -354,12 +354,12 @@ How to install/use the package in the monorepo.
 ```markdown
 ## Installation
 
-This package is part of the Beak Gaming Platform monorepo. Add it to your app's dependencies:
+This package is part of the Joolie Boolie monorepo. Add it to your app's dependencies:
 
 \`\`\`json
 {
   "dependencies": {
-    "@beak-gaming/sync": "workspace:*"
+    "@joolie-boolie/sync": "workspace:*"
   }
 }
 \`\`\`
@@ -379,7 +379,7 @@ Minimal working example.
 ## Quick Start
 
 \`\`\`typescript
-import { createSyncStore, useSyncStore } from '@beak-gaming/sync';
+import { createSyncStore, useSyncStore } from '@joolie-boolie/sync';
 
 // Define your message types
 type MyMessage =
@@ -486,9 +486,9 @@ List related packages in the monorepo.
 ```markdown
 ## Related Packages
 
-- **@beak-gaming/ui** - UI components
-- **@beak-gaming/theme** - Design tokens
-- **@beak-gaming/testing** - Test utilities (includes sync mocks)
+- **@joolie-boolie/ui** - UI components
+- **@joolie-boolie/theme** - Design tokens
+- **@joolie-boolie/testing** - Test utilities (includes sync mocks)
 ```
 
 #### Section 10: Related Documentation
@@ -517,7 +517,7 @@ Use consistent terminology across all READMEs:
 | Presenter view | Host view, Control panel | Dual-screen apps |
 | Audience view | Display view, Player view | Dual-screen apps |
 | BroadcastChannel API | Browser sync, Window communication | Technical docs |
-| Senior-friendly | Elder-friendly, Accessible | Design language |
+| Accessible | Elder-friendly, Accessible | Design language |
 | Game engine | Game logic, Core | Architecture |
 | Pure functions | Stateless functions | Game engine |
 | Zustand store | State store, Store | State management |
@@ -568,9 +568,9 @@ Always use real package names in examples:
 
 ```typescript
 ✅ Correct:
-import { Button } from '@beak-gaming/ui';
-import { useAuth } from '@beak-gaming/auth';
-import { createClient } from '@beak-gaming/database';
+import { Button } from '@joolie-boolie/ui';
+import { useAuth } from '@joolie-boolie/auth';
+import { createClient } from '@joolie-boolie/database';
 
 ❌ Incorrect:
 import { Button } from '../ui';
@@ -622,12 +622,12 @@ useEffect(() => {
 
 ```markdown
 ✅ Correct:
-# Beak Gaming Platform
+# Joolie Boolie
 ## Architecture overview
 ### Game engine pattern
 
 ❌ Incorrect:
-# Beak gaming platform
+# Joolie Boolie platform
 ## Architecture Overview
 ### Game Engine Pattern
 ```
@@ -655,7 +655,7 @@ See [Testing Guide](../../docs/TESTING.md)
 
 **Other packages:**
 ```markdown
-See [@beak-gaming/ui README](../../packages/ui/README.md)
+See [@joolie-boolie/ui README](../../packages/ui/README.md)
 ```
 
 **Always use relative paths, not absolute paths:**
@@ -682,7 +682,7 @@ See [@beak-gaming/ui README](../../packages/ui/README.md)
 **Copy-Pasteable:**
 ```typescript
 // ✅ This works if pasted into a file
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 export function MyComponent() {
   return <Button onClick={() => alert('Hello')}>Click Me</Button>;
@@ -693,7 +693,7 @@ export function MyComponent() {
 ```typescript
 // ✅ All imports shown
 import { useEffect } from 'react';
-import { useSyncStore } from '@beak-gaming/sync';
+import { useSyncStore } from '@joolie-boolie/sync';
 
 // ❌ Missing imports
 function MyComponent() {
@@ -721,7 +721,7 @@ const useStore = create((set) => ({
 **1. Minimal Example (Quick Start):**
 ```typescript
 // Simplest possible usage
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 
 <Button>Click Me</Button>
 ```
@@ -729,7 +729,7 @@ import { Button } from '@beak-gaming/ui';
 **2. Common Use Case:**
 ```typescript
 // Realistic component
-import { Button } from '@beak-gaming/ui';
+import { Button } from '@joolie-boolie/ui';
 import { useGameStore } from '@/stores/game';
 
 export function GameControls() {
@@ -753,7 +753,7 @@ export function GameControls() {
 // Complex integration
 import { useEffect } from 'react';
 import { create } from 'zustand';
-import { createSyncStore } from '@beak-gaming/sync';
+import { createSyncStore } from '@joolie-boolie/sync';
 
 type GameMessage =
   | { type: 'START'; timestamp: number }
@@ -792,7 +792,7 @@ Use this checklist when creating or updating READMEs:
 ### Code Quality
 - [ ] Minimum 3 working examples for packages (1 for apps)
 - [ ] All code blocks have language identifiers (```typescript, ```tsx, ```bash)
-- [ ] Examples use real package names (e.g., `@beak-gaming/ui`, not `../ui`)
+- [ ] Examples use real package names (e.g., `@joolie-boolie/ui`, not `../ui`)
 - [ ] Examples are copy-pasteable and complete
 
 ### Consistency
@@ -1159,8 +1159,8 @@ pnpm lint
 ## Shared Packages
 
 This app uses:
-- **@beak-gaming/package1** - Description
-- **@beak-gaming/package2** - Description
+- **@joolie-boolie/package1** - Description
+- **@joolie-boolie/package2** - Description
 
 ## Integration Status
 
@@ -1188,7 +1188,7 @@ This app uses:
 ### 10.2 Complete Package README Template
 
 ```markdown
-# @beak-gaming/package-name
+# @joolie-boolie/package-name
 
 **Status:** ✅ Production Ready (100% Complete)
 
@@ -1205,7 +1205,7 @@ One paragraph description of what this package does.
 \`\`\`json
 {
   "dependencies": {
-    "@beak-gaming/package-name": "workspace:*"
+    "@joolie-boolie/package-name": "workspace:*"
   }
 }
 \`\`\`
@@ -1217,7 +1217,7 @@ pnpm install
 ## Quick Start
 
 \`\`\`typescript
-import { Thing } from '@beak-gaming/package-name';
+import { Thing } from '@joolie-boolie/package-name';
 
 // Minimal example
 const thing = new Thing();
@@ -1272,8 +1272,8 @@ Explanation of key design decisions.
 
 ## Related Packages
 
-- **@beak-gaming/related1** - Description
-- **@beak-gaming/related2** - Description
+- **@joolie-boolie/related1** - Description
+- **@joolie-boolie/related2** - Description
 
 ## Related Documentation
 
@@ -1407,9 +1407,9 @@ Run these commands from repository root to find instances that need updating.
 ## Acknowledgments
 
 This standards document was created based on:
-- Analysis of existing Beak Gaming Platform READMEs
+- Analysis of existing Joolie Boolie READMEs
 - Best practices from the monorepo community
-- Senior-friendly design requirements
+- Accessible design requirements
 - Feedback from AI assistant integration (Claude Code)
 
 For questions or suggestions about these standards, open an issue or PR in the repository.

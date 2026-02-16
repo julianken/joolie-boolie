@@ -42,7 +42,7 @@ export function LoginButton({ returnTo }: LoginButtonProps) {
         disabled:opacity-50 disabled:cursor-not-allowed
       "
     >
-      {loading ? 'Redirecting...' : 'Sign in with Beak Gaming'}
+      {loading ? 'Redirecting...' : 'Sign in with Joolie Boolie'}
     </button>
   );
 }

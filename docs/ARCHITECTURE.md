@@ -27,15 +27,15 @@ GameState (immutable) → engine functions → new GameState
 ## Monorepo Structure
 
 ```
-beak-gaming-platform/
+joolie-boolie-platform/
 ├── apps/
-│   ├── bingo/           # Beak Bingo - 75-ball bingo game (port 3000)
-│   ├── trivia/          # Trivia Night - Team trivia game (port 3001)
+│   ├── bingo/           # Bingo - 75-ball bingo game (port 3000)
+│   ├── trivia/          # Trivia - Team trivia game (port 3001)
 │   └── platform-hub/    # Central hub - auth, dashboard, game selector (port 3002)
 ├── packages/
 │   ├── sync/            # Dual-screen synchronization (BroadcastChannel)
 │   ├── ui/              # Shared UI components (Button, Modal, Toggle, Input, etc.)
-│   ├── theme/           # Senior-friendly design tokens and CSS
+│   ├── theme/           # Accessible design tokens and CSS
 │   ├── auth/            # Supabase authentication wrappers (34 exports)
 │   ├── game-engine/     # Abstract game state machine
 │   ├── database/        # Supabase database utilities (268 exports)

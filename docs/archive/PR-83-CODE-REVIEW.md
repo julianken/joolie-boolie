@@ -3,7 +3,7 @@
 **Reviewer:** Claude Sonnet 4.5
 **Date:** 2026-01-20
 **Branch:** feat/session-routes-factory
-**PR:** https://github.com/julianken/beak-gaming-platform/pull/83
+**PR:** https://github.com/julianken/joolie-boolie-platform/pull/83
 
 ---
 
@@ -545,7 +545,7 @@ Since the apps don't use this factory yet (no integration), I couldn't test runt
    - 4-6 digit PINs = 10,000 to 1,000,000 combinations
    - With 5 attempts, ~0.05% to 0.0005% success rate for random guessing
    - With 15-minute lockout, max ~480 attempts/day
-   - **Assessment:** Acceptable for this use case (retirement community, low stakes)
+   - **Assessment:** Acceptable for this use case (group and community, low stakes)
    - **Consideration:** For higher security needs, consider 6-8 digits minimum
 
 3. **Session Expiration**

@@ -1,4 +1,4 @@
-# BEAK GAMING PLATFORM - MASTER PLAN
+# JOOLIE BOOLIE PLATFORM - MASTER PLAN
 ## Single Source of Truth | Internal Beta MVP Roadmap
 
 **Last Updated:** January 22, 2026
@@ -10,7 +10,7 @@
 
 ## EXECUTIVE SUMMARY
 
-The Beak Gaming Platform is a unified gaming system for retirement communities, featuring Bingo and Trivia games with shared authentication, template management, and dual-screen presentation capabilities. Built as a Turborepo monorepo with 3 apps and 9 shared packages.
+The Joolie Boolie is a unified gaming system for groups and communities, featuring Bingo and Trivia games with shared authentication, template management, and dual-screen presentation capabilities. Built as a Turborepo monorepo with 3 apps and 9 shared packages.
 
 ### Current State
 
@@ -19,12 +19,12 @@ The Beak Gaming Platform is a unified gaming system for retirement communities, 
 | **Bingo App** | 85% | ✅ Production Ready | Full game engine, 29 patterns, audio, OAuth, templates |
 | **Trivia App** | 95% | ✅ Production Ready | Full game engine, 20 questions, TTS, OAuth, templates, CSV import |
 | **Platform Hub** | 55-60% | 🚧 Active Development | OAuth server + CSRF + token rotation + consent UI + security hardening complete |
-| **@beak-gaming/auth** | 95% | ✅ Complete | 34 exports, partially integrated (Platform Hub only) |
-| **@beak-gaming/database** | 98% | ✅ Complete | 268 exports, type-safe client, CRUD, React hooks, PIN security |
-| **@beak-gaming/sync** | 100% | ✅ Complete | BroadcastChannel sync, comprehensive tests |
-| **@beak-gaming/ui** | 100% | ✅ Complete | Button, Toggle, Slider, Modal, Input, Skeleton variants |
-| **@beak-gaming/theme** | 100% | ✅ Complete | 2 theme modes (light/dark), senior-friendly tokens |
-| **@beak-gaming/testing** | 70% | ⚠️ Partial | Mocks complete, helpers module unimplemented |
+| **@joolie-boolie/auth** | 95% | ✅ Complete | 34 exports, partially integrated (Platform Hub only) |
+| **@joolie-boolie/database** | 98% | ✅ Complete | 268 exports, type-safe client, CRUD, React hooks, PIN security |
+| **@joolie-boolie/sync** | 100% | ✅ Complete | BroadcastChannel sync, comprehensive tests |
+| **@joolie-boolie/ui** | 100% | ✅ Complete | Button, Toggle, Slider, Modal, Input, Skeleton variants |
+| **@joolie-boolie/theme** | 100% | ✅ Complete | 2 theme modes (light/dark), accessible tokens |
+| **@joolie-boolie/testing** | 70% | ⚠️ Partial | Mocks complete, helpers module unimplemented |
 
 ### MVP Definition (Internal Beta Ready)
 
@@ -68,7 +68,7 @@ The Beak Gaming Platform is a unified gaming system for retirement communities, 
 ### 1.1 Monorepo Structure
 
 ```
-beak-gaming-platform/
+joolie-boolie-platform/
 ├── apps/
 │   ├── bingo/              # Port 3000 - 75-ball bingo with 29 patterns
 │   ├── platform-hub/       # Port 3002 - OAuth server + game selector
@@ -244,7 +244,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
 **Tailwind 4 (vs CSS Modules, Styled Components):**
 - JIT compilation (only used classes)
-- Design tokens align with senior-friendly theme
+- Design tokens align with accessible theme
 - Large community, extensive plugins
 - No runtime CSS-in-JS overhead
 
@@ -362,22 +362,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
 | Package | Status | Exports | Test Coverage |
 |---------|--------|---------|---------------|
-| @beak-gaming/auth | ✅ 95% | 34 (AuthProvider, hooks, ProtectedRoute) | 100% (58/58 tests) |
-| @beak-gaming/database | ✅ 98% | 268 (client, CRUD, hooks, filters, PIN security) | 90%+ |
-| @beak-gaming/sync | ✅ 100% | 68 exports (BroadcastSync, hooks, stores, session utils, room code generator) | 95%+ |
-| @beak-gaming/ui | ⚠️ 88% | 15 components (Button, Modal, Toggle, Input, Slider, Skeleton variants, Confetti, SyncStatusIndicator, CreateGameModal, JoinGameModal, RoomCodeDisplay). Missing: Card, Toast (Toast duplicated in apps) | 85%+ |
-| @beak-gaming/theme | ✅ 100% | 2 theme modes + design tokens | N/A |
-| @beak-gaming/game-engine | ⚠️ 60-70% | GameStatus, transitions, statistics (700+ lines) | 90%+ |
-| @beak-gaming/types | ✅ Complete | Shared TypeScript types | N/A |
-| @beak-gaming/error-tracking | ✅ Complete | ErrorBoundary, client/server loggers | 85%+ |
-| @beak-gaming/testing | ⚠️ 70% | BroadcastChannel, Audio, Supabase mocks (helpers empty) | N/A |
+| @joolie-boolie/auth | ✅ 95% | 34 (AuthProvider, hooks, ProtectedRoute) | 100% (58/58 tests) |
+| @joolie-boolie/database | ✅ 98% | 268 (client, CRUD, hooks, filters, PIN security) | 90%+ |
+| @joolie-boolie/sync | ✅ 100% | 68 exports (BroadcastSync, hooks, stores, session utils, room code generator) | 95%+ |
+| @joolie-boolie/ui | ⚠️ 88% | 15 components (Button, Modal, Toggle, Input, Slider, Skeleton variants, Confetti, SyncStatusIndicator, CreateGameModal, JoinGameModal, RoomCodeDisplay). Missing: Card, Toast (Toast duplicated in apps) | 85%+ |
+| @joolie-boolie/theme | ✅ 100% | 2 theme modes + design tokens | N/A |
+| @joolie-boolie/game-engine | ⚠️ 60-70% | GameStatus, transitions, statistics (700+ lines) | 90%+ |
+| @joolie-boolie/types | ✅ Complete | Shared TypeScript types | N/A |
+| @joolie-boolie/error-tracking | ✅ Complete | ErrorBoundary, client/server loggers | 85%+ |
+| @joolie-boolie/testing | ⚠️ 70% | BroadcastChannel, Audio, Supabase mocks (helpers empty) | N/A |
 
 **Key Findings:**
-- `@beak-gaming/auth` **NOT integrated in Bingo/Trivia** (34 exports available but apps have duplicate OAuth clients)
+- `@joolie-boolie/auth` **NOT integrated in Bingo/Trivia** (34 exports available but apps have duplicate OAuth clients)
 - Platform Hub duplicates auth code in `/lib/supabase/*` instead of using package exports
-- `@beak-gaming/game-engine` underutilized (apps don't use shared base types)
-- `@beak-gaming/testing` helpers module is placeholder only
-- `@beak-gaming/ui` missing Card and Toast components (15/17 claimed components = 88%)
+- `@joolie-boolie/game-engine` underutilized (apps don't use shared base types)
+- `@joolie-boolie/testing` helpers module is placeholder only
+- `@joolie-boolie/ui` missing Card and Toast components (15/17 claimed components = 88%)
 
 ---
 
@@ -458,14 +458,14 @@ SELECT * FROM public.bingo_templates;  -- Should be empty or have valid user_ids
 
 ---
 
-#### Task 5: Extract Duplicate OAuth Clients to @beak-gaming/auth
+#### Task 5: Extract Duplicate OAuth Clients to @joolie-boolie/auth
 **Current State:** Bingo and Trivia have identical OAuth client implementations (100% duplicate)
 
 **Actions:**
 1. Extract `startOAuthFlow()` to `packages/auth/src/oauth-client.ts`
 2. Parameterize app-specific values (app name, storage keys)
-3. Update Bingo to import from `@beak-gaming/auth`
-4. Update Trivia to import from `@beak-gaming/auth`
+3. Update Bingo to import from `@joolie-boolie/auth`
+4. Update Trivia to import from `@joolie-boolie/auth`
 5. Delete duplicate files
 6. Run tests to verify integration
 
@@ -786,7 +786,7 @@ async function safeHandler<T>(
 - jsdom 27.4.0 (DOM environment)
 
 **Mocks Available:**
-- BroadcastChannel (`@beak-gaming/testing`)
+- BroadcastChannel (`@joolie-boolie/testing`)
 - Audio APIs
 - localStorage/sessionStorage
 - Supabase clients
@@ -811,22 +811,22 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...  # Server-side
 SESSION_TOKEN_SECRET=<generate-with-openssl-rand-hex-32>
 
 # App URLs
-NEXT_PUBLIC_APP_URL=https://bingo.beakgaming.com        # Bingo
-NEXT_PUBLIC_APP_URL=https://trivia.beakgaming.com       # Trivia
-NEXT_PUBLIC_APP_URL=https://hub.beakgaming.com          # Platform-Hub
+NEXT_PUBLIC_APP_URL=https://bingo.joolieboolie.com        # Bingo
+NEXT_PUBLIC_APP_URL=https://trivia.joolieboolie.com       # Trivia
+NEXT_PUBLIC_APP_URL=https://hub.joolieboolie.com          # Platform-Hub
 
 # Cross-App URLs (Platform-Hub only)
-NEXT_PUBLIC_BINGO_URL=https://bingo.beakgaming.com
-NEXT_PUBLIC_TRIVIA_URL=https://trivia.beakgaming.com
+NEXT_PUBLIC_BINGO_URL=https://bingo.joolieboolie.com
+NEXT_PUBLIC_TRIVIA_URL=https://trivia.joolieboolie.com
 
 # OAuth (Bingo & Trivia)
 NEXT_PUBLIC_OAUTH_CLIENT_ID=<from-supabase-dashboard>
-NEXT_PUBLIC_OAUTH_REDIRECT_URI=https://bingo.beakgaming.com/auth/callback     # Per-app
-NEXT_PUBLIC_OAUTH_CONSENT_URL=https://hub.beakgaming.com/oauth/consent
+NEXT_PUBLIC_OAUTH_REDIRECT_URI=https://bingo.joolieboolie.com/auth/callback     # Per-app
+NEXT_PUBLIC_OAUTH_CONSENT_URL=https://hub.joolieboolie.com/oauth/consent
 
 # Turbo Remote Caching (Optional, CI/CD only)
 TURBO_TOKEN=<from-vercel>
-TURBO_TEAM=beak-gaming
+TURBO_TEAM=joolie-boolie
 TURBO_REMOTE_ONLY=true
 ```
 
@@ -842,7 +842,7 @@ TURBO_REMOTE_ONLY=true
 
 **Build Command:**
 ```bash
-cd ../.. && pnpm turbo build --filter=@beak-gaming/bingo...
+cd ../.. && pnpm turbo build --filter=@joolie-boolie/bingo...
 ```
 
 **Status:** ✅ Ready for deployment after critical fixes
@@ -941,7 +941,7 @@ cd ../.. && pnpm turbo build --filter=@beak-gaming/bingo...
 - Scales to 10+ tabs
 
 **Trade-offs:**
-- Only works same-device (acceptable for retirement communities)
+- Only works same-device (acceptable for groups and communities)
 - No message persistence (acceptable, state recovered on refresh)
 
 **Status:** ✅ Keep - Perfect fit for use case
@@ -951,10 +951,10 @@ cd ../.. && pnpm turbo build --filter=@beak-gaming/bingo...
 ### 10.2 Implementation Decisions
 
 #### Why Custom OAuth Clients in Apps?
-**Decision:** Apps implement own OAuth clients instead of using @beak-gaming/auth
+**Decision:** Apps implement own OAuth clients instead of using @joolie-boolie/auth
 
 **Rationale:**
-- @beak-gaming/auth wasn't ready when apps were built
+- @joolie-boolie/auth wasn't ready when apps were built
 - Apps needed OAuth immediately for MVP
 - Simple 60-line implementation, easy to replicate
 
@@ -1062,7 +1062,7 @@ async function playRollSound(volume: number, soundFile: string): Promise<void> {
 
 **The Problem:** 60 lines of identical PKCE + OAuth logic in both apps
 
-**Better Approach:** Extract to `@beak-gaming/auth` package
+**Better Approach:** Extract to `@joolie-boolie/auth` package
 
 **Quick Win:** Eliminates 60 lines of duplication, already budgeted in roadmap.
 
@@ -1073,7 +1073,7 @@ async function playRollSound(volume: number, soundFile: string): Promise<void> {
 
 **The Problem:** Shared package has Button, but both apps maintain duplicates
 
-**Better Approach:** Delete duplicate Button/Modal/Toast, re-export from @beak-gaming/ui
+**Better Approach:** Delete duplicate Button/Modal/Toast, re-export from @joolie-boolie/ui
 
 **Quick Win:** Removes 180+ lines, trivial complexity.
 
@@ -1084,7 +1084,7 @@ async function playRollSound(volume: number, soundFile: string): Promise<void> {
 
 **The Problem:** 100% identical Toast implementations in both apps - byte-for-byte duplicate code
 
-**Better Approach:** Extract to `@beak-gaming/ui` package as single shared Toast component
+**Better Approach:** Extract to `@joolie-boolie/ui` package as single shared Toast component
 
 **Quick Win:** Removes 351 lines of duplication, ensures consistent Toast behavior across platform, reduces maintenance burden
 
@@ -1098,7 +1098,7 @@ async function playRollSound(volume: number, soundFile: string): Promise<void> {
 
 **The Problem:** Package has Modal, but apps maintain separate (different) implementations. Bingo and Trivia use different approaches (div vs dialog).
 
-**Better Approach:** Consolidate to single Modal in `@beak-gaming/ui` with variants if needed
+**Better Approach:** Consolidate to single Modal in `@joolie-boolie/ui` with variants if needed
 
 **Quick Win:** Delete app-level variants after ensuring package Modal supports needed features (focus trap, portal, accessibility)
 
@@ -1226,8 +1226,8 @@ All critical path and security hardening tasks completed:
 **Wave 2C: Code Consolidation ✅ COMPLETE (Jan 2026)**
 1. BEA-312: Fixed PBKDF2 timing attack vulnerability (PR #184)
 2. BEA-306: Implemented cross-app SSO with unified cookies (PR #185, -936 lines)
-3. BEA-307: Consolidated Toast components to @beak-gaming/ui (PR #186, -693 lines)
-4. BEA-308: Consolidated Button/Modal components to @beak-gaming/ui (PR #187, -537 lines)
+3. BEA-307: Consolidated Toast components to @joolie-boolie/ui (PR #186, -693 lines)
+4. BEA-308: Consolidated Button/Modal components to @joolie-boolie/ui (PR #187, -537 lines)
 - **Total:** 2,166 lines removed, 4 PRs awaiting review
 
 > **Note:** Original BEA-306 scope was OAuth client consolidation. Implemented SSO instead as more valuable MVP feature. OAuth client consolidation deemed premature optimization.

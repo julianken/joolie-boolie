@@ -71,9 +71,9 @@ test.describe('Real Supabase Login', () => {
 
     // Verify SSO cookies were set
     const cookies = await page.context().cookies();
-    const accessTokenCookie = cookies.find((c) => c.name === 'beak_access_token');
-    const refreshTokenCookie = cookies.find((c) => c.name === 'beak_refresh_token');
-    const userIdCookie = cookies.find((c) => c.name === 'beak_user_id');
+    const accessTokenCookie = cookies.find((c) => c.name === 'jb_access_token');
+    const refreshTokenCookie = cookies.find((c) => c.name === 'jb_refresh_token');
+    const userIdCookie = cookies.find((c) => c.name === 'jb_user_id');
 
     expect(accessTokenCookie).toBeTruthy();
     expect(refreshTokenCookie).toBeTruthy();
