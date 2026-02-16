@@ -25,6 +25,7 @@ import { shouldRefreshToken, refreshTokens } from '@beak-gaming/auth';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const PLATFORM_HUB_URL = process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002';
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN?.trim() || undefined;
+const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID;
 
 // Production guard: E2E mode must never run in production
 if (process.env.E2E_TESTING === 'true' && process.env.NODE_ENV === 'production') {
@@ -220,7 +221,7 @@ export async function middleware(request: NextRequest) {
 
   // Check if token needs proactive refresh (5 minutes before expiry)
   if (shouldRefreshToken(accessToken) && refreshToken) {
-    const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL);
+    const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
 
     if (result.success && result.accessToken && result.refreshToken) {
       // Token refreshed successfully - continue with new tokens in response cookies
@@ -244,7 +245,7 @@ export async function middleware(request: NextRequest) {
   if (!isValid) {
     // Invalid token - try one more time to refresh before giving up
     if (refreshToken) {
-      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL);
+      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
       if (result.success && result.accessToken && result.refreshToken) {
         const isNewTokenValid = await verifyAccessToken(result.accessToken);
         if (isNewTokenValid) {
