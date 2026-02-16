@@ -46,6 +46,15 @@ pnpm-debug.log*
 # Secrets (local-only credentials, never commit)
 .secrets/
 
+# Screenshots (QA artifacts)
+*.png
+
+# Env backups
+*.backup-pre-manual-test
+
+# Supabase local state
+supabase/.branches/
+
 # Misc
 .vercel
 .worktrees
