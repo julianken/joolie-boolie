@@ -16,13 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Joolie Boolie Bingo",
+  title: "Bingo",
   description: "Cloud-based Bingo system for groups and communities",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Joolie Boolie Bingo",
+    title: "Bingo",
   },
   formatDetection: {
     telephone: false,

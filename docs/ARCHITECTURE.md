@@ -29,7 +29,7 @@ GameState (immutable) → engine functions → new GameState
 ```
 joolie-boolie-platform/
 ├── apps/
-│   ├── bingo/           # Joolie Boolie Bingo - 75-ball bingo game (port 3000)
+│   ├── bingo/           # Bingo - 75-ball bingo game (port 3000)
 │   ├── trivia/          # Trivia - Team trivia game (port 3001)
 │   └── platform-hub/    # Central hub - auth, dashboard, game selector (port 3002)
 ├── packages/

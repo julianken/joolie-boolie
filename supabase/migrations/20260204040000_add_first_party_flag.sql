@@ -6,6 +6,6 @@ ADD COLUMN is_first_party BOOLEAN NOT NULL DEFAULT false;
 UPDATE oauth_clients
 SET is_first_party = true
 WHERE id IN (
-  '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21', -- Joolie Boolie Bingo
-  '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936'  -- Joolie Boolie Trivia
+  '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21', -- Bingo
+  '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936'  -- Trivia
 );

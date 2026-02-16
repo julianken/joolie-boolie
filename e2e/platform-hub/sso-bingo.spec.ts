@@ -172,7 +172,7 @@ test.describe('Bingo → Platform Hub SSO', () => {
 
       // Verify consent page elements
       await expect(page.locator('h1:has-text("Authorize Access")')).toBeVisible();
-      await expect(page.getByRole('heading', { name: 'Joolie Boolie Bingo' })).toBeVisible(); // Client name
+      await expect(page.getByRole('heading', { name: 'Bingo' })).toBeVisible(); // Client name
       await expect(page.locator(`text=${testUser.email}`)).toBeVisible(); // User email
       await expect(page.locator('text=wants to access your Joolie Boolie account')).toBeVisible();
 

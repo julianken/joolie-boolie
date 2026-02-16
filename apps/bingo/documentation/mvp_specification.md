@@ -430,7 +430,7 @@ bingo-project/
 
 ## Decisions Made
 
-1. **Project name:** Joolie Boolie Bingo
+1. **Project name:** Bingo
 2. **Audio voices:** Multiple selectable options (3-4 voices: male/female, professional/warm)
 3. **Logo upload limits:** Max 2MB, jpg/png/webp
 4. **Access model:** Free to play (no login required), optional accounts for saving templates

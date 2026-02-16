@@ -15,7 +15,7 @@
 │   4. Delete this instruction block before committing                        │
 │                                                                              │
 │ PLACEHOLDERS TO REPLACE:                                                     │
-│   [APP_NAME]           - Full app name (e.g., "Joolie Boolie Bingo")                │
+│   [APP_NAME]           - Full app name (e.g., "Bingo")                │
 │   [APP_SLUG]           - Directory name (e.g., "bingo")                     │
 │   [PORT]               - Dev server port (e.g., "3000")                     │
 │   [STATUS]             - Current status (e.g., "✅ Production Ready (85%)") │

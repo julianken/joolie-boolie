@@ -543,7 +543,7 @@ export default function PlayPage() {
             {/* Title section */}
             <div className="flex-shrink-0">
               <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                Joolie Boolie Bingo
+                Bingo
               </h1>
               <p className="text-lg text-muted-foreground">Presenter View</p>
             </div>

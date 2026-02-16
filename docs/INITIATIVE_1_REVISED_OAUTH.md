@@ -200,7 +200,7 @@ curl -s https://iivxpjhmnalsuvpdzgza.supabase.co/auth/v1/.well-known/openid-conf
 
 2. **Register Bingo Client:**
    - Click: "New OAuth Client" or "Register Client"
-   - Client Name: `Joolie Boolie Bingo`
+   - Client Name: `Bingo`
    - Client Type: `Public` (no client secret)
    - Redirect URIs:
      - Dev: `http://localhost:3000/auth/callback`
@@ -283,8 +283,8 @@ grep OAUTH apps/trivia/.env.local
    - Configured Authorization Path: `/oauth/consent`
    - Settings saved successfully
 
-2. **Joolie Boolie Bingo Client Registered:**
-   - Client Name: `Joolie Boolie Bingo`
+2. **Bingo Client Registered:**
+   - Client Name: `Bingo`
    - Client ID: `0d87a03a-d90a-4ccc-a46b-85fdd8d53c21`
    - Client Type: Public (PKCE-enabled, no client secret)
    - Redirect URIs:

@@ -48,7 +48,7 @@ function TriviaIcon() {
 const games = [
   {
     id: 'bingo',
-    title: 'Joolie Boolie Bingo',
+    title: 'Bingo',
     description:
       'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers and automatic ball calling.',
     href: process.env.NEXT_PUBLIC_BINGO_URL

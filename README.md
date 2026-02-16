@@ -20,7 +20,7 @@ A unified gaming platform for groups and communities, featuring Bingo, Trivia, a
 
 ## Features
 
-### Joolie Boolie Bingo
+### Bingo
 - 75-ball bingo (B:1-15, I:16-30, N:31-45, G:46-60, O:61-75)
 - 15+ bingo patterns (lines, corners, frames, shapes, letters, blackout)
 - Voice packs with British slang variant and hall reverb options
@@ -65,7 +65,7 @@ A unified gaming platform for groups and communities, featuring Bingo, Trivia, a
 ```
 joolie-boolie-platform/
 ├── apps/
-│   ├── bingo/           # Joolie Boolie Bingo (port 3000) - See README: apps/bingo/README.md
+│   ├── bingo/           # Bingo (port 3000) - See README: apps/bingo/README.md
 │   ├── trivia/          # Trivia (port 3001) - See README: apps/trivia/README.md
 │   └── platform-hub/    # Central hub (port 3002) - See README: apps/platform-hub/README.md
 ├── packages/

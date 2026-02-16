@@ -170,7 +170,7 @@ function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
   return [
     {
       id: 'bingo',
-      title: 'Joolie Boolie Bingo',
+      title: 'Bingo',
       description:
         'Classic 75-ball bingo with dual-screen display. Perfect for bingo nights with large, easy-to-read numbers.',
       href: process.env.NEXT_PUBLIC_BINGO_URL

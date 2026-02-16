@@ -78,13 +78,13 @@ USING (true);
 INSERT INTO oauth_clients (id, name, redirect_uris, consent_page_url) VALUES
   (
     '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21'::uuid,
-    'Joolie Boolie Bingo',
+    'Bingo',
     ARRAY['http://localhost:3000/auth/callback', 'https://bingo.joolieboolie.com/auth/callback'],
     'http://localhost:3002/oauth/consent'
   ),
   (
     '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936'::uuid,
-    'Joolie Boolie Trivia',
+    'Trivia',
     ARRAY['http://localhost:3001/auth/callback', 'https://trivia.joolieboolie.com/auth/callback'],
     'http://localhost:3002/oauth/consent'
   );

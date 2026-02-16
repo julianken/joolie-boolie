@@ -207,7 +207,7 @@ Error: element(s) not found
 // Presenter clicks "Open Display"
 // → Opens http://localhost:3000/display?session=A3B7K9
 // → Display page loads via BroadcastChannel sync (no network needed)
-// → Shows "Joolie Boolie Bingo" heading
+// → Shows "Bingo" heading
 ```
 
 #### Debugging Steps:

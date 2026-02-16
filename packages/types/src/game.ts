@@ -33,7 +33,7 @@ export type GameType = 'bingo' | 'trivia';
  * Map of game types to their display names.
  */
 export const GAME_TYPE_NAMES: Record<GameType, string> = {
-  bingo: 'Joolie Boolie Bingo',
+  bingo: 'Bingo',
   trivia: 'Trivia',
 } as const;
 

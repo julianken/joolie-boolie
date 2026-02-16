@@ -43,7 +43,7 @@ const session: GameSession = {
 
 // Check game type
 const gameType: GameType = 'bingo'; // 'bingo' | 'trivia'
-const displayName = GAME_TYPE_NAMES[gameType]; // 'Joolie Boolie Bingo'
+const displayName = GAME_TYPE_NAMES[gameType]; // 'Bingo'
 ```
 
 ### 2. API Response Wrappers
@@ -186,7 +186,7 @@ Available game types in the Joolie Boolie.
 #### `GAME_TYPE_NAMES`
 ```typescript
 const GAME_TYPE_NAMES: Record<GameType, string> = {
-  bingo: 'Joolie Boolie Bingo',
+  bingo: 'Bingo',
   trivia: 'Trivia',
 };
 ```

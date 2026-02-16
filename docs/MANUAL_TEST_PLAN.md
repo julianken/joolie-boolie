@@ -141,7 +141,7 @@ pnpm dev
 
 | # | Test Case | Steps |
 |---|-----------|-------|
-| 1 | Home page loads | Navigate to `localhost:3000`. Verify "Joolie Boolie Bingo" branding is visible. Verify "Sign in with Joolie Boolie" button exists. |
+| 1 | Home page loads | Navigate to `localhost:3000`. Verify "Bingo" branding is visible. Verify "Sign in with Joolie Boolie" button exists. |
 | 2 | Sign in redirects to Hub | Click "Sign in with Joolie Boolie". Verify redirect to `localhost:3002/login` (or `/api/oauth/authorize`). |
 | 3 | Play route protected | Navigate to `localhost:3000/play`. Verify redirect to home page (unauthenticated). |
 | 4 | Display route public | Navigate to `localhost:3000/display`. Verify the page loads (may show "invalid session" which is expected). |

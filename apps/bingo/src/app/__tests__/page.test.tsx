@@ -104,7 +104,7 @@ describe('Home Page (BEA-422)', () => {
       const element = await Home();
       render(element);
 
-      expect(screen.getByText('Joolie Boolie Bingo')).toBeInTheDocument();
+      expect(screen.getByText('Bingo')).toBeInTheDocument();
       expect(screen.getByText(/modern bingo for groups and communities/i)).toBeInTheDocument();
     });
 

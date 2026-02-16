@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Joolie Boolie Bingo** - A cloud-based, web-accessible Bingo system designed for groups and communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
+**Bingo** - A cloud-based, web-accessible Bingo system designed for groups and communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
 
 **Current State:** Fully functional with audio, patterns, themes, and dual-screen sync.
 

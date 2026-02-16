@@ -1,6 +1,6 @@
 -- Fix OAuth consent_page_url from localhost to production (BEA-517)
 --
--- Both OAuth clients (Joolie Boolie Bingo and Joolie Boolie Trivia) had consent_page_url
+-- Both OAuth clients (Bingo and Trivia) had consent_page_url
 -- pointing to http://localhost:3002/oauth/consent instead of the
 -- production URL. This caused OAuth consent redirects to fail in
 -- production.

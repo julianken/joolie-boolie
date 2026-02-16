@@ -23,7 +23,7 @@ export default async function Home() {
             {/* Logo / Title */}
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground">
-                Joolie Boolie Bingo
+                Bingo
               </h1>
               <p className="text-2xl md:text-3xl text-muted-foreground max-w-2xl mx-auto">
                 Modern bingo for groups and communities
@@ -206,7 +206,7 @@ export default async function Home() {
       <footer className="bg-muted/10 border-t border-border py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-lg text-muted-foreground">
-            Part of the <span className="font-semibold">Joolie Boolie</span> for groups and communities
+            Part of <span className="font-semibold">Joolie Boolie</span> — games for groups and communities
           </p>
         </div>
       </footer>

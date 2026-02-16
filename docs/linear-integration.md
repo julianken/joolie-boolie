@@ -171,7 +171,7 @@ Given our Turborepo monorepo with multiple apps (Bingo, Trivia, Platform Hub) an
 Create teams aligned with your monorepo structure:
 
 1. **Platform Team** - Platform Hub, shared infrastructure
-2. **Bingo Team** - Joolie Boolie Bingo app
+2. **Bingo Team** - Bingo app
 3. **Trivia Team** - Trivia app
 4. **Packages Team** - Shared packages (sync, ui, theme, auth, database, game-engine)
 5. **DevOps Team** - CI/CD, deployment, infrastructure

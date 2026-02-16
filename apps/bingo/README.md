@@ -1,4 +1,4 @@
-# Joolie Boolie Bingo
+# Bingo
 
 **Status:** ✅ Production Ready (85% Complete)
 

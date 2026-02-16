@@ -38,7 +38,7 @@ This document replaces the original LINEAR_PROJECTS_MANUAL_CREATION.md with a si
   - Token expiration set to 1 hour (3600s)
   - PKCE requirement enabled (S256)
   - Bingo client registered:
-    - Client name: "Joolie Boolie Bingo"
+    - Client name: "Bingo"
     - Client type: Public (PKCE, no secret)
     - Redirect URIs: `http://localhost:3000/auth/callback`, `https://bingo.joolieboolie.com/auth/callback`
     - Scopes: `openid email profile`

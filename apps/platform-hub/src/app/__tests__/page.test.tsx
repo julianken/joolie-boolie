@@ -43,9 +43,9 @@ describe('HomePage', () => {
       expect(screen.getByRole('list', { name: 'Available games' })).toBeInTheDocument();
     });
 
-    it('renders Joolie Boolie Bingo card', () => {
+    it('renders Bingo card', () => {
       render(<HomePage />);
-      expect(screen.getByText('Joolie Boolie Bingo')).toBeInTheDocument();
+      expect(screen.getByText('Bingo')).toBeInTheDocument();
     });
 
     it('renders Bingo description', () => {

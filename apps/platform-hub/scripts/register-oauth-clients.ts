@@ -39,7 +39,7 @@ async function registerClients() {
   console.log(`   Consent page: ${PLATFORM_HUB_URL}/oauth/consent\n`);
 
   // Register Bingo
-  console.log('📝 Creating Joolie Boolie Bingo client...');
+  console.log('📝 Creating Bingo client...');
   const bingoResult = await supabase.auth.admin.oauth.createClient({
     redirect_uris: [
       'http://localhost:3000/auth/callback',

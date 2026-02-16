@@ -99,7 +99,7 @@ test.describe('Platform Hub Dashboard @high', () => {
   }) => {
     // Find Bingo link by exact aria-label (case sensitive)
     const bingoLink = authenticatedPage.getByRole('link', {
-      name: 'Play Joolie Boolie Bingo',
+      name: 'Play Bingo',
     });
     await expect(bingoLink).toBeVisible();
 
@@ -139,7 +139,7 @@ test.describe('Platform Hub Dashboard @high', () => {
     // Game cards should show play statistics
     // Look for "sessions" or "played" indicators
     const bingoCard = authenticatedPage.locator('article').filter({
-      hasText: 'Joolie Boolie Bingo',
+      hasText: 'Bingo',
     });
     await expect(bingoCard).toBeVisible();
 

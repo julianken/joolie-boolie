@@ -244,7 +244,7 @@ describe('PlayPage - Session ID Strategy', () => {
 
       // Should still render without crashing
       await waitFor(() => {
-        expect(screen.getByText('Joolie Boolie Bingo')).toBeInTheDocument();
+        expect(screen.getByText('Bingo')).toBeInTheDocument();
       });
     });
   });

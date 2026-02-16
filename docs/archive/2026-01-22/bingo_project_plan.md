@@ -1,8 +1,8 @@
-# Joolie Boolie Bingo - Project Plan
+# Bingo - Project Plan
 
 ## Project Overview
 
-**Name:** Joolie Boolie Bingo
+**Name:** Bingo
 **Domain:** jb-bingo (TBD: .com, .io, .app)
 **Access Model:** Free to play (no login required), optional accounts for saving templates
 **Future Monetization:** Ads and/or paid tier (keep architecture flexible)
@@ -492,8 +492,8 @@ Card generation and PDF printing moved to post-MVP. Facilities will use physical
 - [ ] Create `public/manifest.json`
   ```json
   {
-    "name": "Joolie Boolie Bingo",
-    "short_name": "Joolie Boolie Bingo",
+    "name": "Bingo",
+    "short_name": "Bingo",
     "description": "Digital bingo caller for groups and communities",
     "start_url": "/play",
     "display": "standalone",

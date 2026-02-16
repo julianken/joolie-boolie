@@ -17,7 +17,7 @@ export const E2E_TEST_USER_ID = 'e2e-test-user-00000000-0000-0000-0000-000000000
 export const E2E_MOCK_CLIENTS: Record<string, { id: string; name: string; redirect_uris: string[]; is_first_party: boolean }> = {
   '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21': {
     id: '0d87a03a-d90a-4ccc-a46b-85fdd8d53c21',
-    name: 'Joolie Boolie Bingo',
+    name: 'Bingo',
     redirect_uris: [
       'http://localhost:3000/auth/callback',
       'https://bingo.joolie-boolie.com/auth/callback',
@@ -26,7 +26,7 @@ export const E2E_MOCK_CLIENTS: Record<string, { id: string; name: string; redire
   },
   '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936': {
     id: '0cd92ba6-459b-4c07-ab9d-b9bf9dbb1936',
-    name: 'Joolie Boolie Trivia',
+    name: 'Trivia',
     redirect_uris: [
       'http://localhost:3001/auth/callback',
       'https://trivia.joolie-boolie.com/auth/callback',

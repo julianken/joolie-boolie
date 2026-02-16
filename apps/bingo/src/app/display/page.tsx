@@ -299,7 +299,7 @@ function AudienceDisplay({
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              Joolie Boolie Bingo
+              Bingo
             </h1>
             <p className="text-lg text-muted-foreground">Audience Display</p>
           </div>

@@ -1,7 +1,7 @@
 /**
  * Lighthouse CI Configuration - Bingo App
  *
- * App-specific Lighthouse configuration for Joolie Boolie Bingo.
+ * App-specific Lighthouse configuration for Bingo.
  * Tests all critical user paths including presenter and audience views.
  *
  * Usage:
