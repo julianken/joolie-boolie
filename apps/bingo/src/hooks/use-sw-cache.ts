@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   getCacheStatus,
   clearVoiceCache,
@@ -36,6 +36,7 @@ export function useSWCache(): UseSWCacheResult {
   const [status, setStatus] = useState<CacheStatus>({ cachedPacks: [], totalFiles: 0 });
   const [isPreloading, setIsPreloading] = useState(false);
   const [preloadProgress, setPreloadProgress] = useState(0);
+  const isPreloadingRef = useRef(false);
 
   useEffect(() => {
     setIsSupported(isServiceWorkerSupported());
@@ -52,8 +53,9 @@ export function useSWCache(): UseSWCacheResult {
   }, [isSupported]);
 
   const preload = useCallback(async (packId: VoicePackId) => {
-    if (!isSupported || isPreloading) return;
+    if (!isSupported || isPreloadingRef.current) return;
 
+    isPreloadingRef.current = true;
     setIsPreloading(true);
     setPreloadProgress(0);
 
@@ -63,10 +65,11 @@ export function useSWCache(): UseSWCacheResult {
       });
       await refresh();
     } finally {
+      isPreloadingRef.current = false;
       setIsPreloading(false);
       setPreloadProgress(0);
     }
-  }, [isSupported, isPreloading, refresh]);
+  }, [isSupported, refresh]);
 
   const clearCache = useCallback(async () => {
     if (!isSupported) return;

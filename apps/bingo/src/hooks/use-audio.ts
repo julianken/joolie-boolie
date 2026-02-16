@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAudioStore } from '@/stores/audio-store';
 import { useSWCache } from './use-sw-cache';
 
@@ -16,21 +16,13 @@ export function useAudioPreload() {
   const loadManifest = useAudioStore((s) => s.loadManifest);
   const { preload, preloadProgress, isPreloading, cachedPacks } = useSWCache();
 
-  // Track current pack to detect changes
-  const currentPack = useRef(voicePack);
-
   useEffect(() => {
-    // Load the manifest first
     loadManifest();
   }, [loadManifest]);
 
   useEffect(() => {
-    // Preload when voice pack changes and it's not already cached
-    if (currentPack.current !== voicePack || !cachedPacks.includes(voicePack)) {
-      currentPack.current = voicePack;
-      preload(voicePack);
-    }
-  }, [voicePack, preload, cachedPacks]);
+    preload(voicePack);
+  }, [voicePack, preload]);
 
   return {
     preloadProgress,

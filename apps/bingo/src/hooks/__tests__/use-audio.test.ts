@@ -117,7 +117,7 @@ describe('use-audio', () => {
       });
     });
 
-    it('skips preload if already cached', async () => {
+    it('calls preload once on mount even if already cached', async () => {
       const mockPreload = vi.fn();
       vi.mocked(useSWCache).mockReturnValue({
         preload: mockPreload,
@@ -132,15 +132,13 @@ describe('use-audio', () => {
 
       const { rerender } = renderHook(() => useAudioPreload());
 
-      // Force re-render to trigger the effect again
-      rerender();
+      await waitFor(() => {
+        expect(mockPreload).toHaveBeenCalledWith('standard');
+      });
 
-      // Since 'standard' is already in cachedPacks and the currentPack ref matches voicePack,
-      // on initial render, currentPack.current equals voicePack (both 'standard'),
-      // and cachedPacks includes 'standard', so the condition is false and preload is not called.
-      // However, on first render, the ref is initialized to voicePack, so the condition
-      // `currentPack.current !== voicePack` is false initially, and `!cachedPacks.includes(voicePack)`
-      // is also false since it's already cached. Therefore, preload is never called.
+      // Re-renders with same voicePack don't call preload again
+      mockPreload.mockClear();
+      rerender();
       expect(mockPreload).not.toHaveBeenCalled();
     });
 
