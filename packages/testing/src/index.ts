@@ -28,5 +28,23 @@ export {
   type MockSupabaseClient,
 } from './mocks/supabase';
 
+// Mocks - Sentry
+export {
+  mockSentry,
+  type MockScope,
+  type MockSentry,
+} from './mocks/sentry';
+
+// Mocks - OpenTelemetry
+export {
+  mockOtel,
+  mockTracer,
+  mockTracerProvider,
+  type MockSpan,
+  type MockTracer,
+  type MockTracerProvider,
+  type MockOtel,
+} from './mocks/otel';
+
 // Helpers
 export { HELPERS_PLACEHOLDER } from './helpers/index';
