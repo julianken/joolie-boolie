@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
   TriviaGameState,
   Question,
@@ -7,6 +8,77 @@ import {
   GameSettings,
   GameStatus,
 } from '@/types';
+
+// =============================================================================
+// ZOD SCHEMAS
+// =============================================================================
+
+const GameStatusSchema = z.enum(['setup', 'playing', 'between_rounds', 'paused', 'ended']);
+
+const QuestionSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  type: z.enum(['multiple_choice', 'true_false']),
+  correctAnswers: z.array(z.string()),
+  options: z.array(z.string()),
+  optionTexts: z.array(z.string()),
+  category: z.string(),
+  roundIndex: z.number(),
+  explanation: z.string().optional(),
+});
+
+const TeamSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  score: z.number(),
+  tableNumber: z.number().min(1).max(20),
+  roundScores: z.array(z.number()),
+});
+
+const TeamAnswerSchema = z.object({
+  teamId: z.string(),
+  questionId: z.string(),
+  answer: z.string(),
+  isCorrect: z.boolean(),
+  pointsAwarded: z.number(),
+});
+
+const TimerSchema = z.object({
+  duration: z.number().min(0),
+  remaining: z.number().min(0),
+  isRunning: z.boolean(),
+});
+
+const GameSettingsSchema = z.object({
+  roundsCount: z.number().min(1),
+  questionsPerRound: z.number().min(1),
+  timerDuration: z.number().min(0),
+  timerAutoStart: z.boolean(),
+  timerVisible: z.boolean(),
+  ttsEnabled: z.boolean(),
+});
+
+const SerializedTriviaStateSchema = z.object({
+  sessionId: z.string(),
+  status: GameStatusSchema,
+  statusBeforePause: GameStatusSchema.nullable(),
+  questions: z.array(QuestionSchema),
+  selectedQuestionIndex: z.number().min(0),
+  displayQuestionIndex: z.number().min(0).nullable(),
+  currentRound: z.number().min(0),
+  totalRounds: z.number().min(1),
+  teams: z.array(TeamSchema),
+  teamAnswers: z.array(TeamAnswerSchema),
+  timer: TimerSchema,
+  settings: GameSettingsSchema,
+  showScoreboard: z.boolean().default(false),
+  emergencyBlank: z.boolean().default(false),
+  ttsEnabled: z.boolean().default(false),
+});
+
+// =============================================================================
+// PUBLIC TYPES
+// =============================================================================
 
 /**
  * Serialized representation of a Trivia game state for database storage.
@@ -40,125 +112,9 @@ export class SerializationError extends Error {
   }
 }
 
-/**
- * Validates that a value is a valid Question object.
- */
-function isQuestion(value: unknown): value is Question {
-  if (!value || typeof value !== 'object') return false;
-  const q = value as Record<string, unknown>;
-  return (
-    typeof q.id === 'string' &&
-    typeof q.text === 'string' &&
-    typeof q.type === 'string' &&
-    ['multiple_choice', 'true_false'].includes(q.type) &&
-    Array.isArray(q.correctAnswers) &&
-    q.correctAnswers.every((a) => typeof a === 'string') &&
-    Array.isArray(q.options) &&
-    q.options.every((o) => typeof o === 'string') &&
-    Array.isArray(q.optionTexts) &&
-    q.optionTexts.every((t) => typeof t === 'string') &&
-    typeof q.category === 'string' &&
-    typeof q.roundIndex === 'number'
-  );
-}
-
-/**
- * Validates that a value is an array of Question objects.
- */
-function isQuestionArray(value: unknown): value is Question[] {
-  return Array.isArray(value) && value.every(isQuestion);
-}
-
-/**
- * Validates that a value is a valid Team object.
- */
-function isTeam(value: unknown): value is Team {
-  if (!value || typeof value !== 'object') return false;
-  const t = value as Record<string, unknown>;
-  return (
-    typeof t.id === 'string' &&
-    typeof t.name === 'string' &&
-    typeof t.score === 'number' &&
-    typeof t.tableNumber === 'number' &&
-    t.tableNumber >= 1 &&
-    t.tableNumber <= 20 &&
-    Array.isArray(t.roundScores) &&
-    t.roundScores.every((s) => typeof s === 'number')
-  );
-}
-
-/**
- * Validates that a value is an array of Team objects.
- */
-function isTeamArray(value: unknown): value is Team[] {
-  return Array.isArray(value) && value.every(isTeam);
-}
-
-/**
- * Validates that a value is a valid TeamAnswer object.
- */
-function isTeamAnswer(value: unknown): value is TeamAnswer {
-  if (!value || typeof value !== 'object') return false;
-  const a = value as Record<string, unknown>;
-  return (
-    typeof a.teamId === 'string' &&
-    typeof a.questionId === 'string' &&
-    typeof a.answer === 'string' &&
-    typeof a.isCorrect === 'boolean' &&
-    typeof a.pointsAwarded === 'number'
-  );
-}
-
-/**
- * Validates that a value is an array of TeamAnswer objects.
- */
-function isTeamAnswerArray(value: unknown): value is TeamAnswer[] {
-  return Array.isArray(value) && value.every(isTeamAnswer);
-}
-
-/**
- * Validates that a value is a valid Timer object.
- */
-function isTimer(value: unknown): value is Timer {
-  if (!value || typeof value !== 'object') return false;
-  const t = value as Record<string, unknown>;
-  return (
-    typeof t.duration === 'number' &&
-    t.duration >= 0 &&
-    typeof t.remaining === 'number' &&
-    t.remaining >= 0 &&
-    typeof t.isRunning === 'boolean'
-  );
-}
-
-/**
- * Validates that a value is a valid GameSettings object.
- */
-function isGameSettings(value: unknown): value is GameSettings {
-  if (!value || typeof value !== 'object') return false;
-  const s = value as Record<string, unknown>;
-  return (
-    typeof s.roundsCount === 'number' &&
-    s.roundsCount > 0 &&
-    typeof s.questionsPerRound === 'number' &&
-    s.questionsPerRound > 0 &&
-    typeof s.timerDuration === 'number' &&
-    s.timerDuration >= 0 &&
-    typeof s.timerAutoStart === 'boolean' &&
-    typeof s.timerVisible === 'boolean' &&
-    typeof s.ttsEnabled === 'boolean'
-  );
-}
-
-/**
- * Validates that a value is a valid game status.
- */
-function isGameStatus(value: unknown): value is GameStatus {
-  return (
-    typeof value === 'string' &&
-    ['setup', 'playing', 'between_rounds', 'paused', 'ended'].includes(value)
-  );
-}
+// =============================================================================
+// SERIALIZATION
+// =============================================================================
 
 /**
  * Serializes a TriviaGameState object into a plain object suitable for database storage.
@@ -187,6 +143,10 @@ export function serializeTriviaState(state: TriviaGameState): SerializedTriviaSt
   };
 }
 
+// =============================================================================
+// DESERIALIZATION
+// =============================================================================
+
 /**
  * Deserializes a database record back into a partial TriviaGameState object.
  * This function performs validation and provides sensible defaults for missing data.
@@ -203,45 +163,44 @@ export function deserializeTriviaState(data: unknown): Partial<TriviaGameState> 
 
   const record = data as Record<string, unknown>;
 
-  // Validate and extract sessionId (required)
+  // Validate sessionId first (with targeted error message matching original)
   if (typeof record.sessionId !== 'string') {
     throw new SerializationError('Invalid sessionId: expected string');
   }
 
-  // Validate and extract status (required)
-  if (!isGameStatus(record.status)) {
+  // Validate status (with targeted error message matching original)
+  if (!GameStatusSchema.safeParse(record.status).success) {
     throw new SerializationError(
       `Invalid status: expected 'setup', 'playing', 'between_rounds', 'paused', or 'ended', got ${record.status}`
     );
   }
 
-  // Validate statusBeforePause (optional)
+  // Validate statusBeforePause (with targeted error message)
   const statusBeforePause = record.statusBeforePause;
   if (
     statusBeforePause !== null &&
     statusBeforePause !== undefined &&
-    !isGameStatus(statusBeforePause)
+    !GameStatusSchema.safeParse(statusBeforePause).success
   ) {
     throw new SerializationError(
       'Invalid statusBeforePause: expected valid GameStatus or null'
     );
   }
 
-  // Validate questions (required, can be empty array)
-  if (!isQuestionArray(record.questions)) {
-    throw new SerializationError(
-      'Invalid questions: expected array of Question objects'
-    );
+  // Validate questions (with targeted error message)
+  const questionsResult = z.array(QuestionSchema).safeParse(record.questions);
+  if (!questionsResult.success) {
+    throw new SerializationError('Invalid questions: expected array of Question objects');
   }
 
-  // Validate selectedQuestionIndex (required)
+  // Validate selectedQuestionIndex (with targeted error message)
   if (typeof record.selectedQuestionIndex !== 'number' || record.selectedQuestionIndex < 0) {
     throw new SerializationError(
       'Invalid selectedQuestionIndex: expected non-negative number'
     );
   }
 
-  // Validate displayQuestionIndex (optional)
+  // Validate displayQuestionIndex (with targeted error message)
   const displayQuestionIndex = record.displayQuestionIndex;
   if (
     displayQuestionIndex !== null &&
@@ -253,78 +212,63 @@ export function deserializeTriviaState(data: unknown): Partial<TriviaGameState> 
     );
   }
 
-  // Validate currentRound (required)
+  // Validate currentRound (with targeted error message)
   if (typeof record.currentRound !== 'number' || record.currentRound < 0) {
-    throw new SerializationError(
-      'Invalid currentRound: expected non-negative number'
-    );
+    throw new SerializationError('Invalid currentRound: expected non-negative number');
   }
 
-  // Validate totalRounds (required)
+  // Validate totalRounds (with targeted error message)
   if (typeof record.totalRounds !== 'number' || record.totalRounds < 1) {
-    throw new SerializationError(
-      'Invalid totalRounds: expected positive number'
-    );
+    throw new SerializationError('Invalid totalRounds: expected positive number');
   }
 
-  // Validate teams (required, can be empty array)
-  if (!isTeamArray(record.teams)) {
-    throw new SerializationError(
-      'Invalid teams: expected array of Team objects'
-    );
+  // Validate teams (with targeted error message)
+  const teamsResult = z.array(TeamSchema).safeParse(record.teams);
+  if (!teamsResult.success) {
+    throw new SerializationError('Invalid teams: expected array of Team objects');
   }
 
-  // Validate teamAnswers (required, can be empty array)
-  if (!isTeamAnswerArray(record.teamAnswers)) {
-    throw new SerializationError(
-      'Invalid teamAnswers: expected array of TeamAnswer objects'
-    );
+  // Validate teamAnswers (with targeted error message)
+  const teamAnswersResult = z.array(TeamAnswerSchema).safeParse(record.teamAnswers);
+  if (!teamAnswersResult.success) {
+    throw new SerializationError('Invalid teamAnswers: expected array of TeamAnswer objects');
   }
 
-  // Validate timer (required)
-  if (!isTimer(record.timer)) {
-    throw new SerializationError(
-      'Invalid timer: expected Timer object'
-    );
+  // Validate timer (with targeted error message)
+  const timerResult = TimerSchema.safeParse(record.timer);
+  if (!timerResult.success) {
+    throw new SerializationError('Invalid timer: expected Timer object');
   }
 
-  // Validate settings (required)
-  if (!isGameSettings(record.settings)) {
-    throw new SerializationError(
-      'Invalid settings: expected GameSettings object'
-    );
+  // Validate settings (with targeted error message)
+  const settingsResult = GameSettingsSchema.safeParse(record.settings);
+  if (!settingsResult.success) {
+    throw new SerializationError('Invalid settings: expected GameSettings object');
   }
 
-  // Validate showScoreboard (optional, default false)
+  // Optional boolean fields with defaults
   const showScoreboard =
     typeof record.showScoreboard === 'boolean' ? record.showScoreboard : false;
-
-  // Validate emergencyBlank (optional, default false)
   const emergencyBlank =
     typeof record.emergencyBlank === 'boolean' ? record.emergencyBlank : false;
-
-  // Validate ttsEnabled (optional, default false)
   const ttsEnabled =
     typeof record.ttsEnabled === 'boolean' ? record.ttsEnabled : false;
 
-  // Build the partial state
-  const partialState: Partial<TriviaGameState> = {
-    sessionId: record.sessionId,
-    status: record.status,
+  return {
+    sessionId: record.sessionId as string,
+    status: record.status as GameStatus,
     statusBeforePause: (statusBeforePause ?? null) as GameStatus | null,
-    questions: record.questions,
-    selectedQuestionIndex: record.selectedQuestionIndex,
+    questions: questionsResult.data as Question[],
+    selectedQuestionIndex: record.selectedQuestionIndex as number,
     displayQuestionIndex: (displayQuestionIndex ?? null) as number | null,
-    currentRound: record.currentRound,
-    totalRounds: record.totalRounds,
-    teams: record.teams,
-    teamAnswers: record.teamAnswers,
-    timer: record.timer,
-    settings: record.settings,
+    currentRound: record.currentRound as number,
+    totalRounds: record.totalRounds as number,
+    teams: teamsResult.data as Team[],
+    teamAnswers: teamAnswersResult.data as TeamAnswer[],
+    timer: timerResult.data as Timer,
+    settings: settingsResult.data as GameSettings,
     showScoreboard,
     emergencyBlank,
     ttsEnabled,
   };
-
-  return partialState;
 }
