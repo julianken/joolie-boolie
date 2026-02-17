@@ -7,6 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./mocks": "./src/mocks/index.ts",
+    "./mocks/sentry": "./src/mocks/sentry.ts",
+    "./mocks/otel": "./src/mocks/otel.ts",
     "./helpers": "./src/helpers/index.ts",
     "./setup": "./src/setup.ts"
   },
