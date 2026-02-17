@@ -147,16 +147,33 @@ export interface ThemePayload {
 // SYNC MESSAGES
 // =============================================================================
 
-export type SyncMessageType = 'STATE_UPDATE' | 'REQUEST_SYNC' | 'DISPLAY_THEME_CHANGED';
+export type SyncMessageType = 'STATE_UPDATE' | 'REQUEST_SYNC' | 'DISPLAY_THEME_CHANGED' | 'CHANNEL_READY';
 
-// Trivia-specific payload union type
+// Trivia-specific payload union type (kept for backwards compatibility)
 export type TriviaSyncPayload = TriviaGameState | ThemePayload | null;
 
-export interface SyncMessage {
-  type: SyncMessageType;
-  payload: TriviaSyncPayload;
+/** Base fields shared by all sync messages */
+interface SyncMessageBase {
   timestamp: number;
+  originId?: string;
+  sequenceNumber?: number;
 }
+
+/**
+ * Discriminated union of all Trivia sync messages.
+ * Each variant maps a `type` to its exact `payload` type, enabling
+ * exhaustive `switch` blocks with full type narrowing and zero casts.
+ */
+export type TriviaSyncMessage =
+  | (SyncMessageBase & { type: 'STATE_UPDATE'; payload: TriviaGameState })
+  | (SyncMessageBase & { type: 'REQUEST_SYNC'; payload: null })
+  | (SyncMessageBase & { type: 'DISPLAY_THEME_CHANGED'; payload: ThemePayload })
+  | (SyncMessageBase & { type: 'CHANNEL_READY'; payload: null });
+
+/**
+ * @deprecated Use `TriviaSyncMessage` instead. Kept for backwards compatibility.
+ */
+export type SyncMessage = TriviaSyncMessage;
 
 // =============================================================================
 // GAME SESSION TYPES (API)
