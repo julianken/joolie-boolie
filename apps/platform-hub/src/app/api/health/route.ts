@@ -1,43 +1,37 @@
-import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { createClient } from '@joolie-boolie/database/server'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { error: authError } = await supabase.auth.getSession();
+    const supabase = await createClient()
 
-    if (authError) {
-      return NextResponse.json(
-        {
-          status: 'degraded',
-          app: 'platform-hub',
-          checks: { supabase: 'error' },
-          error: authError.message,
-          timestamp: new Date().toISOString(),
-          version: process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
-        },
-        { status: 503 }
-      );
+    // Test connection via auth (doesn't require tables)
+    const { data, error } = await supabase.auth.getSession()
+
+    if (error) {
+      return NextResponse.json({
+        status: 'error',
+        message: 'Auth connection failed',
+        error: error.message
+      }, { status: 500 })
     }
+
+    // Also test if profiles table exists
+    const { error: tableError } = await supabase.from('profiles').select('id').limit(1)
 
     return NextResponse.json({
       status: 'ok',
-      app: 'platform-hub',
-      checks: { supabase: 'ok' },
-      timestamp: new Date().toISOString(),
-      version: process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
-    });
+      message: 'Supabase connection successful',
+      auth: 'connected',
+      session: data.session ? 'active' : 'none',
+      database: tableError ? `table issue: ${tableError.message}` : 'profiles table accessible',
+      timestamp: new Date().toISOString()
+    })
   } catch (err) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        app: 'platform-hub',
-        checks: { supabase: 'error' },
-        error: err instanceof Error ? err.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-        version: process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
-      },
-      { status: 503 }
-    );
+    return NextResponse.json({
+      status: 'error',
+      message: 'Connection failed',
+      error: err instanceof Error ? err.message : 'Unknown error'
+    }, { status: 500 })
   }
 }

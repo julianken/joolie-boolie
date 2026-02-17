@@ -1,10 +1,37 @@
-import { NextResponse } from 'next/server';
+import { createClient } from '@joolie-boolie/database/server'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    app: 'trivia',
-    timestamp: new Date().toISOString(),
-    version: process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
-  });
+  try {
+    const supabase = await createClient()
+
+    // Test connection via auth (doesn't require tables)
+    const { data, error } = await supabase.auth.getSession()
+
+    if (error) {
+      return NextResponse.json({
+        status: 'error',
+        message: 'Auth connection failed',
+        error: error.message
+      }, { status: 500 })
+    }
+
+    // Also test if profiles table exists
+    const { error: tableError } = await supabase.from('profiles').select('id').limit(1)
+
+    return NextResponse.json({
+      status: 'ok',
+      message: 'Supabase connection successful',
+      auth: 'connected',
+      session: data.session ? 'active' : 'none',
+      database: tableError ? `table issue: ${tableError.message}` : 'profiles table accessible',
+      timestamp: new Date().toISOString()
+    })
+  } catch (err) {
+    return NextResponse.json({
+      status: 'error',
+      message: 'Connection failed',
+      error: err instanceof Error ? err.message : 'Unknown error'
+    }, { status: 500 })
+  }
 }
