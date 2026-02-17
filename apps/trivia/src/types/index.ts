@@ -31,6 +31,14 @@ export type QuestionCategory =
   | 'movies'
   | 'tv';
 
+/**
+ * Trivia-specific game status values.
+ *
+ * Differs from the shared `GameStatus` in `@joolie-boolie/game-engine`
+ * which uses `'idle'` instead of `'setup'` and lacks `'between_rounds'`.
+ * Trivia needs `'setup'` for its configuration phase and `'between_rounds'`
+ * for multi-round game flow.
+ */
 export type GameStatus = 'setup' | 'playing' | 'between_rounds' | 'paused' | 'ended';
 
 // =============================================================================
@@ -162,12 +170,10 @@ export interface SyncMessage {
 // GAME SESSION TYPES (API)
 // =============================================================================
 
-export type TriviaGameSessionStatus = 'setup' | 'playing' | 'between_rounds' | 'paused' | 'ended';
-
 export interface TriviaGameSession {
   id: string;
   name: string;
-  status: TriviaGameSessionStatus;
+  status: GameStatus;
   currentRound: number;
   totalRounds: number;
   teams: Team[];
@@ -185,7 +191,7 @@ export interface CreateTriviaGameRequest {
 
 export interface UpdateTriviaGameRequest {
   name?: string;
-  status?: TriviaGameSessionStatus;
+  status?: GameStatus;
   currentRound?: number;
   totalRounds?: number;
   teams?: Team[];
