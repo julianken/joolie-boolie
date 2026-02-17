@@ -1,3 +1,24 @@
+import type {
+  TeamId as BrandedTeamId,
+  QuestionId as BrandedQuestionId,
+} from '@joolie-boolie/types/branded';
+
+// =============================================================================
+// BRANDED TYPE RE-EXPORTS
+// =============================================================================
+
+/**
+ * Team identifier, branded for compile-time safety.
+ * Prevents accidental mixing with QuestionId or other string IDs.
+ */
+export type TeamId = BrandedTeamId;
+
+/**
+ * Question identifier, branded for compile-time safety.
+ * Prevents accidental mixing with TeamId or other string IDs.
+ */
+export type QuestionId = BrandedQuestionId;
+
 // =============================================================================
 // TYPE GUARDS & DISCRIMINATED UNION
 // =============================================================================
@@ -91,7 +112,7 @@ export interface Timer {
 // =============================================================================
 
 export interface Question {
-  id: string;
+  id: QuestionId;
   text: string;
   type: QuestionType;
   correctAnswers: string[]; // Array to support multiple correct answers
@@ -107,7 +128,7 @@ export interface Question {
 // =============================================================================
 
 export interface Team {
-  id: string;
+  id: TeamId;
   name: string; // "Table 1" or custom name
   score: number; // Total score (computed from roundScores sum)
   tableNumber: number; // 1-20
@@ -132,8 +153,8 @@ export interface GameSettings {
 // =============================================================================
 
 export interface TeamAnswer {
-  teamId: string;
-  questionId: string;
+  teamId: TeamId;
+  questionId: QuestionId;
   answer: string;
   isCorrect: boolean;
   pointsAwarded: number;
@@ -284,7 +305,7 @@ export interface UpdateQuestionSetRequest {
  * Summary of team scores for a completed session
  */
 export interface SessionTeamScore {
-  teamId: string;
+  teamId: TeamId;
   teamName: string;
   totalScore: number;
   roundScores: number[];
@@ -294,7 +315,7 @@ export interface SessionTeamScore {
  * Summary of a question answer for session history
  */
 export interface SessionQuestionSummary {
-  questionId: string;
+  questionId: QuestionId;
   questionText: string;
   correctAnswers: string[];
   teamsCorrect: number;
@@ -313,7 +334,7 @@ export interface TriviaSessionHistory {
   questionsAnswered: number;
   totalQuestions: number;
   teamScores: SessionTeamScore[];
-  winnerTeamId: string | null;
+  winnerTeamId: TeamId | null;
   winnerTeamName: string | null;
   userId: string | null; // For future auth integration
   questionSetId: string | null;
@@ -334,7 +355,7 @@ export interface CreateSessionHistoryRequest {
   questionsAnswered: number;
   totalQuestions: number;
   teamScores: SessionTeamScore[];
-  winnerTeamId?: string;
+  winnerTeamId?: TeamId;
   winnerTeamName?: string;
   userId?: string;
   questionSetId?: string;
@@ -350,7 +371,7 @@ export interface UpdateSessionHistoryRequest {
   roundsPlayed?: number;
   questionsAnswered?: number;
   teamScores?: SessionTeamScore[];
-  winnerTeamId?: string;
+  winnerTeamId?: TeamId;
   winnerTeamName?: string;
   questionSummaries?: SessionQuestionSummary[];
 }
