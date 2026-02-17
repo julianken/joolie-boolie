@@ -320,82 +320,138 @@ export type TableRow<T extends TableName> = Database['public']['Tables'][T]['Row
 export type TableInsert<T extends TableName> = Database['public']['Tables'][T]['Insert'];
 export type TableUpdate<T extends TableName> = Database['public']['Tables'][T]['Update'];
 
+// =============================================================================
+// Zod Schemas for Runtime Validation
+// =============================================================================
+
+import { z } from 'zod';
+
+const ProfileSchema = z.object({
+  id: z.string(),
+  facility_name: z.string().nullable(),
+  default_game_title: z.string().nullable(),
+  logo_url: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+const BingoTemplateSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  name: z.string(),
+  pattern_id: z.string(),
+  voice_pack: z.string(),
+  auto_call_enabled: z.boolean(),
+  auto_call_interval: z.number(),
+  is_default: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+const TriviaQuestionSchema = z.object({
+  question: z.string(),
+  options: z.array(z.string()),
+  correctIndex: z.number(),
+  category: z.string().optional(),
+  explanation: z.string().optional(),
+});
+
+const TriviaTemplateSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  name: z.string(),
+  questions: z.array(TriviaQuestionSchema),
+  rounds_count: z.number(),
+  questions_per_round: z.number(),
+  timer_duration: z.number(),
+  is_default: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+const BingoPresetSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  name: z.string(),
+  pattern_id: z.string(),
+  voice_pack: z.string(),
+  auto_call_enabled: z.boolean(),
+  auto_call_interval: z.number(),
+  is_default: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+const TriviaPresetSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  name: z.string(),
+  rounds_count: z.number(),
+  questions_per_round: z.number(),
+  timer_duration: z.number(),
+  is_default: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+const TriviaQuestionSetSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  questions: z.array(TriviaQuestionSchema),
+  is_default: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+const GameSessionSchema = z.object({
+  id: z.string(),
+  room_code: z.string(),
+  session_id: z.string(),
+  game_type: z.enum(['bingo', 'trivia']),
+  template_id: z.string().nullable(),
+  preset_id: z.string().nullable(),
+  question_set_id: z.string().nullable(),
+  pin_hash: z.string(),
+  pin_salt: z.string(),
+  failed_pin_attempts: z.number(),
+  last_failed_attempt_at: z.string().nullable(),
+  status: z.enum(['active', 'paused', 'completed', 'expired']),
+  game_state: z.record(z.unknown()),
+  user_id: z.string().nullable(),
+  last_sync_at: z.string(),
+  sequence_number: z.number(),
+  expires_at: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
 // Type guard helpers
 export function isProfile(obj: unknown): obj is Profile {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'created_at' in obj &&
-    'updated_at' in obj
-  );
+  return ProfileSchema.safeParse(obj).success;
 }
 
 export function isBingoTemplate(obj: unknown): obj is BingoTemplate {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'user_id' in obj &&
-    'pattern_id' in obj &&
-    'voice_pack' in obj
-  );
+  return BingoTemplateSchema.safeParse(obj).success;
 }
 
 export function isTriviaTemplate(obj: unknown): obj is TriviaTemplate {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'user_id' in obj &&
-    'questions' in obj &&
-    'rounds_count' in obj
-  );
+  return TriviaTemplateSchema.safeParse(obj).success;
 }
 
 export function isBingoPreset(obj: unknown): obj is BingoPreset {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'user_id' in obj &&
-    'pattern_id' in obj &&
-    'voice_pack' in obj &&
-    !('questions' in obj)
-  );
+  return BingoPresetSchema.safeParse(obj).success;
 }
 
 export function isTriviaPreset(obj: unknown): obj is TriviaPreset {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'user_id' in obj &&
-    'rounds_count' in obj &&
-    !('questions' in obj) &&
-    !('pattern_id' in obj)
-  );
+  return TriviaPresetSchema.safeParse(obj).success;
 }
 
 export function isTriviaQuestionSet(obj: unknown): obj is TriviaQuestionSet {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'user_id' in obj &&
-    'questions' in obj &&
-    !('rounds_count' in obj) &&
-    !('pattern_id' in obj)
-  );
+  return TriviaQuestionSetSchema.safeParse(obj).success;
 }
 
 export function isGameSession(obj: unknown): obj is GameSession {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'room_code' in obj &&
-    'session_id' in obj &&
-    'game_type' in obj
-  );
+  return GameSessionSchema.safeParse(obj).success;
 }

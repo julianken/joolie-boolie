@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import type { Question, QuestionType, QuestionCategory } from '@/types';
 import type {
@@ -8,6 +9,37 @@ import type {
   ValidationWarning,
 } from './types';
 import { isValidQuestionType, isValidQuestionCategory, isValidCorrectAnswer } from './types';
+
+// =============================================================================
+// ZOD SCHEMA
+// =============================================================================
+
+const QUESTION_TYPES = ['multiple_choice', 'true_false'] as const;
+const QUESTION_CATEGORIES = [
+  'general_knowledge',
+  'science',
+  'history',
+  'geography',
+  'entertainment',
+  'sports',
+  'art_literature',
+  'music',
+  'movies',
+  'tv',
+] as const;
+const CORRECT_ANSWERS = ['A', 'B', 'C', 'D', 'True', 'False'] as const;
+
+export const QuestionSchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  type: z.enum(QUESTION_TYPES),
+  correctAnswers: z.array(z.string()).min(1),
+  options: z.array(z.string()).min(1),
+  optionTexts: z.array(z.string()).min(1),
+  category: z.enum(QUESTION_CATEGORIES),
+  explanation: z.string().optional(),
+  roundIndex: z.number().int().min(0),
+});
 
 // =============================================================================
 // MAIN VALIDATION FUNCTIONS
@@ -413,24 +445,11 @@ function validateSingleCsvQuestion(
 // =============================================================================
 
 /**
- * Validate that a question object is complete and valid
+ * Validate that a question object is complete and valid.
+ * Uses Zod schema for thorough structural and type validation.
  */
 export function validateQuestion(question: unknown): question is Question {
-  if (!question || typeof question !== 'object') return false;
-
-  const q = question as Record<string, unknown>;
-
-  // Required fields
-  if (typeof q.id !== 'string' || !q.id) return false;
-  if (typeof q.text !== 'string' || !q.text) return false;
-  if (!isValidQuestionType(q.type as string)) return false;
-  if (!Array.isArray(q.correctAnswers) || q.correctAnswers.length === 0) return false;
-  if (!Array.isArray(q.options) || q.options.length === 0) return false;
-  if (!Array.isArray(q.optionTexts) || q.optionTexts.length === 0) return false;
-  if (!isValidQuestionCategory(q.category as string)) return false;
-  if (typeof q.roundIndex !== 'number' || q.roundIndex < 0) return false;
-
-  return true;
+  return QuestionSchema.safeParse(question).success;
 }
 
 /**
