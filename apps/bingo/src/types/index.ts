@@ -162,11 +162,31 @@ export interface ThemePayload {
   theme: ThemeMode;
 }
 
-export interface SyncMessage {
-  type: SyncMessageType;
-  payload: GameState | BingoBall | BingoPattern | AudioSettingsPayload | ThemePayload | null;
+/** Base fields shared by all sync messages */
+interface SyncMessageBase {
   timestamp: number;
+  originId?: string;
+  sequenceNumber?: number;
 }
+
+/**
+ * Discriminated union of all Bingo sync messages.
+ * Each variant maps a `type` to its exact `payload` type, enabling
+ * exhaustive `switch` blocks with full type narrowing and zero casts.
+ */
+export type BingoSyncMessage =
+  | (SyncMessageBase & { type: 'GAME_STATE_UPDATE'; payload: GameState })
+  | (SyncMessageBase & { type: 'BALL_CALLED'; payload: BingoBall })
+  | (SyncMessageBase & { type: 'GAME_RESET'; payload: null })
+  | (SyncMessageBase & { type: 'PATTERN_CHANGED'; payload: BingoPattern })
+  | (SyncMessageBase & { type: 'REQUEST_SYNC'; payload: null })
+  | (SyncMessageBase & { type: 'AUDIO_SETTINGS_CHANGED'; payload: AudioSettingsPayload })
+  | (SyncMessageBase & { type: 'DISPLAY_THEME_CHANGED'; payload: ThemePayload });
+
+/**
+ * @deprecated Use `BingoSyncMessage` instead. Kept for backwards compatibility.
+ */
+export type SyncMessage = BingoSyncMessage;
 
 // Ball deck types
 export interface BallDeck {

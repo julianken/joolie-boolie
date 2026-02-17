@@ -3,13 +3,10 @@
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSyncStore, type SyncRole } from '@joolie-boolie/sync';
 import { useGameStore } from '@/stores/game-store';
-import { BroadcastSync, type SyncMessage } from '@joolie-boolie/sync';
+import { BroadcastSync } from '@joolie-boolie/sync';
 import { getChannelName } from '@/lib/sync/session';
-import type { TriviaGameState, ThemeMode, ThemePayload, TriviaSyncPayload } from '@/types';
+import type { TriviaGameState, ThemeMode, TriviaSyncPayload, TriviaSyncMessage } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';
-
-// Trivia message types
-type TriviaMessageType = 'STATE_UPDATE' | 'REQUEST_SYNC' | 'DISPLAY_THEME_CHANGED' | 'CHANNEL_READY';
 
 /**
  * Extended BroadcastSync with trivia-specific convenience methods.
@@ -37,10 +34,11 @@ function createTriviaBroadcastSync(sessionId: string): TriviaBroadcastSync {
   return new TriviaBroadcastSync(channelName, { debug: isDebug });
 }
 
-type MessageHandler = (message: SyncMessage<TriviaSyncPayload>) => void;
+type MessageHandler = (message: TriviaSyncMessage) => void;
 
 /**
  * Create a message handler that routes messages by type.
+ * Uses discriminated union narrowing -- no manual type casts required.
  */
 export function createMessageRouter(handlers: Partial<{
   onStateUpdate: (state: TriviaGameState) => void;
@@ -48,16 +46,16 @@ export function createMessageRouter(handlers: Partial<{
   onDisplayThemeChanged: (theme: ThemeMode) => void;
   onChannelReady: () => void;
 }>): MessageHandler {
-  return (message: SyncMessage<TriviaSyncPayload>) => {
-    switch (message.type as TriviaMessageType) {
+  return (message: TriviaSyncMessage) => {
+    switch (message.type) {
       case 'STATE_UPDATE':
-        handlers.onStateUpdate?.(message.payload as TriviaGameState);
+        handlers.onStateUpdate?.(message.payload);
         break;
       case 'REQUEST_SYNC':
         handlers.onSyncRequest?.();
         break;
       case 'DISPLAY_THEME_CHANGED':
-        handlers.onDisplayThemeChanged?.((message.payload as ThemePayload).theme);
+        handlers.onDisplayThemeChanged?.(message.payload.theme);
         break;
       case 'CHANNEL_READY':
         handlers.onChannelReady?.();
@@ -190,7 +188,12 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
       },
     });
 
-    const unsubscribe = sync.subscribe(router);
+    // Cast at the transport boundary: BroadcastSync uses a generic SyncMessage<TPayload>
+    // while our router expects the discriminated TriviaSyncMessage union.
+    // This is safe because the TriviaBroadcastSync class only sends valid TriviaSyncMessage types.
+    const unsubscribe = sync.subscribe(
+      router as unknown as (message: import('@joolie-boolie/sync').SyncMessage<TriviaSyncPayload>) => void
+    );
 
     // If audience, request initial sync with retry logic
     // This handles the race condition where presenter may not be ready yet

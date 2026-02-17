@@ -3,23 +3,13 @@
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSyncStore, type SyncRole } from '@joolie-boolie/sync';
 import { useGameStore } from '@/stores/game-store';
-import { BroadcastSync, type SyncMessage } from '@joolie-boolie/sync';
+import { BroadcastSync } from '@joolie-boolie/sync';
 import { getChannelName } from '@/lib/sync/session';
-import { GameState, BingoBall, BingoPattern, ThemeMode, AudioSettingsPayload, ThemePayload } from '@/types';
+import type { GameState, BingoBall, BingoPattern, ThemeMode, AudioSettingsPayload, BingoSyncMessage } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';
 
-// Bingo-specific payload union type
-type BingoSyncPayload = GameState | BingoBall | BingoPattern | AudioSettingsPayload | ThemePayload | null;
-
-// Bingo message types
-type BingoMessageType =
-  | 'GAME_STATE_UPDATE'
-  | 'BALL_CALLED'
-  | 'GAME_RESET'
-  | 'PATTERN_CHANGED'
-  | 'REQUEST_SYNC'
-  | 'AUDIO_SETTINGS_CHANGED'
-  | 'DISPLAY_THEME_CHANGED';
+// Bingo-specific payload union type (used for BroadcastSync generic parameter)
+type BingoSyncPayload = GameState | BingoBall | BingoPattern | AudioSettingsPayload | { theme: ThemeMode } | null;
 
 /**
  * Extended BroadcastSync with bingo-specific convenience methods.
@@ -61,10 +51,11 @@ function createBingoBroadcastSync(sessionId: string): BingoBroadcastSync {
   return new BingoBroadcastSync(channelName);
 }
 
-type MessageHandler = (message: SyncMessage<BingoSyncPayload>) => void;
+type MessageHandler = (message: BingoSyncMessage) => void;
 
 /**
  * Create a message handler that routes messages by type.
+ * Uses discriminated union narrowing -- no manual type casts required.
  */
 export function createMessageRouter(handlers: Partial<{
   onStateUpdate: (state: GameState) => void;
@@ -75,28 +66,28 @@ export function createMessageRouter(handlers: Partial<{
   onAudioSettingsChanged: (settings: AudioSettingsPayload) => void;
   onDisplayThemeChanged: (theme: ThemeMode) => void;
 }>): MessageHandler {
-  return (message: SyncMessage<BingoSyncPayload>) => {
-    switch (message.type as BingoMessageType) {
+  return (message: BingoSyncMessage) => {
+    switch (message.type) {
       case 'GAME_STATE_UPDATE':
-        handlers.onStateUpdate?.(message.payload as GameState);
+        handlers.onStateUpdate?.(message.payload);
         break;
       case 'BALL_CALLED':
-        handlers.onBallCalled?.(message.payload as BingoBall);
+        handlers.onBallCalled?.(message.payload);
         break;
       case 'GAME_RESET':
         handlers.onReset?.();
         break;
       case 'PATTERN_CHANGED':
-        handlers.onPatternChanged?.(message.payload as BingoPattern);
+        handlers.onPatternChanged?.(message.payload);
         break;
       case 'REQUEST_SYNC':
         handlers.onSyncRequest?.();
         break;
       case 'AUDIO_SETTINGS_CHANGED':
-        handlers.onAudioSettingsChanged?.(message.payload as AudioSettingsPayload);
+        handlers.onAudioSettingsChanged?.(message.payload);
         break;
       case 'DISPLAY_THEME_CHANGED':
-        handlers.onDisplayThemeChanged?.((message.payload as ThemePayload).theme);
+        handlers.onDisplayThemeChanged?.(message.payload.theme);
         break;
     }
   };
@@ -230,7 +221,12 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
       onDisplayThemeChanged: handleDisplayThemeChanged,
     });
 
-    const unsubscribe = broadcastSync.subscribe(router);
+    // Cast at the transport boundary: BroadcastSync uses a generic SyncMessage<TPayload>
+    // while our router expects the discriminated BingoSyncMessage union.
+    // This is safe because the BingoBroadcastSync class only sends valid BingoSyncMessage types.
+    const unsubscribe = broadcastSync.subscribe(
+      router as unknown as (message: import('@joolie-boolie/sync').SyncMessage<BingoSyncPayload>) => void
+    );
 
     // If audience, request initial sync with retry logic
     // This handles the race condition where presenter may not be ready yet

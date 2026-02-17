@@ -4,7 +4,7 @@ import { useSync } from '../use-sync';
 import { useSyncStore } from '@joolie-boolie/sync';
 import { useGameStore } from '@/stores/game-store';
 import { createMessageRouter } from '../use-sync';
-import { SyncMessage, BingoPattern, BingoBall, GameState } from '@/types';
+import { BingoSyncMessage, BingoPattern, BingoBall, GameState } from '@/types';
 
 // Test session ID for all tests
 const TEST_SESSION_ID = '550e8400-e29b-41d4-a716-446655440000';
@@ -26,7 +26,7 @@ class MockBroadcastChannel {
   }
 
   // Helper to simulate receiving a message
-  simulateMessage(message: SyncMessage) {
+  simulateMessage(message: BingoSyncMessage) {
     if (this.onmessage) {
       this.onmessage({ data: message } as MessageEvent);
     }
