@@ -169,3 +169,31 @@ export function isValidQuestionCategory(category: string): category is QuestionC
 export function isValidCorrectAnswer(answer: string): boolean {
   return ['A', 'B', 'C', 'D', 'True', 'False'].includes(answer);
 }
+
+// =============================================================================
+// API ADAPTER TYPES (The Trivia API v2 integration)
+// =============================================================================
+
+/**
+ * Options for batch conversion of Trivia API questions.
+ */
+export interface ApiAdapterOptions {
+  /** Number of questions per round for roundIndex assignment. Default: 5. */
+  questionsPerRound?: number;
+  /** If true, niche questions are excluded before conversion. Default: false. */
+  excludeNiche?: boolean;
+  /** Source identifier written to TriviaQuestion.source. Default: 'the-trivia-api'. */
+  source?: string;
+}
+
+/**
+ * Summary of a batch conversion. Used for UI preview display.
+ */
+export interface ApiConversionSummary {
+  totalReceived: number;
+  totalConverted: number;
+  nicheFiltered: number;
+  roundsGenerated: number;
+  categoryCounts: Record<string, number>;
+  difficultyCounts: Record<string, number>;
+}

@@ -79,6 +79,10 @@ export interface TriviaQuestion {
   correctIndex: number;
   category?: string;
   explanation?: string;
+  /** Source system that produced this question (e.g., 'the-trivia-api', 'manual'). */
+  source?: string;
+  /** External ID from the source system, for deduplication and provenance tracking. */
+  externalId?: string;
 }
 
 export interface TriviaTemplate {
@@ -354,6 +358,8 @@ const TriviaQuestionSchema = z.object({
   correctIndex: z.number(),
   category: z.string().optional(),
   explanation: z.string().optional(),
+  source: z.string().optional(),
+  externalId: z.string().optional(),
 });
 
 const TriviaTemplateSchema = z.object({

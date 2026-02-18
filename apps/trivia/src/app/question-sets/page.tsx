@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import type { TriviaQuestionSet, TriviaQuestion } from '@joolie-boolie/database/types';
 import { QuestionSetImporter } from '@/components/presenter/QuestionSetImporter';
+import { TriviaApiImporter } from '@/components/presenter/TriviaApiImporter';
 import { QuestionSetEditorModal } from '@/components/question-editor/QuestionSetEditorModal';
 import {
   getCategoryStatistics,
@@ -16,6 +17,7 @@ export default function QuestionSetsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showImporter, setShowImporter] = useState(false);
+  const [showApiImporter, setShowApiImporter] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [editingQuestionSetId, setEditingQuestionSetId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -159,10 +161,23 @@ export default function QuestionSetsPage() {
           </button>
           <button
             type="button"
-            onClick={() => setShowImporter(!showImporter)}
+            onClick={() => {
+              setShowImporter(!showImporter);
+              if (!showImporter) setShowApiImporter(false);
+            }}
             className="inline-flex items-center min-h-[44px] px-5 py-2 text-base font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             {showImporter ? 'Hide Importer' : 'Import Questions'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowApiImporter(!showApiImporter);
+              if (!showApiImporter) setShowImporter(false);
+            }}
+            className="inline-flex items-center min-h-[44px] px-5 py-2 text-base font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            {showApiImporter ? 'Hide API Importer' : 'Fetch from Trivia API'}
           </button>
           <Link
             href="/"
@@ -180,6 +195,18 @@ export default function QuestionSetsPage() {
             onImportSuccess={() => {
               fetchQuestionSets();
               setShowImporter(false);
+            }}
+          />
+        </div>
+      )}
+
+      {/* API Importer section */}
+      {showApiImporter && (
+        <div className="mb-8 p-6 border border-border rounded-xl bg-card">
+          <TriviaApiImporter
+            onSaveSuccess={() => {
+              fetchQuestionSets();
+              setShowApiImporter(false);
             }}
           />
         </div>

@@ -21,6 +21,7 @@ import { RoomSetupModal } from '@/components/presenter/RoomSetupModal';
 import { SaveTemplateModal } from '@/components/presenter/SaveTemplateModal';
 import { PresetSelector } from '@/components/presenter/PresetSelector';
 import { QuestionSetSelector } from '@/components/presenter/QuestionSetSelector';
+import { TriviaApiImporter } from '@/components/presenter/TriviaApiImporter';
 import { QuestionImporter } from '@/components/presenter/QuestionImporter';
 import { SavePresetModal } from '@/components/presenter/SavePresetModal';
 import { SaveQuestionSetModal } from '@/components/presenter/SaveQuestionSetModal';
@@ -214,6 +215,7 @@ export default function PlayPage() {
   const [showSavePresetModal, setShowSavePresetModal] = useState(false);
   const [showSaveQuestionSetModal, setShowSaveQuestionSetModal] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<QuestionCategory[]>([]);
+  const [showApiImporter, setShowApiImporter] = useState(false);
 
   // Filter questions by selected categories (setup-time filtering)
   const filteredQuestions = useMemo(() => {
@@ -687,6 +689,33 @@ export default function PlayPage() {
                 <h2 className="text-lg font-semibold text-foreground">Question Content</h2>
                 <QuestionImporter status={game.status} onImport={gameState.importQuestions} />
                 <QuestionSetSelector disabled={game.status !== 'setup'} />
+                {/* API Question Importer -- collapsible tertiary option */}
+                <div className="border border-border rounded-xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowApiImporter((prev) => !prev)}
+                    disabled={game.status !== 'setup'}
+                    aria-expanded={showApiImporter}
+                    className="
+                      w-full min-h-[44px] px-4 py-2.5
+                      flex items-center justify-between
+                      text-base font-medium text-left
+                      hover:bg-muted/50 transition-colors
+                      focus:outline-none focus:ring-2 focus:ring-primary/50
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                    "
+                  >
+                    <span>Fetch from Trivia API</span>
+                    <span aria-hidden="true" className="text-muted-foreground">
+                      {showApiImporter ? '\u25B2' : '\u25BC'}
+                    </span>
+                  </button>
+                  {showApiImporter && (
+                    <div className="border-t border-border p-4">
+                      <TriviaApiImporter disabled={game.status !== 'setup'} />
+                    </div>
+                  )}
+                </div>
                 <CategoryFilterCompact
                   selectedCategories={selectedCategories}
                   onCategoryChange={setSelectedCategories}
