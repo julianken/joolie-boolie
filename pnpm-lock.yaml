@@ -7,13 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@grafana/faro-react':
-        specifier: ^2.2.4
-        version: 2.2.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@grafana/faro-web-sdk':
-        specifier: ^2.2.4
-        version: 2.2.4
     devDependencies:
       '@lhci/cli':
         specifier: ^0.15.1
@@ -60,12 +53,6 @@ importers:
 
   apps/bingo:
     dependencies:
-      '@grafana/faro-react':
-        specifier: ^2.2.4
-        version: 2.2.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@grafana/faro-web-sdk':
-        specifier: ^2.2.4
-        version: 2.2.4
       '@joolie-boolie/audio':
         specifier: workspace:*
         version: link:../../packages/audio
@@ -217,12 +204,6 @@ importers:
 
   apps/platform-hub:
     dependencies:
-      '@grafana/faro-react':
-        specifier: ^2.2.4
-        version: 2.2.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@grafana/faro-web-sdk':
-        specifier: ^2.2.4
-        version: 2.2.4
       '@joolie-boolie/auth':
         specifier: workspace:*
         version: link:../../packages/auth
@@ -362,12 +343,6 @@ importers:
 
   apps/trivia:
     dependencies:
-      '@grafana/faro-react':
-        specifier: ^2.2.4
-        version: 2.2.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@grafana/faro-web-sdk':
-        specifier: ^2.2.4
-        version: 2.2.4
       '@joolie-boolie/audio':
         specifier: workspace:*
         version: link:../../packages/audio
