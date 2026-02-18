@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { createGameLifecycleLogger } from '@joolie-boolie/sync';
 import { GameState, BingoPattern, BingoBall } from '@/types';
 import {
   createInitialState,
@@ -22,18 +23,7 @@ import {
   canResumeGame,
 } from '@/lib/game';
 
-/**
- * Emit a structured lifecycle event for game observability.
- * Uses console.warn with JSON for structured client-side logging.
- */
-function emitLifecycleEvent(event: string, data?: Record<string, unknown>): void {
-  console.warn(JSON.stringify({
-    event,
-    game: 'bingo',
-    timestamp: new Date().toISOString(),
-    ...data,
-  }));
-}
+const lifecycleLogger = createGameLifecycleLogger({ game: 'bingo' });
 
 export interface GameStore extends GameState {
   // Internal flag for sync loop prevention
@@ -62,7 +52,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
   // Actions
   startGame: (pattern?: BingoPattern) => {
-    emitLifecycleEvent('game.started', { pattern: pattern?.name });
+    lifecycleLogger.emit('game.started', { pattern: pattern?.name });
     set((state) => startGameEngine(state, pattern));
   },
 
@@ -75,7 +65,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     set(newState);
     // Emit ball called event with context
     if (newState.currentBall) {
-      emitLifecycleEvent('game.ball_called', {
+      lifecycleLogger.emit('game.ball_called', {
         ball: `${newState.currentBall.letter}-${newState.currentBall.number}`,
         ballsCalled: getBallsCalled(newState),
         ballsRemaining: getBallsRemaining(newState),
@@ -92,7 +82,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     const previousBall = state.currentBall;
     set(undoLastCallEngine(state));
     if (previousBall) {
-      emitLifecycleEvent('game.ball_undone', {
+      lifecycleLogger.emit('game.ball_undone', {
         ball: `${previousBall.letter}-${previousBall.number}`,
       });
     }
@@ -100,28 +90,28 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   pauseGame: () => {
-    emitLifecycleEvent('game.paused');
+    lifecycleLogger.emit('game.paused');
     set((state) => pauseGameEngine(state));
   },
 
   resumeGame: () => {
-    emitLifecycleEvent('game.resumed');
+    lifecycleLogger.emit('game.resumed');
     set((state) => resumeGameEngine(state));
   },
 
   endGame: () => {
     const state = get();
-    emitLifecycleEvent('game.ended', { ballsCalled: getBallsCalled(state) });
+    lifecycleLogger.emit('game.ended', { ballsCalled: getBallsCalled(state) });
     set((state) => endGameEngine(state));
   },
 
   resetGame: () => {
-    emitLifecycleEvent('game.reset');
+    lifecycleLogger.emit('game.reset');
     set((state) => resetGameEngine(state));
   },
 
   setPattern: (pattern: BingoPattern) => {
-    emitLifecycleEvent('game.pattern_changed', { pattern: pattern.name });
+    lifecycleLogger.emit('game.pattern_changed', { pattern: pattern.name });
     set((state) => setPatternEngine(state, pattern));
   },
 

@@ -32,6 +32,8 @@ export { useSync } from './use-sync';
 
 // Heartbeat monitoring
 export { SyncHeartbeat } from './heartbeat';
+export type { UseSyncHeartbeatOptions, UseSyncHeartbeatReturn } from './use-sync-heartbeat';
+export { useSyncHeartbeat } from './use-sync-heartbeat';
 
 // Observability
 export {
