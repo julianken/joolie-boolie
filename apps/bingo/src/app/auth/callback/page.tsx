@@ -23,6 +23,15 @@ function CallbackHandler() {
 
   useEffect(() => {
     async function handleCallback() {
+      // Handle post-token-exchange redirect: cookies are already set,
+      // just navigate to the final destination.
+      const authSuccess = searchParams.get('auth_success');
+      if (authSuccess === '1') {
+        const finalDest = searchParams.get('returnTo') || '/';
+        window.location.href = finalDest;
+        return;
+      }
+
       const code = searchParams.get('code');
       const state = searchParams.get('state');
       const errorParam = searchParams.get('error');

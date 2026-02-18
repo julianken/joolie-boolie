@@ -91,9 +91,14 @@ export function createTokenRedirectHandler(config: TokenRedirectHandlerConfig) {
         }
       }
 
-      // Build redirect response with cookies
-      // Use 303 See Other to convert POST to GET for the redirect
-      const redirectUrl = new URL(returnTo, request.url);
+      // Redirect to /auth/callback (excluded from middleware) with a success flag.
+      // The callback page will handle the final client-side navigation to returnTo.
+      // We do NOT redirect directly to protected routes like /play because the
+      // middleware would run before the browser has committed the cookies from
+      // this response, causing them to be cleared.
+      const redirectUrl = new URL('/auth/callback', request.url);
+      redirectUrl.searchParams.set('auth_success', '1');
+      redirectUrl.searchParams.set('returnTo', returnTo);
       const response = NextResponse.redirect(redirectUrl, 303);
 
       // Set auth cookies on the redirect response
