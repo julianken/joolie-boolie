@@ -57,3 +57,18 @@ export {
   groupQuestionsByRound,
   getExportStats,
 } from './exporter';
+
+// API Adapter
+export {
+  fisherYatesShuffle,
+  sanitizeText,
+  triviaApiQuestionToQuestion,
+  triviaApiQuestionToTriviaQuestion,
+  triviaApiQuestionsToQuestions,
+  triviaApiQuestionsToTriviaQuestions,
+  filterNicheQuestions,
+  getApiConversionSummary,
+} from './api-adapter';
+
+// API Adapter types
+export type { ApiAdapterOptions, ApiConversionSummary } from './types';

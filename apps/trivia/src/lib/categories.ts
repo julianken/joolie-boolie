@@ -76,6 +76,74 @@ export const LEGACY_CATEGORY_MAPPING = {
 } as const satisfies Record<string, QuestionCategory>;
 
 // =============================================================================
+// EXTERNAL API CATEGORY MAPPING (The Trivia API v2)
+// =============================================================================
+
+/**
+ * Maps category slugs from the-trivia-api.com (v2) to internal QuestionCategory values.
+ *
+ * The external API uses 10 categories. Our app uses 7 canonical categories.
+ *
+ * | API Category          | Internal Category    |
+ * |-----------------------|----------------------|
+ * | music                 | entertainment        |
+ * | film_and_tv           | entertainment        |
+ * | sport_and_leisure     | sports               |
+ * | arts_and_literature   | art_literature       |
+ * | history               | history              |
+ * | science               | science              |
+ * | geography             | geography            |
+ * | society_and_culture   | general_knowledge    |
+ * | food_and_drink        | general_knowledge    |
+ * | general_knowledge     | general_knowledge    |
+ */
+export const TRIVIA_API_CATEGORY_MAP: Readonly<Record<string, QuestionCategory>> = {
+  music: 'entertainment',
+  film_and_tv: 'entertainment',
+  sport_and_leisure: 'sports',
+  arts_and_literature: 'art_literature',
+  history: 'history',
+  science: 'science',
+  geography: 'geography',
+  society_and_culture: 'general_knowledge',
+  food_and_drink: 'general_knowledge',
+  general_knowledge: 'general_knowledge',
+} as const;
+
+/**
+ * Map an external API category string to an internal QuestionCategory.
+ *
+ * Lookup order:
+ * 1. Exact match in TRIVIA_API_CATEGORY_MAP (covers all known API categories)
+ * 2. Delegated to normalizeCategoryId() (handles legacy aliases + canonical pass-through + fallback)
+ *
+ * @param apiCategory - The category string from the external API.
+ * @returns The corresponding internal QuestionCategory.
+ */
+export function mapApiCategory(apiCategory: string): QuestionCategory {
+  const apiMapped = TRIVIA_API_CATEGORY_MAP[apiCategory];
+  if (apiMapped !== undefined) {
+    return apiMapped;
+  }
+  return normalizeCategoryId(apiCategory);
+}
+
+/**
+ * Reverse-map: get the external API category strings that correspond to a
+ * given internal QuestionCategory. Used to build API query parameters.
+ *
+ * @param internalCategory - An internal QuestionCategory.
+ * @returns Array of external API category strings that map to this internal category.
+ */
+export function getApiCategoriesForInternal(
+  internalCategory: QuestionCategory
+): string[] {
+  return Object.entries(TRIVIA_API_CATEGORY_MAP)
+    .filter(([, internal]) => internal === internalCategory)
+    .map(([apiCat]) => apiCat);
+}
+
+// =============================================================================
 // CATEGORY UTILITIES
 // =============================================================================
 
