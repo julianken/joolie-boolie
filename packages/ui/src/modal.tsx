@@ -1,6 +1,13 @@
 'use client';
 
-import { ReactNode, useEffect, useRef, useCallback, KeyboardEvent } from 'react';
+import {
+  ReactNode,
+  useEffect,
+  useRef,
+  useCallback,
+  KeyboardEvent,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from './button';
 
@@ -14,7 +21,17 @@ export interface ModalProps {
   onConfirm?: () => void;
   variant?: 'default' | 'danger';
   showFooter?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'full';
 }
+
+const sizeMaxWidth: Record<NonNullable<ModalProps['size']>, string> = {
+  sm: 'max-w-[400px]',
+  md: 'max-w-[560px]',
+  lg: 'max-w-[720px]',
+  full: 'max-w-[calc(100vw-2rem)]',
+};
+
+type AnimState = 'entering' | 'visible' | 'exiting' | 'hidden';
 
 export function Modal({
   isOpen,
@@ -26,9 +43,29 @@ export function Modal({
   onConfirm,
   variant = 'default',
   showFooter = true,
+  size = 'md',
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+  const [animState, setAnimState] = useState<AnimState>('hidden');
+
+  // Animation state machine:
+  // isOpen=true  -> entering -> visible
+  // isOpen=false -> exiting  -> hidden (after 200ms)
+  useEffect(() => {
+    if (isOpen) {
+      setAnimState('entering');
+      const t = setTimeout(() => setAnimState('visible'), 10);
+      return () => clearTimeout(t);
+    } else {
+      if (animState === 'visible' || animState === 'entering') {
+        setAnimState('exiting');
+        const t = setTimeout(() => setAnimState('hidden'), 200);
+        return () => clearTimeout(t);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Get all focusable elements within the modal
   const getFocusableElements = useCallback(() => {
@@ -76,7 +113,6 @@ export function Modal({
     if (isOpen) {
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
 
-      // Focus the modal container after a short delay to allow render
       setTimeout(() => {
         const focusableElements = getFocusableElements();
         if (focusableElements.length > 0) {
@@ -86,7 +122,6 @@ export function Modal({
         }
       }, 0);
 
-      // Prevent body scroll
       document.body.style.overflow = 'hidden';
     }
 
@@ -108,23 +143,46 @@ export function Modal({
     [onClose]
   );
 
-  if (!isOpen) return null;
+  if (animState === 'hidden') return null;
+
+  // Animation styles based on state
+  const isEnter = animState === 'entering';
+  const isExit = animState === 'exiting';
+
+  const backdropStyle: React.CSSProperties = {
+    opacity: isEnter ? 0 : isExit ? 0 : 1,
+    transition: isExit
+      ? 'opacity 200ms ease-out'
+      : 'opacity 200ms ease-out',
+  };
+
+  const contentStyle: React.CSSProperties = {
+    opacity: isEnter ? 0 : isExit ? 0 : 1,
+    transform: isEnter
+      ? 'scale(0.95) translateY(4px)'
+      : isExit
+        ? 'scale(0.98) translateY(2px)'
+        : 'scale(1) translateY(0)',
+    transition: isExit
+      ? 'opacity 200ms ease-out, transform 200ms ease-out'
+      : 'opacity 250ms cubic-bezier(0, 0, 0.2, 1), transform 300ms cubic-bezier(0.42, 0, 0.2, 1)',
+  };
 
   const modalContent = (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
-      className="
-        fixed inset-0 z-50
-        flex items-center justify-center
-        p-4
-      "
+      className="fixed inset-0 z-[50] flex items-center justify-center p-4"
       onKeyDown={handleKeyDown as unknown as React.KeyboardEventHandler}
     >
-      {/* Backdrop */}
+      {/* Backdrop: --overlay color with backdrop blur */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 backdrop-blur-xl"
+        style={{
+          background: 'var(--overlay)',
+          ...backdropStyle,
+        }}
         onClick={handleBackdropClick}
         aria-hidden="true"
       />
@@ -133,22 +191,26 @@ export function Modal({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="
-          relative z-10
-          w-full max-w-lg
-          max-h-[90vh]
-          flex flex-col
-          bg-background rounded-xl
-          shadow-2xl
-          border-2 border-border
-          outline-none
-        "
+        className={[
+          'relative z-10',
+          'w-full',
+          sizeMaxWidth[size],
+          'max-h-[90vh]',
+          'flex flex-col',
+          'bg-surface-elevated',
+          // Border: 1px border-border-strong per spec (section 3.4)
+          'border border-border-strong',
+          'rounded-[var(--radius-xl)]',
+          'shadow-xl',
+          'outline-none',
+        ].join(' ')}
+        style={contentStyle}
       >
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-border">
           <h2
             id="modal-title"
-            className="text-2xl font-bold text-foreground"
+            className="text-xl font-bold text-foreground"
           >
             {title}
           </h2>
@@ -156,18 +218,18 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="
-              min-h-[44px] min-w-[44px]
-              flex items-center justify-center
-              rounded-lg
-              text-muted-foreground hover:text-foreground
-              hover:bg-muted/20
-              transition-colors
-              focus:outline-none focus:ring-4 focus:ring-primary/50
-            "
+            className={[
+              'min-h-[44px] min-w-[44px]',
+              'flex items-center justify-center',
+              'rounded-lg',
+              'text-foreground-muted hover:text-foreground',
+              'hover:bg-surface-hover',
+              'transition-colors',
+              'focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--ring)]',
+            ].join(' ')}
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -184,7 +246,7 @@ export function Modal({
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6 text-lg">
+        <div className="flex-1 overflow-y-auto p-6 text-base text-foreground">
           {children}
         </div>
 
@@ -213,7 +275,6 @@ export function Modal({
     </div>
   );
 
-  // Use portal to render at document root
   if (typeof document !== 'undefined') {
     return createPortal(modalContent, document.body);
   }

@@ -7,6 +7,34 @@ export { Toggle, type ToggleProps } from './toggle';
 // Slider
 export { Slider, type SliderProps } from './slider';
 
+// Card
+export {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  type CardProps,
+  type CardHeaderProps,
+  type CardBodyProps,
+  type CardFooterProps,
+} from './card';
+
+// Badge
+export { Badge, type BadgeProps, type BadgeColor, type BadgeStyle, type BadgeSize } from './badge';
+
+// Motion presets
+export {
+  springSmooth,
+  springGentle,
+  springBouncy,
+  springSnappy,
+  springHeavy,
+  springMicro,
+  springResponsive,
+  springDialog,
+  springNotification,
+} from './motion/presets';
+
 // WebVitals
 export {
   WebVitals,

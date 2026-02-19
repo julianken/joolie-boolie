@@ -20,14 +20,17 @@ export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'rectangular' | 'circular' | 'text';
   /**
    * Animation style of the skeleton.
-   * @default 'pulse'
+   * 'wave' is an alias for 'shimmer' (backward compatible).
+   * @default 'shimmer'
    */
-  animation?: 'pulse' | 'wave' | 'none';
+  animation?: 'shimmer' | 'wave' | 'pulse' | 'none';
 }
 
 /**
  * Base skeleton component for loading states.
- * Provides a placeholder with animation while content loads.
+ * Uses a shimmer sweep animation (left-to-right gradient highlight).
+ * Base color: --muted (background surface).
+ * Shimmer highlight: --surface-hover.
  */
 export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
   (
@@ -35,7 +38,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
       width = '100%',
       height = '1rem',
       variant = 'rectangular',
-      animation = 'pulse',
+      animation = 'shimmer',
       className = '',
       style,
       ...props
@@ -45,36 +48,60 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
     const widthStyle = typeof width === 'number' ? `${width}px` : width;
     const heightStyle = typeof height === 'number' ? `${height}px` : height;
 
-    const variantStyles = {
+    const variantClasses = {
       rectangular: 'rounded-md',
       circular: 'rounded-full',
       text: 'rounded',
     };
 
-    const animationStyles = {
+    const animationClasses: Record<string, string> = {
+      shimmer: 'jb-skeleton-shimmer motion-reduce:animate-none',
+      // 'wave' is the legacy name — maps to the same shimmer sweep animation
+      wave: 'jb-skeleton-shimmer motion-reduce:animate-none',
       pulse: 'animate-pulse motion-reduce:animate-none',
-      wave: 'animate-shimmer motion-reduce:animate-none bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]',
       none: '',
     };
 
     return (
-      <div
-        ref={ref}
-        role="status"
-        aria-label="Loading..."
-        className={`
-          bg-muted/60
-          ${variantStyles[variant]}
-          ${animationStyles[animation]}
-          ${className}
-        `.trim()}
-        style={{
-          width: widthStyle,
-          height: heightStyle,
-          ...style,
-        }}
-        {...props}
-      />
+      <>
+        <style>{`
+          @keyframes jb-shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .jb-skeleton-shimmer {
+            background: linear-gradient(
+              90deg,
+              var(--muted) 0%,
+              var(--surface-hover) 50%,
+              var(--muted) 100%
+            );
+            background-size: 200% 100%;
+            animation: jb-shimmer 1.8s ease-in-out infinite;
+          }
+        `}</style>
+        <div
+          ref={ref}
+          role="status"
+          aria-label="Loading..."
+          className={[
+            // Use --surface-elevated as base background for non-shimmer animations
+            // (shimmer applies its own gradient background via the CSS class)
+            animation !== 'shimmer' && animation !== 'wave' ? 'bg-surface-elevated' : '',
+            variantClasses[variant],
+            animationClasses[animation],
+            className,
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          style={{
+            width: widthStyle,
+            height: heightStyle,
+            ...style,
+          }}
+          {...props}
+        />
+      </>
     );
   }
 );

@@ -5,20 +5,66 @@ export interface ToggleProps {
   onChange: (checked: boolean) => void;
   label: string;
   disabled?: boolean;
+  size?: 'sm' | 'md';
+  labelPosition?: 'left' | 'right';
 }
 
-export function Toggle({ checked, onChange, label, disabled = false }: ToggleProps) {
+export function Toggle({
+  checked,
+  onChange,
+  label,
+  disabled = false,
+  size = 'md',
+  labelPosition = 'right',
+}: ToggleProps) {
   const handleToggle = () => {
     if (!disabled) onChange(!checked);
   };
 
+  // Track and thumb sizes per spec (section 3.5 / 1.15):
+  // sm: 40x24px track, 16px thumb with 4px inset
+  // md: 52x30px track, 22px thumb with 4px inset
+  const trackW = size === 'md' ? 52 : 40;
+  const trackH = size === 'md' ? 30 : 24;
+  const thumbSize = size === 'md' ? 22 : 16;
+  const thumbInset = 4;
+  const thumbTravel = trackW - thumbSize - thumbInset * 2;
+
+  const trackStyle = {
+    width: trackW,
+    height: trackH,
+  };
+
+  const thumbStyle = {
+    width: thumbSize,
+    height: thumbSize,
+    transform: checked
+      ? `translateX(${thumbInset + thumbTravel}px)`
+      : `translateX(${thumbInset}px)`,
+  };
+
+  const labelEl = (
+    <span
+      className="text-base font-medium select-none text-foreground"
+      onClick={handleToggle}
+    >
+      {label}
+    </span>
+  );
+
   return (
     <div
-      className={`
-        flex items-center gap-3 min-h-[44px]
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-      `}
+      className={[
+        'flex items-center gap-3',
+        // 44px minimum touch target
+        'min-h-[44px]',
+        disabled ? 'opacity-[0.38] cursor-not-allowed' : 'cursor-pointer',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
+      {labelPosition === 'left' && labelEl}
+
       <button
         type="button"
         role="switch"
@@ -26,29 +72,30 @@ export function Toggle({ checked, onChange, label, disabled = false }: TogglePro
         aria-label={label}
         disabled={disabled}
         onClick={handleToggle}
-        className={`
-          relative inline-flex h-[44px] w-[80px] shrink-0
-          items-center rounded-full border-0 p-0
-          transition-colors duration-200
-          focus:outline-none focus:ring-4 focus:ring-primary/50
-          ${checked ? 'bg-accent' : 'bg-muted'}
-          disabled:cursor-not-allowed
-        `}
+        style={trackStyle}
+        className={[
+          'relative shrink-0',
+          'items-center rounded-full border-0 p-0',
+          'transition-colors duration-200',
+          // Checked: success green. Unchecked: muted surface.
+          checked ? 'bg-success' : 'bg-secondary',
+          // Hover ring (subtle glow)
+          !disabled
+            ? 'hover:shadow-[0_0_0_3px_var(--ring)] focus-visible:shadow-[0_0_0_3px_var(--ring)]'
+            : '',
+          'focus:outline-none',
+          'disabled:cursor-not-allowed',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         <span
-          className={`
-            inline-block h-[36px] w-[36px] rounded-full bg-white
-            shadow-md transition-transform duration-200
-            ${checked ? 'translate-x-[40px]' : 'translate-x-[4px]'}
-          `}
+          style={thumbStyle}
+          className="absolute top-[4px] inline-block rounded-full bg-white shadow-sm transition-transform duration-200"
         />
       </button>
-      <span
-        className="text-lg font-medium select-none"
-        onClick={handleToggle}
-      >
-        {label}
-      </span>
+
+      {labelPosition === 'right' && labelEl}
     </div>
   );
 }
