@@ -59,8 +59,8 @@ export function Slider({
 
       {/* Track: 4px height per spec (section 3.8) */}
       <SliderTrack
-        style={{ marginTop: 12, marginBottom: 12 }}
-        className="relative h-[4px] w-full rounded-full bg-border"
+        style={{ marginTop: 12, marginBottom: 12, height: 6, backgroundColor: 'color-mix(in srgb, var(--foreground) 20%, transparent)' }}
+        className="relative w-full rounded-full"
       >
         {({ state }) => (
           <>

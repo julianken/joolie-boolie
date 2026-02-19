@@ -282,7 +282,7 @@ export default function PlayPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 md:gap-4">
 
             {/* Left column: Bingo Board */}
-            <section className="hidden sm:block md:col-span-1 lg:col-span-4 lg:order-1 space-y-3">
+            <section className="hidden sm:block md:col-span-1 lg:col-span-3 lg:order-1 space-y-3">
               <div
                 className="bg-surface border border-border-subtle rounded-xl p-3 shadow-md"
                 style={{ boxShadow: 'var(--shadow-md)' }}
@@ -327,7 +327,7 @@ export default function PlayPage() {
 
                 <h2 className="text-base font-semibold text-foreground-secondary relative z-10">Current Ball</h2>
                 <div className="relative z-10">
-                  <BallDisplay ball={game.currentBall} size="xl" />
+                  <BallDisplay ball={game.currentBall} size="lg" />
                 </div>
                 {game.previousBall && (
                   <div className="flex items-center gap-2 text-foreground-secondary relative z-10">
@@ -367,10 +367,10 @@ export default function PlayPage() {
             </section>
 
             {/* Right column: Settings / Pattern */}
-            <section className="md:col-span-1 lg:col-span-3 lg:order-3 space-y-3">
+            <section className="md:col-span-1 lg:col-span-4 lg:order-3 space-y-3">
               {/* Pattern Selection */}
               <div
-                className="bg-surface border border-border-subtle rounded-xl p-3 space-y-3"
+                className="bg-surface border border-border-subtle rounded-xl p-3 space-y-2"
                 style={{ boxShadow: 'var(--shadow-sm)' }}
               >
                 <PatternSelector
@@ -383,29 +383,30 @@ export default function PlayPage() {
 
               {/* Game Settings */}
               <div
-                className="bg-surface border border-border-subtle rounded-xl p-3 space-y-3"
+                className="bg-surface border border-border-subtle rounded-xl p-3 space-y-2"
                 style={{ boxShadow: 'var(--shadow-sm)' }}
               >
                 <h2 className="text-base font-semibold text-foreground-secondary">Settings</h2>
 
-                {/* Auto-call toggle */}
-                <Toggle
-                  checked={game.autoCallEnabled}
-                  onChange={game.toggleAutoCall}
-                  label="Auto-call"
-                />
-
-                {/* Speed slider */}
-                <Slider
-                  value={game.autoCallSpeed}
-                  onChange={game.setAutoCallSpeed}
-                  min={5}
-                  max={30}
-                  step={1}
-                  label="Call Interval"
-                  unit="s"
-                  disabled={!game.autoCallEnabled}
-                />
+                {/* Auto-call toggle + conditional speed slider */}
+                <div className="space-y-1">
+                  <Toggle
+                    checked={game.autoCallEnabled}
+                    onChange={game.toggleAutoCall}
+                    label="Auto-call"
+                  />
+                  {game.autoCallEnabled && (
+                    <Slider
+                      value={game.autoCallSpeed}
+                      onChange={game.setAutoCallSpeed}
+                      min={5}
+                      max={30}
+                      step={1}
+                      label="Call Interval"
+                      unit="s"
+                    />
+                  )}
+                </div>
 
                 {/* Audio toggle */}
                 <Toggle
@@ -413,53 +414,50 @@ export default function PlayPage() {
                   onChange={game.toggleAudio}
                   label="Audio Announcements"
                 />
-                <p className="text-sm text-foreground-secondary">
-                  Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">M</kbd> to toggle
-                </p>
 
-                {/* Voice pack selector */}
-                <VoiceSelector
-                  selectedVoice={voicePack}
-                  onSelect={setVoicePack}
-                  preloadProgress={preloadProgress}
-                />
+                {/* Audio & Sound collapsible */}
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer py-2 text-base font-medium text-foreground-secondary hover:text-foreground transition-colors select-none list-none [&::-webkit-details-marker]:hidden">
+                    <span>Audio & Sound</span>
+                    <svg className="w-4 h-4 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="space-y-3 pt-2">
+                    {/* Voice pack selector */}
+                    <VoiceSelector
+                      selectedVoice={voicePack}
+                      onSelect={setVoicePack}
+                      preloadProgress={preloadProgress}
+                    />
 
-                {/* Roll sound selector */}
-                <RollSoundSelector />
+                    {/* Roll sound selector */}
+                    <RollSoundSelector />
 
-                {/* Reveal chime selector */}
-                <RevealChimeSelector />
+                    {/* Reveal chime selector */}
+                    <RevealChimeSelector />
+                  </div>
+                </details>
 
-                {/* Theme selector */}
-                <ThemeSelector
-                  presenterTheme={presenterTheme}
-                  displayTheme={displayTheme}
-                  onPresenterThemeChange={setPresenterTheme}
-                  onDisplayThemeChange={setDisplayTheme}
-                />
+                {/* Appearance collapsible */}
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer py-2 text-base font-medium text-foreground-secondary hover:text-foreground transition-colors select-none list-none [&::-webkit-details-marker]:hidden">
+                    <span>Appearance</span>
+                    <svg className="w-4 h-4 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="space-y-3 pt-2">
+                    <ThemeSelector
+                      presenterTheme={presenterTheme}
+                      displayTheme={displayTheme}
+                      onPresenterThemeChange={setPresenterTheme}
+                      onDisplayThemeChange={setDisplayTheme}
+                    />
+                  </div>
+                </details>
               </div>
 
-              {/* Keyboard shortcuts reference */}
-              <div
-                className="hidden md:block bg-surface border border-border-subtle rounded-xl p-3"
-                data-testid="keyboard-shortcuts-section"
-              >
-                <h2 className="text-base font-semibold mb-2 text-foreground-secondary">Shortcuts</h2>
-                <ul className="space-y-1.5 text-sm">
-                  {[
-                    { label: 'Roll', key: 'Space' },
-                    { label: 'Pause/Resume', key: 'P' },
-                    { label: 'Undo', key: 'U' },
-                    { label: 'Reset', key: 'R' },
-                    { label: 'Mute/Unmute', key: 'M' },
-                  ].map(({ label, key }) => (
-                    <li key={key} className="flex justify-between items-center">
-                      <span className="text-foreground-secondary">{label}</span>
-                      <kbd className="px-2 py-0.5 bg-muted rounded font-mono text-xs text-foreground-secondary">{key}</kbd>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </section>
           </div>
         </div>

@@ -142,14 +142,14 @@ export interface BallCounterProps {
 
 export function BallCounter({ called, remaining }: BallCounterProps) {
   return (
-    <div className="flex gap-6 text-center">
+    <div className="flex gap-4 text-center">
       <div className="flex flex-col">
-        <span className="text-3xl font-bold tabular-nums text-foreground" data-testid="balls-called-count">{called}</span>
+        <span className="text-2xl font-bold tabular-nums text-foreground" data-testid="balls-called-count">{called}</span>
         <span className="text-base text-foreground-secondary">Called</span>
       </div>
       <div className="w-px bg-border" />
       <div className="flex flex-col">
-        <span className="text-3xl font-bold tabular-nums text-foreground" data-testid="balls-remaining-count">{remaining}</span>
+        <span className="text-2xl font-bold tabular-nums text-foreground" data-testid="balls-remaining-count">{remaining}</span>
         <span className="text-base text-foreground-secondary">Remaining</span>
       </div>
     </div>

@@ -70,15 +70,15 @@ const columnHeaderText: Record<BingoColumn, string> = {
  */
 function getColumnHeaderStyle(column: BingoColumn): React.CSSProperties {
   return {
-    width: '44px',
-    height: '44px',
+    width: '36px',
+    height: '36px',
     borderRadius: '9999px',
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 700,
-    fontSize: '18px',
+    fontSize: '15px',
     position: 'relative',
     background: columnHeaderBg[column],
     color: columnHeaderText[column],

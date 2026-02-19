@@ -62,7 +62,7 @@ export function PatternSelector({
     <div className="flex flex-col gap-2">
       <label
         htmlFor={id}
-        className={`text-lg font-medium ${disabled ? 'opacity-50' : ''}`}
+        className={`text-base font-medium ${disabled ? 'opacity-50' : ''}`}
       >
         Winning Pattern
       </label>
@@ -72,8 +72,8 @@ export function PatternSelector({
         onChange={handleChange}
         disabled={disabled}
         className={`
-          min-h-[56px] px-4 py-3
-          text-lg rounded-lg
+          min-h-[40px] px-3 py-2
+          text-sm rounded-lg
           bg-background border-2 border-border
           focus:outline-none focus:ring-4 focus:ring-primary/50 focus:border-primary
           disabled:opacity-50 disabled:cursor-not-allowed
@@ -124,24 +124,19 @@ export function PatternPreview({ pattern }: PatternPreviewProps) {
   }, [pattern]);
 
   if (!pattern) {
-    return (
-      <div className="flex flex-col gap-2">
-        <h3 className="text-lg font-semibold text-muted-foreground">Pattern Preview</h3>
-        <p className="text-base text-muted-foreground">No pattern selected</p>
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-lg font-semibold text-muted-foreground">Pattern Preview</h3>
+      <h3 className="text-base font-semibold text-muted-foreground">Pattern Preview</h3>
       <div className="grid grid-cols-5 gap-1 w-fit">
         {grid.map((row, rowIndex) =>
           row.map((isMarked, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
               className={`
-                w-8 h-8 rounded
+                w-6 h-6 rounded
                 ${
                   isMarked
                     ? 'bg-primary'
