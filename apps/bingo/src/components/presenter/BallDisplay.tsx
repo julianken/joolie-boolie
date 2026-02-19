@@ -51,6 +51,48 @@ export function BallDisplay({ ball, size = 'lg' }: BallDisplayProps) {
       aria-label={`Ball ${ball.label}`}
       data-testid={`ball-display-${ball.label}`}
     >
+      {/* White ring — explicit div instead of ::before pseudo-element.
+          Pseudo-elements break when container-type: size interacts with
+          flex/grid layouts. Real divs are immune. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          width: '74%',
+          height: '74%',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '9999px',
+          zIndex: 1,
+          pointerEvents: 'none',
+          background: 'transparent',
+          border: '4.5cqi solid rgba(255,255,255,0.85)',
+          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.10)',
+        }}
+      />
+
+      {/* Inner white face — explicit div instead of ::after pseudo-element. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          width: '60%',
+          height: '60%',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '9999px',
+          zIndex: 1,
+          pointerEvents: 'none',
+          background: [
+            'radial-gradient(ellipse 60% 40% at 50% 30%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)',
+            'linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.95) 45%, rgba(255,255,255,0.88) 100%)',
+          ].join(', '),
+          boxShadow: '0 -0.5cqi 1cqi rgba(255,255,255,0.60), 0 1cqi 2cqi rgba(0,0,0,0.15)',
+        }}
+      />
+
       <span className="ball-content">
         {/* Column letter hidden on sm (A-02: decorative at small sizes) */}
         <span

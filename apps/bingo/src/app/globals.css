@@ -91,40 +91,10 @@
   color: #1A1720;
 }
 
-/* White ring — hollow circle between outer sphere and inner face */
-.bingo-ball::before {
-  content: '';
-  position: absolute;
-  width: 74%;
-  height: 74%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 9999px;
-  border: 4.5cqi solid rgba(255, 255, 255, 0.85);
-  background: transparent;
-  z-index: 1;
-  pointer-events: none;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.10);
-}
-
-/* Inner white face — solid white circle where the number sits */
-.bingo-ball::after {
-  content: '';
-  position: absolute;
-  width: 60%;
-  height: 60%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 9999px;
-  background:
-    radial-gradient(ellipse 60% 40% at 50% 30%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%),
-    linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.95) 45%, rgba(255,255,255,0.88) 100%);
-  z-index: 1;
-  pointer-events: none;
-  box-shadow: 0 -0.5cqi 1cqi rgba(255,255,255,0.60), 0 1cqi 2cqi rgba(0,0,0,0.15);
-}
+/* Ring and face are rendered as explicit <div> children in BallDisplay and
+   BallReveal components (not pseudo-elements) to avoid container-type: size
+   distortion in flex/grid layouts. See BallReveal.tsx for the canonical
+   ring + face implementation. */
 
 /* Number sits above ring and face.
    font-size uses cqi here (child of container) so it resolves against ball. */
