@@ -313,7 +313,7 @@ function AudienceDisplay({
           {/* Game layout: top 1/3 (ball + info + pattern), bottom 2/3 (board) */}
           {hasContent && (
             <div
-              className="flex-1 flex flex-col overflow-hidden"
+              className="flex-1 flex flex-col"
               style={{ padding: '2.5vh 3vw 1.5vh 3vw', gap: '1.5vh' }}
             >
 
@@ -437,7 +437,7 @@ function AudienceDisplay({
               {/* Board: takes majority of vertical space */}
               <section style={{ flex: '2.5' }} className="min-h-0 flex flex-col items-stretch justify-center" aria-label="Bingo board">
                 <div
-                  className="rounded-2xl flex flex-col justify-center overflow-hidden"
+                  className="rounded-2xl flex flex-col justify-center"
                   style={{
                     height: '88%',
                     padding: '26px',

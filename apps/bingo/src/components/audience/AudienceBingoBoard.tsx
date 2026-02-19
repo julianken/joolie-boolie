@@ -111,7 +111,7 @@ export function AudienceBingoBoard({ calledBalls }: AudienceBingoBoardProps) {
     // At 1280×720:  4px gap → cells ≈  70× 76px (same ratio, same gap in px).
     // At 1366×768:  4px gap → cells ≈  75× 81px (same ratio, same gap in px).
     <div
-      className="flex flex-col h-full min-h-0 overflow-hidden"
+      className="flex flex-col h-full min-h-0"
       style={{ gap: 'var(--board-gap)', '--board-gap': '14px' } as React.CSSProperties}
       data-testid="called-numbers-board"
     >
@@ -161,7 +161,6 @@ export function AudienceBingoBoard({ calledBalls }: AudienceBingoBoardProps) {
                   className={`
                     flex items-center justify-center
                     font-bold rounded-lg transition-all duration-300
-                    overflow-hidden
                     ${isCalled ? 'cell-flash-audience-animation' : ''}
                   `}
                   style={{

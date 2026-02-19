@@ -20,12 +20,13 @@ async function executeCallSequence(
   audioEnabled: boolean
 ) {
   if (audioEnabled) {
-    await audioStore.playRollSound(); // Roll sound plays first
+    await audioStore.playRollSound();
   }
-  const ball = callBallFn(); // Ball appears after roll completes
+  const ball = callBallFn(); // Ball appears — animation starts slightly before chime
   if (ball && audioEnabled) {
-    await audioStore.playRevealChime(); // Reveal chime plays when ball is shown
-    await audioStore.playBallVoice(ball); // Voice announcement plays
+    await new Promise<void>((r) => setTimeout(r, 400));
+    await audioStore.playRevealChime();
+    await audioStore.playBallVoice(ball);
   }
   return ball;
 }

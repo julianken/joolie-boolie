@@ -5,9 +5,10 @@ import { BingoBall, BingoColumn } from '@/types';
 
 /**
  * Bingo-specific spring preset for ball reveal.
- * High-energy, bouncy — stiffness 120, damping 14.
+ * Fast punchy pop — reaches peak in ~80ms, settles by ~200ms.
+ * Tiny overshoot (~5%) for a satisfying snap without lingering.
  */
-const springBallReveal = { type: 'spring' as const, stiffness: 120, damping: 14, mass: 1 };
+const springBallReveal = { type: 'spring' as const, stiffness: 800, damping: 35, mass: 0.6 };
 
 export interface BallRevealProps {
   ball: BingoBall | null;
@@ -63,7 +64,7 @@ function getBallBackground(column: BingoColumn): string {
 }
 
 function getBallBoxShadow(column: BingoColumn): string {
-  // Two-layer glow: tight inner glow + large soft halo (matches reference)
+  // Two-layer glow: tight inner glow + large soft halo
   const glows: Record<BingoColumn, string> = {
     B: '0 4px 30px rgba(59, 130, 246, 0.60), 0 0px 80px rgba(59, 130, 246, 0.35)',
     I: '0 4px 30px rgba(239, 68, 68, 0.60), 0 0px 80px rgba(239, 68, 68, 0.35)',
@@ -102,14 +103,14 @@ export function BallReveal({ ball, autoCallInterval, isAutoCall, size = 'hero' }
   // Determine animation based on tier and reduced motion preference
   const getInitial = () => {
     if (prefersReducedMotion) return { opacity: 0 };
-    if (tier === 'full') return { scale: 0, rotateY: 180, filter: 'blur(8px)', opacity: 0 };
+    if (tier === 'full') return { scale: 0, opacity: 0 };
     if (tier === 'simple') return { scale: 0.6, opacity: 0 };
     return { opacity: 0 };
   };
 
   const getAnimate = () => {
     if (prefersReducedMotion) return { opacity: 1 };
-    if (tier === 'full') return { scale: 1, rotateY: 0, filter: 'blur(0px)', opacity: 1 };
+    if (tier === 'full') return { scale: 1, opacity: 1 };
     if (tier === 'simple') return { scale: 1, opacity: 1 };
     return { opacity: 1 };
   };
