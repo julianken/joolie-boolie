@@ -1,9 +1,11 @@
 'use client';
 
+import { motion, useReducedMotion } from 'motion/react';
 import type { Question, Timer } from '@/types';
 import { AudienceTimer } from './AudienceTimer';
 import { AudienceAnswerOptions } from './AudienceAnswerOptions';
 import { AudienceRoundInfo } from './AudienceRoundInfo';
+import { questionReveal, springQuestionReveal } from '@/lib/motion/presets';
 
 export interface AudienceQuestionProps {
   /** The current question to display */
@@ -24,29 +26,28 @@ export interface AudienceQuestionProps {
   revealedAnswer?: string | null;
 }
 
-// Category color mappings for visual distinction
+// Category color mappings for visual distinction — using CSS vars for hex values
 const categoryColors: Record<string, { bg: string; border: string; text: string }> = {
-  music: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-500' },
-  movies: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-500' },
-  tv: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-500' },
-  history: { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-500' },
+  music:   { bg: 'bg-purple-500/10', border: 'border-purple-500/40', text: 'text-purple-400' },
+  movies:  { bg: 'bg-red-500/10',    border: 'border-red-500/40',    text: 'text-red-400' },
+  tv:      { bg: 'bg-blue-500/10',   border: 'border-blue-500/40',   text: 'text-blue-400' },
+  history: { bg: 'bg-amber-500/10',  border: 'border-amber-500/40',  text: 'text-amber-400' },
+  science: { bg: 'bg-teal-500/10',   border: 'border-teal-500/40',   text: 'text-teal-400' },
+  sports:  { bg: 'bg-green-500/10',  border: 'border-green-500/40',  text: 'text-green-400' },
+  art:     { bg: 'bg-pink-500/10',   border: 'border-pink-500/40',   text: 'text-pink-400' },
 };
 
-const defaultCategoryColor = { bg: 'bg-primary/10', border: 'border-primary/30', text: 'text-primary' };
+const defaultCategoryColor = { bg: 'bg-primary/10', border: 'border-primary/40', text: 'text-primary' };
 
 /**
  * Full-featured question display for audience/projector view.
- * Combines question text, timer, answer options, and round info.
- * Optimized for readability from 30+ feet away.
  *
- * Features:
- * - Large, readable question text
- * - Integrated countdown timer
- * - Color-coded answer options
- * - Round/question progress
- * - Category theming
- * - Smooth transitions
- * - High contrast dark theme support
+ * Hero text uses clamp(2.5rem, 5.5vw, 6rem) for cinematic scaling.
+ * Minimum effective size at 1920x1080: ~105px (well above 40px minimum).
+ * Motion entrance: springQuestionReveal slides up + fades in.
+ * Respects prefers-reduced-motion via useReducedMotion().
+ *
+ * NOTE: Audience display text minimum 40px on 1920x1080 (Issue A-23).
  */
 export function AudienceQuestion({
   question,
@@ -58,18 +59,22 @@ export function AudienceQuestion({
   timerVisible = true,
   revealedAnswer,
 }: AudienceQuestionProps) {
-  // Get category colors
+  const shouldReduceMotion = useReducedMotion();
   const categoryStyle = categoryColors[question.category] || defaultCategoryColor;
 
   return (
-    <article
-      className="flex flex-col h-full min-h-[80vh] py-4 gap-6 animate-in fade-in duration-500 motion-reduce:animate-none"
+    <motion.article
+      key={question.text}
+      variants={questionReveal}
+      initial={shouldReduceMotion ? 'visible' : 'hidden'}
+      animate="visible"
+      transition={shouldReduceMotion ? { duration: 0 } : springQuestionReveal}
+      className="flex flex-col h-full min-h-[80vh] py-4 gap-6"
       role="region"
       aria-label={`Question ${questionNumber} of ${totalQuestions}, Round ${roundNumber}`}
     >
       {/* Header: Round info and Timer */}
       <header className="flex flex-col lg:flex-row items-center justify-between gap-6 px-4">
-        {/* Round and question progress */}
         <div className="flex-1 w-full lg:w-auto">
           <AudienceRoundInfo
             roundNumber={roundNumber}
@@ -80,7 +85,6 @@ export function AudienceQuestion({
           />
         </div>
 
-        {/* Timer (if provided and visible) */}
         {timer && timerVisible && (
           <div className="flex-shrink-0">
             <AudienceTimer
@@ -93,9 +97,9 @@ export function AudienceQuestion({
         )}
       </header>
 
-      {/* Main content: Question text */}
+      {/* Main content: Category badge + Question text */}
       <section className="flex-1 flex flex-col items-center justify-center px-4 lg:px-8">
-        {/* Category badge with visual styling */}
+        {/* Category badge */}
         <div
           className={`
             mb-6 px-8 py-3 rounded-full border-2
@@ -103,15 +107,24 @@ export function AudienceQuestion({
           `}
           aria-label={`Category: ${question.category}`}
         >
-          <span className={`text-2xl lg:text-3xl font-bold capitalize ${categoryStyle.text}`}>
+          <span
+            className={`font-bold capitalize ${categoryStyle.text}`}
+            style={{ fontSize: 'clamp(1.25rem, 2vw, 1.875rem)' }}
+          >
             {question.category}
           </span>
         </div>
 
-        {/* Question text - largest element for maximum readability */}
+        {/* Hero question text — cinematic scale for projection */}
         <h2
           id="current-question"
-          className="text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-foreground text-center leading-tight max-w-6xl"
+          className="font-bold text-foreground text-center leading-tight max-w-6xl"
+          style={{
+            fontSize: 'clamp(2.5rem, 5.5vw, 6rem)',
+            lineHeight: 1.15,
+            fontFamily: 'var(--font-display)',
+            letterSpacing: '-0.02em',
+          }}
         >
           {question.text}
         </h2>
@@ -129,18 +142,22 @@ export function AudienceQuestion({
         </div>
       </section>
 
-      {/* Timer status (for large timer at bottom when answer options are shown) */}
+      {/* Timer expired announcement */}
       {timer && timerVisible && timer.remaining <= 0 && timer.duration > 0 && (
         <div
-          className="text-center py-4 bg-red-500/10 border-t border-red-500/30"
+          className="text-center py-4 border-t"
+          style={{ background: 'rgba(244, 63, 94, 0.1)', borderColor: 'rgba(244, 63, 94, 0.3)' }}
           role="alert"
           aria-live="assertive"
         >
-          <span className="text-3xl lg:text-4xl font-bold text-red-500 motion-safe:animate-pulse">
+          <span
+            className="font-bold text-red-400 motion-safe:animate-pulse"
+            style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}
+          >
             TIME IS UP!
           </span>
         </div>
       )}
-    </article>
+    </motion.article>
   );
 }

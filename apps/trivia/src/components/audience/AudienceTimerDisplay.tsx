@@ -1,5 +1,6 @@
 'use client';
 
+import { useReducedMotion } from 'motion/react';
 import type { Timer } from '@/types';
 
 export interface AudienceTimerDisplayProps {
@@ -10,77 +11,91 @@ export interface AudienceTimerDisplayProps {
 }
 
 /**
- * Calculate urgency color based on time remaining percentage.
- * Returns both background and text colors for the circular display.
+ * Timer color thresholds using --trivia-timer-* tokens.
+ * Using hex values directly for older TV/projector compatibility (FINAL-DESIGN-PLAN.md 9.9).
+ *
+ * >50% time remaining: safe (green)
+ * 25-50%: warning (amber)
+ * <25%: danger (red) + heartbeat pulse
  */
-function getUrgencyColors(remaining: number, duration: number): {
-  text: string;
-  bg: string;
-  ring: string;
-  progressStroke: string;
+function getTimerColors(remaining: number, duration: number): {
+  stroke: string;
+  textColor: string;
+  trackColor: string;
+  glow: string;
+  isDanger: boolean;
 } {
   if (duration === 0) {
     return {
-      text: 'text-muted-foreground',
-      bg: 'bg-muted/30',
-      ring: 'ring-muted',
-      progressStroke: 'stroke-muted',
+      stroke:     '#6E7388',
+      textColor:  '#6E7388',
+      trackColor: 'rgba(110, 115, 136, 0.15)',
+      glow:       'none',
+      isDanger:   false,
     };
   }
 
-  const percentage = (remaining / duration) * 100;
+  const pct = (remaining / duration) * 100;
 
-  if (percentage > 50) {
-    // Green - plenty of time
+  if (pct > 50) {
+    // Safe — green (#34D399 = --trivia-timer-safe)
     return {
-      text: 'text-green-600 dark:text-green-400',
-      bg: 'bg-green-500/10',
-      ring: 'ring-green-500/30',
-      progressStroke: 'stroke-green-500',
+      stroke:     '#34D399',
+      textColor:  '#34D399',
+      trackColor: 'rgba(52, 211, 153, 0.10)',
+      glow:       '0 0 16px 4px rgba(52, 211, 153, 0.30)',
+      isDanger:   false,
     };
-  } else if (percentage > 25) {
-    // Yellow/Amber - getting low
+  } else if (pct > 25) {
+    // Warning — amber (#FBBF24 = --trivia-timer-warning)
     return {
-      text: 'text-amber-500 dark:text-amber-400',
-      bg: 'bg-amber-500/10',
-      ring: 'ring-amber-500/30',
-      progressStroke: 'stroke-amber-500',
+      stroke:     '#FBBF24',
+      textColor:  '#FBBF24',
+      trackColor: 'rgba(251, 191, 36, 0.10)',
+      glow:       '0 0 16px 4px rgba(251, 191, 36, 0.25)',
+      isDanger:   false,
     };
   } else {
-    // Red - urgent
+    // Danger — red (#F43F5E = --trivia-timer-danger) + heartbeat
     return {
-      text: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-500/10',
-      ring: 'ring-red-500/30',
-      progressStroke: 'stroke-red-500',
+      stroke:     '#F43F5E',
+      textColor:  '#F43F5E',
+      trackColor: 'rgba(244, 63, 94, 0.12)',
+      glow:       '0 0 20px 6px rgba(244, 63, 94, 0.40)',
+      isDanger:   true,
     };
   }
 }
 
 /**
- * Large audience timer display optimized for projector/large TV view.
- * Designed to be readable from 30+ feet away with min 48px font.
- * Includes circular progress indicator and color-coded urgency.
- * Respects reduced motion preferences.
+ * Large audience timer display with circular SVG countdown.
+ *
+ * - SVG stroke-dasharray depletes clockwise as time ticks down.
+ * - Color transitions: green (>50%) -> amber (25-50%) -> red (<25%).
+ * - Heartbeat pulse animation in final 25% (or final 5 seconds).
+ * - role="timer" with aria-live="polite" for screen readers.
+ * - Respects prefers-reduced-motion via useReducedMotion().
+ *
+ * Minimum readable size: 280px diameter. At 1920x1080 this is
+ * clearly readable from 30+ feet. (Issue A-23)
  */
 export function AudienceTimerDisplay({
   timer,
   visible = true,
 }: AudienceTimerDisplayProps) {
+  const shouldReduceMotion = useReducedMotion();
   const { remaining, duration, isRunning } = timer;
 
-  // Don't render if not visible
-  if (!visible) {
-    return null;
-  }
+  if (!visible) return null;
 
-  // Calculate progress percentage (inverted for countdown effect)
-  const progressPercentage = duration > 0 ? (remaining / duration) * 100 : 0;
+  const progressPct = duration > 0 ? (remaining / duration) * 100 : 0;
+  const colors = getTimerColors(remaining, duration);
 
-  // Get urgency colors based on time remaining
-  const colors = getUrgencyColors(remaining, duration);
+  // Heartbeat kicks in at <25% or when 5 seconds remain
+  const isHeartbeat = colors.isDanger && isRunning && !shouldReduceMotion;
+  const isFinalFive = remaining <= 5 && remaining > 0 && isRunning && !shouldReduceMotion;
 
-  // Format time as MM:SS or just seconds if under 60
+  // Format time display
   const formatTime = (seconds: number): string => {
     if (seconds >= 60) {
       const mins = Math.floor(seconds / 60);
@@ -91,11 +106,11 @@ export function AudienceTimerDisplay({
   };
 
   // SVG circular progress calculations
-  const size = 280;
-  const strokeWidth = 16;
-  const radius = (size - strokeWidth) / 2;
+  const svgSize = 280;
+  const strokeWidth = 14;
+  const radius = (svgSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
+  const dashOffset = circumference - (progressPct / 100) * circumference;
 
   return (
     <div
@@ -103,97 +118,109 @@ export function AudienceTimerDisplay({
       role="region"
       aria-label="Question timer"
     >
-      {/* Circular timer display */}
-      <div className="relative">
-        {/* SVG circular progress ring */}
+      {/* Circular timer */}
+      <div
+        className="relative"
+        style={{
+          filter: shouldReduceMotion ? 'none' : `drop-shadow(${colors.glow})`,
+        }}
+      >
+        {/* SVG ring — rotated so 12 o'clock is start */}
         <svg
-          width={size}
-          height={size}
-          className="transform -rotate-90 motion-safe:transition-transform motion-safe:duration-1000"
+          width={svgSize}
+          height={svgSize}
+          style={{ transform: 'rotate(-90deg)' }}
           aria-hidden="true"
         >
-          {/* Background ring */}
+          {/* Track ring */}
           <circle
-            cx={size / 2}
-            cy={size / 2}
+            cx={svgSize / 2}
+            cy={svgSize / 2}
             r={radius}
             fill="none"
-            stroke="currentColor"
+            stroke={colors.trackColor}
             strokeWidth={strokeWidth}
-            className="text-muted-foreground/20"
           />
           {/* Progress ring */}
           <circle
-            cx={size / 2}
-            cy={size / 2}
+            cx={svgSize / 2}
+            cy={svgSize / 2}
             r={radius}
             fill="none"
+            stroke={colors.stroke}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            className={`${colors.progressStroke} motion-safe:transition-[stroke-dashoffset] motion-safe:duration-1000 motion-safe:ease-linear`}
+            strokeDashoffset={dashOffset}
+            style={{
+              transition: shouldReduceMotion ? 'none' : 'stroke-dashoffset 1s linear, stroke 0.4s ease',
+            }}
           />
         </svg>
 
         {/* Center time display */}
         <div
-          className={`
-            absolute inset-0 flex flex-col items-center justify-center
-            ${colors.bg} rounded-full m-4 ring-4 ${colors.ring}
-            motion-safe:transition-colors motion-safe:duration-300
-          `}
+          className={`absolute inset-0 flex flex-col items-center justify-center rounded-full m-4 ${
+            isHeartbeat || isFinalFive ? 'timer-heartbeat' : ''
+          }`}
+          style={{
+            background: colors.trackColor,
+          }}
         >
           <span
-            className={`
-              text-7xl lg:text-8xl xl:text-9xl font-bold tabular-nums
-              ${colors.text}
-              motion-safe:transition-colors motion-safe:duration-300
-            `}
+            className="font-bold tabular-nums"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(3rem, 6vw, 5rem)',
+              color: colors.textColor,
+              lineHeight: 1,
+              transition: shouldReduceMotion ? 'none' : 'color 0.4s ease',
+            }}
             role="timer"
-            aria-live="assertive"
+            aria-live="polite"
             aria-atomic="true"
           >
             {formatTime(remaining)}
           </span>
-
-          {/* Unit label */}
           <span
-            className={`
-              text-xl lg:text-2xl font-medium
-              ${colors.text} opacity-70
-            `}
+            className="font-medium mt-1"
+            style={{
+              fontSize: 'clamp(0.875rem, 1.5vw, 1.25rem)',
+              color: colors.textColor,
+              opacity: 0.7,
+            }}
           >
-            {remaining >= 60 ? 'minutes' : 'seconds'}
+            {remaining >= 60 ? 'min' : 'sec'}
           </span>
         </div>
       </div>
 
-      {/* Status indicator */}
-      <div
-        className="flex items-center gap-3"
-        role="status"
-        aria-live="polite"
-      >
+      {/* Status text */}
+      <div className="flex items-center gap-3" role="status" aria-live="polite">
         <span
           aria-hidden="true"
-          className={`
-            w-4 h-4 rounded-full
-            ${isRunning ? 'bg-green-500 motion-safe:animate-pulse' : 'bg-muted'}
-          `}
+          className={`w-3 h-3 rounded-full ${isRunning ? 'motion-safe:animate-pulse' : ''}`}
+          style={{ background: isRunning ? colors.stroke : '#6E7388' }}
         />
-        <span className="text-2xl lg:text-3xl font-medium text-muted-foreground">
+        <span
+          className="font-medium"
+          style={{
+            color: '#6E7388',
+            fontSize: 'clamp(1rem, 2vw, 1.5rem)',
+          }}
+        >
           {isRunning ? 'Time Running' : remaining <= 0 ? "Time's Up!" : 'Timer Paused'}
         </span>
       </div>
 
-      {/* Time up flash effect - only when timer reaches 0 */}
+      {/* Time up announcement */}
       {remaining <= 0 && duration > 0 && (
         <div
-          className={`
-            text-4xl lg:text-5xl font-bold text-red-600 dark:text-red-400
-            motion-safe:animate-pulse
-          `}
+          className="font-bold motion-safe:animate-pulse"
+          style={{
+            color: '#F43F5E',
+            fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+          }}
           aria-live="assertive"
         >
           TIME!

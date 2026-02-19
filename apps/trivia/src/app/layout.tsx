@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono } from 'next/font/google';
+import { fontDisplay, fontSans } from '@joolie-boolie/theme';
 import './globals.css';
 import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
 import { ErrorBoundaryProvider } from '@/components/providers/ErrorBoundaryProvider';
@@ -9,14 +10,10 @@ import { ToastProvider } from "@joolie-boolie/ui";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+  variable: '--font-mono',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -37,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#7c3aed',
+  themeColor: '#7E52E4',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -49,11 +46,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${fontDisplay.variable} ${fontSans.variable} ${geistMono.variable}`}>
       <head />
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <ToastProvider>
           <ErrorBoundaryProvider>
             {children}

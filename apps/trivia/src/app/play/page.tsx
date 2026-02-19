@@ -12,7 +12,6 @@ import { QuestionList } from '@/components/presenter/QuestionList';
 import { QuestionDisplay } from '@/components/presenter/QuestionDisplay';
 import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
 import { TeamManager } from '@/components/presenter/TeamManager';
-import { OpenDisplayButton as _OpenDisplayButton } from '@/components/presenter/OpenDisplayButton';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
 import { ThemeSelector } from '@joolie-boolie/ui';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
@@ -61,7 +60,6 @@ export default function PlayPage() {
       useGameStore.setState(partialState);
     },
     serializeState: () => serializeTriviaState(useGameStore.getState()),
-    // Trivia shows the modal so users can pick a room setup explicitly
     autoCreateOffline: false,
   });
 
@@ -76,7 +74,6 @@ export default function PlayPage() {
   const { isSyncing: _isSyncing, lastSyncTime: _lastSyncTime } = useAutoSync(
     gameState,
     async (state) => {
-      // Skip API calls in offline/setup mode
       if (session.mode !== 'online' || !session.roomCode) return;
       const serialized = serializeTriviaState(state);
       const response = await fetch(`/api/sessions/${session.roomCode}/state`, {
@@ -90,23 +87,15 @@ export default function PlayPage() {
       debounceMs: 2000,
       enabled: session.mode === 'online' && !!session.roomCode,
       isCriticalChange: (prev, next) => {
-        if (prev?.status !== next?.status) {
-          return 'STATUS_CHANGED';
-        }
-        if (prev?.displayQuestionIndex !== next?.displayQuestionIndex) {
-          return 'QUESTION_CHANGED';
-        }
-        if (prev?.currentRound !== next?.currentRound) {
-          return 'ROUND_CHANGED';
-        }
+        if (prev?.status !== next?.status) return 'STATUS_CHANGED';
+        if (prev?.displayQuestionIndex !== next?.displayQuestionIndex) return 'QUESTION_CHANGED';
+        if (prev?.currentRound !== next?.currentRound) return 'ROUND_CHANGED';
         return null;
       },
     }
   );
 
   // Save offline session state to localStorage
-  // Guard: only save after offline recovery has been attempted to prevent
-  // overwriting recovered state with initial empty state (BEA-504)
   useEffect(() => {
     if (session.mode === 'offline' && session.offlineSessionId) {
       try {
@@ -124,7 +113,7 @@ export default function PlayPage() {
     }
   }, [session.mode, session.offlineSessionId, gameState]);
 
-  // Session handlers that wrap the shared hook
+  // Session handlers
   const handlePlayOffline = useCallback(() => {
     session.playOffline();
   }, [session]);
@@ -146,27 +135,17 @@ export default function PlayPage() {
     session.closeModal();
   }, [session]);
 
-  // Create new game handler - clears all session data and shows room setup modal
   const handleCreateNewGame = useCallback(() => {
-    // Show confirmation if game is active
     if (game.status !== 'setup' && game.status !== 'ended') {
       const confirmed = window.confirm(
         'This will end the current game and create a new one. Are you sure?'
       );
-      if (!confirmed) {
-        return;
-      }
+      if (!confirmed) return;
     }
-
-    // Reset game state to initial
     game.resetGame();
-
-    // Clear session and show modal
     session.resetSession({ showModal: true });
   }, [game, session]);
 
-  // Open display window with room code or offline session ID in URL (BEA-415)
-  // Always opens the display window — never shows the room setup modal
   const openDisplay = useCallback(() => {
     let displayUrl: string;
     let windowName: string;
@@ -178,7 +157,6 @@ export default function PlayPage() {
       displayUrl = `${window.location.origin}/display?room=${session.roomCode}`;
       windowName = `trivia-display-${session.roomCode}`;
     } else {
-      // No session yet — open display anyway, it shows its own error/loading state
       displayUrl = `${window.location.origin}/display`;
       windowName = 'trivia-display';
     }
@@ -188,42 +166,31 @@ export default function PlayPage() {
       windowName,
       'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
     );
-    if (displayWindow) {
-      displayWindow.focus();
-    }
+    if (displayWindow) displayWindow.focus();
   }, [session]);
 
-  // Handle next round action
   const handleNextRound = () => {
     game.nextRound();
     setShowRoundSummary(false);
   };
 
-  // Handle complete round
   const handleCompleteRound = () => {
     game.completeRound();
     setShowRoundSummary(true);
   };
 
-  // Settings panel state
   const [showSettings, setShowSettings] = useState(false);
-
-  // Save template modal state
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
-
-  // Save preset/question set modal state
   const [showSavePresetModal, setShowSavePresetModal] = useState(false);
   const [showSaveQuestionSetModal, setShowSaveQuestionSetModal] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<QuestionCategory[]>([]);
   const [showApiImporter, setShowApiImporter] = useState(false);
 
-  // Filter questions by selected categories (setup-time filtering)
   const filteredQuestions = useMemo(() => {
     if (selectedCategories.length === 0) return game.questions;
     return filterQuestionsByCategory(game.questions, selectedCategories);
   }, [game.questions, selectedCategories]);
 
-  // Get settings from settings store
   const {
     roundsCount,
     questionsPerRound,
@@ -236,10 +203,8 @@ export default function PlayPage() {
     saveTeamSetup,
   } = useSettingsStore();
 
-  // Sync settings store values to game store when in setup mode
   useEffect(() => {
     if (game.status === 'setup') {
-      // Access store directly to avoid dependency on game object
       useGameStore.getState().updateSettings({
         roundsCount,
         questionsPerRound,
@@ -249,22 +214,12 @@ export default function PlayPage() {
         ttsEnabled,
       });
     }
-  }, [
-    game.status,
-    roundsCount,
-    questionsPerRound,
-    timerDuration,
-    timerAutoStart,
-    timerVisible,
-    ttsEnabled,
-  ]);
+  }, [game.status, roundsCount, questionsPerRound, timerDuration, timerAutoStart, timerVisible, ttsEnabled]);
 
-  // Handle saving current teams to settings store
   const handleSaveTeams = useCallback(() => {
     saveTeamSetup(game.teams);
   }, [saveTeamSetup, game.teams]);
 
-  // Handle loading teams from settings store
   const handleLoadTeams = useCallback(
     (teamSetup: TeamSetup) => {
       game.loadTeamsFromSetup(teamSetup.names);
@@ -272,30 +227,46 @@ export default function PlayPage() {
     [game]
   );
 
-  // Helper to get status display
+  /** Audience scene name for the indicator (Issue 2.3) */
+  const getAudienceScene = (): string => {
+    switch (game.status) {
+      case 'setup':       return 'Waiting';
+      case 'playing':
+        if (game.displayQuestionIndex !== null) {
+          return `Question ${(game.displayQuestionIndex ?? 0) + 1}`;
+        }
+        return 'Waiting for Question';
+      case 'paused':      return game.emergencyBlank ? 'Emergency Blank' : 'Paused';
+      case 'between_rounds': return 'Scoreboard';
+      case 'ended':       return 'Game Over';
+      default:            return 'Waiting';
+    }
+  };
+
+  /** Status badge for the presenter header */
   const getStatusDisplay = () => {
     switch (game.status) {
       case 'setup':
-        return { text: 'Setup', className: 'bg-blue-500/20 text-blue-600' };
+        return { text: 'Setup', className: 'bg-blue-500/20 text-blue-400' };
       case 'playing':
         return {
           text: `Playing - ${game.roundProgress}`,
-          className: 'bg-green-500/20 text-green-600',
+          className: 'bg-success/20 text-success',
         };
       case 'paused':
         return {
           text: game.emergencyBlank ? 'Emergency Pause' : 'Paused',
-          className: 'bg-orange-500/20 text-orange-600',
+          className: 'bg-warning/20 text-warning',
         };
       case 'between_rounds':
         return {
           text: `Round ${game.currentRound + 1} Complete`,
-          className: 'bg-yellow-500/20 text-yellow-600',
+          className: 'bg-accent/20 text-accent',
         };
       case 'ended':
-        return { text: 'Ended', className: 'bg-gray-500/20 text-gray-600' };
+        return { text: 'Ended', className: 'bg-muted text-muted-foreground' };
       default:
-        return { text: 'Unknown', className: 'bg-gray-500/20 text-gray-600' };
+        return { text: 'Unknown', className: 'bg-muted text-muted-foreground' };
     }
   };
 
@@ -317,149 +288,173 @@ export default function PlayPage() {
         Skip to game controls
       </a>
 
-      <main id="main" className="min-h-screen bg-background p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+      {/*
+        Fixed-viewport 3-column layout during gameplay (Issue 6.5).
+        Left rail: question navigator (w-64)
+        Center: hero question panel (flex-1)
+        Right: leaderboard sidebar (w-80)
+        Bottom: fixed action bar (h-16)
+        No viewport scrolling during gameplay.
+      */}
+      <div
+        id="main"
+        className="h-screen flex flex-col overflow-hidden bg-background"
+        style={{ fontFamily: 'var(--font-sans)' }}
+      >
+        {/* ---- TOP HEADER BAR ---- */}
+        <header
+          className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-border bg-surface/80"
+          style={{ backdropFilter: 'blur(8px)', height: '56px' }}
+        >
+          {/* Brand + Presenter label */}
+          <div className="flex items-center gap-3">
+            <h1
+              className="text-xl font-bold text-foreground"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
               Trivia
             </h1>
-            <p className="text-lg text-muted-foreground">Presenter View</p>
+            <span
+              className="px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-primary/15 text-primary"
+              style={{ letterSpacing: '0.08em' }}
+            >
+              Presenter
+            </span>
           </div>
 
-          {/* Display controls */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-            {/* Game status */}
-            <span className={`px-2 sm:px-3 py-1 rounded-full text-base font-medium ${statusDisplay.className}`}>
+          {/* Center: status + audience scene indicator (Issue 2.3) */}
+          <div className="flex items-center gap-4">
+            <span className={`px-2 py-1 rounded-full text-sm font-medium ${statusDisplay.className}`}>
               {statusDisplay.text}
             </span>
+            <span className="text-sm text-foreground-secondary font-medium hidden md:block">
+              Audience: {getAudienceScene()}
+            </span>
+          </div>
 
+          {/* Right: controls */}
+          <div className="flex items-center gap-2">
             {/* Connection status */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" title={isConnected ? 'Sync active' : 'Sync not active'}>
               <div
-                className={`
-                  w-3 h-3 rounded-full
-                  ${isConnected ? 'bg-success' : 'bg-muted'}
-                `}
-                title={isConnected ? 'Sync active' : 'Sync not active'}
+                className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-success' : 'bg-muted-foreground'}`}
+                aria-hidden="true"
               />
-              <span className="text-base text-muted-foreground hidden sm:block">
-                {isConnected ? 'Sync Active' : 'Sync Ready'}
+              <span className="text-sm text-foreground-secondary hidden lg:block">
+                {isConnected ? 'Synced' : 'Ready'}
               </span>
             </div>
 
-            {/* Play Offline button - only show if no session active */}
+            {/* Room code */}
+            {session.roomCode && session.mode !== 'offline' && (
+              <span className="font-mono text-sm font-semibold text-foreground bg-surface px-2 py-1 rounded-md">
+                {session.roomCode}
+              </span>
+            )}
+
+            {/* Play Offline */}
             {!session.roomCode && session.mode !== 'offline' && (
-              <Button
-                onClick={handlePlayOffline}
-                variant="secondary"
-                size="md"
-              >
+              <Button onClick={handlePlayOffline} variant="secondary" size="sm">
                 Play Offline
               </Button>
             )}
 
-            {/* Open Display button */}
-            <Button
-              onClick={openDisplay}
-              variant="secondary"
-              size="md"
-            >
+            {/* Open Display */}
+            <Button onClick={openDisplay} variant="secondary" size="sm">
               Open Display
             </Button>
 
-            {/* Fullscreen toggle - hidden on small mobile */}
+            {/* Create New Game */}
+            {(session.roomCode || session.mode === 'offline') && (
+              <Button onClick={handleCreateNewGame} variant="secondary" size="sm">
+                New Game
+              </Button>
+            )}
+
+            {/* Fullscreen */}
             <button
               onClick={game.toggleFullscreen}
               className="hidden sm:flex min-w-[var(--size-touch)] min-h-[var(--size-touch)] items-center justify-center rounded-lg
-                text-muted-foreground hover:text-foreground hover:bg-muted/30
+                text-foreground-secondary hover:text-foreground hover:bg-surface-hover
                 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               title={game.isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
               aria-label={game.isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
             >
               {game.isFullscreen ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
                 </svg>
               ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                 </svg>
               )}
             </button>
 
-            {/* Settings button */}
+            {/* Settings */}
             <button
               onClick={() => setShowSettings(!showSettings)}
               className={`min-w-[var(--size-touch)] min-h-[var(--size-touch)] flex items-center justify-center rounded-lg
                 transition-colors focus:outline-none focus:ring-2 focus:ring-primary
                 ${showSettings
                   ? 'bg-primary/20 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                  : 'text-foreground-secondary hover:text-foreground hover:bg-surface-hover'
                 }`}
               title={showSettings ? 'Hide settings' : 'Show settings'}
               aria-label={showSettings ? 'Hide settings panel' : 'Show settings panel'}
               aria-expanded={showSettings}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </button>
 
-            {/* Help button - hidden on mobile (keyboard shortcuts not relevant for touch) */}
+            {/* Help */}
             <button
               onClick={() => game.setShowHelp(true)}
               className="hidden md:flex min-w-[var(--size-touch)] min-h-[var(--size-touch)] items-center justify-center rounded-lg
-                text-muted-foreground hover:text-foreground hover:bg-muted/30
+                text-foreground-secondary hover:text-foreground hover:bg-surface-hover
                 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               title="Keyboard shortcuts (?)"
               aria-label="Show keyboard shortcuts"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
           </div>
         </header>
 
-        {/* Room code and PIN display - shown below header */}
-        {(session.roomCode || (session.mode === 'offline' && session.offlineSessionId)) && (
-          <div className="mb-4 flex flex-wrap items-center gap-4">
-            {session.roomCode && session.mode !== 'offline' && (
-              <div className="flex items-center gap-2">
-                <span className="text-base text-muted-foreground">Room:</span>
-                <span className="font-mono font-semibold text-foreground">{session.roomCode}</span>
-                {session.pin && (
-                  <>
-                    <span className="text-base text-muted-foreground ml-2">PIN:</span>
-                    <span className="font-mono font-semibold text-foreground">{session.pin}</span>
-                  </>
-                )}
-              </div>
-            )}
-            {session.mode === 'offline' && session.offlineSessionId && (
-              <div className="flex items-center gap-2">
-                <span className="text-base text-muted-foreground">Offline Session:</span>
-                <span className="font-mono font-semibold text-foreground">{session.offlineSessionId}</span>
-              </div>
-            )}
-            <Button
-              onClick={handleCreateNewGame}
-              variant="secondary"
-              size="md"
-            >
-              Create New Game
-            </Button>
-          </div>
-        )}
+        {/* ---- MAIN 3-COLUMN AREA ---- */}
+        <div className="flex flex-1 overflow-hidden">
 
-        {/* Main content grid - Mobile first: stack vertically, then responsive columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Question Display - shown first on mobile for better UX */}
-          <section className="md:col-span-2 lg:col-span-5 lg:order-2">
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
+          {/* LEFT RAIL: Question Navigator (w-64) */}
+          <aside
+            className="w-64 flex-shrink-0 border-r border-border overflow-y-auto bg-surface/40"
+            aria-label="Question navigator"
+          >
+            <div className="p-3">
+              <QuestionList
+                questions={game.status === 'setup' ? filteredQuestions : game.questions}
+                selectedIndex={game.selectedQuestionIndex}
+                displayIndex={game.displayQuestionIndex}
+                currentRound={game.currentRound}
+                totalRounds={game.totalRounds}
+                onSelect={game.selectQuestion}
+                onSetDisplay={game.setDisplayQuestion}
+              />
+            </div>
+          </aside>
+
+          {/* CENTER: Hero Question Panel (flex-1) */}
+          <main
+            id="main-content"
+            className="flex-1 overflow-y-auto p-4"
+            aria-label="Current question"
+          >
+            {/* Question display */}
+            <div className="bg-surface border border-border rounded-xl p-4 shadow-md mb-4">
               <QuestionDisplay
                 question={game.selectedQuestion}
                 peekAnswer={game.peekAnswer}
@@ -473,140 +468,43 @@ export default function PlayPage() {
                 isOnDisplay={game.displayQuestionIndex === game.selectedQuestionIndex}
               />
             </div>
-          </section>
 
-          {/* Question List - collapsed on small mobile, shown on tablet+ */}
-          <section className="hidden sm:block md:col-span-1 lg:col-span-3 lg:order-1">
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <QuestionList
-                questions={game.status === 'setup' ? filteredQuestions : game.questions}
-                selectedIndex={game.selectedQuestionIndex}
-                displayIndex={game.displayQuestionIndex}
-                currentRound={game.currentRound}
-                totalRounds={game.totalRounds}
-                onSelect={game.selectQuestion}
-                onSetDisplay={game.setDisplayQuestion}
-              />
-            </div>
-          </section>
-
-          {/* Mobile-only compact question navigator */}
-          <section className="sm:hidden">
-            <div className="bg-background border border-border rounded-xl p-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-base font-medium text-muted-foreground">
-                  Round {game.currentRound + 1}/{game.totalRounds}
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => game.selectQuestion(Math.max(0, game.selectedQuestionIndex - 1))}
-                    disabled={game.selectedQuestionIndex === 0}
-                    className="min-w-[var(--size-touch)] min-h-[var(--size-touch)] flex items-center justify-center rounded-lg
-                      bg-muted/30 hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed
-                      transition-colors"
-                    aria-label="Previous question"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <span className="text-base font-medium min-w-[4rem] text-center">
-                    Q{game.selectedQuestionIndex + 1}/{game.questions.length}
-                  </span>
-                  <button
-                    onClick={() => game.selectQuestion(Math.min(game.questions.length - 1, game.selectedQuestionIndex + 1))}
-                    disabled={game.selectedQuestionIndex === 0}
-                    className="min-w-[var(--size-touch)] min-h-[var(--size-touch)] flex items-center justify-center rounded-lg
-                      bg-muted/30 hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed
-                      transition-colors"
-                    aria-label="Next question"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Right column: Team Management & Scores */}
-          <section id="game-controls" className="md:col-span-1 lg:col-span-4 lg:order-3 space-y-4 md:space-y-6" aria-label="Game controls and team management">
-            {/* Team Manager */}
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <TeamManager
-                teams={game.teams}
-                status={game.status}
-                onAddTeam={game.addTeam}
-                onRemoveTeam={game.removeTeam}
-                onRenameTeam={game.renameTeam}
-              />
-            </div>
-
-            {/* Team Score Input - during playing or between_rounds */}
-            {(game.status === 'playing' || game.status === 'between_rounds') && (
-              <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-                <TeamScoreInput
-                  teams={game.teams}
-                  currentRound={game.currentRound}
-                  onAdjustScore={game.adjustTeamScore}
-                  onSetScore={game.setTeamScore}
-                />
-              </div>
-            )}
-
-            {/* Keyboard shortcuts reference - hidden on mobile (not relevant for touch) */}
-            <div className="hidden md:block bg-background border border-border rounded-xl p-4 shadow-sm">
+            {/* Keyboard shortcuts reference */}
+            <div className="hidden md:block bg-surface border border-border rounded-xl p-4 shadow-sm mb-4">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-semibold">Keyboard Shortcuts</h2>
+                <h2 className="text-base font-semibold text-foreground">Keyboard Shortcuts</h2>
                 <button
                   onClick={() => game.setShowHelp(true)}
-                  className="text-base text-primary hover:text-primary/80 underline"
+                  className="text-sm text-primary hover:text-primary/80 underline min-h-[var(--size-touch)] flex items-center"
                 >
                   View all
                 </button>
               </div>
-              <ul className="space-y-2 text-base">
+              <ul className="space-y-1.5 text-sm">
                 <li className="flex justify-between">
-                  <span className="text-muted-foreground">Navigate questions</span>
+                  <span className="text-foreground-secondary">Navigate questions</span>
                   <div className="flex gap-1">
-                    <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                      ↑
-                    </kbd>
-                    <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                      ↓
-                    </kbd>
+                    <kbd className="px-1.5 py-0.5 bg-surface-elevated border border-border rounded font-mono text-xs">↑</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-surface-elevated border border-border rounded font-mono text-xs">↓</kbd>
                   </div>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-muted-foreground">Peek answer</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    Space
-                  </kbd>
+                  <span className="text-foreground-secondary">Peek answer</span>
+                  <kbd className="px-1.5 py-0.5 bg-surface-elevated border border-border rounded font-mono text-xs">Space</kbd>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-muted-foreground">Toggle display</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    D
-                  </kbd>
+                  <span className="text-foreground-secondary">Toggle display</span>
+                  <kbd className="px-1.5 py-0.5 bg-surface-elevated border border-border rounded font-mono text-xs">D</kbd>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-muted-foreground">Fullscreen</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    F
-                  </kbd>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">All shortcuts</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    ?
-                  </kbd>
+                  <span className="text-foreground-secondary">Fullscreen</span>
+                  <kbd className="px-1.5 py-0.5 bg-surface-elevated border border-border rounded font-mono text-xs">F</kbd>
                 </li>
               </ul>
             </div>
 
-            {/* Theme Settings */}
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
+            {/* Theme settings */}
+            <div className="bg-surface border border-border rounded-xl p-3 shadow-sm mb-4">
               <ThemeSelector
                 presenterTheme={presenterTheme}
                 displayTheme={displayTheme}
@@ -615,9 +513,9 @@ export default function PlayPage() {
               />
             </div>
 
-            {/* Settings Panel - collapsible */}
+            {/* Settings panel */}
             {showSettings && (
-              <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
+              <div className="bg-surface border border-border rounded-xl p-3 shadow-sm mb-4">
                 <SettingsPanel
                   status={game.status}
                   roundsCount={roundsCount}
@@ -635,370 +533,317 @@ export default function PlayPage() {
               </div>
             )}
 
-            {/* Game ended state */}
-            {game.status === 'ended' && (
-              <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-                <h2 className="text-lg md:text-xl font-semibold mb-3 text-center">
-                  Game Over!
-                </h2>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setShowRoundSummary(true)}
-                    className="w-full px-4 py-3 rounded-xl text-base font-medium
-                      bg-muted hover:bg-muted/80 text-foreground
-                      transition-colors duration-200 min-h-[48px]"
-                  >
-                    View Final Results
-                  </button>
-                  <button
-                    onClick={game.resetGame}
-                    className="w-full px-4 py-3 rounded-xl text-base font-medium
-                      bg-primary hover:bg-primary/90 text-primary-foreground
-                      transition-colors duration-200 min-h-[48px]"
-                  >
-                    Start New Game
-                  </button>
+            {/* Setup mode content */}
+            {game.status === 'setup' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="bg-surface border border-border rounded-xl p-4 shadow-sm space-y-4">
+                    <h2 className="text-base font-semibold text-foreground">Game Settings</h2>
+                    <PresetSelector disabled={game.status !== 'setup'} />
+                    <button
+                      onClick={() => setShowSavePresetModal(true)}
+                      className="w-full px-4 py-3 rounded-xl text-sm font-medium
+                        bg-primary hover:bg-primary-hover text-primary-foreground
+                        transition-colors duration-200 min-h-[44px]"
+                    >
+                      Save Settings as Preset
+                    </button>
+                  </div>
+                  <div className="bg-surface border border-border rounded-xl p-4 shadow-sm space-y-4">
+                    <h2 className="text-base font-semibold text-foreground">Question Content</h2>
+                    <QuestionImporter status={game.status} onImport={gameState.importQuestions} />
+                    <QuestionSetSelector disabled={game.status !== 'setup'} />
+                    <div className="border border-border rounded-xl overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setShowApiImporter((prev) => !prev)}
+                        disabled={game.status !== 'setup'}
+                        aria-expanded={showApiImporter}
+                        className="w-full min-h-[44px] px-4 py-2.5 flex items-center justify-between
+                          text-sm font-medium text-left hover:bg-surface-hover transition-colors
+                          focus:outline-none focus:ring-2 focus:ring-primary/50
+                          disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <span>Fetch from Trivia API</span>
+                        <span aria-hidden="true" className="text-foreground-secondary">
+                          {showApiImporter ? '\u25B2' : '\u25BC'}
+                        </span>
+                      </button>
+                      {showApiImporter && (
+                        <div className="border-t border-border p-4">
+                          <TriviaApiImporter disabled={game.status !== 'setup'} />
+                        </div>
+                      )}
+                    </div>
+                    <CategoryFilterCompact
+                      selectedCategories={selectedCategories}
+                      onCategoryChange={setSelectedCategories}
+                      questions={game.questions}
+                    />
+                    <button
+                      onClick={() => setShowSaveQuestionSetModal(true)}
+                      disabled={game.questions.length === 0}
+                      className={`w-full px-4 py-3 rounded-xl text-sm font-medium
+                        transition-colors duration-200 min-h-[44px]
+                        ${game.questions.length > 0
+                          ? 'bg-primary hover:bg-primary-hover text-primary-foreground'
+                          : 'bg-muted text-muted-foreground cursor-not-allowed'
+                        }`}
+                    >
+                      Save Questions as Set
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-surface border border-border rounded-xl p-4 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <h2 className="text-base font-semibold text-foreground">Ready to Start?</h2>
+                      <p className="text-sm text-foreground-secondary">
+                        {game.teams.length === 0
+                          ? 'Add at least one team to begin'
+                          : `${game.teams.length} team${game.teams.length === 1 ? '' : 's'} ready`}
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => setShowSaveTemplateModal(true)}
+                        disabled={game.questions.length === 0}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px]
+                          ${game.questions.length > 0
+                            ? 'bg-secondary hover:bg-secondary-hover text-secondary-foreground'
+                            : 'bg-muted text-muted-foreground cursor-not-allowed'
+                          }`}
+                      >
+                        Save Template
+                      </button>
+                      <button
+                        onClick={game.startGame}
+                        disabled={!game.canStart}
+                        className={`px-6 py-2 rounded-xl text-sm font-semibold transition-colors min-h-[44px]
+                          ${game.canStart
+                            ? 'bg-success hover:bg-success/90 text-success-foreground'
+                            : 'bg-muted text-muted-foreground cursor-not-allowed'
+                          }`}
+                      >
+                        Start Game
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
-          </section>
+
+            {/* Round summary */}
+            {showRoundSummary && (
+              <div className="mt-4">
+                <RoundSummary
+                  currentRound={game.currentRound}
+                  totalRounds={game.totalRounds}
+                  roundWinners={game.roundWinners}
+                  teamsSortedByScore={game.teamsSortedByScore}
+                  isLastRound={game.isLastRound || game.status === 'ended'}
+                  onNextRound={handleNextRound}
+                  onClose={() => setShowRoundSummary(false)}
+                />
+              </div>
+            )}
+          </main>
+
+          {/* RIGHT SIDEBAR: Leaderboard + Team Controls (w-80) */}
+          <aside
+            id="game-controls"
+            className="w-80 flex-shrink-0 border-l border-border overflow-y-auto bg-surface/40"
+            aria-label="Game controls and team management"
+          >
+            <div className="p-3 space-y-3">
+              {/* Team Manager */}
+              <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
+                <TeamManager
+                  teams={game.teams}
+                  status={game.status}
+                  onAddTeam={game.addTeam}
+                  onRemoveTeam={game.removeTeam}
+                  onRenameTeam={game.renameTeam}
+                />
+              </div>
+
+              {/* Team Score Input */}
+              {(game.status === 'playing' || game.status === 'between_rounds') && (
+                <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
+                  <TeamScoreInput
+                    teams={game.teams}
+                    currentRound={game.currentRound}
+                    onAdjustScore={game.adjustTeamScore}
+                    onSetScore={game.setTeamScore}
+                  />
+                </div>
+              )}
+
+              {/* Game ended state */}
+              {game.status === 'ended' && (
+                <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
+                  <h2 className="text-base font-semibold mb-3 text-center text-foreground">Game Over</h2>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setShowRoundSummary(true)}
+                      className="w-full px-4 py-3 rounded-xl text-sm font-medium
+                        bg-surface-elevated hover:bg-surface-hover text-foreground
+                        border border-border transition-colors min-h-[44px]"
+                    >
+                      View Final Results
+                    </button>
+                    <button
+                      onClick={game.resetGame}
+                      className="w-full px-4 py-3 rounded-xl text-sm font-medium
+                        bg-primary hover:bg-primary-hover text-primary-foreground
+                        transition-colors min-h-[44px]"
+                    >
+                      Start New Game
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
 
-        {/* Setup mode - shown below main content */}
-        {game.status === 'setup' && (
-          <div className="mt-4 md:mt-6 space-y-4">
-            {/* Two-column layout: Game Settings + Question Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Left: Game Settings */}
-              <div className="bg-background border border-border rounded-xl p-4 shadow-sm space-y-4">
-                <h2 className="text-lg font-semibold text-foreground">Game Settings</h2>
-                <PresetSelector disabled={game.status !== 'setup'} />
-                <button
-                  onClick={() => setShowSavePresetModal(true)}
-                  className="w-full px-4 py-3 rounded-xl text-base font-medium
-                    bg-primary hover:bg-primary/90 text-primary-foreground
-                    transition-colors duration-200 min-h-[48px]"
-                  title="Save current settings as a preset"
-                >
-                  Save Settings as Preset
-                </button>
-              </div>
-
-              {/* Right: Question Content */}
-              <div className="bg-background border border-border rounded-xl p-4 shadow-sm space-y-4">
-                <h2 className="text-lg font-semibold text-foreground">Question Content</h2>
-                <QuestionImporter status={game.status} onImport={gameState.importQuestions} />
-                <QuestionSetSelector disabled={game.status !== 'setup'} />
-                {/* API Question Importer -- collapsible tertiary option */}
-                <div className="border border-border rounded-xl overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setShowApiImporter((prev) => !prev)}
-                    disabled={game.status !== 'setup'}
-                    aria-expanded={showApiImporter}
-                    className="
-                      w-full min-h-[44px] px-4 py-2.5
-                      flex items-center justify-between
-                      text-base font-medium text-left
-                      hover:bg-muted/50 transition-colors
-                      focus:outline-none focus:ring-2 focus:ring-primary/50
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                    "
-                  >
-                    <span>Fetch from Trivia API</span>
-                    <span aria-hidden="true" className="text-muted-foreground">
-                      {showApiImporter ? '\u25B2' : '\u25BC'}
-                    </span>
-                  </button>
-                  {showApiImporter && (
-                    <div className="border-t border-border p-4">
-                      <TriviaApiImporter disabled={game.status !== 'setup'} />
-                    </div>
-                  )}
-                </div>
-                <CategoryFilterCompact
-                  selectedCategories={selectedCategories}
-                  onCategoryChange={setSelectedCategories}
-                  questions={game.questions}
-                />
-                <button
-                  onClick={() => setShowSaveQuestionSetModal(true)}
-                  disabled={game.questions.length === 0}
-                  className={`
-                    w-full px-4 py-3 rounded-xl text-base font-medium
-                    transition-colors duration-200 min-h-[48px]
-                    ${
-                      game.questions.length > 0
-                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                        : 'bg-muted text-muted-foreground cursor-not-allowed'
-                    }
-                  `}
-                  title="Save current questions as a question set"
-                >
-                  Save Questions as Set
-                </button>
-              </div>
-            </div>
-
-            {/* Full width: Legacy template save + Start Game */}
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <div>
-                  <h2 className="text-base md:text-lg font-semibold text-foreground">
-                    Ready to Start?
-                  </h2>
-                  <p className="text-base text-muted-foreground">
-                    {game.teams.length === 0
-                      ? 'Add at least one team to begin'
-                      : `${game.teams.length} team${game.teams.length === 1 ? '' : 's'} ready`}
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={() => setShowSaveTemplateModal(true)}
-                    disabled={game.questions.length === 0}
-                    className={`
-                      w-full sm:w-auto px-4 py-3 rounded-xl text-base font-medium
-                      transition-colors duration-200 min-h-[48px]
-                      ${
-                        game.questions.length > 0
-                          ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                          : 'bg-muted text-muted-foreground cursor-not-allowed'
-                      }
-                    `}
-                    title="Save current questions as a template"
-                  >
-                    Save Template (Legacy)
-                  </button>
-                  <button
-                    onClick={game.startGame}
-                    disabled={!game.canStart}
-                    className={`
-                      w-full sm:w-auto px-6 py-3 rounded-xl text-base md:text-lg font-semibold
-                      transition-colors duration-200 min-h-[48px]
-                      ${
-                        game.canStart
-                          ? 'bg-success hover:bg-success/90 text-white'
-                          : 'bg-muted text-muted-foreground cursor-not-allowed'
-                      }
-                    `}
-                  >
-                    Start Game
-                  </button>
-                </div>
-              </div>
-            </div>
+        {/* ---- FIXED BOTTOM ACTION BAR (h-16) ---- */}
+        <footer
+          className="flex-shrink-0 flex items-center justify-between px-4 border-t border-border bg-surface/80"
+          style={{ backdropFilter: 'blur(8px)', height: '64px' }}
+        >
+          {/* Left: round context */}
+          <div className="text-sm text-foreground-secondary font-medium">
+            {game.status === 'playing' && (
+              <span>Round {game.currentRound + 1} / {game.totalRounds}</span>
+            )}
           </div>
-        )}
 
-        {/* Last question of round prompt - shown below main content */}
-        {game.status === 'playing' && game.isLastQuestionOfRound && (
-          <div className="mt-4 md:mt-6 bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-              <div>
-                <h2 className="text-base md:text-lg font-semibold text-foreground">
-                  Last Question of Round {game.currentRound + 1}
-                </h2>
-                <p className="text-base text-muted-foreground">
-                  Complete the round when ready to show round summary
-                </p>
-              </div>
+          {/* Center: primary action buttons */}
+          <div className="flex items-center gap-2">
+            {/* Last question of round */}
+            {game.status === 'playing' && game.isLastQuestionOfRound && (
               <button
                 onClick={handleCompleteRound}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-semibold
-                  bg-orange-600 hover:bg-orange-700 text-white
-                  transition-colors duration-200 min-h-[48px]"
+                className="px-4 py-2 rounded-lg text-sm font-semibold
+                  bg-warning/20 hover:bg-warning/30 text-warning
+                  border border-warning/30 transition-colors min-h-[44px]"
               >
                 Complete Round
               </button>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Between rounds controls - shown below main content */}
-        {game.status === 'between_rounds' && (
-          <div className="mt-4 md:mt-6 bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-              <div>
-                <h2 className="text-base md:text-lg font-semibold text-foreground">
-                  Round {game.currentRound + 1} Complete
-                </h2>
-                <p className="text-base text-muted-foreground">
-                  Review scores and proceed when ready
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            {/* Between rounds */}
+            {game.status === 'between_rounds' && (
+              <>
                 <button
                   onClick={() => setShowRoundSummary(true)}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-medium
-                    bg-muted hover:bg-muted/80 text-foreground
-                    transition-colors duration-200 min-h-[48px]"
+                  className="px-4 py-2 rounded-lg text-sm font-medium
+                    bg-surface-elevated hover:bg-surface-hover text-foreground
+                    border border-border transition-colors min-h-[44px]"
                 >
                   Show Summary
                 </button>
                 <button
                   onClick={handleNextRound}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-semibold
-                    bg-success hover:bg-success/90 text-white
-                    transition-colors duration-200 min-h-[48px]"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold
+                    bg-success hover:bg-success/90 text-success-foreground
+                    transition-colors min-h-[44px]"
                 >
                   {game.isLastRound ? 'End Game' : 'Next Round'}
                 </button>
-              </div>
-            </div>
-          </div>
-        )}
+              </>
+            )}
 
-        {/* Round Summary - shown below main content */}
-        {showRoundSummary && (
-          <div className="mt-4 md:mt-6">
-            <RoundSummary
-              currentRound={game.currentRound}
-              totalRounds={game.totalRounds}
-              roundWinners={game.roundWinners}
-              teamsSortedByScore={game.teamsSortedByScore}
-              isLastRound={game.isLastRound || game.status === 'ended'}
-              onNextRound={handleNextRound}
-              onClose={() => setShowRoundSummary(false)}
-            />
-          </div>
-        )}
-
-        {/* Paused state controls - shown below main content */}
-        {game.status === 'paused' && (
-          <div className="mt-4 md:mt-6 bg-orange-500/10 border border-orange-500/30 rounded-xl p-3 md:p-4 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-              <div className="flex items-center gap-3 md:gap-4">
-                {/* Pause icon */}
-                <div className="min-w-[var(--size-touch)] min-h-[var(--size-touch)] md:w-12 md:h-12 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-5 h-5 md:w-6 md:h-6 text-orange-600"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-base md:text-lg font-semibold text-foreground">
-                    {game.emergencyBlank ? 'Emergency Pause Active' : 'Game Paused'}
-                  </h2>
-                  <p className="text-base text-muted-foreground">
-                    {game.emergencyBlank
-                      ? 'Audience display is blanked. Press E to clear emergency.'
-                      : 'Press P or click Resume to continue the game'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            {/* Paused state */}
+            {game.status === 'paused' && (
+              <>
                 {game.emergencyBlank && (
                   <button
                     onClick={game.emergencyPause}
-                    className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-medium
-                      bg-error hover:bg-error/90 text-white
-                      transition-colors duration-200 min-h-[48px]"
+                    className="px-4 py-2 rounded-lg text-sm font-medium
+                      bg-error/20 hover:bg-error/30 text-error
+                      border border-error/30 transition-colors min-h-[44px]"
                   >
                     Clear Emergency
                   </button>
                 )}
                 <button
                   onClick={game.resumeGame}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-semibold
-                    bg-success hover:bg-success/90 text-white
-                    transition-colors duration-200 min-h-[48px]"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold
+                    bg-success hover:bg-success/90 text-success-foreground
+                    transition-colors min-h-[44px]"
                 >
-                  Resume Game
+                  Resume
                 </button>
-              </div>
-            </div>
+              </>
+            )}
           </div>
-        )}
 
-        {/* Pause controls - shown during playing or between_rounds */}
-        {(game.status === 'playing' || game.status === 'between_rounds') && (
-          <div className="mt-4 md:mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
-            <button
-              onClick={game.pauseGame}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-medium
-                bg-orange-500/20 hover:bg-orange-500/30 text-orange-600
-                border border-orange-500/30
-                transition-colors duration-200 flex items-center justify-center gap-2 min-h-[48px]"
-              title="Pause game (P)"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-              </svg>
-              Pause
-            </button>
-            <button
-              onClick={game.emergencyPause}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl text-base font-medium
-                bg-error/20 hover:bg-error/30 text-error
-                border border-error/30
-                transition-colors duration-200 flex items-center justify-center gap-2 min-h-[48px]"
-              title="Emergency pause - blanks display (E)"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-              Emergency
-            </button>
+          {/* Right: Pause + Emergency */}
+          <div className="flex items-center gap-2">
+            {(game.status === 'playing' || game.status === 'between_rounds') && (
+              <>
+                <button
+                  onClick={game.pauseGame}
+                  className="px-3 py-2 rounded-lg text-sm font-medium
+                    bg-warning/15 hover:bg-warning/25 text-warning
+                    border border-warning/30 flex items-center gap-1.5
+                    transition-colors min-h-[44px]"
+                  title="Pause game (P)"
+                >
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                  </svg>
+                  Pause
+                </button>
+                <button
+                  onClick={game.emergencyPause}
+                  className="px-3 py-2 rounded-lg text-sm font-medium
+                    bg-error/15 hover:bg-error/25 text-error
+                    border border-error/30 flex items-center gap-1.5
+                    transition-colors min-h-[44px]"
+                  title="Emergency pause — blanks display (E)"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  Emergency
+                </button>
+              </>
+            )}
           </div>
-        )}
+        </footer>
       </div>
-    </main>
 
-    {/* Keyboard shortcuts modal */}
-    <KeyboardShortcutsModal
-      isOpen={game.showHelp}
-      onClose={() => game.setShowHelp(false)}
-    />
-
-    {/* Session modals */}
-    <RoomSetupModal
-      isOpen={session.shouldShowModal}
-      onClose={session.closeModal}
-      onCreateRoom={handleModalCreateRoom}
-      onJoinRoom={handleModalJoinRoom}
-      onPlayOffline={handleModalPlayOffline}
-      error={session.error}
-      isLoading={session.isLoading}
-    />
-
-    {/* Save Template Modal */}
-    <SaveTemplateModal
-      isOpen={showSaveTemplateModal}
-      onClose={() => setShowSaveTemplateModal(false)}
-    />
-
-    {/* Save Preset Modal */}
-    <SavePresetModal
-      isOpen={showSavePresetModal}
-      onClose={() => setShowSavePresetModal(false)}
-    />
-
-    {/* Save Question Set Modal */}
-    <SaveQuestionSetModal
-      isOpen={showSaveQuestionSetModal}
-      onClose={() => setShowSaveQuestionSetModal(false)}
-    />
+      {/* Modals */}
+      <KeyboardShortcutsModal
+        isOpen={game.showHelp}
+        onClose={() => game.setShowHelp(false)}
+      />
+      <RoomSetupModal
+        isOpen={session.shouldShowModal}
+        onClose={session.closeModal}
+        onCreateRoom={handleModalCreateRoom}
+        onJoinRoom={handleModalJoinRoom}
+        onPlayOffline={handleModalPlayOffline}
+        error={session.error}
+        isLoading={session.isLoading}
+      />
+      <SaveTemplateModal
+        isOpen={showSaveTemplateModal}
+        onClose={() => setShowSaveTemplateModal(false)}
+      />
+      <SavePresetModal
+        isOpen={showSavePresetModal}
+        onClose={() => setShowSavePresetModal(false)}
+      />
+      <SaveQuestionSetModal
+        isOpen={showSaveQuestionSetModal}
+        onClose={() => setShowSaveQuestionSetModal(false)}
+      />
     </>
   );
 }

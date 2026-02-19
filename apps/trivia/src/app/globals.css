@@ -1,167 +1,114 @@
 @import "tailwindcss";
+@import "@joolie-boolie/theme/globals.css";
 
-/* Accessible high contrast color palette - Trivia: Purple/Blue theme */
+/* ================================================================
+   TRIVIA APP TOKEN OVERRIDES
+   Cinematic blue-black quiz show atmosphere.
+   All shared tokens inherited from @joolie-boolie/theme/globals.css.
+   ================================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
+  /* Trivia-specific background: cool blue-black */
+  --background: #0a0b14;
 
-  /* Primary: Deep purple for Trivia branding */
-  --primary: #6d28d9;
-  --primary-foreground: #ffffff;
+  /* Trivia-specific tokens (all prefixed --trivia-*) */
+  --trivia-game-accent:    #4F7BF7;
+  --trivia-accent-hover:   #6B91FF;
+  --trivia-accent-glow:    rgba(79, 123, 247, 0.15);
+  --trivia-text-muted:     #6E7388;  /* CORRECTED from #565B70. Issue A-05. 3.5:1. */
 
-  /* Secondary: Slate gray */
-  --secondary: #475569;
-  --secondary-foreground: #ffffff;
+  /* Answer option colors (CORRECTED for presenter AA compliance, Issue A-03) */
+  --trivia-option-a:       #2563EB;  /* Electric Blue */
+  --trivia-option-b:       #DC2626;  /* Ruby Red */
+  --trivia-option-c:       #047857;  /* Darkened from #059669 for presenter view */
+  --trivia-option-d:       #B45309;  /* Darkened from #D97706 for presenter view */
 
-  /* Accent: Indigo for highlights */
-  --accent: #4f46e5;
-  --accent-foreground: #ffffff;
+  /* Audience display uses brighter colors (text always 30px+, passes 3:1 large text) */
+  --trivia-audience-option-a: #3B82F6;  /* Bright blue for projection */
+  --trivia-audience-option-b: #EF4444;  /* Bright red for projection */
+  --trivia-audience-option-c: #10B981;  /* Bright green for projection */
+  --trivia-audience-option-d: #F59E0B;  /* Bright amber for projection */
 
-  /* Feedback colors */
-  --success: #16a34a;
-  --warning: #854d0e;
-  --error: #dc2626;
+  /* Game-specific semantic colors */
+  --trivia-correct:        #34D399;
+  --trivia-incorrect:      #F43F5E;
+  --trivia-timer-safe:     #34D399;
+  --trivia-timer-warning:  #FBBF24;
+  --trivia-timer-danger:   #F43F5E;
 
-  /* Borders and muted elements */
-  --border: #d1d5db;
-  --muted: #6b7280;
-  --muted-foreground: #4b5563;
-
-  /* Team colors for scoring */
-  --team-1: #6d28d9;  /* Purple */
-  --team-2: #dc2626;  /* Red */
-  --team-3: #059669;  /* Green */
-  --team-4: #d97706;  /* Orange */
-  --team-5: #1e40af;  /* Blue */
-  --team-6: #0891b2;  /* Cyan */
+  /* Trivia animation timing */
+  --trivia-answer-dim-duration:     200ms;
+  --trivia-answer-reveal-delay:     200ms;
+  --trivia-stagger-row-delay:       80ms;
 }
 
-/* System dark mode (when no class is set) */
-@media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) {
-    --background: #0f0a1f;
-    --foreground: #f1f5f9;
+/* ================================================================
+   TRIVIA KEYFRAMES
+   ================================================================ */
 
-    --primary: #8b5cf6;
-    --primary-foreground: #ffffff;
+/* Timer heartbeat pulse in final 5 seconds */
+@keyframes timer-heartbeat {
+  0%, 100% { transform: scale(1); }
+  15%       { transform: scale(1.08); }
+  30%       { transform: scale(1); }
+  45%       { transform: scale(1.05); }
+  60%       { transform: scale(1); }
+}
 
-    --secondary: #64748b;
-    --secondary-foreground: #ffffff;
+/* Waiting ambient gradient drift */
+@keyframes waiting-ambient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-    --accent: #6366f1;
-    --accent-foreground: #ffffff;
+/* Breathing scale for waiting wordmark */
+@keyframes waiting-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%       { transform: scale(1.04); opacity: 1; }
+}
 
-    --border: #2e1f4d;
-    --muted: #94a3b8;
-    --muted-foreground: #cbd5e1;
+/* Score roll slide */
+@keyframes score-roll-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ================================================================
+   UTILITY CLASSES — Trivia-specific
+   ================================================================ */
+
+/* Cinematic ambient background for waiting display */
+.trivia-ambient-bg {
+  background: linear-gradient(
+    135deg,
+    #0a0b14 0%,
+    #0d1026 25%,
+    #0a0e20 50%,
+    #0c0b18 75%,
+    #0a0b14 100%
+  );
+  background-size: 300% 300%;
+  animation: waiting-ambient 20s ease infinite;
+}
+
+/* Reduced motion: freeze ambient animation */
+@media (prefers-reduced-motion: reduce) {
+  .trivia-ambient-bg {
+    animation: none;
+    background: #0a0b14;
+  }
+
+  .timer-heartbeat {
+    animation: none;
   }
 }
 
-/* Class-based dark mode */
-:root.dark {
-  --background: #0f0a1f;
-  --foreground: #f1f5f9;
-
-  --primary: #8b5cf6;
-  --primary-foreground: #ffffff;
-
-  --secondary: #64748b;
-  --secondary-foreground: #ffffff;
-
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
-
-  --border: #2e1f4d;
-  --muted: #94a3b8;
-  --muted-foreground: #cbd5e1;
+/* Timer heartbeat class */
+.timer-heartbeat {
+  animation: timer-heartbeat 0.8s ease-in-out infinite;
 }
 
-@theme inline {
-  /* Colors */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-
-  /* Team colors */
-  --color-team-1: var(--team-1);
-  --color-team-2: var(--team-2);
-  --color-team-3: var(--team-3);
-  --color-team-4: var(--team-4);
-  --color-team-5: var(--team-5);
-  --color-team-6: var(--team-6);
-
-  /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  /* Accessible font sizes (minimum 18px for body text) */
-  --text-base: 1.125rem;       /* 18px - new base */
-  --text-lg: 1.25rem;          /* 20px */
-  --text-xl: 1.5rem;           /* 24px */
-  --text-2xl: 1.875rem;        /* 30px */
-  --text-3xl: 2.25rem;         /* 36px */
-  --text-4xl: 3rem;            /* 48px */
-  --text-5xl: 3.75rem;         /* 60px */
-  --text-6xl: 4.5rem;          /* 72px */
-  --text-7xl: 6rem;            /* 96px */
-  --text-8xl: 8rem;            /* 128px */
-
-  /* Touch target sizes (minimum 44px for accessibility) */
-  --size-touch: 2.75rem;       /* 44px minimum touch target */
-  --size-touch-lg: 3.5rem;     /* 56px large touch target */
-  --size-touch-xl: 4rem;       /* 64px extra large touch target */
-
-  /* Spacing scale */
-  --spacing-touch: 2.75rem;    /* 44px - for touch target spacing */
-}
-
-/* Base styles */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
-  font-size: var(--text-base);
-  line-height: 1.6;
-}
-
-/* Focus styles for accessibility */
-*:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Enhanced focus styles for better visibility */
-a:focus-visible,
-button:focus-visible,
-[role="button"]:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex]:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 6px rgba(30, 64, 175, 0.2);
-}
-
-/* Large click targets for interactive elements */
-button,
-[role="button"] {
-  min-height: var(--size-touch);
-  min-width: var(--size-touch);
-}
-
-/* Screen reader only utility (matches Tailwind's sr-only) */
+/* Screen reader only */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -174,28 +121,7 @@ button,
   border-width: 0;
 }
 
-/* Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  /* Allow essential transitions at reduced speed */
-  .motion-reduce\:transition-none {
-    transition: none !important;
-  }
-
-  .motion-reduce\:animate-none {
-    animation: none !important;
-  }
-}
-
-/* Ensure links in skip navigation are visible when focused */
+/* Skip link */
 .skip-link:focus {
   clip: auto;
   clip-path: none;
@@ -207,13 +133,12 @@ button,
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   :root {
-    --border: #000000;
-    --muted: #4b5563;
-    --muted-foreground: #1f2937;
-  }
-
-  *:focus-visible {
-    outline-width: 4px;
-    outline-offset: 4px;
+    --trivia-option-a: #1D4ED8;
+    --trivia-option-b: #B91C1C;
+    --trivia-option-c: #065F46;
+    --trivia-option-d: #92400E;
   }
 }
+
+/* NOTE: Audience display text minimum is 40px on 1920x1080.
+   See FINAL-DESIGN-PLAN.md Part 8, Issue A-23 (1024x768 projector minimum). */

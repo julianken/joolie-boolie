@@ -32,3 +32,10 @@ export {
   AudienceRoundInfo,
   type AudienceRoundInfoProps,
 } from './AudienceRoundInfo';
+
+// Phase 5: Redesign components
+export {
+  RoundTransitionOverlay,
+  type RoundTransitionOverlayProps,
+} from './RoundTransitionOverlay';
+export { AnimatedScore, type AnimatedScoreProps } from './AnimatedScore';
