@@ -180,6 +180,14 @@ export default function PlayPage() {
     }
   }, [session]);
 
+  // Audience state label (Issue 2.3 — presenter audience-state indicator)
+  const audienceStateLabel = {
+    idle: 'Waiting',
+    playing: 'Game in Progress',
+    paused: 'Paused',
+    ended: 'Game Over',
+  }[game.status] ?? 'Waiting';
+
   return (
     <>
       {/* Skip link for keyboard navigation */}
@@ -191,263 +199,270 @@ export default function PlayPage() {
       </a>
 
       <OfflineBanner />
-      <main id="main" className="min-h-screen bg-background p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="mb-6 space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-            {/* Title section */}
-            <div className="flex-shrink-0">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+      <main id="main" className="min-h-screen bg-background p-3 md:p-4">
+        <div className="max-w-[1600px] mx-auto">
+
+          {/* Compact single-line header */}
+          <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
                 Bingo
               </h1>
-              <p className="text-lg text-muted-foreground">Presenter View</p>
+              {/* Presenter badge */}
+              <span
+                className="
+                  px-2 py-0.5 rounded text-xs font-semibold
+                  bg-primary/20 text-primary border border-primary/30
+                "
+                aria-label="Presenter view"
+              >
+                Presenter
+              </span>
+              {/* Audience state indicator (Issue 2.3) */}
+              <span className="text-sm font-medium text-foreground-secondary hidden sm:inline">
+                Audience: {audienceStateLabel}
+              </span>
             </div>
 
-            {/* Room information - inline display matching trivia style */}
-            {(session.roomCode || session.mode === 'offline') && (
-              <div className="flex flex-wrap items-center gap-2 flex-1">
-                {session.roomCode && session.mode !== 'offline' && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-base text-muted-foreground">Room:</span>
-                    <span className="font-mono font-semibold text-foreground">{session.roomCode}</span>
-                    {session.pin && (
-                      <>
-                        <span className="text-base text-muted-foreground ml-2">PIN:</span>
-                        <span className="font-mono font-semibold text-foreground">{session.pin}</span>
-                      </>
-                    )}
-                  </div>
-                )}
-                {session.mode === 'offline' && session.offlineSessionId && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-base text-muted-foreground">Offline Session:</span>
-                    <span className="font-mono font-semibold text-foreground">{session.offlineSessionId}</span>
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Room info + controls row */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Session info */}
+              {session.roomCode && session.mode !== 'offline' && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-foreground-secondary">Room:</span>
+                  <span className="font-mono font-semibold text-foreground text-sm">{session.roomCode}</span>
+                  {session.pin && (
+                    <>
+                      <span className="text-sm text-foreground-secondary ml-1">PIN:</span>
+                      <span className="font-mono font-semibold text-foreground text-sm">{session.pin}</span>
+                    </>
+                  )}
+                </div>
+              )}
+              {session.mode === 'offline' && session.offlineSessionId && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-foreground-secondary">Offline:</span>
+                  <span className="font-mono font-semibold text-foreground text-sm">{session.offlineSessionId}</span>
+                </div>
+              )}
 
-            {/* Display controls */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-shrink-0">
               {/* Connection status */}
               <div className="flex items-center gap-2" data-testid="sync-indicator">
                 <div
-                  className={`
-                    w-3 h-3 rounded-full
-                    ${isConnected ? 'bg-success' : 'bg-muted'}
-                  `}
+                  className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-success' : 'bg-foreground-muted'}`}
                   title={isConnected ? 'Sync active' : 'Sync not active'}
                 />
-                <span className="text-base text-muted-foreground hidden sm:block">
-                  {isConnected ? 'Sync Active' : 'Sync Ready'}
+                <span className="text-sm text-foreground-secondary hidden sm:block">
+                  {isConnected ? 'Synced' : 'Ready'}
                 </span>
               </div>
 
+              {/* Action buttons */}
               <div className="flex items-center gap-2">
-                {/* Play Offline button - only show if no session active */}
                 {!session.roomCode && session.mode !== 'offline' && (
-                  <Button
-                    onClick={handlePlayOffline}
-                    variant="secondary"
-                    size="md"
-                    aria-label="Quick offline play"
-                  >
-                    Play Offline
+                  <Button onClick={handlePlayOffline} variant="secondary" size="md" aria-label="Quick offline play">
+                    Offline
                   </Button>
                 )}
-
-                {/* Create New Game button - always visible (BEA-417) */}
-                <Button
-                  onClick={handleCreateNewGame}
-                  variant="secondary"
-                  size="md"
-                  className="shadow-lg"
-                >
-                  Create New Game
+                <Button onClick={handleCreateNewGame} variant="secondary" size="md" className="shadow-lg">
+                  New Game
                 </Button>
-
-                {/* Open Display button */}
-                <Button
-                  onClick={openDisplay}
-                  variant="secondary"
-                  size="md"
-                >
+                <Button onClick={openDisplay} variant="secondary" size="md">
                   Open Display
                 </Button>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Main content grid - Mobile first: stack vertically, then 2 cols on tablet, 3 cols on desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Center column on mobile (moved up for better UX): Current Ball + Controls */}
-          <section className="md:col-span-2 lg:col-span-4 lg:order-2 space-y-4 md:space-y-6">
-            {/* Current Ball Display */}
-            <div className="bg-background border border-border rounded-xl p-4 md:p-6 shadow-sm flex flex-col items-center gap-3 md:gap-4" data-testid="current-ball-section">
-              <h2 className="text-lg md:text-xl font-semibold">Current Ball</h2>
-              <BallDisplay ball={game.currentBall} size="xl" />
-              {game.previousBall && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-base md:text-lg">Previous:</span>
-                  <BallDisplay ball={game.previousBall} size="sm" />
+          {/* Command center 3-column grid
+              Left(col-span-4): board
+              Center(col-span-5): current ball + controls — slightly wider
+              Right(col-span-3): settings/pattern
+          */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 md:gap-4">
+
+            {/* Left column: Bingo Board */}
+            <section className="hidden sm:block md:col-span-1 lg:col-span-4 lg:order-1 space-y-3">
+              <div
+                className="bg-surface border border-border-subtle rounded-xl p-3 shadow-md"
+                style={{ boxShadow: 'var(--shadow-md)' }}
+              >
+                <h2 className="text-base font-semibold mb-2 text-foreground-secondary">Called Numbers</h2>
+                <BingoBoard calledBalls={game.calledBalls} />
+              </div>
+
+              <div
+                className="bg-surface border border-border-subtle rounded-xl p-3"
+                style={{ boxShadow: 'var(--shadow-sm)' }}
+              >
+                <RecentBalls balls={game.recentBalls} />
+              </div>
+            </section>
+
+            {/* Mobile-only recent balls */}
+            <section className="sm:hidden space-y-3">
+              <div className="bg-surface border border-border-subtle rounded-xl p-3">
+                <RecentBalls balls={game.recentBalls} />
+              </div>
+            </section>
+
+            {/* Center column: Current Ball + Controls */}
+            <section className="md:col-span-2 lg:col-span-5 lg:order-2 space-y-3" data-testid="current-ball-section">
+              {/* Current Ball with ambient glow backdrop */}
+              <div
+                className="bg-surface border border-border-subtle rounded-xl p-4 flex flex-col items-center gap-3 relative overflow-hidden"
+                style={{ boxShadow: 'var(--shadow-md)' }}
+              >
+                {/* Ambient glow div behind current ball */}
+                {game.currentBall && (
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none transition-opacity duration-700"
+                    style={{
+                      background: `radial-gradient(circle at 50% 45%, var(--bingo-ball-${game.currentBall.column.toLowerCase()}-glow-intense) 0%, transparent 65%)`,
+                      opacity: 0.7,
+                    }}
+                  />
+                )}
+
+                <h2 className="text-base font-semibold text-foreground-secondary relative z-10">Current Ball</h2>
+                <div className="relative z-10">
+                  <BallDisplay ball={game.currentBall} size="xl" />
                 </div>
-              )}
-              <BallCounter
-                called={game.ballsCalled}
-                remaining={game.ballsRemaining}
-              />
-            </div>
+                {game.previousBall && (
+                  <div className="flex items-center gap-2 text-foreground-secondary relative z-10">
+                    <span className="text-sm">Previous:</span>
+                    <BallDisplay ball={game.previousBall} size="sm" />
+                  </div>
+                )}
+                <div className="relative z-10">
+                  <BallCounter called={game.ballsCalled} remaining={game.ballsRemaining} />
+                </div>
+              </div>
 
-            {/* Control Panel */}
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <ControlPanel
-                isProcessing={game.isProcessing}
-                status={game.status}
-                canCall={game.canCall}
-                canStart={game.canStart}
-                canPause={game.canPause}
-                canResume={game.canResume}
-                canUndo={game.canUndo}
-                onStart={() => game.startGame(game.pattern ?? undefined)}
-                onCallBall={game.callBall}
-                onPause={game.pauseGame}
-                onResume={game.resumeGame}
-                onReset={game.requestReset}
-                onUndo={game.undoCall}
-                showResetConfirm={game.showResetConfirm}
-                onConfirmReset={game.confirmReset}
-                onCancelReset={game.cancelReset}
-              />
-            </div>
-          </section>
+              {/* Control Panel */}
+              <div
+                className="bg-surface border border-border-subtle rounded-xl p-3"
+                style={{ boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ControlPanel
+                  isProcessing={game.isProcessing}
+                  status={game.status}
+                  canCall={game.canCall}
+                  canStart={game.canStart}
+                  canPause={game.canPause}
+                  canResume={game.canResume}
+                  canUndo={game.canUndo}
+                  onStart={() => game.startGame(game.pattern ?? undefined)}
+                  onCallBall={game.callBall}
+                  onPause={game.pauseGame}
+                  onResume={game.resumeGame}
+                  onReset={game.requestReset}
+                  onUndo={game.undoCall}
+                  showResetConfirm={game.showResetConfirm}
+                  onConfirmReset={game.confirmReset}
+                  onCancelReset={game.cancelReset}
+                />
+              </div>
+            </section>
 
-          {/* Left column: Bingo Board - hidden on small mobile, shown on larger screens */}
-          <section className="hidden sm:block md:col-span-1 lg:col-span-4 lg:order-1 space-y-4 md:space-y-6">
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Called Numbers</h2>
-              <BingoBoard calledBalls={game.calledBalls} />
-            </div>
+            {/* Right column: Settings / Pattern */}
+            <section className="md:col-span-1 lg:col-span-3 lg:order-3 space-y-3">
+              {/* Pattern Selection */}
+              <div
+                className="bg-surface border border-border-subtle rounded-xl p-3 space-y-3"
+                style={{ boxShadow: 'var(--shadow-sm)' }}
+              >
+                <PatternSelector
+                  selectedPattern={game.pattern}
+                  onSelect={game.setPattern}
+                  disabled={game.status === 'playing'}
+                />
+                <PatternPreview pattern={game.pattern} />
+              </div>
 
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm">
-              <RecentBalls balls={game.recentBalls} />
-            </div>
-          </section>
+              {/* Game Settings */}
+              <div
+                className="bg-surface border border-border-subtle rounded-xl p-3 space-y-3"
+                style={{ boxShadow: 'var(--shadow-sm)' }}
+              >
+                <h2 className="text-base font-semibold text-foreground-secondary">Settings</h2>
 
-          {/* Mobile-only recent balls (shown when board is hidden) */}
-          <section className="sm:hidden space-y-4">
-            <div className="bg-background border border-border rounded-xl p-3 shadow-sm">
-              <RecentBalls balls={game.recentBalls} />
-            </div>
-          </section>
+                {/* Auto-call toggle */}
+                <Toggle
+                  checked={game.autoCallEnabled}
+                  onChange={game.toggleAutoCall}
+                  label="Auto-call"
+                />
 
-          {/* Right column: Settings */}
-          <section className="md:col-span-1 lg:col-span-4 lg:order-3 space-y-4 md:space-y-6">
-            {/* Pattern Selection */}
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm space-y-3 md:space-y-4">
-              <PatternSelector
-                selectedPattern={game.pattern}
-                onSelect={game.setPattern}
-                disabled={game.status === 'playing'}
-              />
-              <PatternPreview pattern={game.pattern} />
-            </div>
+                {/* Speed slider */}
+                <Slider
+                  value={game.autoCallSpeed}
+                  onChange={game.setAutoCallSpeed}
+                  min={5}
+                  max={30}
+                  step={1}
+                  label="Call Interval"
+                  unit="s"
+                  disabled={!game.autoCallEnabled}
+                />
 
-            {/* Game Settings */}
-            <div className="bg-background border border-border rounded-xl p-3 md:p-4 shadow-sm space-y-4 md:space-y-6">
-              <h2 className="text-lg md:text-xl font-semibold">Settings</h2>
+                {/* Audio toggle */}
+                <Toggle
+                  checked={game.audioEnabled}
+                  onChange={game.toggleAudio}
+                  label="Audio Announcements"
+                />
+                <p className="text-sm text-foreground-secondary">
+                  Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">M</kbd> to toggle
+                </p>
 
-              {/* Auto-call toggle */}
-              <Toggle
-                checked={game.autoCallEnabled}
-                onChange={game.toggleAutoCall}
-                label="Auto-call"
-              />
+                {/* Voice pack selector */}
+                <VoiceSelector
+                  selectedVoice={voicePack}
+                  onSelect={setVoicePack}
+                  preloadProgress={preloadProgress}
+                />
 
-              {/* Speed slider */}
-              <Slider
-                value={game.autoCallSpeed}
-                onChange={game.setAutoCallSpeed}
-                min={5}
-                max={30}
-                step={1}
-                label="Call Interval"
-                unit="s"
-                disabled={!game.autoCallEnabled}
-              />
+                {/* Roll sound selector */}
+                <RollSoundSelector />
 
-              {/* Audio toggle */}
-              <Toggle
-                checked={game.audioEnabled}
-                onChange={game.toggleAudio}
-                label="Audio Announcements"
-              />
-              <p className="text-base text-muted-foreground">
-                Press M to toggle audio
-              </p>
+                {/* Reveal chime selector */}
+                <RevealChimeSelector />
 
-              {/* Voice pack selector */}
-              <VoiceSelector
-                selectedVoice={voicePack}
-                onSelect={setVoicePack}
-                preloadProgress={preloadProgress}
-              />
+                {/* Theme selector */}
+                <ThemeSelector
+                  presenterTheme={presenterTheme}
+                  displayTheme={displayTheme}
+                  onPresenterThemeChange={setPresenterTheme}
+                  onDisplayThemeChange={setDisplayTheme}
+                />
+              </div>
 
-              {/* Roll sound selector */}
-              <RollSoundSelector />
-
-              {/* Reveal chime selector */}
-              <RevealChimeSelector />
-
-              {/* Theme selector */}
-              <ThemeSelector
-                presenterTheme={presenterTheme}
-                displayTheme={displayTheme}
-                onPresenterThemeChange={setPresenterTheme}
-                onDisplayThemeChange={setDisplayTheme}
-              />
-            </div>
-
-            {/* Keyboard shortcuts reference - hidden on mobile (not relevant for touch) */}
-            <div className="hidden md:block bg-background border border-border rounded-xl p-4 shadow-sm" data-testid="keyboard-shortcuts-section">
-              <h2 className="text-xl font-semibold mb-3">Keyboard Shortcuts</h2>
-              <ul className="space-y-2 text-base">
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Roll</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    Space
-                  </kbd>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Pause/Resume</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    P
-                  </kbd>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Undo</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    U
-                  </kbd>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Reset</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    R
-                  </kbd>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Mute/Unmute</span>
-                  <kbd className="px-2 py-1 bg-muted/30 rounded font-mono text-base">
-                    M
-                  </kbd>
-                </li>
-              </ul>
-            </div>
-          </section>
+              {/* Keyboard shortcuts reference */}
+              <div
+                className="hidden md:block bg-surface border border-border-subtle rounded-xl p-3"
+                data-testid="keyboard-shortcuts-section"
+              >
+                <h2 className="text-base font-semibold mb-2 text-foreground-secondary">Shortcuts</h2>
+                <ul className="space-y-1.5 text-sm">
+                  {[
+                    { label: 'Roll', key: 'Space' },
+                    { label: 'Pause/Resume', key: 'P' },
+                    { label: 'Undo', key: 'U' },
+                    { label: 'Reset', key: 'R' },
+                    { label: 'Mute/Unmute', key: 'M' },
+                  ].map(({ label, key }) => (
+                    <li key={key} className="flex justify-between items-center">
+                      <span className="text-foreground-secondary">{label}</span>
+                      <kbd className="px-2 py-0.5 bg-muted rounded font-mono text-xs text-foreground-secondary">{key}</kbd>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          </div>
         </div>
-      </div>
       </main>
 
       {/* Session modals */}

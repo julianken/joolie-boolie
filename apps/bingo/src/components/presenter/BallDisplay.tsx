@@ -7,19 +7,19 @@ export interface BallDisplayProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-const sizeStyles = {
-  sm: 'w-[48px] h-[48px] text-xl',
-  md: 'w-[64px] h-[64px] text-2xl',
-  lg: 'w-[96px] h-[96px] text-4xl',
-  xl: 'w-[160px] h-[160px] text-7xl',
-};
+const sizeClasses = {
+  sm: 'bingo-ball-sm',
+  md: 'bingo-ball-md',
+  lg: 'bingo-ball-lg',
+  xl: 'bingo-ball-xl',
+} as const;
 
-const columnColors: Record<BingoColumn, string> = {
-  B: 'bg-ball-b text-white',
-  I: 'bg-ball-i text-white',
-  N: 'bg-ball-n text-gray-900 border-2 border-black dark:border-gray-400',
-  G: 'bg-ball-g text-white',
-  O: 'bg-ball-o text-white',
+const columnFontSizes: Record<BingoColumn, string> = {
+  B: 'text-[0.35em]',
+  I: 'text-[0.35em]',
+  N: 'text-[0.35em]',
+  G: 'text-[0.35em]',
+  O: 'text-[0.35em]',
 };
 
 export function BallDisplay({ ball, size = 'lg' }: BallDisplayProps) {
@@ -27,14 +27,14 @@ export function BallDisplay({ ball, size = 'lg' }: BallDisplayProps) {
     return (
       <div
         className={`
-          ${sizeStyles[size]}
-          rounded-full flex items-center justify-center
-          bg-muted/30 border-4 border-dashed border-muted
-          font-bold
+          ${sizeClasses[size]}
+          bingo-ball
+          bg-surface-elevated border-4 border-dashed border-border
+          flex items-center justify-center
         `}
         aria-label="No ball called yet"
       >
-        <span className="text-muted-foreground">?</span>
+        <span className="text-foreground-muted font-bold relative z-10">?</span>
       </div>
     );
   }
@@ -42,19 +42,23 @@ export function BallDisplay({ ball, size = 'lg' }: BallDisplayProps) {
   return (
     <div
       className={`
-        ${sizeStyles[size]}
-        ${columnColors[ball.column]}
-        rounded-full flex items-center justify-center
-        font-bold shadow-lg
-        transition-transform duration-200
-        animate-in zoom-in-50 duration-300 motion-reduce:animate-none
+        ${sizeClasses[size]}
+        bingo-ball
+        ball-enter-animation
       `}
-      role="img"
+      data-column={ball.column}
+      role="status"
       aria-label={`Ball ${ball.label}`}
       data-testid={`ball-display-${ball.label}`}
     >
-      <span className="flex flex-col items-center leading-none">
-        <span className="text-[0.4em] font-semibold">{ball.column}</span>
+      <span className="ball-content">
+        {/* Column letter hidden on sm (A-02: decorative at small sizes) */}
+        <span
+          className={`ball-column-letter ${columnFontSizes[ball.column]} font-semibold`}
+          aria-hidden="true"
+        >
+          {ball.column}
+        </span>
         <span>{ball.number}</span>
       </span>
     </div>
@@ -71,7 +75,7 @@ export function RecentBalls({ balls, maxDisplay = 5 }: RecentBallsProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-lg font-semibold text-muted-foreground">Recent Calls</h3>
+      <h3 className="text-lg font-semibold text-foreground-secondary">Recent Calls</h3>
       <div className="flex gap-2 flex-wrap">
         {displayBalls.length === 0 ? (
           <p className="text-muted-foreground text-base">No balls called yet</p>
@@ -98,13 +102,13 @@ export function BallCounter({ called, remaining }: BallCounterProps) {
   return (
     <div className="flex gap-6 text-center">
       <div className="flex flex-col">
-        <span className="text-3xl font-bold tabular-nums" data-testid="balls-called-count">{called}</span>
-        <span className="text-base text-muted-foreground">Called</span>
+        <span className="text-3xl font-bold tabular-nums text-foreground" data-testid="balls-called-count">{called}</span>
+        <span className="text-base text-foreground-secondary">Called</span>
       </div>
       <div className="w-px bg-border" />
       <div className="flex flex-col">
-        <span className="text-3xl font-bold tabular-nums" data-testid="balls-remaining-count">{remaining}</span>
-        <span className="text-base text-muted-foreground">Remaining</span>
+        <span className="text-3xl font-bold tabular-nums text-foreground" data-testid="balls-remaining-count">{remaining}</span>
+        <span className="text-base text-foreground-secondary">Remaining</span>
       </div>
     </div>
   );

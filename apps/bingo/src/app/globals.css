@@ -1,141 +1,323 @@
-@import "tailwindcss";
+@import "@joolie-boolie/theme/globals.css";
 
-/* Accessible high contrast color palette */
+/* ================================================================
+   BINGO APP TOKEN OVERRIDES
+   Cool blue-tinted background for bingo hall atmosphere.
+   Bingo-specific tokens prefixed --bingo-* (Resolution C21).
+   ================================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
+  /* Override shared background with cool blue-tinted bingo hall atmosphere */
+  --background: #0a0e1a;
 
-  /* Primary: Deep blue for good visibility */
-  --primary: #1e40af;
-  --primary-foreground: #ffffff;
+  /* Bingo-specific background glow */
+  --bingo-bg-glow: #0d1225;
 
-  /* Secondary: Slate gray */
-  --secondary: #475569;
-  --secondary-foreground: #ffffff;
+  /* Muted text corrected for bingo context — Issue A-05, 3.5:1 on #0a0e1a */
+  --bingo-text-muted: #6B7189;
 
-  /* Accent: Emerald green for success/highlights */
-  --accent: #059669;
-  --accent-foreground: #ffffff;
+  /* ----------------------------------------------------------------
+     Ball glow tokens — derived from corrected ball colors (Part 1 §1.11)
+  ---------------------------------------------------------------- */
+  --bingo-ball-b-glow:         rgba(59, 130, 246, 0.35);
+  --bingo-ball-i-glow:         rgba(239, 68, 68, 0.35);
+  --bingo-ball-n-glow:         rgba(232, 230, 235, 0.20);
+  --bingo-ball-g-glow:         rgba(34, 197, 94, 0.35);
+  --bingo-ball-o-glow:         rgba(245, 158, 11, 0.35);
+  --bingo-ball-b-glow-intense: rgba(59, 130, 246, 0.55);
+  --bingo-ball-i-glow-intense: rgba(239, 68, 68, 0.55);
+  --bingo-ball-n-glow-intense: rgba(232, 230, 235, 0.35);
+  --bingo-ball-g-glow-intense: rgba(34, 197, 94, 0.55);
+  --bingo-ball-o-glow-intense: rgba(245, 158, 11, 0.55);
 
-  /* Bingo ball colors - high contrast versions */
-  --ball-b: #1e40af; /* Blue */
-  --ball-i: #dc2626; /* Red */
-  --ball-n: #ffffff; /* White with dark text */
-  --ball-g: #059669; /* Green */
-  --ball-o: #d97706; /* Orange/Amber */
+  /* ----------------------------------------------------------------
+     Board cell highlight tokens — column-colored called cells
+  ---------------------------------------------------------------- */
+  --bingo-cell-b-bg:   rgba(59, 130, 246, 0.18);
+  --bingo-cell-b-text: #60a5fa;
+  --bingo-cell-i-bg:   rgba(239, 68, 68, 0.18);
+  --bingo-cell-i-text: #f87171;
+  --bingo-cell-n-bg:   rgba(232, 230, 235, 0.12);
+  --bingo-cell-n-text: #e8e6eb;
+  --bingo-cell-g-bg:   rgba(34, 197, 94, 0.18);
+  --bingo-cell-g-text: #34d399;
+  --bingo-cell-o-bg:   rgba(245, 158, 11, 0.18);
+  --bingo-cell-o-text: #fbbf24;
 
-  /* Feedback colors */
-  --success: #16a34a;
-  --warning: #854d0e;
-  --error: #dc2626;
-
-  /* Borders and muted elements */
-  --border: #d1d5db;
-  --muted: #6b7280;
-  --muted-foreground: #4b5563;
+  /* Bingo-specific ball bounce easing */
+  --bingo-ease-ball-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Dark mode system pref — re-apply bingo background override */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-
-    --primary: #3b82f6;
-    --primary-foreground: #ffffff;
-
-    --secondary: #64748b;
-    --secondary-foreground: #ffffff;
-
-    --accent: #10b981;
-    --accent-foreground: #ffffff;
-
-    --border: #334155;
-    --muted: #94a3b8;
-    --muted-foreground: #cbd5e1;
+  :root:not(.light) {
+    --background: #0a0e1a;
+    --bingo-bg-glow: #0d1225;
   }
 }
 
-/* Class-based dark mode */
+/* Explicit dark class re-applies bingo override */
 :root.dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-
-  --secondary: #64748b;
-  --secondary-foreground: #ffffff;
-
-  --accent: #10b981;
-  --accent-foreground: #ffffff;
-
-  --border: #334155;
-  --muted: #94a3b8;
-  --muted-foreground: #cbd5e1;
+  --background: #0a0e1a;
+  --bingo-bg-glow: #0d1225;
 }
 
-@theme inline {
-  /* Colors */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
+/* ================================================================
+   3D GRADIENT BALL STYLES
+   Ball colors: B=#3B82F6, I=#EF4444, N=#E8E6EB, G=#22C55E, O=#F59E0B
+   Corrected per Part 1 §1.11 and FINAL-DESIGN-PLAN.md Part 5.
+   ================================================================ */
 
-  /* Bingo ball colors */
-  --color-ball-b: var(--ball-b);
-  --color-ball-i: var(--ball-i);
-  --color-ball-n: var(--ball-n);
-  --color-ball-g: var(--ball-g);
-  --color-ball-o: var(--ball-o);
-
-  /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  /* Accessible font sizes (minimum 18px for body text) */
-  --text-base: 1.125rem;       /* 18px - new base */
-  --text-lg: 1.25rem;          /* 20px */
-  --text-xl: 1.5rem;           /* 24px */
-  --text-2xl: 1.875rem;        /* 30px */
-  --text-3xl: 2.25rem;         /* 36px */
-  --text-4xl: 3rem;            /* 48px */
-  --text-5xl: 3.75rem;         /* 60px - for large ball display */
-  --text-6xl: 4.5rem;          /* 72px - for audience display */
-  --text-7xl: 6rem;            /* 96px - for main ball number */
-  --text-8xl: 8rem;            /* 128px - for projected display */
-
-  /* Touch target sizes (minimum 44px for accessibility) */
-  --size-touch: 2.75rem;       /* 44px minimum touch target */
-  --size-touch-lg: 3.5rem;     /* 56px large touch target */
-  --size-touch-xl: 4rem;       /* 64px extra large touch target */
-
-  /* Bingo-specific sizes */
-  --size-ball-sm: 3rem;        /* 48px small ball */
-  --size-ball-md: 4rem;        /* 64px medium ball */
-  --size-ball-lg: 6rem;        /* 96px large ball */
-  --size-ball-xl: 10rem;       /* 160px extra large ball for display */
-
-  /* Spacing scale */
-  --spacing-touch: 2.75rem;    /* 44px - for touch target spacing */
+/* Base ball shape */
+.bingo-ball {
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
+  overflow: visible;
+  /* 3D depth via inner shadow */
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* Base styles */
+/* White horizontal stripe — ::after pseudo-element */
+.bingo-ball::after {
+  content: '';
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28%;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 9999px;
+  /* Perspective curve on stripe */
+  clip-path: ellipse(50% 50% at 50% 50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Number sits above stripe */
+.bingo-ball .ball-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+/* ----------------------------------------------------------------
+   Column color data attributes — data-column="B|I|N|G|O"
+---------------------------------------------------------------- */
+
+.bingo-ball[data-column="B"] {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.45) 0%, transparent 55%),
+    radial-gradient(circle at 65% 70%, rgba(0,0,0,0.15) 0%, transparent 50%),
+    #3B82F6;
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    0 4px 24px rgba(59, 130, 246, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  color: #FFFFFF;
+}
+
+.bingo-ball[data-column="I"] {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.45) 0%, transparent 55%),
+    radial-gradient(circle at 65% 70%, rgba(0,0,0,0.15) 0%, transparent 50%),
+    #EF4444;
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    0 4px 24px rgba(239, 68, 68, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  color: #FFFFFF;
+}
+
+/* N column — silver ball with dark text (#1A1720 per Part 1 §1.11) */
+.bingo-ball[data-column="N"] {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.65) 0%, transparent 55%),
+    radial-gradient(circle at 65% 70%, rgba(0,0,0,0.10) 0%, transparent 50%),
+    #E8E6EB;
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.20),
+    inset 0 2px 6px rgba(255, 255, 255, 0.60),
+    0 4px 24px rgba(232, 230, 235, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  /* Dark text on silver — CORRECTED from #1a1a2e per Part 1 §1.11 */
+  color: #1A1720;
+}
+
+/* N stripe is darker for contrast on silver ball */
+.bingo-ball[data-column="N"]::after {
+  background: rgba(26, 23, 32, 0.12);
+}
+
+.bingo-ball[data-column="G"] {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.45) 0%, transparent 55%),
+    radial-gradient(circle at 65% 70%, rgba(0,0,0,0.15) 0%, transparent 50%),
+    #22C55E;
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    0 4px 24px rgba(34, 197, 94, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  color: #052E16;
+}
+
+.bingo-ball[data-column="O"] {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.45) 0%, transparent 55%),
+    radial-gradient(circle at 65% 70%, rgba(0,0,0,0.15) 0%, transparent 50%),
+    #F59E0B;
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    0 4px 24px rgba(245, 158, 11, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  color: #422006;
+}
+
+/* ----------------------------------------------------------------
+   Size variants
+   sm=44px, md=64px, lg=120px, xl=160px, hero=responsive 320-400px
+---------------------------------------------------------------- */
+
+.bingo-ball-sm {
+  width: 44px;
+  height: 44px;
+  font-size: 1.125rem;  /* 18px */
+}
+
+.bingo-ball-sm::after {
+  height: 24%;
+}
+
+.bingo-ball-md {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;  /* 24px */
+}
+
+.bingo-ball-lg {
+  width: 120px;
+  height: 120px;
+  font-size: 2.25rem;  /* 36px */
+}
+
+.bingo-ball-xl {
+  width: 160px;
+  height: 160px;
+  font-size: 3.75rem;  /* 60px */
+}
+
+/* Hero ball: 320px on mobile, 400px on desktop (md breakpoint) */
+.bingo-ball-hero {
+  width: 320px;
+  height: 320px;
+  font-size: 6rem;  /* 96px */
+}
+
+@media (min-width: 768px) {
+  .bingo-ball-hero {
+    width: 400px;
+    height: 400px;
+    font-size: 8rem;  /* 128px */
+  }
+}
+
+/* sm ball letter aria-hidden (A-02: letter is decorative at small sizes) */
+.bingo-ball-sm .ball-column-letter {
+  display: none;
+}
+
+/* ----------------------------------------------------------------
+   Ball entrance animation — CSS @keyframes
+---------------------------------------------------------------- */
+
+@keyframes ball-enter {
+  0% {
+    transform: scale(0) rotateY(180deg);
+    filter: blur(8px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08) rotateY(10deg);
+    filter: blur(1px);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.97) rotateY(-5deg);
+    filter: blur(0);
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+.ball-enter-animation {
+  animation: ball-enter var(--spring-bouncy-time, 500ms) var(--bingo-ease-ball-bounce) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ball-enter-animation {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------
+   Board cell highlight animation
+---------------------------------------------------------------- */
+
+@keyframes cell-highlight {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  70%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.cell-highlight-animation {
+  animation: cell-highlight var(--duration-moderate, 400ms) var(--ease-overshoot) forwards;
+}
+
+/* Audience board flash — larger scale */
+@keyframes cell-flash-audience {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.cell-flash-audience-animation {
+  animation: cell-flash-audience var(--duration-slow, 600ms) var(--ease-overshoot) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell-highlight-animation,
+  .cell-flash-audience-animation {
+    animation: none;
+  }
+}
+
+/* ================================================================
+   BASE OVERRIDES
+   ================================================================ */
+
+/* Override shared base body with bingo-specific background */
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
-  font-size: var(--text-base);
-  line-height: 1.6;
 }
 
 /* Focus styles for accessibility */
@@ -154,17 +336,10 @@ textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
-  box-shadow: 0 0 0 6px rgba(30, 64, 175, 0.2);
+  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
 }
 
-/* Large click targets for interactive elements */
-button,
-[role="button"] {
-  min-height: var(--size-touch);
-  min-width: var(--size-touch);
-}
-
-/* Screen reader only utility (matches Tailwind's sr-only) */
+/* Screen reader only utility */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -177,27 +352,6 @@ button,
   border-width: 0;
 }
 
-/* Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  /* Allow essential transitions at reduced speed */
-  .motion-reduce\:transition-none {
-    transition: none !important;
-  }
-
-  .motion-reduce\:animate-none {
-    animation: none !important;
-  }
-}
-
 /* Ensure links in skip navigation are visible when focused */
 .skip-link:focus {
   clip: auto;
@@ -205,18 +359,4 @@ button,
   width: auto;
   height: auto;
   margin: 0;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  :root {
-    --border: #000000;
-    --muted: #4b5563;
-    --muted-foreground: #1f2937;
-  }
-
-  *:focus-visible {
-    outline-width: 4px;
-    outline-offset: 4px;
-  }
 }

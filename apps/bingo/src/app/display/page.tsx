@@ -10,7 +10,8 @@ import { isValidSessionId } from '@/lib/sync/session';
 import { isValidRoomCode } from '@joolie-boolie/sync';
 import { RoomCodeDisplay } from '@joolie-boolie/ui';
 import {
-  LargeCurrentBall,
+  BallReveal,
+  GlowBackdrop,
   AudienceBingoBoard,
   PatternDisplay,
   BallsCalledCounter,
@@ -29,13 +30,12 @@ const displayShortcuts = [
 
 /**
  * Invalid Session Error Component
- * Displayed when the session ID or room code is missing or invalid.
  */
 function InvalidSessionError() {
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center p-8" role="main">
       <div className="max-w-lg text-center space-y-6" role="alert">
-        <div className="w-24 h-24 mx-auto rounded-full bg-error/20 flex items-center justify-center" aria-hidden="true">
+        <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)' }} aria-hidden="true">
           <svg
             className="w-12 h-12 text-error"
             fill="none"
@@ -54,10 +54,10 @@ function InvalidSessionError() {
         <h1 className="text-3xl md:text-4xl font-bold text-foreground">
           Invalid Session
         </h1>
-        <p className="text-xl text-muted-foreground">
+        <p className="text-xl text-foreground-secondary">
           This display link is invalid or has expired.
         </p>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-lg text-foreground-secondary">
           Please use the &quot;Open Display&quot; button from the presenter window to open a valid display.
         </p>
       </div>
@@ -77,10 +77,11 @@ function DisplayLoading() {
       aria-label="Loading audience display"
     >
       <div
-        className="w-32 h-32 rounded-full border-8 border-muted/30 border-t-primary animate-spin motion-reduce:animate-none"
+        className="w-32 h-32 rounded-full border-8 border-t-primary animate-spin motion-reduce:animate-none"
+        style={{ borderColor: 'rgba(59, 130, 246, 0.20)', borderTopColor: 'var(--primary)' }}
         aria-hidden="true"
       />
-      <p className="mt-6 text-2xl text-muted-foreground" role="status" aria-live="polite">
+      <p className="mt-6 text-2xl text-foreground-secondary" role="status" aria-live="polite">
         Loading display...
       </p>
     </main>
@@ -92,43 +93,33 @@ function DisplayLoading() {
  * Inner component that uses useSearchParams (requires Suspense boundary).
  */
 function DisplayContent() {
-  // Parse room code or session ID from URL
   const searchParams = useSearchParams();
   const roomCode = searchParams.get('room');
-  const offlineSessionId = searchParams.get('offline'); // offline mode session ID
-  const sessionId = searchParams.get('session'); // backward compatibility
+  const offlineSessionId = searchParams.get('offline');
+  const sessionId = searchParams.get('session');
 
-  // Validate room code first (preferred for online mode)
   if (roomCode) {
-    if (!isValidRoomCode(roomCode)) {
-      return <InvalidSessionError />;
-    }
+    if (!isValidRoomCode(roomCode)) return <InvalidSessionError />;
     return <AudienceDisplay roomCode={roomCode} />;
   }
 
-  // Check for offline session ID
   if (offlineSessionId) {
-    if (!isValidSessionId(offlineSessionId)) {
-      return <InvalidSessionError />;
-    }
+    if (!isValidSessionId(offlineSessionId)) return <InvalidSessionError />;
     return <AudienceDisplay sessionId={offlineSessionId} />;
   }
 
-  // Fall back to session ID for backward compatibility
   if (sessionId) {
-    if (!isValidSessionId(sessionId)) {
-      return <InvalidSessionError />;
-    }
+    if (!isValidSessionId(sessionId)) return <InvalidSessionError />;
     return <AudienceDisplay sessionId={sessionId} />;
   }
 
-  // No room code or session ID provided
   return <InvalidSessionError />;
 }
 
 /**
  * Audience Display Component
- * Renders the game display once we have a valid session or room code.
+ * Center-dominant layout: 60% ball theater, 25% board, 15% pattern/counter.
+ * Optimized for projector/large TV, readable from 10-30 feet.
  */
 function AudienceDisplay({
   roomCode,
@@ -137,7 +128,6 @@ function AudienceDisplay({
   roomCode?: string;
   sessionId?: string;
 }) {
-  // State for database polling
   const [dbSessionId, setDbSessionId] = useState<string | null>(sessionId || null);
   const [dbError, setDbError] = useState<string | null>(null);
   const [isResolvingRoomCode, setIsResolvingRoomCode] = useState(false);
@@ -159,7 +149,6 @@ function AudienceDisplay({
         const response = await fetch(`/api/sessions/room/${roomCode}`);
 
         if (!response.ok) {
-          // Graceful failure - don't set error on 404, just keep polling
           if (response.status !== 404) {
             console.warn(`Failed to fetch session for room ${roomCode}:`, response.statusText);
           }
@@ -173,18 +162,15 @@ function AudienceDisplay({
           setIsResolvingRoomCode(false);
         }
       } catch (error) {
-        // Graceful failure - log but don't show error to user
         console.warn('Error fetching session ID:', error);
         setIsResolvingRoomCode(false);
       } finally {
-        // Schedule next poll - stop after session ID is resolved
         if (isMounted && !dbSessionId) {
           timeoutId = setTimeout(fetchSessionId, 5000);
         }
       }
     };
 
-    // Start polling
     fetchSessionId();
 
     return () => {
@@ -193,62 +179,46 @@ function AudienceDisplay({
     };
   }, [roomCode, dbSessionId]);
 
-  // Determine which session ID to use for BroadcastChannel sync
-  // CRITICAL FIX (BEA-413): Must match the presenter's sessionId calculation
-  //
-  // Presenter logic (apps/bingo/src/app/play/page.tsx:69):
-  //   const sessionId = roomCode || offlineSessionId || '';
-  //
-  // Display MUST use the same priority order to ensure channel name matches:
-  // 1. Online mode (room code): Use room code directly (NOT the DB-resolved UUID)
-  // 2. Offline mode: Use the offline session ID from URL
-  // 3. Legacy: Fallback to sessionId param (backward compatibility)
+  // CRITICAL: Match presenter's sessionId calculation
   const effectiveSessionId = roomCode || sessionId || '';
 
-  // Initialize sync as audience role with session-scoped channel
   const { isConnected, connectionError, requestSync } = useSync({
     role: 'audience',
     sessionId: effectiveSessionId,
   });
 
-  // Fullscreen support
   const { isFullscreen, toggleFullscreen } = useFullscreen();
-
-  // Help modal state
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = useCallback(() => setShowHelp((prev) => !prev), []);
   const closeHelp = useCallback(() => setShowHelp(false), []);
 
-  // Apply display theme
   const displayTheme = useThemeStore((state) => state.displayTheme);
   useApplyTheme(displayTheme);
 
-  // Get game state from store (hydrated by sync)
   const currentBall = useGameStore((state) => state.currentBall);
   const calledBalls = useGameStore((state) => state.calledBalls);
   const pattern = useGameStore((state) => state.pattern);
   const status = useGameStore((state) => state.status);
+  const autoCallEnabled = useGameStore((state) => state.autoCallEnabled);
+  const autoCallSpeed = useGameStore((state) => state.autoCallSpeed);
   const { ballsCalled, ballsRemaining } = useGameSelectors();
 
-  // Get sync status
   const lastSyncTimestamp = useSyncStore((state) => state.lastSyncTimestamp);
 
-  // Request sync on visibility change (when user switches back to this tab)
+  // Request sync on visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         requestSync();
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [requestSync]);
 
-  // Keyboard shortcuts for display page (F=fullscreen, ?=help)
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if user is typing in an input
       if (
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement
@@ -256,17 +226,13 @@ function AudienceDisplay({
         return;
       }
 
-      // Handle help modal toggle with ? key
       if (event.key === '?') {
         event.preventDefault();
         toggleHelp();
         return;
       }
 
-      // Don't process other shortcuts when help modal is open
-      if (showHelp) {
-        return;
-      }
+      if (showHelp) return;
 
       switch (event.code) {
         case 'KeyF':
@@ -279,90 +245,80 @@ function AudienceDisplay({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleFullscreen, showHelp, toggleHelp]);
 
-  // Format last sync time
   const lastSyncFormatted = lastSyncTimestamp
     ? new Date(lastSyncTimestamp).toLocaleTimeString()
     : 'Never';
 
+  const hasContent = isConnected || (currentBall !== null) || calledBalls.length > 0;
+
   return (
     <>
-      {/* Skip link for keyboard navigation */}
+      {/* Skip link */}
       <a
         href="#main-display"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/50"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:outline-none"
       >
         Skip to main display
       </a>
-    <main className="min-h-screen bg-background flex flex-col" role="main">
-      {/* Header with sync status */}
-      <header className="bg-muted/10 border-b border-border px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+
+      <main className="min-h-screen bg-background flex flex-col" role="main">
+
+        {/* Minimal status bar header */}
+        <header
+          className="px-4 py-2 flex items-center justify-between"
+          style={{
+            borderBottom: '1px solid var(--border-subtle)',
+            backdropFilter: 'blur(12px)',
+            background: 'rgba(10, 14, 26, 0.85)',
+          }}
+        >
+          {/* Left: title + room code */}
+          <div className="flex items-center gap-4">
+            <h1
+              className="text-xl font-bold text-foreground"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
               Bingo
             </h1>
-            <p className="text-lg text-muted-foreground">Audience Display</p>
+            {roomCode && (
+              <span className="text-sm font-mono text-foreground-secondary">
+                Room: <span className="text-foreground font-semibold">{roomCode}</span>
+              </span>
+            )}
           </div>
 
-          {/* Status indicators and controls */}
-          <div className="flex items-center gap-4">
-            {/* Fullscreen indicator */}
-            {isFullscreen && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-lg">
-                <svg
-                  className="w-4 h-4 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                  />
-                </svg>
-                <span className="text-base text-primary font-medium hidden sm:inline">Fullscreen</span>
-              </div>
+          {/* Right: controls + status */}
+          <div className="flex items-center gap-3">
+            {/* Game status */}
+            {status !== 'idle' && (
+              <span
+                className="text-sm font-medium px-2 py-0.5 rounded"
+                style={{
+                  backgroundColor: status === 'playing' ? 'rgba(34, 197, 94, 0.15)' : status === 'paused' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                  color: status === 'playing' ? 'var(--success)' : status === 'paused' ? 'var(--warning)' : 'var(--error)',
+                }}
+              >
+                {status === 'playing' && 'Live'}
+                {status === 'paused' && 'Paused'}
+                {status === 'ended' && 'Ended'}
+              </span>
             )}
 
-            {/* Fullscreen toggle button */}
+            {/* Fullscreen button — 44px minimum (A-11) */}
             <button
               onClick={toggleFullscreen}
-              className="min-w-[var(--size-touch)] min-h-[var(--size-touch)] p-2 rounded-lg hover:bg-muted/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className="rounded-lg hover:bg-surface-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}
               title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
-              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              aria-label={isFullscreen ? 'Exit fullscreen (press F)' : 'Enter fullscreen (press F)'}
             >
               {isFullscreen ? (
-                <svg
-                  className="w-5 h-5 text-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"
-                  />
+                <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
                 </svg>
               ) : (
-                <svg
-                  className="w-5 h-5 text-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-                  />
+                <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                 </svg>
               )}
             </button>
@@ -370,64 +326,51 @@ function AudienceDisplay({
             {/* Help button */}
             <button
               onClick={toggleHelp}
-              className="p-2 rounded-lg hover:bg-muted/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className="p-2 rounded-lg hover:bg-surface-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              style={{ minWidth: '44px', minHeight: '44px' }}
               title="Keyboard shortcuts (?)"
               aria-label="Show keyboard shortcuts"
             >
-              <svg
-                className="w-5 h-5 text-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
 
             {/* Connection status */}
             <div
-              className="flex items-center gap-3"
+              className="flex items-center gap-2"
               role="status"
               aria-live="polite"
               aria-label={isConnected ? `Connected to presenter, synced at ${lastSyncFormatted}` : 'Waiting for presenter'}
             >
               <div
-                className={`
-                  w-4 h-4 rounded-full
-                  motion-reduce:animate-none
-                  ${isConnected ? 'bg-success animate-pulse' : 'bg-error'}
-                `}
+                className={`w-3 h-3 rounded-full motion-reduce:animate-none ${isConnected ? 'bg-success animate-pulse' : 'bg-error'}`}
                 aria-hidden="true"
               />
-              <span className="text-base text-muted-foreground hidden md:block">
-                {isConnected ? `Synced at ${lastSyncFormatted}` : 'Waiting for presenter...'}
+              <span className="text-sm text-foreground-secondary hidden md:block">
+                {isConnected ? `Synced ${lastSyncFormatted}` : 'Waiting...'}
               </span>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Error display */}
-      {(connectionError || dbError) && (
-        <div className="bg-error/10 border-b border-error px-4 py-3" role="alert">
-          <p className="text-center text-error font-medium">
+        {/* Error banner */}
+        {(connectionError || dbError) && (
+          <div
+            className="px-4 py-3 text-center font-medium"
+            role="alert"
+            style={{ backgroundColor: 'rgba(239, 68, 68, 0.10)', borderBottom: '1px solid var(--error)', color: 'var(--error)' }}
+          >
             {connectionError ? `Connection Error: ${connectionError}` : `Database Error: ${dbError}`}
-          </p>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Main content */}
-      <div id="main-display" className="flex-1 p-4 md:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto h-full">
+        {/* Main display content */}
+        <div id="main-display" className="flex-1 flex flex-col" aria-label="Audience display">
+
           {/* Room Code Display - only shown when using room code */}
-          {roomCode && (
-            <div className="mb-6">
+          {roomCode && !hasContent && (
+            <div className="p-4">
               <RoomCodeDisplay
                 roomCode={roomCode}
                 showSyncStatus={false}
@@ -435,54 +378,49 @@ function AudienceDisplay({
               />
             </div>
           )}
+
           {/* Waiting state */}
-          {!isConnected && !currentBall && (
+          {!hasContent && (
             <div
-              className="flex flex-col items-center justify-center h-full gap-6 text-center"
+              className="flex-1 flex flex-col items-center justify-center gap-8 text-center p-8"
               role="status"
               aria-live="polite"
             >
               <div
-                className="w-32 h-32 rounded-full border-8 border-muted/30 border-t-primary animate-spin motion-reduce:animate-none"
+                className="w-32 h-32 rounded-full border-8 animate-spin motion-reduce:animate-none"
+                style={{ borderColor: 'rgba(59, 130, 246, 0.20)', borderTopColor: 'var(--primary)' }}
                 aria-hidden="true"
               />
-              <p className="text-3xl md:text-4xl text-muted-foreground">
-                {isResolvingRoomCode ? 'Connecting to room...' : 'Waiting for presenter...'}
+              <p className="text-4xl md:text-5xl text-foreground-secondary font-semibold" style={{ fontFamily: 'var(--font-display)' }}>
+                {isResolvingRoomCode ? 'Connecting...' : 'Waiting for presenter'}
               </p>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-2xl text-foreground-muted">
                 {isResolvingRoomCode
                   ? 'Establishing connection with the game session.'
-                  : 'Open the presenter view in another window to start the game.'}
+                  : 'Open the presenter view to start the game.'}
               </p>
             </div>
           )}
 
-          {/* Game display - responsive grid layout */}
-          {(isConnected || currentBall || calledBalls.length > 0) && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-              {/* Left section: Bingo Board */}
-              <section className="lg:col-span-5 xl:col-span-4" aria-label="Bingo board">
-                <div className="bg-background border border-border rounded-xl p-4 shadow-sm" data-testid="called-numbers-board">
-                  <h2 className="text-xl md:text-2xl font-semibold mb-4 text-center">
-                    Called Numbers
-                  </h2>
-                  <AudienceBingoBoard calledBalls={calledBalls} />
-                </div>
-              </section>
+          {/* Center-dominant 3-column layout: 60% ball / 25% board / 15% pattern */}
+          {hasContent && (
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 lg:p-6">
 
-              {/* Center section: Current Ball + Counter */}
-              <section className="lg:col-span-4 xl:col-span-5 flex flex-col items-center gap-8" aria-label="Current ball and game status">
-                {/* Game status indicator */}
+              {/* Center: Hero ball theater — 60% width on desktop */}
+              <section
+                className="lg:col-span-7 lg:order-2 flex flex-col items-center justify-center relative"
+                aria-label="Current ball"
+              >
+                {/* Game status */}
                 {status !== 'idle' && (
                   <div
+                    className="mb-6 px-6 py-2 rounded-full text-2xl font-semibold"
                     role="status"
                     aria-live="polite"
-                    className={`
-                      px-6 py-2 rounded-full text-xl font-semibold
-                      ${status === 'playing' ? 'bg-success/20 text-success' : ''}
-                      ${status === 'paused' ? 'bg-warning/20 text-warning' : ''}
-                      ${status === 'ended' ? 'bg-muted/20 text-muted-foreground' : ''}
-                    `}
+                    style={{
+                      backgroundColor: status === 'playing' ? 'rgba(34, 197, 94, 0.15)' : status === 'paused' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(107, 113, 137, 0.15)',
+                      color: status === 'playing' ? 'var(--success)' : status === 'paused' ? 'var(--warning)' : 'var(--foreground-muted)',
+                    }}
                   >
                     {status === 'playing' && 'Game in Progress'}
                     {status === 'paused' && 'Game Paused'}
@@ -490,54 +428,94 @@ function AudienceDisplay({
                   </div>
                 )}
 
-                {/* Current ball - hero display */}
-                <div className="flex flex-col items-center gap-4">
-                  <h2 className="text-2xl md:text-3xl font-semibold text-muted-foreground">
-                    {currentBall ? 'Current Ball' : 'Ready to Start'}
-                  </h2>
-                  <LargeCurrentBall ball={currentBall} />
+                {/* Ball display with ambient glow */}
+                <div className="relative flex items-center justify-center">
+                  {/* GlowBackdrop behind ball */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute pointer-events-none"
+                    style={{
+                      width: '500px',
+                      height: '500px',
+                      left: '50%',
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                  >
+                    <GlowBackdrop
+                      column={currentBall?.column ?? null}
+                      visible={!!currentBall}
+                    />
+                  </div>
+
+                  {/* Spring-animated ball */}
+                  <div className="relative z-10">
+                    <BallReveal
+                      ball={currentBall}
+                      autoCallInterval={autoCallSpeed}
+                      isAutoCall={autoCallEnabled}
+                    />
+                  </div>
                 </div>
 
-                {/* Ball counter */}
-                <BallsCalledCounter called={ballsCalled} remaining={ballsRemaining} />
+                {/* Balls called counter below ball */}
+                <div className="mt-8">
+                  <BallsCalledCounter called={ballsCalled} remaining={ballsRemaining} />
+                </div>
               </section>
 
-              {/* Right section: Pattern Display */}
-              <section className="lg:col-span-3 xl:col-span-3" aria-label="Winning pattern">
-                <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+              {/* Left: Bingo Board — 25% width on desktop */}
+              <section className="lg:col-span-3 lg:order-1" aria-label="Bingo board">
+                <div
+                  className="rounded-xl p-3 h-full"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                >
+                  <h2
+                    className="text-xl font-semibold mb-3 text-center text-foreground-secondary"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Called
+                  </h2>
+                  <AudienceBingoBoard calledBalls={calledBalls} />
+                </div>
+              </section>
+
+              {/* Right: Pattern display — 15% width on desktop */}
+              <section className="lg:col-span-2 lg:order-3" aria-label="Winning pattern">
+                <div
+                  className="rounded-xl p-3 h-full"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                >
                   <PatternDisplay pattern={pattern} />
                 </div>
               </section>
             </div>
           )}
         </div>
-      </div>
+        {/* Footer removed per design plan Part 5 */}
+      </main>
 
-      {/* Footer */}
-      <footer className="bg-muted/10 border-t border-border px-4 py-2">
-        <p className="text-center text-base text-muted-foreground">
-          Keep this window visible on the projector or large display - Press F for fullscreen, ? for help
-        </p>
-      </footer>
-    </main>
-    <KeyboardShortcutsModal
-      isOpen={showHelp}
-      onClose={closeHelp}
-      shortcuts={displayShortcuts}
-    />
+      <KeyboardShortcutsModal
+        isOpen={showHelp}
+        onClose={closeHelp}
+        shortcuts={displayShortcuts}
+      />
     </>
   );
 }
 
 /**
  * Audience Display Page
- *
  * Optimized for projector/large TV display.
+ * Center-dominant layout (60% ball, 25% board, 15% pattern).
  * Syncs state from presenter window via BroadcastChannel.
- * Designed to be readable from the back of the room (30+ feet).
- *
- * Requires a valid session ID in the URL query parameter.
- * Navigate via the "Open Display" button in the presenter view.
+ * Readable from 10-30 feet (Issue A-23: projector readability).
  */
 export default function DisplayPage() {
   return (
