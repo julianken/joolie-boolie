@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useGame } from './use-game';
 import { useFullscreen } from './use-fullscreen';
 import { useGameStore } from '@/stores/game-store';
 import type { AudienceScene } from '@/types/audience-scene';
+import { REVEAL_TIMING } from '@/types/audience-scene';
 
 /**
  * Keyboard shortcut hook for trivia game controls.
@@ -37,11 +38,29 @@ import type { AudienceScene } from '@/types/audience-scene';
  * Help:
  * - ? = Show help modal
  */
+/** Scenes that trigger the POST_REVEAL_LOCK */
+const REVEAL_LOCK_SCENES: ReadonlySet<AudienceScene> = new Set([
+  'answer_reveal',
+  'round_reveal_answer',
+]);
+
+/** Keys blocked during the reveal lock (advancement keys only) */
+const LOCKED_KEY_CODES: ReadonlySet<string> = new Set([
+  'Enter',
+  'ArrowRight',
+  'Space',
+]);
+
 export function useGameKeyboard() {
   const game = useGame();
   const fullscreen = useFullscreen();
   const [peekAnswer, setPeekAnswer] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+
+  // POST_REVEAL_LOCK: prevents premature advancement during reveal animation
+  const isLockedRef = useRef(false);
+  const pendingKeyRef = useRef<string | null>(null);
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Toggle scoreboard visibility
   const toggleScoreboard = useCallback(() => {
@@ -55,6 +74,38 @@ export function useGameKeyboard() {
     useGameStore.setState({ ttsEnabled: !state.ttsEnabled });
   }, []);
 
+  // POST_REVEAL_LOCK: Start lock when entering a reveal scene, clear after POST_REVEAL_LOCK_MS.
+  // Queued keypresses are replayed by dispatching a synthetic keydown event.
+  useEffect(() => {
+    const unsub = useGameStore.subscribe((state, prevState) => {
+      const scene = state.audienceScene;
+      const prevScene = prevState.audienceScene;
+      if (scene !== prevScene && REVEAL_LOCK_SCENES.has(scene)) {
+        // Entering a reveal scene: engage lock
+        isLockedRef.current = true;
+        pendingKeyRef.current = null;
+
+        // Clear any existing timer
+        if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+
+        lockTimerRef.current = setTimeout(() => {
+          isLockedRef.current = false;
+          // Replay queued keypress
+          const pending = pendingKeyRef.current;
+          pendingKeyRef.current = null;
+          if (pending) {
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: pending, bubbles: true }));
+          }
+        }, REVEAL_TIMING.POST_REVEAL_LOCK_MS);
+      }
+    });
+
+    return () => {
+      unsub();
+      if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ignore if user is typing in an input
@@ -62,6 +113,13 @@ export function useGameKeyboard() {
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement
       ) {
+        return;
+      }
+
+      // POST_REVEAL_LOCK: Queue advancement keys during reveal animation
+      if (isLockedRef.current && LOCKED_KEY_CODES.has(event.code)) {
+        event.preventDefault();
+        pendingKeyRef.current = event.code;
         return;
       }
 
