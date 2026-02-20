@@ -40,7 +40,7 @@ const NEXT_ACTION_HINTS: Record<AudienceScene, string> = {
  * Reads audienceScene directly from game store.
  */
 export function NextActionHint() {
-  const audienceScene = useGameStore((state) => state.audienceScene);
+  const audienceScene = useGameStore((state) => state.audienceScene ?? 'waiting');
   const hint = NEXT_ACTION_HINTS[audienceScene];
 
   return (

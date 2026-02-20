@@ -152,7 +152,7 @@ export function RoundSummaryScene() {
               <motion.div
                 key={team.id}
                 role="listitem"
-                aria-label={`${rankLabels[index] ?? `${index + 1}th`} place: ${team.name}, ${team.score} points${delta ? `, +${delta.delta} this round` : ''}`}
+                aria-label={`${rankLabels[index] ?? `${index + 1}th`} place: ${team.name}, ${team.score} points${delta ? `, ${delta.delta > 0 ? '+' : ''}${delta.delta} this round` : ''}`}
                 variants={scoreboardRow}
                 transition={
                   shouldReduceMotion
