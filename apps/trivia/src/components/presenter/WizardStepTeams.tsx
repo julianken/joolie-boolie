@@ -17,7 +17,6 @@ export interface WizardStepTeamsProps {
   canStart: boolean;
   questionCount: number;
   roundsCount: number;
-  questionsPerRound?: number;
   lastTeamSetup: TeamSetup | null;
   onAddTeam: (name?: string) => void;
   onRemoveTeam: (teamId: string) => void;
@@ -43,7 +42,6 @@ export function WizardStepTeams({
   canStart,
   questionCount,
   roundsCount,
-  questionsPerRound: _questionsPerRound,
   lastTeamSetup,
   onAddTeam,
   onRemoveTeam,

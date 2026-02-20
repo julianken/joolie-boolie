@@ -13,8 +13,7 @@ import { QuestionImporter } from '@/components/presenter/QuestionImporter';
 import { QuestionSetSelector } from '@/components/presenter/QuestionSetSelector';
 import { TriviaApiImporter } from '@/components/presenter/TriviaApiImporter';
 import { CategoryFilterCompact } from '@/components/presenter/CategoryFilter';
-import type { QuestionCategory } from '@/types';
-import type { Question } from '@/types';
+import type { QuestionCategory, Question } from '@/types';
 
 export interface WizardStepQuestionsProps {
   questions: Question[];

@@ -11,7 +11,6 @@
 import { PresetSelector } from '@/components/presenter/PresetSelector';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
 import type { TeamSetup, SettingsState } from '@/stores/settings-store';
-import { useGameStore } from '@/stores/game-store';
 import type { Team } from '@/types';
 
 export interface WizardStepSettingsProps {
@@ -47,7 +46,6 @@ export function WizardStepSettings({
 }: WizardStepSettingsProps) {
   const handleRevealModeChange = (mode: 'instant' | 'batch') => {
     onUpdateSetting('revealMode', mode);
-    useGameStore.getState().updateRevealMode(mode);
   };
 
   return (
@@ -137,6 +135,7 @@ export function WizardStepSettings({
 
       {/* Save Settings as Preset */}
       <button
+        type="button"
         onClick={onSavePreset}
         className="w-full px-4 py-3 rounded-xl text-sm font-medium
           bg-primary hover:bg-primary-hover text-primary-foreground

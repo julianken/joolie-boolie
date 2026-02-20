@@ -24,8 +24,7 @@ import { WizardStepQuestions } from '@/components/presenter/WizardStepQuestions'
 import { WizardStepSettings } from '@/components/presenter/WizardStepSettings';
 import { WizardStepTeams } from '@/components/presenter/WizardStepTeams';
 import type { TeamSetup, SettingsState } from '@/stores/settings-store';
-import type { Team, Question } from '@/types';
-import type { QuestionCategory } from '@/types';
+import type { Team, Question, QuestionCategory } from '@/types';
 
 export interface SetupWizardProps {
   // Questions
@@ -199,7 +198,6 @@ export function SetupWizard({
                 canStart={canStart}
                 questionCount={questions.length}
                 roundsCount={roundsCount}
-                questionsPerRound={questionsPerRound}
                 lastTeamSetup={lastTeamSetup}
                 onAddTeam={onAddTeam}
                 onRemoveTeam={onRemoveTeam}

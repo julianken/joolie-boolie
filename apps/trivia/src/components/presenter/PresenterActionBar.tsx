@@ -58,6 +58,7 @@ export function PresenterActionBar({
         {/* Last question of round */}
         {status === 'playing' && isLastQuestionOfRound && (
           <button
+            type="button"
             onClick={onCompleteRound}
             className="px-4 py-2 rounded-lg text-sm font-semibold
               bg-warning/20 hover:bg-warning/30 text-warning
@@ -71,6 +72,7 @@ export function PresenterActionBar({
         {status === 'between_rounds' && (
           <>
             <button
+              type="button"
               onClick={onShowSummary}
               className="px-4 py-2 rounded-lg text-sm font-medium
                 bg-surface-elevated hover:bg-surface-hover text-foreground
@@ -79,6 +81,7 @@ export function PresenterActionBar({
               Show Summary
             </button>
             <button
+              type="button"
               onClick={onNextRound}
               className="px-4 py-2 rounded-lg text-sm font-semibold
                 bg-success hover:bg-success/90 text-success-foreground
@@ -94,6 +97,7 @@ export function PresenterActionBar({
           <>
             {emergencyBlank && (
               <button
+                type="button"
                 onClick={onEmergencyPause}
                 className="px-4 py-2 rounded-lg text-sm font-medium
                   bg-error/20 hover:bg-error/30 text-error
@@ -103,6 +107,7 @@ export function PresenterActionBar({
               </button>
             )}
             <button
+              type="button"
               onClick={onResumeGame}
               className="px-4 py-2 rounded-lg text-sm font-semibold
                 bg-success hover:bg-success/90 text-success-foreground
@@ -119,6 +124,7 @@ export function PresenterActionBar({
         {(status === 'playing' || status === 'between_rounds') && (
           <>
             <button
+              type="button"
               onClick={onPauseGame}
               className="px-3 py-2 rounded-lg text-sm font-medium
                 bg-warning/15 hover:bg-warning/25 text-warning
@@ -132,6 +138,7 @@ export function PresenterActionBar({
               Pause
             </button>
             <button
+              type="button"
               onClick={onEmergencyPause}
               className="px-3 py-2 rounded-lg text-sm font-medium
                 bg-error/15 hover:bg-error/25 text-error
