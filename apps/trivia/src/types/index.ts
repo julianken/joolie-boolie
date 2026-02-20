@@ -53,6 +53,29 @@ export {
 } from './guards';
 
 // =============================================================================
+// AUDIENCE SCENE LAYER
+// =============================================================================
+
+export type {
+  AudienceScene,
+  RevealPhase,
+  RevealMode,
+  ScoreDelta,
+  RevealCeremonyQuestion,
+  RevealCeremonyResults,
+} from './audience-scene';
+
+export {
+  SCENE_TIMING,
+  REVEAL_TIMING,
+  BATCH_REVEAL_TIMING,
+  TIMED_SCENES,
+  BATCH_ONLY_SCENES,
+  INSTANT_ONLY_SCENES,
+  VALID_SCENES_BY_STATUS,
+} from './audience-scene';
+
+// =============================================================================
 // CONSTANTS
 // =============================================================================
 
@@ -146,6 +169,18 @@ export interface GameSettings {
   timerAutoStart: boolean;
   timerVisible: boolean;
   ttsEnabled: boolean;
+  /**
+   * How answers are revealed to the audience.
+   *
+   * - 'batch': Default. Pub quiz style -- all answers revealed in the
+   *   round-end ceremony. Builds suspense. Best for groups.
+   * - 'instant': After each question. Educational settings and small groups.
+   *
+   * Changeable between rounds (via updateRevealMode()), not mid-round.
+   * UI: "After each question" (instant) / "At end of round" (batch).
+   * Code values ('instant', 'batch') never appear in UI copy.
+   */
+  revealMode: import('./audience-scene').RevealMode;
 }
 
 // =============================================================================
@@ -165,34 +200,106 @@ export interface TeamAnswer {
 // =============================================================================
 
 export interface TriviaGameState {
-  // Session
+  // -- Session --
   sessionId: string;
   status: GameStatus;
   statusBeforePause: GameStatus | null; // For pause/resume functionality
 
-  // Questions
+  // -- Questions --
   questions: Question[]; // All questions for the game
   selectedQuestionIndex: number; // Which question presenter is viewing (0-based)
   displayQuestionIndex: number | null; // Which question shown on audience (null = none)
 
-  // Rounds
+  // -- Rounds --
   currentRound: number; // 0-based current round index
   totalRounds: number; // Total number of rounds (default 3)
 
-  // Teams
+  // -- Teams --
   teams: Team[]; // Max 20
   teamAnswers: TeamAnswer[]; // All team answers for scoring
 
-  // Timer
+  // -- Timer --
   timer: Timer;
   settings: GameSettings;
 
-  // Display settings
-  showScoreboard: boolean; // Manual toggle
+  // -- Display settings (legacy flags, preserved for compatibility) --
+  showScoreboard: boolean; // Manual toggle (intercepted in batch mode)
   emergencyBlank: boolean; // Emergency pause blanks audience
 
-  // Audio
+  // -- Audio --
   ttsEnabled: boolean; // Off by default
+
+  // =========================================================================
+  // AUDIENCE SCENE LAYER (new -- phase 5)
+  // =========================================================================
+
+  /**
+   * Current audience display scene. Controls what the audience display renders.
+   * Orthogonal to GameStatus -- the engine does not set this directly (except
+   * through scene-setting helpers). Synced via BroadcastChannel STATE_UPDATE.
+   *
+   * Default: 'waiting'. Resets to valid default via deriveSceneFromStatus()
+   * if a GameStatus change invalidates the current scene.
+   */
+  audienceScene: import('./audience-scene').AudienceScene;
+
+  /**
+   * Scene to restore after pause or emergency blank.
+   * Set when transitioning to 'paused' or 'emergency_blank'.
+   * Cleared on resume. null when not in an interruptible state.
+   */
+  sceneBeforePause: import('./audience-scene').AudienceScene | null;
+
+  /**
+   * Epoch milliseconds when audienceScene was last set.
+   * Used by timed scenes on the audience display to compute remaining duration
+   * after a reconnect (REQUEST_SYNC). BroadcastChannel is same-device only,
+   * so clock skew is not a concern.
+   */
+  sceneTimestamp: number;
+
+  /**
+   * Current phase of the 5-beat reveal choreography.
+   * null when no reveal is in progress.
+   *
+   * SYNCED (not presenter-local) so the audience display can render the
+   * settled state on reconnect without replaying the animation.
+   * See RevealPhase in types/audience-scene.ts for beat descriptions.
+   */
+  revealPhase: import('./audience-scene').RevealPhase;
+
+  /**
+   * Score changes for the most recent scoring event.
+   * In instant mode: per-question deltas shown in score_flash.
+   * In batch mode: full-round deltas shown in round_summary.
+   * Cleared when the scene that displays them advances.
+   */
+  scoreDeltas: import('./audience-scene').ScoreDelta[];
+
+  // -- Batch reveal ceremony fields --
+
+  /**
+   * During batch ceremony: which question index (within RevealCeremonyResults)
+   * is currently active. null when no ceremony is in progress.
+   * 0-based index into revealCeremonyResults.questions[].
+   */
+  revealCeremonyQuestionIndex: number | null;
+
+  /**
+   * During batch ceremony: pre-built snapshot of all questions and team results
+   * for the current round. Built once at ceremony start (startRevealCeremony),
+   * rebuilt if presenter corrects a score during ceremony.
+   * null when no ceremony is in progress.
+   * Synced as part of STATE_UPDATE (~5KB for 10Q x 20 teams).
+   */
+  revealCeremonyResults: import('./audience-scene').RevealCeremonyResults | null;
+
+  /**
+   * During batch ceremony: whether the current question's answer has been
+   * revealed to the audience (i.e., round_reveal_answer scene entered for
+   * this index). Used to render settled state on reconnect.
+   */
+  revealCeremonyAnswerShown: boolean;
 }
 
 // =============================================================================

@@ -90,6 +90,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
   const getCurrentState = useCallback((): TriviaGameState => {
     const state = useGameStore.getState();
     return {
+      // -- Existing (unchanged) ---------------------------------------------
       sessionId: state.sessionId,
       status: state.status,
       statusBeforePause: state.statusBeforePause,
@@ -105,6 +106,18 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
       showScoreboard: state.showScoreboard,
       emergencyBlank: state.emergencyBlank,
       ttsEnabled: state.ttsEnabled,
+
+      // -- NEW: Scene fields ------------------------------------------------
+      audienceScene: state.audienceScene,
+      sceneBeforePause: state.sceneBeforePause,
+      sceneTimestamp: state.sceneTimestamp,
+      scoreDeltas: state.scoreDeltas,
+      revealPhase: state.revealPhase,
+
+      // -- NEW: Ceremony fields ---------------------------------------------
+      revealCeremonyQuestionIndex: state.revealCeremonyQuestionIndex,
+      revealCeremonyResults: state.revealCeremonyResults,
+      revealCeremonyAnswerShown: state.revealCeremonyAnswerShown,
     };
   }, []);
 
@@ -262,6 +275,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
       // Broadcast on any state change
       if (state !== prevState) {
         sync.broadcastState({
+          // -- Existing (unchanged) -----------------------------------------
           sessionId: state.sessionId,
           status: state.status,
           statusBeforePause: state.statusBeforePause,
@@ -277,6 +291,18 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
           showScoreboard: state.showScoreboard,
           emergencyBlank: state.emergencyBlank,
           ttsEnabled: state.ttsEnabled,
+
+          // -- NEW: Scene fields --------------------------------------------
+          audienceScene: state.audienceScene,
+          sceneBeforePause: state.sceneBeforePause,
+          sceneTimestamp: state.sceneTimestamp,
+          scoreDeltas: state.scoreDeltas,
+          revealPhase: state.revealPhase,
+
+          // -- NEW: Ceremony fields -----------------------------------------
+          revealCeremonyQuestionIndex: state.revealCeremonyQuestionIndex,
+          revealCeremonyResults: state.revealCeremonyResults,
+          revealCeremonyAnswerShown: state.revealCeremonyAnswerShown,
         });
       }
     });

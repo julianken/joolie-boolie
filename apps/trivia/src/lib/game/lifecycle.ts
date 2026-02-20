@@ -1,4 +1,4 @@
-import type { TriviaGameState, GameSettings } from '@/types';
+import type { TriviaGameState, GameSettings, RevealMode } from '@/types';
 import { DEFAULT_ROUNDS, QUESTIONS_PER_ROUND, DEFAULT_TIMER_DURATION } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { deepFreeze } from './helpers';
@@ -16,6 +16,10 @@ export function createDefaultSettings(): GameSettings {
     timerAutoStart: false,
     timerVisible: true,
     ttsEnabled: false,
+    // New field -- batch is the default (pub quiz is the primary use case).
+    // Existing saved sessions without this field use 'batch' via Zod default
+    // in GameSettingsSchema (serializer.ts). New games get 'batch'.
+    revealMode: 'batch',
   });
 }
 
@@ -41,6 +45,20 @@ export function createInitialState(): TriviaGameState {
     showScoreboard: true,
     emergencyBlank: false,
     ttsEnabled: false,
+
+    // -- Audience Scene Layer --
+    // All new fields from the phase 5 redesign. Default values represent the
+    // pre-game waiting state with no reveal or ceremony in progress.
+    audienceScene: 'waiting',
+    sceneBeforePause: null,
+    sceneTimestamp: 0, // 0 = never set (waiting is the initial state, not timed)
+    revealPhase: null,
+    scoreDeltas: [],
+
+    // -- Batch Reveal Ceremony --
+    revealCeremonyQuestionIndex: null,
+    revealCeremonyResults: null,
+    revealCeremonyAnswerShown: false,
   });
 }
 
@@ -195,6 +213,29 @@ export function updateSettings(
       duration: newSettings.timerDuration,
       remaining: newSettings.timerDuration,
       isRunning: false,
+    },
+  });
+}
+
+/**
+ * Update the reveal mode. Allowed in setup or between_rounds only.
+ *
+ * This is a pure function that returns a new state. The store action wrapper
+ * additionally persists the preference to settings-store for cross-session use.
+ */
+export function updateRevealMode(
+  state: TriviaGameState,
+  mode: RevealMode
+): TriviaGameState {
+  if (state.status !== 'setup' && state.status !== 'between_rounds') {
+    return state;
+  }
+
+  return deepFreeze({
+    ...state,
+    settings: {
+      ...state.settings,
+      revealMode: mode,
     },
   });
 }

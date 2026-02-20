@@ -52,10 +52,20 @@ function createMockState(overrides?: Partial<TriviaGameState>): TriviaGameState 
       timerAutoStart: false,
       timerVisible: true,
       ttsEnabled: false,
+      revealMode: 'batch',
     },
     showScoreboard: false,
     emergencyBlank: false,
     ttsEnabled: false,
+    // Scene / ceremony fields (BEA-568)
+    audienceScene: 'waiting',
+    sceneBeforePause: null,
+    sceneTimestamp: 0,
+    revealPhase: null,
+    scoreDeltas: [],
+    revealCeremonyQuestionIndex: null,
+    revealCeremonyResults: null,
+    revealCeremonyAnswerShown: false,
     ...overrides,
   };
 }

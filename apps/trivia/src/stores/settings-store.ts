@@ -20,6 +20,7 @@ export interface SettingsState {
   timerVisible: boolean; // default true
   timerAutoReveal: boolean; // default true - auto-reveal answer when timer reaches 0
   ttsEnabled: boolean; // default false
+  revealMode: 'instant' | 'batch'; // default 'batch' -- pub quiz style
 
   // Team persistence
   lastTeamSetup: TeamSetup | null;
@@ -49,6 +50,7 @@ export const SETTINGS_DEFAULTS: SettingsState = {
   timerVisible: true,
   timerAutoReveal: true,
   ttsEnabled: false,
+  revealMode: 'batch',  // pub quiz style is the primary use case
   lastTeamSetup: null,
 };
 
@@ -114,7 +116,7 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: 'trivia-settings',
-      version: 1,
+      version: 2,  // BUMPED from 1 -- added revealMode
       // Only persist certain fields, excluding methods
       partialize: (state) => ({
         roundsCount: state.roundsCount,
@@ -124,8 +126,26 @@ export const useSettingsStore = create<SettingsStore>()(
         timerVisible: state.timerVisible,
         timerAutoReveal: state.timerAutoReveal,
         ttsEnabled: state.ttsEnabled,
+        revealMode: state.revealMode,  // NEW -- add to persist list
         lastTeamSetup: state.lastTeamSetup,
       }),
+      // Migration from version 1 to version 2
+      // Zustand persist calls migrate(storedData, storedVersion) when
+      // the stored version is less than the current version.
+      migrate: (persistedState: unknown, fromVersion: number) => {
+        const stored = persistedState as Record<string, unknown>;
+
+        if (fromVersion === 1) {
+          // Version 1 had no revealMode. Add the new default.
+          return {
+            ...stored,
+            revealMode: 'batch' as const,
+          };
+        }
+
+        // Unknown version: return as-is and let Zustand merge with SETTINGS_DEFAULTS.
+        return stored;
+      },
     }
   )
 );
@@ -142,6 +162,7 @@ export function useSettings() {
     timerAutoStart: state.timerAutoStart,
     timerVisible: state.timerVisible,
     ttsEnabled: state.ttsEnabled,
+    revealMode: state.revealMode,  // NEW
   })));
 }
 

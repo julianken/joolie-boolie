@@ -56,6 +56,10 @@ const GameSettingsSchema = z.object({
   timerAutoStart: z.boolean(),
   timerVisible: z.boolean(),
   ttsEnabled: z.boolean(),
+  // NEW: backward-compatible default
+  // Sessions without this field (saved before the redesign) parse as 'batch'.
+  // Sessions saved after the redesign parse their stored value.
+  revealMode: z.enum(['instant', 'batch']).default('batch'),
 });
 
 const SerializedTriviaStateSchema = z.object({
