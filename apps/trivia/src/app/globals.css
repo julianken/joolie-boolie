@@ -39,6 +39,101 @@
   --trivia-answer-dim-duration:     200ms;
   --trivia-answer-reveal-delay:     200ms;
   --trivia-stagger-row-delay:       80ms;
+
+  /* ================================================================
+     AUDIENCE DISPLAY — Projection color tokens (BEA-569 / T1.15)
+     Dark canvas designed for 30+ ft viewing distance.
+     Minimum 18% opacity for all overlaid surfaces.
+     ================================================================ */
+
+  /* Canvas */
+  --display-bg:              #0a0b14;
+  --display-bg-pure:         #000000;
+
+  /* Brand gradient — blue to violet to lavender */
+  --display-gradient-start:  #4F7BF7;
+  --display-gradient-mid:    #7E52E4;
+  --display-gradient-end:    #A78BFA;
+
+  --display-gradient:
+    linear-gradient(135deg, #4F7BF7 0%, #7E52E4 60%, #A78BFA 100%);
+
+  --display-final-gradient:
+    linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+
+  --display-glow-center:
+    radial-gradient(circle at 50% 50%, rgba(79, 123, 247, 0.15) 0%, transparent 60%);
+
+  /* Answer reveal semantic colors */
+  --display-correct:         #34D399;
+  --display-incorrect:       #F43F5E;
+  --display-correct-bg:      rgba(52, 211, 153, 0.10);
+  --display-correct-glow:    rgba(52, 211, 153, 0.40);
+  --display-correct-bloom:   rgba(52, 211, 153, 0.20);
+
+  /* Overlay surfaces */
+  --display-overlay-soft:    rgba(10, 11, 20, 0.82);
+  --display-overlay-hard:    rgba(10, 11, 20, 0.96);
+  --display-card-bg:         rgba(26, 23, 32, 0.60);
+  --display-card-bg-hover:   rgba(36, 31, 46, 0.70);
+  --display-option-opacity:  0.18;
+
+  /* ================================================================
+     ANIMATION TIMING — Audience display sequence tokens (BEA-569)
+     ================================================================ */
+
+  --dur-instant:   100ms;
+  --dur-fast:      200ms;
+  --dur-utility:   300ms;
+  --dur-major:     500ms;
+  --dur-prominent: 800ms;
+  --dur-hero:      1200ms;
+  --dur-extended:  2000ms;
+
+  --trivia-scene-enter:    180ms;
+  --trivia-scene-exit:     280ms;
+  --trivia-reveal-freeze:  300ms;
+  --trivia-reveal-dim:     250ms;
+  --trivia-reveal-glow:    180ms;
+  --trivia-reveal-lock:    1100ms;
+
+  --trivia-score-roll:     600ms;
+  --trivia-score-stagger:  70ms;
+
+  --trivia-confetti-start: 6500ms;
+  --trivia-confetti-stop:  11500ms;
+
+  --ease-entrance:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit:       cubic-bezier(0.4, 0, 1, 1);
+  --ease-emphasis:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-mechanical: linear;
+
+  /* ================================================================
+     AUDIENCE DISPLAY — Spacing and layout tokens (BEA-569)
+     ================================================================ */
+
+  --display-safe-h:  5vw;
+  --display-safe-v:  4vh;
+  --display-radius:  clamp(12px, 1.2vw, 20px);
+  --display-border:  6px;
+
+  --timer-track-height:  8px;
+  --timer-circle-size:   clamp(80px, 10vh, 140px);
+
+  /* Typography scale — clamp() for projection readability */
+  --display-text-body:       clamp(1.5rem,  2.5vw,  2rem);
+  --display-text-label:      clamp(1.5rem,  2.5vw,  2.25rem);
+  --display-text-question:   clamp(2rem,    3.5vw,  3rem);
+  --display-text-option:     clamp(1.75rem, 2.8vw,  2.5rem);
+  --display-text-category:   clamp(1.25rem, 2vw,    1.75rem);
+  --display-text-round:      clamp(4rem,    10vw,   9rem);
+  --display-text-round-num:  clamp(8rem,    20vmin, 16rem);
+  --display-text-wordmark:   clamp(6rem,    18vw,   16rem);
+  --display-text-roomcode:   clamp(4rem,    10vw,   8rem);
+  --display-text-countdown:  30vmin;
+  --display-text-hero:       clamp(4rem,    10vw,   9rem);
+  --display-text-answers:    clamp(3rem,    8vw,    7rem);
+  --display-text-score:      clamp(2.5rem,  4vw,    3.5rem);
 }
 
 /* ================================================================
@@ -74,6 +169,118 @@
 }
 
 /* ================================================================
+   NEW KEYFRAMES — BEA-569 Phase 5 additions (T1.15, T2.9, T3.5)
+   All transform + opacity only, GPU composited.
+   Each has a @media (prefers-reduced-motion: reduce) override below.
+   ================================================================ */
+
+/* T1.15 — Beat 0: all options flash simultaneously at reveal start (80ms) */
+@keyframes answer-flash {
+  0%   { border-color: transparent; }
+  30%  { border-color: rgba(255, 255, 255, 0.65); }
+  70%  { border-color: rgba(255, 255, 255, 0.40); }
+  100% { border-color: transparent; }
+}
+
+.answer-flash {
+  animation: answer-flash 80ms var(--ease-exit, cubic-bezier(0.4, 0, 1, 1)) forwards;
+}
+
+/* T1.15 — Correct answer sustained green glow — applied ~900ms after reveal */
+@keyframes answer-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px rgba(52, 211, 153, 0.40),
+      0 0 24px 4px rgba(52, 211, 153, 0.20);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(52, 211, 153, 0.65),
+      0 0 40px 8px rgba(52, 211, 153, 0.35);
+  }
+}
+
+.answer-correct-glow {
+  animation: answer-glow-pulse 2s var(--ease-emphasis, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
+}
+
+/* T2.9 — Winner card glow — team color via --winner-glow / --winner-glow-ring inline vars */
+@keyframes winner-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 40px  8px var(--winner-glow),
+      0 0 0     3px var(--winner-glow-ring, rgba(126, 82, 228, 0.50));
+  }
+  50% {
+    box-shadow:
+      0 0 80px 20px var(--winner-glow),
+      0 0 0     4px var(--winner-glow-ring, rgba(126, 82, 228, 0.50));
+  }
+}
+
+.winner-pulse-glow {
+  animation: winner-pulse 2.2s var(--ease-emphasis, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
+}
+
+/* T2.9 — Radial glow behind hero text — ambient depth effect */
+@keyframes glow-pulse-radial {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1.0;
+    transform: scale(1.15);
+  }
+}
+
+.glow-pulse-radial {
+  animation: glow-pulse-radial 2.5s var(--ease-emphasis, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
+  background: var(--display-glow-center,
+    radial-gradient(circle at 50% 50%, rgba(79, 123, 247, 0.15) 0%, transparent 60%)
+  );
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* T2.9 — Final round amber border glow around display edges */
+@keyframes border-glow-amber {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 0 6px rgba(245, 158, 11, 0.35),
+      inset 0 0 40px 0  rgba(245, 158, 11, 0.10);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 6px rgba(245, 158, 11, 0.70),
+      inset 0 0 60px 0  rgba(245, 158, 11, 0.20);
+  }
+}
+
+.final-round-border {
+  animation: border-glow-amber 2.4s var(--ease-emphasis, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
+}
+
+/* T3.5 — CSS confetti fall — 30 particles, duration 2.5-4s each */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translateY(110vh)
+      rotate(var(--fall-rotation, 360deg));
+    opacity: 0;
+  }
+}
+
+/* ================================================================
    UTILITY CLASSES — Trivia-specific
    ================================================================ */
 
@@ -91,8 +298,9 @@
   animation: waiting-ambient 20s ease infinite;
 }
 
-/* Reduced motion: freeze ambient animation */
+/* Reduced motion: freeze ambient animation + disable all new keyframes */
 @media (prefers-reduced-motion: reduce) {
+  /* ---- Existing (unchanged) ---- */
   .trivia-ambient-bg {
     animation: none;
     background: #0a0b14;
@@ -100,6 +308,50 @@
 
   .timer-heartbeat {
     animation: none;
+  }
+
+  /* ---- BEA-569 additions (T1.15, T2.9, T3.5) ---- */
+
+  /* answer-flash: removed — imperceptible when static, adds nothing */
+  .answer-flash {
+    animation: none;
+  }
+
+  /* answer-glow-pulse: retain static glow — spatial information, not animation */
+  .answer-correct-glow {
+    animation: none;
+    box-shadow:
+      0 0 0 3px rgba(52, 211, 153, 0.50),
+      0 0 20px 4px rgba(52, 211, 153, 0.25);
+  }
+
+  /* winner-pulse: retain static glow at peak value */
+  .winner-pulse-glow {
+    animation: none;
+    box-shadow:
+      0 0 60px 14px var(--winner-glow),
+      0 0 0     3px var(--winner-glow-ring, rgba(126, 82, 228, 0.50));
+  }
+
+  /* glow-pulse-radial: freeze at visible state */
+  .glow-pulse-radial {
+    animation: none;
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  /* final-round-border: retain static amber border at peak value */
+  .final-round-border {
+    animation: none;
+    box-shadow:
+      inset 0 0 0 6px rgba(245, 158, 11, 0.55),
+      inset 0 0 50px 0 rgba(245, 158, 11, 0.15);
+  }
+
+  /* confetti-particle: fully hidden — 30 frozen divs would look broken */
+  .confetti-particle {
+    animation-play-state: paused;
+    opacity: 0;
   }
 }
 
@@ -142,3 +394,276 @@
 
 /* NOTE: Audience display text minimum is 40px on 1920x1080.
    See FINAL-DESIGN-PLAN.md Part 8, Issue A-23 (1024x768 projector minimum). */
+
+/* ================================================================
+   AUDIENCE DISPLAY — Utility classes (BEA-569 / T1.15)
+   Trivia-display-specific patterns. Mobile fallbacks are minimal —
+   audience display assumes 1280px+ projector surface.
+   ================================================================ */
+
+/* Full-viewport dark canvas — root of all audience display scenes */
+.display-canvas {
+  background-color: var(--display-bg);
+  min-height: 100dvh;
+  width: 100dvw;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Projection-safe padding — all audience display scene roots use this */
+.display-safe-area {
+  padding: var(--display-safe-v) var(--display-safe-h);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Brand gradient text — wordmark, room code, hero text, "ANSWERS" */
+.display-gradient-text {
+  background: var(--display-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Final-round amber gradient text */
+.display-gradient-text-final {
+  background: var(--display-final-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Answer option — audience display variant with projector-safe sizing */
+.audience-option {
+  border-width: var(--display-border);
+  border-style: solid;
+  border-radius: var(--display-radius);
+  padding: clamp(16px, 2vh, 28px) clamp(20px, 2.5vw, 36px);
+  transition:
+    opacity      var(--trivia-reveal-dim, 250ms) var(--ease-exit),
+    filter       var(--trivia-reveal-dim, 250ms) var(--ease-exit),
+    border-color var(--dur-fast, 200ms)           var(--ease-emphasis),
+    background   var(--dur-fast, 200ms)           var(--ease-emphasis);
+  /* box-shadow handled by CSS animation — not in transition list */
+}
+
+/* Score bar track — horizontal proportional score display */
+.score-bar-track {
+  position: relative;
+  height: var(--timer-track-height, 8px);
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+/* Score bar fill — animated via Motion scaleX from left origin */
+.score-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 100%;
+  border-radius: var(--radius-full, 9999px);
+  /* transform-origin set inline: transform-origin: left center */
+  /* scaleX animated via Motion springScoreBar */
+  /* background-color set via inline style from team color */
+}
+
+/* Timer bar track */
+.timer-bar-track {
+  position: relative;
+  height: var(--timer-track-height, 8px);
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+/* Timer bar fill — linear depletion, no spring */
+.timer-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 100%;
+  transform-origin: left center;
+  border-radius: var(--radius-full, 9999px);
+  transition:
+    transform          var(--timer-duration, 30s) var(--ease-mechanical),
+    background-color   var(--dur-utility, 300ms)  var(--ease-emphasis);
+}
+
+/* T3.5 — Confetti particle base class */
+.confetti-particle {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  will-change: transform, opacity;
+  animation:
+    confetti-fall var(--fall-duration, 3s)
+    var(--fall-delay, 0s)
+    ease-in forwards;
+  pointer-events: none;
+}
+
+/* ================================================================
+   PRESENTER LAYOUT — Three-column grid (BEA-569 / T1.15)
+   Replaces "flex flex-1 overflow-hidden" in play/page.tsx.
+   ================================================================ */
+
+.presenter-layout {
+  display: grid;
+  grid-template-columns: 224px 1fr 288px;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  min-width: 1280px;
+  flex: 1;
+}
+
+.presenter-rail-left {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.presenter-center {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+}
+
+.presenter-rail-right {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Narrow presenter viewport degradation */
+@media (max-width: 1279px) {
+  .presenter-layout {
+    grid-template-columns: 1fr 288px;
+  }
+  .presenter-rail-left {
+    display: none;
+  }
+}
+
+/* ================================================================
+   SETUP WIZARD (BEA-569 / T4)
+   ================================================================ */
+
+.setup-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+}
+
+.setup-wizard-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.setup-step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground-secondary);
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms, color 150ms;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.setup-step-dot.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.setup-step-dot.complete {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--success-foreground);
+}
+
+.setup-step-dot.pending:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.setup-wizard-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  overscroll-behavior: contain;
+}
+
+/* Step 1 — 2x2 source card grid */
+.setup-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 2vh, 20px);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .setup-source-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.setup-source-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setup-source-card:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+}
+
+.setup-source-card.active {
+  border-color: var(--primary);
+  background: var(--surface-selected);
+}
+
+/* ================================================================
+   MOBILE AUDIENCE DISPLAY FALLBACK
+   Single breakpoint — audience display assumes 1280px+ projector.
+   ================================================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --display-text-countdown:  20vmin;
+    --display-text-wordmark:   clamp(3rem, 12vw, 8rem);
+    --display-text-round-num:  clamp(4rem, 14vmin, 10rem);
+    --display-text-hero:       clamp(2.5rem, 8vw, 5rem);
+    --display-text-question:   clamp(1.5rem, 3vw, 2.25rem);
+    --display-text-option:     clamp(1.25rem, 2.5vw, 2rem);
+    --display-safe-h:          4vw;
+    --display-safe-v:          3vh;
+  }
+}
