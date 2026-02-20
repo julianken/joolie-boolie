@@ -14,6 +14,6 @@
  *
  * The audience display renders the same visual for both. Auto-advance
  * behavior is gated in the keyboard handler (useGameKeyboard) and the
- * useSceneAutoAdvance hook, not in the component itself.
+ * the timeRemaining watcher in useGameKeyboard, not in the component itself.
  */
 export { QuestionTransitionScene as ScoringPauseScene } from './QuestionTransitionScene';

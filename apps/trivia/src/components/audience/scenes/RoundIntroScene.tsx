@@ -14,7 +14,7 @@ import { heroSceneEnter, heroSceneEnterReduced } from '@/lib/motion/presets';
  * Motion: hero enter animation (scaleUp + fade, springDramatic).
  * Reduced motion: instant fade-in.
  *
- * Auto-advance at 4s is handled by useSceneAutoAdvance (BEA-572).
+ * Auto-advance at 4s is handled by the timeRemaining watcher in useGameKeyboard.
  */
 export function RoundIntroScene() {
   const shouldReduceMotion = useReducedMotion();

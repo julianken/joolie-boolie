@@ -17,7 +17,7 @@ import { neutralSceneEnter } from '@/lib/motion/presets';
  * - Category name of the next question
  *
  * Auto-advances after 1.5s (BATCH_REVEAL_TIMING.QUESTION_TRANSITION_MS).
- * Auto-advance is handled by useSceneAutoAdvance in the keyboard hook.
+ * Auto-advance is handled by the timeRemaining watcher in useGameKeyboard.
  *
  * Used by both question_transition and scoring_pause (via re-export).
  */

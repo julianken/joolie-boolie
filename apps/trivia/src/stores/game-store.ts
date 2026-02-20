@@ -432,12 +432,39 @@ export const useGameStore = create<GameStore>()((set) => ({
         }
       );
 
+      // Compute score deltas for this round
+      const deltas: ScoreDelta[] = state.teams.map((team) => {
+        const correctCount = ceremonyQuestions.reduce(
+          (sum, q) => sum + (q.teamResults[team.id] ? 1 : 0),
+          0,
+        );
+        return {
+          teamId: team.id,
+          teamName: team.name,
+          delta: correctCount,
+          newScore: team.score,
+          newRank: 0,
+          previousRank: 0,
+        };
+      });
+
+      // Compute current ranks (by newScore descending)
+      const byNew = [...deltas].sort((a, b) => b.newScore - a.newScore);
+      byNew.forEach((d, i) => { d.newRank = i + 1; });
+
+      // Compute previous ranks (by score before this round)
+      const byPrev = [...deltas].sort(
+        (a, b) => (b.newScore - b.delta) - (a.newScore - a.delta),
+      );
+      byPrev.forEach((d, i) => { d.previousRank = i + 1; });
+
       return {
         revealCeremonyResults: { roundIndex: state.currentRound, questions: ceremonyQuestions },
         revealCeremonyQuestionIndex: 0,
         revealCeremonyAnswerShown: false,
         audienceScene: 'round_reveal_intro' as AudienceScene,
         sceneTimestamp: Date.now(),
+        scoreDeltas: deltas,
       };
     });
   },
