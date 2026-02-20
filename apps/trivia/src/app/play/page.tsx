@@ -12,6 +12,10 @@ import { QuestionList } from '@/components/presenter/QuestionList';
 import { QuestionDisplay } from '@/components/presenter/QuestionDisplay';
 import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
 import { TeamManager } from '@/components/presenter/TeamManager';
+import { QuickScoreGrid } from '@/components/presenter/QuickScoreGrid';
+import { NextActionHint } from '@/components/presenter/NextActionHint';
+import { useQuickScore } from '@/hooks/use-quick-score';
+import { useGameEventSounds } from '@/hooks/use-sounds';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
 import { ThemeSelector } from '@joolie-boolie/ui';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
@@ -230,6 +234,31 @@ export default function PlayPage() {
   /** Read audienceScene directly from the store (Issue 2.3, T1.13) */
   const audienceScene = useGameStore((state) => state.audienceScene);
 
+  /** Read revealPhase for sound triggers (T3.1) */
+  const revealPhase = useGameStore((state) => state.revealPhase);
+
+  /** T3.1: Wire scene-aware game event sounds */
+  useGameEventSounds({
+    status: game.status,
+    displayQuestionIndex: game.displayQuestionIndex,
+    currentRound: game.currentRound,
+    audienceScene,
+    revealPhase,
+  });
+
+  /** Quick score hook (T3.6) — wired to selected question index */
+  const quickScore = useQuickScore(game.selectedQuestionIndex);
+
+  /** Scoring-phase scenes where QuickScoreGrid should appear (T3.6) */
+  const isScoringScene = (
+    audienceScene === 'scoring_pause' ||
+    audienceScene === 'answer_reveal' ||
+    audienceScene === 'question_closed' ||
+    audienceScene === 'score_flash' ||
+    audienceScene === 'round_reveal_question' ||
+    audienceScene === 'round_reveal_answer'
+  );
+
   /** Status badge for the presenter header */
   const getStatusDisplay = () => {
     switch (game.status) {
@@ -441,7 +470,7 @@ export default function PlayPage() {
             aria-label="Current question"
           >
             {/* Question display */}
-            <div className="bg-surface border border-border rounded-xl p-4 shadow-md mb-4">
+            <div className="bg-surface border border-border rounded-xl p-4 shadow-md mb-3">
               <QuestionDisplay
                 question={game.selectedQuestion}
                 peekAnswer={game.peekAnswer}
@@ -454,6 +483,11 @@ export default function PlayPage() {
                 roundProgress={game.roundProgress}
                 isOnDisplay={game.displayQuestionIndex === game.selectedQuestionIndex}
               />
+            </div>
+
+            {/* Next action hint (T3.6) */}
+            <div className="mb-4 px-1">
+              <NextActionHint />
             </div>
 
             {/* Keyboard shortcuts reference */}
@@ -655,8 +689,18 @@ export default function PlayPage() {
                 />
               </div>
 
+              {/* Quick Score Grid (T3.6) — shown during scoring-phase scenes */}
+              {(game.status === 'playing' || game.status === 'between_rounds') && isScoringScene && (
+                <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
+                  <QuickScoreGrid
+                    teams={game.teams}
+                    quickScore={quickScore}
+                  />
+                </div>
+              )}
+
               {/* Team Score Input */}
-              {(game.status === 'playing' || game.status === 'between_rounds') && (
+              {(game.status === 'playing' || game.status === 'between_rounds') && !isScoringScene && (
                 <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
                   <TeamScoreInput
                     teams={game.teams}

@@ -10,3 +10,7 @@ export { QuestionClosedScene } from './QuestionClosedScene';
 export { ScoreFlashScene } from './ScoreFlashScene';
 export { RoundIntroScene } from './RoundIntroScene';
 export { RoundSummaryScene } from './RoundSummaryScene';
+// T3 scenes
+export { GameIntroScene } from './GameIntroScene';
+export { FinalBuildupScene } from './FinalBuildupScene';
+export { FinalPodiumScene } from './FinalPodiumScene';

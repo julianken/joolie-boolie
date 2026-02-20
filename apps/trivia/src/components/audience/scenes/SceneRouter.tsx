@@ -22,9 +22,10 @@ import { ScoringPauseScene } from './ScoringPauseScene';
 import { RoundRevealIntroScene } from './RoundRevealIntroScene';
 import { RoundRevealQuestionScene } from './RoundRevealQuestionScene';
 import { RoundRevealAnswerScene } from './RoundRevealAnswerScene';
-
-// Fallback components for scenes not yet built in T2 scope
-import { GameEndDisplay } from '@/components/audience/GameEndDisplay';
+// T3 new scenes
+import { GameIntroScene } from './GameIntroScene';
+import { FinalBuildupScene } from './FinalBuildupScene';
+import { FinalPodiumScene } from './FinalPodiumScene';
 
 export interface SceneRouterProps {
   isConnected: boolean;
@@ -56,8 +57,6 @@ export function SceneRouter({ isConnected, isResolvingRoomCode = false }: SceneR
     (state) => state.revealCeremonyQuestionIndex
   );
   const currentRound = useGameStore((state) => state.currentRound);
-
-  const teams = useGameStore((state) => state.teams);
 
   // Emergency blank: render immediately outside AnimatePresence (no exit transition)
   if (audienceScene === 'emergency_blank') {
@@ -129,13 +128,15 @@ export function SceneRouter({ isConnected, isResolvingRoomCode = false }: SceneR
       case 'round_summary':
         return <RoundSummaryScene />;
 
-      case 'final_buildup':
-      case 'final_podium':
-        return <GameEndDisplay teams={teams} />;
-
-      // -- Scenes not yet built (T2+): show a waiting placeholder -----------
+      // -- T3 new scenes ----------------------------------------------------
       case 'game_intro':
-        return <WaitingScene message="Starting game..." />;
+        return <GameIntroScene />;
+
+      case 'final_buildup':
+        return <FinalBuildupScene />;
+
+      case 'final_podium':
+        return <FinalPodiumScene />;
 
       case 'round_intro':
         return <RoundIntroScene />;

@@ -7,6 +7,7 @@ import {
   type SoundEffectType,
   ALL_SOUND_EFFECTS,
 } from '@/lib/sounds';
+import type { AudienceScene, RevealPhase } from '@/types/audience-scene';
 
 // =============================================================================
 // PRELOAD HOOK
@@ -202,20 +203,27 @@ export interface UseGameEventSoundsOptions {
   displayQuestionIndex: number | null;
   /** Current round number */
   currentRound: number;
+  /** Current audience scene (T3.1) */
+  audienceScene?: AudienceScene;
+  /** Current reveal phase (T3.1) */
+  revealPhase?: RevealPhase;
 }
 
 /**
  * Hook that automatically plays sounds for game events.
  * Tracks state changes and plays appropriate sounds.
+ * T3.1: Extended with 9 scene-aware trigger points.
  */
 export function useGameEventSounds(options: UseGameEventSoundsOptions): void {
-  const { status, displayQuestionIndex, currentRound } = options;
+  const { status, displayQuestionIndex, currentRound, audienceScene, revealPhase } = options;
   const sounds = useSounds();
 
   // Track previous values
   const prevStatusRef = useRef<string>(status);
   const prevDisplayQuestionRef = useRef<number | null>(displayQuestionIndex);
   const prevRoundRef = useRef<number>(currentRound);
+  const prevSceneRef = useRef<AudienceScene | undefined>(audienceScene);
+  const prevRevealPhaseRef = useRef<RevealPhase | undefined>(revealPhase);
 
   useEffect(() => {
     const prevStatus = prevStatusRef.current;
@@ -253,6 +261,66 @@ export function useGameEventSounds(options: UseGameEventSoundsOptions): void {
       sounds.playQuestionReveal();
     }
   }, [status, displayQuestionIndex, currentRound, sounds]);
+
+  // T3.1: Scene-aware sound triggers
+  useEffect(() => {
+    const prevScene = prevSceneRef.current;
+    prevSceneRef.current = audienceScene;
+
+    if (!audienceScene || audienceScene === prevScene) return;
+
+    switch (audienceScene) {
+      case 'round_intro':
+        // Round intro appears
+        sounds.playFireAndForget('question-reveal');
+        break;
+      case 'question_anticipation':
+        // Category badge appears
+        sounds.playQuestionReveal();
+        break;
+      case 'question_active':
+        // Timer begins
+        sounds.playFireAndForget('timer-tick');
+        break;
+      case 'question_closed':
+        // Time runs out
+        sounds.playTimerExpired();
+        break;
+      case 'round_reveal_intro':
+        // Ceremony begins
+        sounds.playRoundComplete();
+        break;
+      case 'final_buildup':
+        // Game ending
+        sounds.playGameWin();
+        break;
+      case 'final_podium':
+        // Winner revealed — delayed by 4.8s to match podium timing
+        setTimeout(() => sounds.playCorrectAnswer(), 4800);
+        break;
+      case 'round_reveal_question':
+        // Next ceremony question advances
+        if (
+          prevScene === 'round_reveal_answer' ||
+          prevScene === 'round_reveal_intro'
+        ) {
+          sounds.playQuestionReveal();
+        }
+        break;
+      default:
+        break;
+    }
+  }, [audienceScene, sounds]);
+
+  // T3.1: RevealPhase illuminate -> play correct-answer sound
+  useEffect(() => {
+    const prevPhase = prevRevealPhaseRef.current;
+    prevRevealPhaseRef.current = revealPhase;
+
+    if (revealPhase === 'illuminate' && prevPhase !== 'illuminate') {
+      sounds.playCorrectAnswer();
+    }
+  }, [revealPhase, sounds]);
 }
 
 // =============================================================================

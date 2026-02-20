@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useTimerState } from '@/stores/game-store';
+import { useTimerState, useGameStore } from '@/stores/game-store';
 import { useGame } from './use-game';
 
 // =============================================================================
@@ -122,8 +122,10 @@ export function useTimerAutoReveal({
       // Mark as auto-revealed for this question
       autoRevealedForQuestionRef.current = selectedQuestionIndex;
 
-      // Reveal the answer
-      setDisplayQuestion(selectedQuestionIndex);
+      // T3.7: Transition to question_closed scene instead of directly revealing.
+      // This decouples timer expiry from answer reveal, letting the presenter
+      // control when the answer is shown (via S key in useGameKeyboard).
+      useGameStore.getState().setAudienceScene('question_closed');
 
       // Trigger flash effect
       triggerFlash();
