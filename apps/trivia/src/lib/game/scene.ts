@@ -215,18 +215,15 @@ export function getNextScene(
 
     // -- Answer reveal ------------------------------------------------------
     case 'answer_reveal':
-      if (trigger === 'auto' || trigger === 'advance') return 'score_flash';
+      if (trigger === 'auto' || trigger === 'advance' || trigger === 'skip') return 'score_flash';
       return null;
 
     case 'score_flash':
-      if (trigger === 'auto' || trigger === 'advance') {
+      if (trigger === 'auto' || trigger === 'advance' || trigger === 'skip') {
         if (isLastQuestion) {
           return isLastRound ? 'final_buildup' : 'round_summary';
         }
         return 'question_anticipation';
-      }
-      if (trigger === 'complete' && isLastQuestion) {
-        return isLastRound ? 'final_buildup' : 'round_summary';
       }
       return null;
 

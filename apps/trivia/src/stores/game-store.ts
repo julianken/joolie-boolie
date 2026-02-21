@@ -207,13 +207,9 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   nextRound: () => {
     set((state) => {
       lifecycleLogger.emit('game.round_started', { round: state.currentRound + 1, totalRounds: state.totalRounds });
-      const baseUpdate = nextRoundEngine(state);
-      return {
-        ...baseUpdate,
-        // FIX Bug #8: nextRound should go to round_intro, not waiting
-        audienceScene: 'round_intro' as AudienceScene,
-        sceneTimestamp: Date.now(),
-      };
+      // Only handle status transition (between_rounds -> playing with next round).
+      // Scene ownership is handled by advanceScene().
+      return nextRoundEngine(state);
     });
   },
 
