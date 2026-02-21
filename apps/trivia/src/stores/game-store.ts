@@ -113,7 +113,11 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   // Actions
   startGame: () => {
     lifecycleLogger.emit('game.started');
-    set((state) => startGameEngine(state));
+    set((state) => ({
+      ...startGameEngine(state),
+      audienceScene: 'game_intro' as AudienceScene,
+      sceneTimestamp: Date.now(),
+    }));
   },
 
   endGame: () => {
@@ -365,6 +369,35 @@ export const useGameStore = create<GameStore>()((set, get) => ({
             audienceScene: nextScene,
             sceneTimestamp: Date.now(),
           };
+        });
+        return;
+      }
+
+      // Side effect: auto-show question when entering question_anticipation.
+      // From round_intro: show the currently selected question (first of the round).
+      // From score_flash: advance to the next question in the round and show it.
+      if (nextScene === 'question_anticipation') {
+        if (state.audienceScene === 'score_flash') {
+          // Find the next question in the current round
+          const nextQIndex = roundQuestions.findIndex(
+            (q) => state.questions.indexOf(q) === displayIdx
+          ) + 1;
+          if (nextQIndex < roundQuestions.length) {
+            const globalIndex = state.questions.indexOf(roundQuestions[nextQIndex]);
+            set({
+              audienceScene: nextScene,
+              sceneTimestamp: Date.now(),
+              selectedQuestionIndex: globalIndex,
+              displayQuestionIndex: globalIndex,
+            });
+            return;
+          }
+        }
+        // Default: show the currently selected question
+        set({
+          audienceScene: nextScene,
+          sceneTimestamp: Date.now(),
+          displayQuestionIndex: state.selectedQuestionIndex,
         });
         return;
       }
