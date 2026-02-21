@@ -358,9 +358,9 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     const nextScene = getNextScene(state.audienceScene, trigger, context);
 
     if (nextScene && nextScene !== state.audienceScene) {
-      // Side effect: call completeRound engine when transitioning from score_flash to round_summary.
+      // Side effect: call completeRound engine when transitioning from answer_reveal to round_summary.
       // This handles the status transition (playing -> between_rounds) that the scene change implies.
-      if (state.audienceScene === 'score_flash' && nextScene === 'round_summary') {
+      if (state.audienceScene === 'answer_reveal' && nextScene === 'round_summary') {
         set((s) => {
           lifecycleLogger.emit('game.round_completed', { round: s.currentRound, totalRounds: s.totalRounds });
           const baseUpdate = completeRoundEngine(s);
@@ -373,11 +373,28 @@ export const useGameStore = create<GameStore>()((set, get) => ({
         return;
       }
 
+      // Side effect: call endGame engine when transitioning from answer_reveal to final_buildup.
+      // This handles the status transition (playing -> ended) that the scene change implies.
+      // Without this, the game stays in 'playing' status while showing final_buildup,
+      // which is not in VALID_SCENES_BY_STATUS.playing, causing WaitingScene to render.
+      if (state.audienceScene === 'answer_reveal' && nextScene === 'final_buildup') {
+        set((s) => {
+          lifecycleLogger.emit('game.ended', { currentRound: s.currentRound, totalRounds: s.totalRounds, teamCount: s.teams.length });
+          const baseUpdate = endGameEngine(s);
+          return {
+            ...baseUpdate,
+            audienceScene: nextScene,
+            sceneTimestamp: Date.now(),
+          };
+        });
+        return;
+      }
+
       // Side effect: auto-show question when entering question_anticipation.
       // From round_intro: show the currently selected question (first of the round).
-      // From score_flash: advance to the next question in the round and show it.
+      // From answer_reveal: advance to the next question in the round and show it.
       if (nextScene === 'question_anticipation') {
-        if (state.audienceScene === 'score_flash') {
+        if (state.audienceScene === 'answer_reveal') {
           // Find the next question in the current round
           const nextQIndex = roundQuestions.findIndex(
             (q) => state.questions.indexOf(q) === displayIdx
@@ -499,7 +516,6 @@ export function useGameSelectors() {
       audienceScene === 'round_intro' ||
       audienceScene === 'question_anticipation' ||
       audienceScene === 'answer_reveal' ||
-      audienceScene === 'score_flash' ||
       audienceScene === 'final_buildup'
     ),
   };
