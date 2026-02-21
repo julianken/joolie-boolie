@@ -8,13 +8,10 @@
  * The 5-state engine is untouched. This module bridges GameStatus to AudienceScene.
  */
 
-import type { TriviaGameState, GameStatus, AudienceScene, RevealMode } from '@/types';
+import type { TriviaGameState, GameStatus, AudienceScene } from '@/types';
 import {
   SCENE_TIMING,
-  BATCH_REVEAL_TIMING,
   TIMED_SCENES,
-  BATCH_ONLY_SCENES,
-  INSTANT_ONLY_SCENES,
   VALID_SCENES_BY_STATUS,
 } from '@/types/audience-scene';
 
@@ -29,22 +26,10 @@ import {
  *  1. A GameStatus transition invalidates the current audienceScene.
  *  2. A session is loaded from DB (audienceScene is not serialized).
  *  3. A REQUEST_SYNC is received with an unknown scene.
- *
- * The revealMode parameter determines which default to use for 'playing':
- *  - 'batch' (default for new games): 'waiting' -- ceremony hasn't started
- *  - 'instant': 'waiting'
- *  Both modes default to 'waiting' in the playing status because the presenter
- *  explicitly drives scene transitions during play.
- *
- * Backward compat: if revealMode is undefined (old sessions), defaults to 'instant'.
  */
 export function deriveSceneFromStatus(
   status: GameStatus,
-  revealMode?: RevealMode
 ): AudienceScene {
-  // Unused parameter retained for future per-status defaults by mode.
-  void revealMode;
-
   switch (status) {
     case 'setup':
       return 'waiting';
@@ -81,19 +66,6 @@ export function isSceneValidForStatus(
   return validSet ? validSet.has(scene) : false;
 }
 
-/**
- * Returns true if the given scene is valid for the given revealMode.
- * Batch-only scenes are invalid in instant mode, and vice versa.
- */
-export function isSceneValidForMode(
-  scene: AudienceScene,
-  revealMode: RevealMode
-): boolean {
-  if (revealMode === 'instant' && BATCH_ONLY_SCENES.has(scene)) return false;
-  if (revealMode === 'batch' && INSTANT_ONLY_SCENES.has(scene)) return false;
-  return true;
-}
-
 // =============================================================================
 // SCENE TIMING
 // =============================================================================
@@ -123,10 +95,6 @@ export function getSceneDuration(
       return SCENE_TIMING.SCORE_FLASH_MS;
     case 'final_buildup':
       return SCENE_TIMING.FINAL_BUILDUP_MS;
-    case 'round_reveal_intro':
-      return BATCH_REVEAL_TIMING.ROUND_REVEAL_INTRO_MS;
-    case 'question_transition':
-      return BATCH_REVEAL_TIMING.QUESTION_TRANSITION_MS;
     default:
       return null; // Indefinite scene
   }
@@ -139,20 +107,6 @@ export function isSceneTimed(scene: AudienceScene): boolean {
   return TIMED_SCENES.has(scene);
 }
 
-/**
- * Returns true if the scene is batch-mode-only.
- */
-export function isSceneBatchOnly(scene: AudienceScene): boolean {
-  return BATCH_ONLY_SCENES.has(scene);
-}
-
-/**
- * Returns true if the scene is instant-mode-only.
- */
-export function isSceneInstantOnly(scene: AudienceScene): boolean {
-  return INSTANT_ONLY_SCENES.has(scene);
-}
-
 // =============================================================================
 // SCENE STATE MACHINE
 // =============================================================================
@@ -162,14 +116,10 @@ export function isSceneInstantOnly(scene: AudienceScene): boolean {
  * relevant to the current transition.
  */
 export interface SceneTransitionContext {
-  /** Current reveal mode from state.settings.revealMode. */
-  revealMode: RevealMode;
   /** True if this is the last question of the current round. */
   isLastQuestion?: boolean;
   /** True if this is the last round of the game. */
   isLastRound?: boolean;
-  /** True if the ceremony is currently active (revealCeremonyResults !== null). */
-  ceremonyActive?: boolean;
 }
 
 /**
@@ -186,9 +136,8 @@ export interface SceneTransitionContext {
  *   'skip'       -- presenter skipped a timed scene (Enter/Space/D)
  *   'timer_start'-- presenter pressed T to start timer
  *   'close'      -- presenter pressed S to close question / enter scoring
- *   'reveal'     -- presenter pressed A to reveal answer (instant mode)
- *   'advance'    -- presenter pressed Right Arrow / Enter (ceremony/scoring)
- *   'retreat'    -- presenter pressed Left Arrow (ceremony)
+ *   'reveal'     -- presenter pressed A to reveal answer
+ *   'advance'    -- presenter pressed Right Arrow / Enter
  *   'complete'   -- presenter pressed C to complete round (last question)
  *   'next_round' -- presenter pressed N (from round_summary)
  *   'pause'      -- presenter pressed P
@@ -207,7 +156,7 @@ export function getNextScene(
   trigger: string,
   context: SceneTransitionContext
 ): AudienceScene | null {
-  const { revealMode, isLastQuestion = false, isLastRound = false } = context;
+  const { isLastQuestion = false, isLastRound = false } = context;
 
   switch (current) {
     // -- Pre-game -----------------------------------------------------------
@@ -233,34 +182,25 @@ export function getNextScene(
 
     case 'question_reading':
       if (trigger === 'timer_start') return 'question_active';
-      if (trigger === 'close') {
-        // S key skips timer entirely -- goes straight to scoring
-        return revealMode === 'batch' ? 'scoring_pause' : 'answer_reveal';
-      }
-      if (trigger === 'reveal' && revealMode === 'instant') return 'answer_reveal';
+      if (trigger === 'close') return 'answer_reveal';
+      if (trigger === 'reveal') return 'answer_reveal';
       return null;
 
     case 'question_active':
       if (trigger === 'auto' || trigger === 'close') return 'question_closed';
-      // S key during active timer ends timer early -- same as timer expiry
       return null;
 
     case 'question_closed':
-      if (trigger === 'close') {
-        // S key: enter scoring phase
-        return revealMode === 'batch' ? 'scoring_pause' : 'answer_reveal';
-      }
-      if (trigger === 'reveal' && revealMode === 'instant') return 'answer_reveal';
+      if (trigger === 'close') return 'answer_reveal';
+      if (trigger === 'reveal') return 'answer_reveal';
       return null;
 
-    // -- Instant mode reveal ------------------------------------------------
+    // -- Answer reveal ------------------------------------------------------
     case 'answer_reveal':
-      if (revealMode !== 'instant') return null; // Safety -- should never be in this scene
       if (trigger === 'auto' || trigger === 'advance') return 'score_flash';
       return null;
 
     case 'score_flash':
-      if (revealMode !== 'instant') return null;
       if (trigger === 'auto' || trigger === 'advance') {
         if (isLastQuestion) {
           return isLastRound ? 'final_buildup' : 'round_summary';
@@ -270,49 +210,6 @@ export function getNextScene(
       if (trigger === 'complete' && isLastQuestion) {
         return isLastRound ? 'final_buildup' : 'round_summary';
       }
-      return null;
-
-    // -- Batch mode: between-question ---------------------------------------
-    case 'scoring_pause':
-      if (revealMode !== 'batch') return null;
-      if (trigger === 'advance' && !isLastQuestion) return 'question_transition';
-      if (trigger === 'complete' && isLastQuestion) return 'round_reveal_intro';
-      return null;
-
-    case 'question_transition':
-      if (revealMode !== 'batch') return null;
-      if (trigger === 'auto' || trigger === 'skip') return 'question_anticipation';
-      return null;
-
-    // -- Batch ceremony -----------------------------------------------------
-    case 'round_reveal_intro':
-      if (revealMode !== 'batch') return null;
-      if (trigger === 'auto' || trigger === 'skip' || trigger === 'advance') {
-        return 'round_reveal_question';
-      }
-      return null;
-
-    case 'round_reveal_question':
-      if (revealMode !== 'batch') return null;
-      if (trigger === 'advance') return 'round_reveal_answer';
-      if (trigger === 'retreat') {
-        // retreat to previous question's revealed state or intro
-        // The ceremony functions handle index decrement -- scene.ts returns scene only
-        return 'round_reveal_intro'; // Caller interprets: retreat from Q0 = intro
-      }
-      if (trigger === 'abort') return 'round_summary';
-      return null;
-
-    case 'round_reveal_answer':
-      if (revealMode !== 'batch') return null;
-      if (trigger === 'advance') {
-        // More questions -> next question's show state; last question -> scoreboard
-        // Context tells us if last question in ceremony -- caller uses isLastQuestion
-        // relative to revealCeremonyResults.questions[]
-        return isLastQuestion ? 'round_summary' : 'round_reveal_question';
-      }
-      if (trigger === 'retreat') return 'round_reveal_question';
-      if (trigger === 'abort') return 'round_summary';
       return null;
 
     // -- Round summary ------------------------------------------------------
@@ -362,9 +259,6 @@ export function getNextScene(
 /**
  * Returns a partial state update that correctly sets the audience scene
  * and records the timestamp. Used by store actions to build new state.
- *
- * Does NOT validate mode compatibility -- callers must ensure the scene
- * is valid for the current revealMode (use isSceneValidForMode()).
  */
 export function buildSceneUpdate(scene: AudienceScene): {
   audienceScene: AudienceScene;
@@ -402,14 +296,14 @@ export function buildPauseSceneUpdate(
  * Falls back to deriveSceneFromStatus() if sceneBeforePause is null.
  */
 export function buildResumeSceneUpdate(
-  state: Pick<TriviaGameState, 'sceneBeforePause' | 'status' | 'settings'>
+  state: Pick<TriviaGameState, 'sceneBeforePause' | 'status'>
 ): {
   audienceScene: AudienceScene;
   sceneBeforePause: null;
   sceneTimestamp: number;
 } {
   const scene = state.sceneBeforePause
-    ?? deriveSceneFromStatus(state.status, state.settings.revealMode);
+    ?? deriveSceneFromStatus(state.status);
   return {
     audienceScene: scene,
     sceneBeforePause: null,

@@ -21,7 +21,7 @@ import { useQuickScore } from './use-quick-score';
  * Game controls:
  * - P = Pause/Resume game (scene-aware: sets/restores audienceScene)
  * - E = Emergency pause (blanks display, scene-aware)
- * - R = Reset game (double-press required — T2.5.7)
+ * - R = Reset game
  * - N = Next round (when in between_rounds state AND scene is round_summary)
  *
  * Display:
@@ -32,35 +32,22 @@ import { useQuickScore } from './use-quick-score';
  * Audio:
  * - M = Mute/unmute TTS
  *
- * Scene-aware shortcuts (T1.12):
- * - T key (KeyT, no modifier): Start timer — NOT toggle. Transitions to question_active.
+ * Scene-aware shortcuts:
+ * - T key (KeyT, no modifier): Start timer -- transitions to question_active.
  * - S key: Context-dependent scene transitions.
- * - Enter: Skip timed scenes and ceremony advance.
+ * - Enter: Skip timed scenes.
+ * - Right Arrow: Advance from answer_reveal/score_flash.
  *
- * Quick Score shortcuts (T2.4):
+ * Quick Score shortcuts:
  * - 1-9 (Digit1-Digit9): During scoring phases, toggle score for team N.
- *   1 = team at index 0, 9 = team at index 8.
  * - 0 (Digit0): During scoring phases, toggle score for team at index 9.
  * - Shift+1-9: During scoring phases, remove a point from team N.
  * - Ctrl/Cmd+Z: Undo last score action.
  *
  * Scoring phase scenes (when 1-9 keys are active):
- * - scoring_pause (batch mode)
- * - question_closed (both modes)
- * - answer_reveal (instant mode)
- * - score_flash (instant mode)
- * - round_reveal_question (batch ceremony)
- * - round_reveal_answer (batch ceremony)
- *
- * Batch ceremony shortcuts (T2.5.6):
- * - C: Complete round / start ceremony (scoring_pause + last Q in batch, or score_flash in instant)
- * - Right Arrow: Context-dependent advancement (scoring_pause -> next Q, ceremony advance)
- * - Left Arrow: Ceremony retreat (round_reveal_answer -> question, round_reveal_question -> prev)
- * - Escape: Abort ceremony -> round_summary
- *
- * Reset confirmation (T2.5.7):
- * - R (first press): Show "Press R again to reset" warning
- * - R (second press within 2s): Execute reset
+ * - question_closed
+ * - answer_reveal
+ * - score_flash
  *
  * Help:
  * - ? = Show help modal
@@ -69,7 +56,6 @@ import { useQuickScore } from './use-quick-score';
 /** Scenes that trigger the POST_REVEAL_LOCK */
 const REVEAL_LOCK_SCENES: ReadonlySet<AudienceScene> = new Set([
   'answer_reveal',
-  'round_reveal_answer',
 ]);
 
 /** Keys blocked during the reveal lock (advancement keys only) */
@@ -83,12 +69,9 @@ const LOCKED_KEY_CODES: ReadonlySet<string> = new Set([
  * Scenes where 1-9/0 quick-score keys and Shift+digit/-score keys are active.
  */
 const SCORING_PHASE_SCENES: ReadonlySet<AudienceScene> = new Set([
-  'scoring_pause',
   'question_closed',
   'answer_reveal',
   'score_flash',
-  'round_reveal_question',
-  'round_reveal_answer',
 ]);
 
 /**
@@ -108,21 +91,13 @@ const DIGIT_TO_TEAM_INDEX: Record<string, number> = {
   Digit0: 9,
 };
 
-/** Duration for R key double-press confirmation window (ms) */
-const RESET_CONFIRM_MS = 2000;
-
 export function useGameKeyboard() {
   const game = useGame();
   const fullscreen = useFullscreen();
   const [peekAnswer, setPeekAnswer] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
-  // R key double-press state (T2.5.7)
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const resetConfirmRef = useRef(false);
-  const resetConfirmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Quick score — keyed by selectedQuestionIndex so it resets per question
+  // Quick score -- keyed by selectedQuestionIndex so it resets per question
   const quickScore = useQuickScore(game.selectedQuestionIndex);
 
   // POST_REVEAL_LOCK: prevents premature advancement during reveal animation
@@ -130,7 +105,7 @@ export function useGameKeyboard() {
   const pendingKeyRef = useRef<string | null>(null);
   const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // useAudienceScene for the presenter — gives us timeRemaining for auto-advance
+  // useAudienceScene for the presenter -- gives us timeRemaining for auto-advance
   const audienceSceneControls = useAudienceScene({ role: 'presenter' });
 
   // Toggle scoreboard visibility
@@ -177,14 +152,31 @@ export function useGameKeyboard() {
     };
   }, []);
 
+  // Helper: determine if current question is last of current round
+  const isLastQuestionInRound = useCallback((): boolean => {
+    const store = useGameStore.getState();
+    const roundQs = store.questions.filter(
+      (q) => q.roundIndex === store.currentRound
+    );
+    const displayIdx = store.displayQuestionIndex;
+    const currentRoundQIndex = displayIdx !== null
+      ? roundQs.findIndex((q) => store.questions.indexOf(q) === displayIdx)
+      : -1;
+    return currentRoundQIndex >= 0 && currentRoundQIndex >= roundQs.length - 1;
+  }, []);
+
+  // Helper: determine if current round is the last round
+  const isLastRoundNow = useCallback((): boolean => {
+    const store = useGameStore.getState();
+    return store.currentRound >= store.totalRounds - 1;
+  }, []);
+
   // Auto-advance: when timeRemaining reaches 0, fire the appropriate next-scene transition.
-  // useAudienceScene sets timeRemaining to 0 when the timer expires. We watch for that
-  // and call the keyboard handler logic for the corresponding scene.
   useEffect(() => {
     const { timeRemaining, scene } = audienceSceneControls;
     if (timeRemaining !== 0) return;
 
-    // timeRemaining hit 0 — auto-advance this scene
+    // timeRemaining hit 0 -- auto-advance this scene
     const store = useGameStore.getState();
 
     switch (scene) {
@@ -197,18 +189,25 @@ export function useGameKeyboard() {
       case 'question_anticipation':
         store.setAudienceScene('question_reading');
         break;
-      case 'round_reveal_intro':
-        store.advanceCeremony();
-        break;
-      case 'question_transition':
-        store.setAudienceScene('question_anticipation');
-        break;
       case 'answer_reveal':
         store.setAudienceScene('score_flash');
         break;
-      case 'score_flash':
-        store.setAudienceScene('question_reading');
+      case 'score_flash': {
+        // FIX Bug #1: score_flash auto-advance must branch correctly
+        const lastQ = isLastQuestionInRound();
+        const lastR = isLastRoundNow();
+        if (lastQ) {
+          if (lastR) {
+            store.setAudienceScene('final_buildup');
+          } else {
+            store.completeRound();
+            // completeRound already sets 'round_summary'
+          }
+        } else {
+          store.setAudienceScene('question_anticipation');
+        }
         break;
+      }
       case 'final_buildup':
         store.setAudienceScene('final_podium');
         break;
@@ -216,7 +215,7 @@ export function useGameKeyboard() {
         break;
     }
   // Only re-run when timeRemaining transitions to 0
-  }, [audienceSceneControls.timeRemaining]); // intentional: only watch timeRemaining
+  }, [audienceSceneControls.timeRemaining, isLastQuestionInRound, isLastRoundNow]); // intentional: only watch timeRemaining
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -239,7 +238,7 @@ export function useGameKeyboard() {
       const currentScene: AudienceScene = useGameStore.getState().audienceScene;
       const store = useGameStore.getState();
 
-      // -- Quick score: 1-9 / 0 digit keys (T2.4) --
+      // -- Quick score: 1-9 / 0 digit keys --
       // Handle before the main switch so digit keys don't fall through
       if (event.code in DIGIT_TO_TEAM_INDEX) {
         // During scoring phases: toggle or remove team score
@@ -261,7 +260,7 @@ export function useGameKeyboard() {
           }
           return;
         }
-        // Outside scoring phase — fall through to allow digit keys for other uses
+        // Outside scoring phase -- fall through to allow digit keys for other uses
       }
 
       switch (event.code) {
@@ -280,93 +279,32 @@ export function useGameKeyboard() {
           }
           break;
 
-        // Right Arrow — context-dependent advancement (T2.5.6)
+        // Right Arrow -- context-dependent advancement
         case 'ArrowRight': {
           event.preventDefault();
           switch (currentScene) {
-            case 'scoring_pause': {
-              // Check if this is the last question of the round by computing from store state
-              const roundQs = store.questions.filter(
-                (q) => q.roundIndex === store.currentRound
-              );
-              const displayIdx = store.displayQuestionIndex;
-              const currentRoundQIndex = displayIdx !== null
-                ? roundQs.findIndex((q) => store.questions.indexOf(q) === displayIdx)
-                : -1;
-              const isLast = currentRoundQIndex >= 0 && currentRoundQIndex >= roundQs.length - 1;
-
-              if (isLast) {
-                // Last Q of round in batch: C key should be used instead, but Right Arrow also works
-                // Advance to ceremony (same as C key)
-                store.startRevealCeremony();
-              } else {
-                // Move to next question via question_transition
-                store.setAudienceScene('question_transition');
-              }
-              break;
-            }
-
-            case 'question_transition':
-              // Skip the transition and go directly to question_anticipation
-              store.setAudienceScene('question_anticipation');
-              break;
-
-            case 'round_reveal_answer':
-              // Advance ceremony (next Q or end ceremony)
-              store.advanceCeremony();
-              break;
-
+            // FIX Bug #4: answer_reveal + ArrowRight should go to score_flash
             case 'answer_reveal':
-              // Instant mode: advance to next question anticipation
-              store.setAudienceScene('question_anticipation');
+              store.setAudienceScene('score_flash');
               break;
 
             case 'score_flash': {
-              // Instant mode: check if last question of round
-              const roundQs = store.questions.filter(
-                (q) => q.roundIndex === store.currentRound
-              );
-              const displayIdx = store.displayQuestionIndex;
-              const currentRoundQIndex = displayIdx !== null
-                ? roundQs.findIndex((q) => store.questions.indexOf(q) === displayIdx)
-                : -1;
-              const isLastInRound = currentRoundQIndex >= 0 && currentRoundQIndex >= roundQs.length - 1;
-
-              if (!isLastInRound) {
+              // FIX Bug #5: score_flash + ArrowRight must branch correctly
+              const lastQ = isLastQuestionInRound();
+              const lastR = isLastRoundNow();
+              if (lastQ) {
+                if (lastR) {
+                  store.setAudienceScene('final_buildup');
+                } else {
+                  store.completeRound();
+                  // completeRound sets 'round_summary'
+                }
+              } else {
                 store.setAudienceScene('question_anticipation');
               }
-              // If last question, do nothing (N key advances to next round)
               break;
             }
 
-            default:
-              break;
-          }
-          break;
-        }
-
-        // Left Arrow — ceremony retreat (T2.5.6)
-        case 'ArrowLeft': {
-          event.preventDefault();
-          switch (currentScene) {
-            case 'round_reveal_answer':
-            case 'round_reveal_question':
-              store.retreatCeremony();
-              break;
-            default:
-              break;
-          }
-          break;
-        }
-
-        // Escape — abort ceremony (T2.5.6)
-        case 'Escape': {
-          switch (currentScene) {
-            case 'round_reveal_question':
-            case 'round_reveal_answer':
-              event.preventDefault();
-              store.abortCeremony();
-              break;
             default:
               break;
           }
@@ -390,91 +328,61 @@ export function useGameKeyboard() {
           }
           break;
 
-        // Pause/Resume game — scene-aware
+        // Pause/Resume game -- scene-aware
+        // FIX Bug #11: save sceneBeforePause before pausing, restore on resume
         case 'KeyP':
           if (game.canPause) {
+            // Save current scene before pausing
+            const sceneBeforePause = currentScene;
             game.pauseGame();
+            useGameStore.setState({ sceneBeforePause });
             store.setAudienceScene('paused');
           } else if (game.canResume) {
             game.resumeGame();
-            // Restore previous scene on resume (sceneBeforePause is set by engine)
+            // Restore previous scene on resume (sceneBeforePause is set above)
             const sceneBeforePause = useGameStore.getState().sceneBeforePause;
             if (sceneBeforePause) {
               store.setAudienceScene(sceneBeforePause);
+              useGameStore.setState({ sceneBeforePause: null });
             } else {
               store.setAudienceScene('waiting');
             }
           }
           break;
 
-        // Emergency pause - blanks audience display — scene-aware
+        // Emergency pause - blanks audience display -- scene-aware
+        // FIX Bug #11: save sceneBeforePause before emergency blank, restore on restore
         case 'KeyE':
-          if (game.canPause || game.canResume) {
+          if (currentScene === 'emergency_blank') {
+            // Restore from emergency blank
+            game.resumeGame();
+            const sceneBeforePause = useGameStore.getState().sceneBeforePause;
+            if (sceneBeforePause) {
+              store.setAudienceScene(sceneBeforePause);
+              useGameStore.setState({ sceneBeforePause: null });
+            } else {
+              store.setAudienceScene('waiting');
+            }
+          } else if (game.canPause || game.canResume) {
+            // Save current scene before emergency blank
+            const sceneBeforePause = currentScene;
             game.emergencyPause();
+            useGameStore.setState({ sceneBeforePause });
             store.setAudienceScene('emergency_blank');
           }
           break;
 
-        // Reset game — double-press confirmation (T2.5.7)
+        // Reset game
         case 'KeyR':
-          if (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
-            if (resetConfirmRef.current) {
-              // Second press within 2s — execute reset
-              if (resetConfirmTimerRef.current) {
-                clearTimeout(resetConfirmTimerRef.current);
-                resetConfirmTimerRef.current = null;
-              }
-              resetConfirmRef.current = false;
-              setShowResetConfirm(false);
-              game.resetGame();
-              setPeekAnswer(false);
-              store.setAudienceScene('waiting');
-            } else {
-              // First press — request confirmation
-              resetConfirmRef.current = true;
-              setShowResetConfirm(true);
-
-              resetConfirmTimerRef.current = setTimeout(() => {
-                resetConfirmRef.current = false;
-                setShowResetConfirm(false);
-                resetConfirmTimerRef.current = null;
-              }, RESET_CONFIRM_MS);
-            }
-          }
+          game.resetGame();
+          setPeekAnswer(false);
+          store.setAudienceScene('waiting');
           break;
 
         // Next round (only when between rounds AND scene is round_summary)
-        // Guard: N must not fire during ceremony scenes that occur during between_rounds status.
         case 'KeyN':
           if (game.status === 'between_rounds' && currentScene === 'round_summary') {
             game.nextRound();
-          }
-          break;
-
-        // C key — start ceremony (batch mode only, last question of round) (T2.5.6)
-        // Also activates during score_flash in instant mode for consistency
-        case 'KeyC':
-          if (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
-            if (currentScene === 'scoring_pause') {
-              // Batch mode: check if this is the last question of the round
-              const roundQs = store.questions.filter(
-                (q) => q.roundIndex === store.currentRound
-              );
-              const displayIdx = store.displayQuestionIndex;
-              const currentRoundQIndex = displayIdx !== null
-                ? roundQs.findIndex((q) => store.questions.indexOf(q) === displayIdx)
-                : -1;
-              const isLast = currentRoundQIndex >= 0 && currentRoundQIndex >= roundQs.length - 1;
-
-              if (isLast) {
-                store.startRevealCeremony();
-              }
-            } else if (currentScene === 'score_flash') {
-              // Instant mode: start ceremony for consistency (if batch mode)
-              if (store.settings.revealMode === 'batch') {
-                store.startRevealCeremony();
-              }
-            }
           }
           break;
 
@@ -483,9 +391,7 @@ export function useGameKeyboard() {
           toggleTTS();
           break;
 
-        // T key — start timer and transition to question_active scene
-        // NOT a toggle: if timer is already running, no-op for the timer start.
-        // Scene transition always fires when in question_reading scene.
+        // T key -- start timer and transition to question_active scene
         case 'KeyT':
           if (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
             // Check if we're in a question scene where starting the timer makes sense
@@ -507,31 +413,22 @@ export function useGameKeyboard() {
           }
           break;
 
-        // S key — context-dependent scene transitions
+        // S key -- context-dependent scene transitions
         case 'KeyS':
           if (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
             switch (currentScene) {
               case 'question_reading':
-                // Skip timer — transition directly to answer reveal (or question_closed)
-                // In instant mode, go to answer_reveal; otherwise question_closed
-                if (store.settings.revealMode === 'instant') {
-                  store.setAudienceScene('answer_reveal');
-                } else {
-                  store.setAudienceScene('question_closed');
-                }
+                // Skip timer -- transition directly to answer reveal
+                store.setAudienceScene('answer_reveal');
                 break;
               case 'question_active':
-                // Close question — transition to question_closed
+                // Close question -- transition to question_closed
                 store.stopTimer();
                 store.setAudienceScene('question_closed');
                 break;
               case 'question_closed':
-                // Enter scoring — in instant mode go to answer_reveal
-                if (store.settings.revealMode === 'instant') {
-                  store.setAudienceScene('answer_reveal');
-                } else {
-                  store.setAudienceScene('scoring_pause');
-                }
+                // Enter scoring -- go to answer_reveal
+                store.setAudienceScene('answer_reveal');
                 break;
               default:
                 break;
@@ -539,7 +436,7 @@ export function useGameKeyboard() {
           }
           break;
 
-        // Enter — skip timed scenes and ceremony advance
+        // Enter -- skip timed scenes
         case 'Enter':
           switch (currentScene) {
             case 'game_intro':
@@ -554,26 +451,24 @@ export function useGameKeyboard() {
             case 'answer_reveal':
               store.setAudienceScene('score_flash');
               break;
-            case 'score_flash':
-              // Advance to next question
-              store.setAudienceScene('question_reading');
+            case 'score_flash': {
+              // FIX Bug #2: Enter on score_flash must branch correctly
+              const lastQ = isLastQuestionInRound();
+              const lastR = isLastRoundNow();
+              if (lastQ) {
+                if (lastR) {
+                  store.setAudienceScene('final_buildup');
+                } else {
+                  store.completeRound();
+                  // completeRound sets 'round_summary'
+                }
+              } else {
+                store.setAudienceScene('question_anticipation');
+              }
               break;
+            }
             case 'final_buildup':
               store.setAudienceScene('final_podium');
-              break;
-            // Batch ceremony: Enter advances at any ceremony scene
-            case 'round_reveal_intro':
-              store.advanceCeremony();
-              break;
-            case 'round_reveal_question':
-              store.advanceCeremony();
-              break;
-            case 'round_reveal_answer':
-              store.advanceCeremony();
-              break;
-            case 'question_transition':
-              // Skip transition, go directly to question_anticipation
-              store.setAudienceScene('question_anticipation');
               break;
             default:
               break;
@@ -585,7 +480,7 @@ export function useGameKeyboard() {
           fullscreen.toggleFullscreen();
           break;
 
-        // Ctrl/Cmd+Z — undo last score action (T2.4)
+        // Ctrl/Cmd+Z -- undo last score action
         case 'KeyZ':
           if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey) {
             if (SCORING_PHASE_SCENES.has(currentScene)) {
@@ -609,16 +504,7 @@ export function useGameKeyboard() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [game, fullscreen, toggleScoreboard, toggleTTS, quickScore]);
-
-  // Cleanup reset confirm timer on unmount
-  useEffect(() => {
-    return () => {
-      if (resetConfirmTimerRef.current) {
-        clearTimeout(resetConfirmTimerRef.current);
-      }
-    };
-  }, []);
+  }, [game, fullscreen, toggleScoreboard, toggleTTS, quickScore, isLastQuestionInRound, isLastRoundNow]);
 
   return {
     ...game,
@@ -626,15 +512,13 @@ export function useGameKeyboard() {
     setPeekAnswer,
     showHelp,
     setShowHelp,
-    // R key double-press confirmation state
-    showResetConfirm,
     // Fullscreen state and controls
     isFullscreen: fullscreen.isFullscreen,
     toggleFullscreen: fullscreen.toggleFullscreen,
     // Additional toggles
     toggleScoreboard,
     toggleTTS,
-    // Quick score (T2.4/T2.5)
+    // Quick score
     quickScore,
     // Scene controls (for presenter UI)
     audienceSceneControls,
