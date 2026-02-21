@@ -16,6 +16,28 @@ import {
 } from '@/types/audience-scene';
 
 // =============================================================================
+// SCENE TRIGGERS
+// =============================================================================
+
+/**
+ * Canonical trigger strings for scene transitions.
+ *
+ * These are the only valid trigger values that advanceScene() and
+ * getNextScene() accept. Keyboard handlers, auto-advance timers,
+ * and store actions all use these constants instead of ad-hoc strings.
+ */
+export const SCENE_TRIGGERS = {
+  AUTO: 'auto',
+  SKIP: 'skip',
+  CLOSE: 'close',
+  REVEAL: 'reveal',
+  ADVANCE: 'advance',
+  NEXT_ROUND: 'next_round',
+  START_GAME: 'start_game',
+  DISPLAY_QUESTION: 'display_question',
+} as const;
+
+// =============================================================================
 // DERIVE SCENE FROM STATUS
 // =============================================================================
 
