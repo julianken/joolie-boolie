@@ -59,19 +59,13 @@ export {
 export type {
   AudienceScene,
   RevealPhase,
-  RevealMode,
   ScoreDelta,
-  RevealCeremonyQuestion,
-  RevealCeremonyResults,
 } from './audience-scene';
 
 export {
   SCENE_TIMING,
   REVEAL_TIMING,
-  BATCH_REVEAL_TIMING,
   TIMED_SCENES,
-  BATCH_ONLY_SCENES,
-  INSTANT_ONLY_SCENES,
   VALID_SCENES_BY_STATUS,
 } from './audience-scene';
 
@@ -169,18 +163,6 @@ export interface GameSettings {
   timerAutoStart: boolean;
   timerVisible: boolean;
   ttsEnabled: boolean;
-  /**
-   * How answers are revealed to the audience.
-   *
-   * - 'batch': Default. Pub quiz style -- all answers revealed in the
-   *   round-end ceremony. Builds suspense. Best for groups.
-   * - 'instant': After each question. Educational settings and small groups.
-   *
-   * Changeable between rounds (via updateRevealMode()), not mid-round.
-   * UI: "After each question" (instant) / "At end of round" (batch).
-   * Code values ('instant', 'batch') never appear in UI copy.
-   */
-  revealMode: import('./audience-scene').RevealMode;
 }
 
 // =============================================================================
@@ -276,30 +258,6 @@ export interface TriviaGameState {
    */
   scoreDeltas: import('./audience-scene').ScoreDelta[];
 
-  // -- Batch reveal ceremony fields --
-
-  /**
-   * During batch ceremony: which question index (within RevealCeremonyResults)
-   * is currently active. null when no ceremony is in progress.
-   * 0-based index into revealCeremonyResults.questions[].
-   */
-  revealCeremonyQuestionIndex: number | null;
-
-  /**
-   * During batch ceremony: pre-built snapshot of all questions and team results
-   * for the current round. Built once at ceremony start (startRevealCeremony),
-   * rebuilt if presenter corrects a score during ceremony.
-   * null when no ceremony is in progress.
-   * Synced as part of STATE_UPDATE (~5KB for 10Q x 20 teams).
-   */
-  revealCeremonyResults: import('./audience-scene').RevealCeremonyResults | null;
-
-  /**
-   * During batch ceremony: whether the current question's answer has been
-   * revealed to the audience (i.e., round_reveal_answer scene entered for
-   * this index). Used to render settled state on reconnect.
-   */
-  revealCeremonyAnswerShown: boolean;
 }
 
 // =============================================================================

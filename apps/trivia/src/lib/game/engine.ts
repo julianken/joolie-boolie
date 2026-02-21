@@ -12,8 +12,7 @@
  *   - selectors.ts   — getSelectedQuestion, getDisplayQuestion, getProgress, canStartGame, isGameOver, getCurrentRoundQuestions, getQuestionsForRound, getRoundProgress, getQuestionInRoundProgress, isLastQuestionOfRound, isLastRound, getRoundScores, getTeamRoundScore, getOverallLeaders, getTeamsSortedByScore, toggleScoreboard
  *   - helpers.ts     — deepFreeze, padRoundScores
  *   - state-machine.ts — VALID_TRANSITIONS, transition, canTransition, getNextStatus, getValidActions
- *   - scene.ts       — deriveSceneFromStatus, getNextScene, isSceneValidForStatus, isSceneValidForMode, buildSceneUpdate, buildPauseSceneUpdate, buildResumeSceneUpdate
- *   - ceremony.ts    — buildRevealCeremonyResults, startRevealCeremony, advanceCeremonyQuestion, retreatCeremonyQuestion, abortCeremony, isCeremonyActive, isLastCeremonyQuestion, getCurrentCeremonyQuestion
+ *   - scene.ts       — deriveSceneFromStatus, getNextScene, isSceneValidForStatus, buildSceneUpdate, buildPauseSceneUpdate, buildResumeSceneUpdate
  */
 
 // Lifecycle
@@ -27,7 +26,6 @@ export {
   resumeGame,
   emergencyPause,
   updateSettings,
-  updateRevealMode,
 } from './lifecycle';
 
 // Teams
@@ -118,25 +116,10 @@ export type { SceneTransitionContext } from './scene';
 export {
   deriveSceneFromStatus,
   isSceneValidForStatus,
-  isSceneValidForMode,
   getSceneDuration,
   isSceneTimed,
-  isSceneBatchOnly,
-  isSceneInstantOnly,
   getNextScene,
   buildSceneUpdate,
   buildPauseSceneUpdate,
   buildResumeSceneUpdate,
 } from './scene';
-
-// Ceremony (batch reveal)
-export {
-  buildRevealCeremonyResults,
-  startRevealCeremony,
-  advanceCeremonyQuestion,
-  retreatCeremonyQuestion,
-  abortCeremony,
-  isCeremonyActive,
-  isLastCeremonyQuestion,
-  getCurrentCeremonyQuestion,
-} from './ceremony';
