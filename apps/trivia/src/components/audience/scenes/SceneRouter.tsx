@@ -3,7 +3,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useGameStore } from '@/stores/game-store';
 import { sceneWrapper, sceneWrapperReduced } from '@/lib/motion/presets';
-import type { AudienceScene } from '@/types';
 
 // Scene components
 import { WaitingScene } from './WaitingScene';

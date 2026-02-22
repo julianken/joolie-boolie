@@ -36,7 +36,6 @@ export function RecapQAScene() {
   const shouldReduceMotion = useReducedMotion();
 
   const currentRound = useGameStore((state) => state.currentRound);
-  const totalRounds = useGameStore((state) => state.totalRounds);
   const displayQuestionIndex = useGameStore((state) => state.displayQuestionIndex);
   const recapShowingAnswer = useGameStore((state) => state.recapShowingAnswer);
   const questions = useGameStore((state) => state.questions);

@@ -62,6 +62,8 @@ function createMockState(overrides?: Partial<TriviaGameState>): TriviaGameState 
     sceneTimestamp: 0,
     revealPhase: null,
     scoreDeltas: [],
+    // Recap sub-state (BEA-587)
+    recapShowingAnswer: null,
     ...overrides,
   };
 }

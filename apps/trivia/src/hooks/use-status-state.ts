@@ -51,6 +51,8 @@ function useGameStateSnapshot(): TriviaGameState {
   const sceneTimestamp = useGameStore((s) => s.sceneTimestamp);
   const revealPhase = useGameStore((s) => s.revealPhase);
   const scoreDeltas = useGameStore((s) => s.scoreDeltas);
+  // Recap sub-state (BEA-587)
+  const recapShowingAnswer = useGameStore((s) => s.recapShowingAnswer);
 
   return useMemo<TriviaGameState>(() => ({
     sessionId,
@@ -74,6 +76,8 @@ function useGameStateSnapshot(): TriviaGameState {
     sceneTimestamp,
     revealPhase,
     scoreDeltas,
+    // Recap sub-state (BEA-587)
+    recapShowingAnswer,
   }), [
     sessionId,
     status,
@@ -96,6 +100,8 @@ function useGameStateSnapshot(): TriviaGameState {
     sceneTimestamp,
     revealPhase,
     scoreDeltas,
+    // Recap sub-state (BEA-587)
+    recapShowingAnswer,
   ]);
 }
 
