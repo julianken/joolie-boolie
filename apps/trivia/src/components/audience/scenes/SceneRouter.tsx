@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useGameStore } from '@/stores/game-store';
 import { sceneWrapper, sceneWrapperReduced } from '@/lib/motion/presets';
+import type { AudienceScene } from '@/types';
 
 // Scene components
 import { WaitingScene } from './WaitingScene';
@@ -70,6 +71,7 @@ export function SceneRouter({ isConnected, isResolvingRoomCode = false }: SceneR
       case 'answer_reveal':
       case 'question_closed':
       case 'question_anticipation':
+      case 'recap_qa':
         return `${audienceScene}-${displayQuestionIndex ?? 'none'}`;
 
       case 'round_intro':
@@ -123,8 +125,22 @@ export function SceneRouter({ isConnected, isResolvingRoomCode = false }: SceneR
       case 'question_closed':
         return <QuestionClosedScene />;
 
-      default:
+      // -- Recap scenes (placeholder — components created in WU-06) ----------
+      case 'recap_title':
         return <WaitingScene />;
+
+      case 'recap_qa':
+        return <WaitingScene />;
+
+      case 'recap_scores':
+        return <WaitingScene />;
+
+      default: {
+        // Exhaustiveness guard — TypeScript ensures all AudienceScene values handled.
+        const _exhaustive: never = audienceScene;
+        void _exhaustive;
+        return <WaitingScene />;
+      }
     }
   };
 

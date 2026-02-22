@@ -257,6 +257,18 @@ export interface TriviaGameState {
    */
   scoreDeltas: import('./audience-scene').ScoreDelta[];
 
+  /**
+   * Sub-state for the recap_qa scene controlling question vs answer face.
+   *
+   * - `null`  -- not in recap (default, reset on exit)
+   * - `false` -- question face showing
+   * - `true`  -- answer face showing
+   *
+   * SYNCED via BroadcastChannel STATE_UPDATE so the audience display
+   * renders the correct face on reconnect.
+   */
+  recapShowingAnswer: boolean | null;
+
 }
 
 // =============================================================================
