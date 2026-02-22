@@ -62,6 +62,14 @@ vi.mock('@/stores/game-store', () => ({
       emergencyBlank: false,
       ttsEnabled: false,
       _isHydrating: false,
+      // Scene fields (BEA-568)
+      audienceScene: 'waiting' as const,
+      sceneBeforePause: null,
+      sceneTimestamp: 0,
+      revealPhase: null,
+      scoreDeltas: [],
+      // Recap sub-state (BEA-587)
+      recapShowingAnswer: null,
       // GameStore action methods
       startGame: vi.fn(),
       endGame: vi.fn(),
@@ -86,6 +94,11 @@ vi.mock('@/stores/game-store', () => ({
       loadTeamsFromSetup: vi.fn(),
       importQuestions: vi.fn(),
       _hydrate: vi.fn(),
+      // Scene action methods (BEA-587/588)
+      setAudienceScene: vi.fn(),
+      advanceScene: vi.fn(),
+      setRevealPhase: vi.fn(),
+      setScoreDeltasBatch: vi.fn(),
     };
     return selector ? selector(store) : store;
   }),
@@ -308,6 +321,14 @@ describe('SaveTemplateModal', () => {
         emergencyBlank: false,
         ttsEnabled: false,
         _isHydrating: false,
+        // Scene fields (BEA-568)
+        audienceScene: 'waiting' as const,
+        sceneBeforePause: null,
+        sceneTimestamp: 0,
+        revealPhase: null,
+        scoreDeltas: [],
+        // Recap sub-state (BEA-587)
+        recapShowingAnswer: null,
         startGame: vi.fn(),
         endGame: vi.fn(),
         resetGame: vi.fn(),
@@ -331,6 +352,11 @@ describe('SaveTemplateModal', () => {
         loadTeamsFromSetup: vi.fn(),
         importQuestions: vi.fn(),
         _hydrate: vi.fn(),
+        // Scene action methods (BEA-587/588)
+        setAudienceScene: vi.fn(),
+        advanceScene: vi.fn(),
+        setRevealPhase: vi.fn(),
+        setScoreDeltasBatch: vi.fn(),
       };
       return selector ? selector(store) : store;
     });
@@ -378,6 +404,14 @@ describe('SaveTemplateModal', () => {
         emergencyBlank: false,
         ttsEnabled: false,
         _isHydrating: false,
+        // Scene fields (BEA-568)
+        audienceScene: 'waiting' as const,
+        sceneBeforePause: null,
+        sceneTimestamp: 0,
+        revealPhase: null,
+        scoreDeltas: [],
+        // Recap sub-state (BEA-587)
+        recapShowingAnswer: null,
         startGame: vi.fn(),
         endGame: vi.fn(),
         resetGame: vi.fn(),
@@ -401,6 +435,11 @@ describe('SaveTemplateModal', () => {
         loadTeamsFromSetup: vi.fn(),
         importQuestions: vi.fn(),
         _hydrate: vi.fn(),
+        // Scene action methods (BEA-587/588)
+        setAudienceScene: vi.fn(),
+        advanceScene: vi.fn(),
+        setRevealPhase: vi.fn(),
+        setScoreDeltasBatch: vi.fn(),
       };
       return selector ? selector(store) : store;
     });

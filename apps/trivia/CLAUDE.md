@@ -170,13 +170,16 @@ pnpm test:coverage     # Run tests with coverage
 | Arrow Up/Down | Navigate questions |
 | Space | Peek answer (local only, not shown on display) |
 | D | Toggle display question on audience |
-| N | Next round |
+| N | Next round / Skip to next round (from any recap scene: recap_title, recap_qa, recap_scores) |
 | P | Pause/Resume game |
 | E | Emergency pause (blanks audience display) |
 | R | Reset game |
 | M | Mute/unmute TTS |
 | T | Toggle scoreboard |
 | ? | Help modal (keyboard shortcuts) |
+| Arrow Left | Navigate to previous question in recap Q/A cycling (between_rounds only) |
+| Arrow Right | Advance to next question / view scores in recap Q/A cycling |
+| A | Toggle answer reveal in recap Q/A scene (between_rounds only) |
 
 ## Architecture Notes
 
