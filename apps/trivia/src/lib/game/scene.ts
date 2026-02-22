@@ -32,6 +32,7 @@ export const SCENE_TRIGGERS = {
   CLOSE: 'close',
   REVEAL: 'reveal',
   ADVANCE: 'advance',
+  BACK: 'back',
   NEXT_ROUND: 'next_round',
   START_GAME: 'start_game',
   DISPLAY_QUESTION: 'display_question',
@@ -156,6 +157,7 @@ export interface SceneTransitionContext {
  *   'close'      -- presenter pressed S to close question / enter scoring
  *   'reveal'     -- presenter pressed A to reveal answer
  *   'advance'    -- presenter pressed Right Arrow / Enter
+ *   'back'       -- presenter pressed Left Arrow (recap backward navigation)
  *   'complete'   -- presenter pressed C to complete round (last question)
  *   'next_round' -- presenter pressed N (from round_summary)
  *   'pause'      -- presenter pressed P
@@ -234,10 +236,36 @@ export function getNextScene(
 
     // -- Round summary (scoring wait screen) --------------------------------
     case 'round_summary':
-      // Right Arrow: start answer review
-      if (trigger === 'advance') return 'answer_reveal';
-      // N key: skip answer review, go directly to next round
+      // Right Arrow: start recap flow
+      if (trigger === 'advance') return 'recap_title';
+      // N key: skip recap, go directly to next round
       if (trigger === 'next_round') {
+        return isLastRound ? 'final_buildup' : 'round_intro';
+      }
+      return null;
+
+    // -- Recap flow (between-rounds answer review) -------------------------
+    case 'recap_title':
+      // Right Arrow: begin Q/A review
+      if (trigger === 'advance') return 'recap_qa';
+      // N key: skip recap entirely, go to next round
+      if (trigger === 'next_round') {
+        return isLastRound ? 'final_buildup' : 'round_intro';
+      }
+      return null;
+
+    case 'recap_qa':
+      // Right Arrow / skip: advance to score reveal (store handles mid-sequence Q cycling)
+      if (trigger === 'advance' || trigger === 'skip') return 'recap_scores';
+      // N key: skip remaining recap, go to next round
+      if (trigger === 'next_round') {
+        return isLastRound ? 'final_buildup' : 'round_intro';
+      }
+      return null;
+
+    case 'recap_scores':
+      // Right Arrow / Enter / N: proceed to next round
+      if (trigger === 'advance' || trigger === 'next_round') {
         return isLastRound ? 'final_buildup' : 'round_intro';
       }
       return null;

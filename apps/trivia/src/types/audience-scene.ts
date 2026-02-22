@@ -15,7 +15,7 @@
 // =============================================================================
 
 /**
- * All 12 audience scene values.
+ * All 15 audience scene values.
  *
  * Scene validity by GameStatus:
  *   setup          -> waiting
@@ -23,7 +23,9 @@
  *                    question_display, question_closed,
  *                    answer_reveal,
  *                    waiting, paused, emergency_blank
- *   between_rounds -> round_summary, paused, emergency_blank
+ *   between_rounds -> round_summary, answer_reveal,
+ *                    recap_title, recap_qa, recap_scores,
+ *                    paused, emergency_blank
  *   paused         -> paused, emergency_blank
  *   ended          -> final_buildup, final_podium, paused, emergency_blank
  */
@@ -44,6 +46,12 @@ export type AudienceScene =
   | 'answer_reveal'
   /** Full scoreboard + round winner callout + score deltas. Indefinite. */
   | 'round_summary'
+  /** "ROUND N RECAP" hero card. Entry point to between-rounds recap flow. Indefinite. */
+  | 'recap_title'
+  /** Bidirectional Q/A review. recapShowingAnswer controls question vs answer face. Indefinite. */
+  | 'recap_qa'
+  /** Animated scoreboard with final round scores. Terminal recap scene before next round. Indefinite. */
+  | 'recap_scores'
   /** "GAME OVER" scales in dramatically. 3s auto-advance. */
   | 'final_buildup'
   /** Staged 3rd -> 2nd -> 1st podium reveal. ~8s animation, then indefinite. */
@@ -172,7 +180,9 @@ export const VALID_SCENES_BY_STATUS: Record<string, ReadonlySet<AudienceScene>> 
     'waiting', 'paused', 'emergency_blank',
   ]),
   between_rounds: new Set<AudienceScene>([
-    'round_summary', 'answer_reveal', 'paused', 'emergency_blank',
+    'round_summary', 'answer_reveal',
+    'recap_title', 'recap_qa', 'recap_scores',
+    'paused', 'emergency_blank',
   ]),
   paused: new Set<AudienceScene>(['paused', 'emergency_blank']),
   ended: new Set<AudienceScene>([
