@@ -9,6 +9,7 @@ interface RoundSummaryProps {
   teamsSortedByScore: Team[];
   isLastRound: boolean;
   onNextRound: () => void;
+  onReviewAnswers?: () => void;
   onClose: () => void;
 }
 
@@ -19,6 +20,7 @@ export function RoundSummary({
   teamsSortedByScore,
   isLastRound,
   onNextRound,
+  onReviewAnswers,
   onClose,
 }: RoundSummaryProps) {
   const roundNumber = currentRound + 1;
@@ -89,6 +91,17 @@ export function RoundSummary({
         >
           {isLastRound ? 'View Questions' : 'Back to Game'}
         </button>
+        {onReviewAnswers && (
+          <button
+            onClick={onReviewAnswers}
+            aria-label={`Review round ${roundNumber} answers on audience display`}
+            className="px-4 py-2 rounded-lg text-base font-semibold
+              bg-primary hover:bg-primary/90 text-primary-foreground
+              transition-colors duration-200"
+          >
+            Review Answers
+          </button>
+        )}
         <button
           onClick={onNextRound}
           aria-label={isLastRound ? 'End game and show final results' : `Start round ${roundNumber + 1}`}

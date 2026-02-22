@@ -69,6 +69,24 @@ export default function PlayPage() {
 
   // Round summary overlay control
   const [showRoundSummary, setShowRoundSummary] = useState(false);
+  const audienceScene = useGameStore((state) => state.audienceScene);
+
+  // Auto-hide round summary overlay when game state advances past it:
+  // - Reset to setup (all reset paths)
+  // - Next round starts (status → playing)
+  // - Recap entry via ArrowRight (scene leaves round_summary during between_rounds)
+  // Note: does NOT hide during 'ended' so "View Final Results" overlay stays visible.
+  useEffect(() => {
+    if (game.status === 'setup' || game.status === 'playing') {
+      setShowRoundSummary(false);
+    }
+  }, [game.status]);
+
+  useEffect(() => {
+    if (game.status === 'between_rounds' && audienceScene !== 'round_summary') {
+      setShowRoundSummary(false);
+    }
+  }, [audienceScene, game.status]);
 
   // Auto-sync game state to database (only in online mode)
   const gameState = useGameStore();
@@ -173,11 +191,13 @@ export default function PlayPage() {
   const handleNextRound = () => {
     game.nextRound();
     setShowRoundSummary(false);
+    useGameStore.getState().setAudienceScene('round_intro');
   };
 
   const handleCompleteRound = () => {
     game.completeRound();
     setShowRoundSummary(true);
+    useGameStore.getState().setAudienceScene('round_summary');
   };
 
   const [showSettings, setShowSettings] = useState(false);
@@ -226,9 +246,6 @@ export default function PlayPage() {
     },
     [game]
   );
-
-  /** Read audienceScene directly from the store (Issue 2.3, T1.13) */
-  const audienceScene = useGameStore((state) => state.audienceScene);
 
   /** Read revealPhase for sound triggers (T3.1) */
   const revealPhase = useGameStore((state) => state.revealPhase);
@@ -591,6 +608,10 @@ export default function PlayPage() {
                   teamsSortedByScore={game.teamsSortedByScore}
                   isLastRound={game.isLastRound || game.status === 'ended'}
                   onNextRound={handleNextRound}
+                  onReviewAnswers={game.status === 'between_rounds' ? () => {
+                    setShowRoundSummary(false);
+                    useGameStore.getState().advanceScene('advance');
+                  } : undefined}
                   onClose={() => setShowRoundSummary(false)}
                 />
               </div>

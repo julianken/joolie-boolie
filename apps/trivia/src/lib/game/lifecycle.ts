@@ -107,6 +107,7 @@ export function resetGame(state: TriviaGameState): TriviaGameState {
     ...initial,
     sessionId: state.sessionId, // Keep same session
     settings: state.settings, // Keep settings
+    questions: state.questions, // Keep imported question set
     totalRounds: state.settings.roundsCount,
     timer: {
       duration: state.settings.timerDuration,

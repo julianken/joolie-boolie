@@ -97,6 +97,13 @@ export function useGameKeyboard() {
   const [peekAnswer, setPeekAnswer] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Reset peekAnswer when game resets to setup
+  useEffect(() => {
+    if (game.status === 'setup') {
+      setPeekAnswer(false);
+    }
+  }, [game.status]);
+
   // Quick score -- keyed by selectedQuestionIndex so it resets per question
   const quickScore = useQuickScore(game.selectedQuestionIndex);
 

@@ -134,7 +134,10 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
   resetGame: () => {
     lifecycleLogger.emit('game.reset');
-    set((state) => resetGameEngine(state));
+    set((state) => ({
+      ...resetGameEngine(state),
+      sceneTimestamp: Date.now(),
+    }));
   },
 
   selectQuestion: (index: number) => {
