@@ -9,8 +9,7 @@ import {
   springAnswerReveal,
 } from '@/lib/motion/presets';
 import { getTeamColor } from '@/lib/motion/team-colors';
-import type { ScoreDelta } from '@/types';
-import type { Team } from '@/types';
+import type { ScoreDelta, Team } from '@/types';
 
 /**
  * Rank change indicator props.
