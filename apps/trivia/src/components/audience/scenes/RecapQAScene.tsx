@@ -53,19 +53,24 @@ export function RecapQAScene() {
     return questions[displayQuestionIndex] ?? null;
   }, [questions, displayQuestionIndex]);
 
-  // Position of this question within the round (0-based index)
+  // Position of this question within the round (0-based index).
+  // findIndex returns -1 when displayQuestionIndex points to a question from
+  // a different round (e.g. stale state after a round transition). Clamp to 0
+  // so downstream calculations always produce a valid question number.
   const questionIndexInRound = useMemo(() => {
     if (!currentQuestion) return 0;
     return questionsInRound.findIndex((q) => q.id === currentQuestion.id);
   }, [questionsInRound, currentQuestion]);
 
+  const safeQuestionIndex = questionIndexInRound === -1 ? 0 : questionIndexInRound;
+
   const totalQuestionsInRound = questionsInRound.length;
-  const isFirstQuestion = questionIndexInRound === 0;
-  const isLastQuestion = questionIndexInRound >= totalQuestionsInRound - 1;
+  const isFirstQuestion = safeQuestionIndex === 0;
+  const isLastQuestion = safeQuestionIndex >= totalQuestionsInRound - 1;
   const isAnswerFace = recapShowingAnswer === true;
 
   const roundNumber = currentRound + 1;
-  const questionNumberInRound = questionIndexInRound + 1;
+  const questionNumberInRound = safeQuestionIndex + 1;
 
   const outerVariants = shouldReduceMotion ? heroSceneEnterReduced : heroSceneEnter;
   // Inner flip: fade between question face and answer face

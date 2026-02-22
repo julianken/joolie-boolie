@@ -33,7 +33,6 @@ export function RecapTitleScene() {
       className="flex flex-col items-center justify-center h-full min-h-[60vh] gap-8 w-full px-4"
       role="region"
       aria-label={`Round ${roundNumber} recap`}
-      aria-live="polite"
     >
       <motion.div
         className="flex flex-col items-center gap-6 text-center"
