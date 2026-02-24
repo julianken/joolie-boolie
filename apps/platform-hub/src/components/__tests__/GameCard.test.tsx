@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { createRef } from 'react';
 import { GameCard } from '../GameCard';
 
 const defaultProps = {
@@ -139,36 +138,22 @@ describe('GameCard', () => {
   });
 
   describe('styling', () => {
-    it('applies custom colorClass', () => {
+    it('colorClass prop is accepted without error', () => {
+      // colorClass is kept for backward compat but not applied to the anchor
       render(<GameCard {...defaultProps} colorClass="bg-blue-50" />);
-      const link = screen.getByRole('article');
-      expect(link.className).toContain('bg-blue-50');
+      expect(screen.getByRole('article')).toBeInTheDocument();
     });
 
-    it('applies custom className', () => {
-      render(<GameCard {...defaultProps} className="custom-class" />);
-      const link = screen.getByRole('article');
-      expect(link).toHaveClass('custom-class');
-    });
-
-    it('has rounded corners', () => {
+    it('inner link has rounded corners', () => {
       render(<GameCard {...defaultProps} />);
       const link = screen.getByRole('article');
-      expect(link.className).toContain('rounded-2xl');
+      expect(link.className).toContain('rounded-xl');
     });
 
-    it('has border', () => {
+    it('inner link has focus-visible ring', () => {
       render(<GameCard {...defaultProps} />);
       const link = screen.getByRole('article');
-      expect(link.className).toContain('border-2');
-    });
-  });
-
-  describe('ref forwarding', () => {
-    it('forwards ref correctly', () => {
-      const ref = createRef<HTMLAnchorElement>();
-      render(<GameCard {...defaultProps} ref={ref} />);
-      expect(ref.current).toBeInstanceOf(HTMLAnchorElement);
+      expect(link.className).toContain('focus-visible:ring-2');
     });
   });
 

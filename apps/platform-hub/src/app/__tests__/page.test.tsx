@@ -7,8 +7,9 @@ describe('HomePage', () => {
     it('renders the main heading', () => {
       render(<HomePage />);
       expect(
-        screen.getByRole('heading', { name: 'Joolie Boolie', level: 1 })
+        screen.getByRole('heading', { level: 1 })
       ).toBeInTheDocument();
+      expect(screen.getByText(/Bring People/)).toBeInTheDocument();
     });
 
     it('renders the tagline', () => {
@@ -20,7 +21,7 @@ describe('HomePage', () => {
 
     it('renders the call-to-action message', () => {
       render(<HomePage />);
-      expect(screen.getByText(/Easy to run. Fun to play./)).toBeInTheDocument();
+      expect(screen.getByText(/Easy to run. Everyone can participate./)).toBeInTheDocument();
     });
 
     it('has proper aria-labelledby on hero section', () => {
@@ -31,10 +32,10 @@ describe('HomePage', () => {
   });
 
   describe('game selector section', () => {
-    it('renders the section heading', () => {
+    it('renders the features section heading', () => {
       render(<HomePage />);
       expect(
-        screen.getByRole('heading', { name: 'Choose Your Game', level: 2 })
+        screen.getByRole('heading', { name: 'Designed for You', level: 2 })
       ).toBeInTheDocument();
     });
 
@@ -144,10 +145,10 @@ describe('HomePage', () => {
       expect(grid).toBeInTheDocument();
     });
 
-    it('has responsive grid columns', () => {
+    it('has responsive flex layout for game cards', () => {
       const { container } = render(<HomePage />);
-      const grid = container.querySelector('[role="list"]');
-      expect(grid?.className).toContain('md:grid-cols-2');
+      const gameList = container.querySelector('[role="list"]');
+      expect(gameList?.className).toContain('md:w-[45%]');
     });
   });
 });

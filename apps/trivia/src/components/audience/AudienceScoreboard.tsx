@@ -69,6 +69,14 @@ export function AudienceScoreboard({
       </div>
 
       {/* Scoreboard rows */}
+      {teams.length === 0 ? (
+        <p
+          className="text-center text-foreground-secondary w-full"
+          style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', padding: '4vh 0' }}
+        >
+          No teams yet
+        </p>
+      ) : (
       <motion.div
         className="w-full flex-1 min-h-0 overflow-y-auto"
         style={{ maxWidth: '88vw', paddingLeft: '2vw', paddingRight: '2vw' }}
@@ -79,15 +87,7 @@ export function AudienceScoreboard({
         aria-label="Team standings"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px, 1.2vh, 20px)' }}>
-        {teams.length === 0 ? (
-          <p
-            className="text-center text-foreground-secondary"
-            style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', padding: '4vh 0' }}
-          >
-            No teams yet
-          </p>
-        ) : (
-          teams.map((team, index) => {
+        {teams.map((team, index) => {
             const teamColor = getTeamColor(index);
             const scoreBarWidth = maxScore > 0 ? (team.score / maxScore) * 100 : 0;
             const isTopThree = index < 3;
@@ -174,10 +174,10 @@ export function AudienceScoreboard({
                 </div>
               </motion.div>
             );
-          })
-        )}
+          })}
         </div>
       </motion.div>
+      )}
 
       {/* Next round indicator */}
       {!isLastRound && (

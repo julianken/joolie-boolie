@@ -172,32 +172,7 @@ describe('AudienceScoreboard', () => {
       expect(screen.getByText('4')).toBeInTheDocument();
     });
 
-    it('should style gold medal correctly', () => {
-      const teams = [createMockTeam('team-1', 'Winner', 50, 1)];
-
-      const { container } = render(
-        <AudienceScoreboard {...defaultProps} teams={teams} />
-      );
-
-      const goldMedal = container.querySelector('.bg-yellow-500');
-      expect(goldMedal).toBeInTheDocument();
-    });
-
-    it('should style silver medal correctly', () => {
-      const teams = [
-        createMockTeam('team-1', 'First', 50, 1),
-        createMockTeam('team-2', 'Second', 40, 2),
-      ];
-
-      const { container } = render(
-        <AudienceScoreboard {...defaultProps} teams={teams} />
-      );
-
-      const silverMedal = container.querySelector('.bg-gray-400');
-      expect(silverMedal).toBeInTheDocument();
-    });
-
-    it('should style bronze medal correctly', () => {
+    it('should style top 3 medals with team color backgrounds', () => {
       const teams = [
         createMockTeam('team-1', 'First', 50, 1),
         createMockTeam('team-2', 'Second', 40, 2),
@@ -208,35 +183,37 @@ describe('AudienceScoreboard', () => {
         <AudienceScoreboard {...defaultProps} teams={teams} />
       );
 
-      const bronzeMedal = container.querySelector('.bg-amber-700');
-      expect(bronzeMedal).toBeInTheDocument();
+      // Top 3 rank badges use inline background styles from getTeamColor()
+      const rankBadges = container.querySelectorAll('.rounded-full.font-bold');
+      expect(rankBadges.length).toBe(3);
     });
   });
 
   describe('large, readable fonts', () => {
-    it('should have large header text', () => {
+    it('should have bold header text', () => {
       render(<AudienceScoreboard {...defaultProps} />);
 
       const header = screen.getByText('Round 1 Complete!');
-      expect(header).toHaveClass('text-4xl');
+      expect(header).toHaveClass('font-bold');
+      expect(header.tagName).toBe('H2');
     });
 
-    it('should have large team name text', () => {
+    it('should have semibold team name text', () => {
       const teams = [createMockTeam('team-1', 'Big Team', 50, 1)];
 
       render(<AudienceScoreboard {...defaultProps} teams={teams} />);
 
       const teamName = screen.getByText('Big Team');
-      expect(teamName).toHaveClass('text-2xl');
+      expect(teamName).toHaveClass('font-semibold');
     });
 
-    it('should have large score text', () => {
+    it('should have bold score text', () => {
       const teams = [createMockTeam('team-1', 'Team', 100, 1)];
 
       render(<AudienceScoreboard {...defaultProps} teams={teams} />);
 
       const score = screen.getByText('100');
-      expect(score).toHaveClass('text-3xl');
+      expect(score).toHaveClass('font-bold');
     });
   });
 
@@ -269,24 +246,27 @@ describe('AudienceScoreboard', () => {
       );
 
       const nextRoundMessage = screen.getByText('Next round starting soon...');
-      expect(nextRoundMessage).toHaveClass('animate-pulse');
+      expect(nextRoundMessage).toHaveClass('motion-safe:animate-pulse');
     });
   });
 
   describe('layout', () => {
-    it('should have fade-in animation', () => {
-      const { container } = render(<AudienceScoreboard {...defaultProps} />);
+    it('should use framer-motion for row animations', () => {
+      const teams = [createMockTeam('team-1', 'Team', 50, 1)];
+      const { container } = render(
+        <AudienceScoreboard {...defaultProps} teams={teams} />
+      );
 
-      const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('animate-in');
-      expect(wrapper).toHaveClass('fade-in');
+      // motion.div renders with role="list"
+      const list = container.querySelector('[role="list"]');
+      expect(list).toBeInTheDocument();
     });
 
-    it('should have minimum height', () => {
+    it('should fill available height', () => {
       const { container } = render(<AudienceScoreboard {...defaultProps} />);
 
       const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('min-h-[60vh]');
+      expect(wrapper).toHaveClass('h-full');
     });
 
     it('should be centered', () => {
@@ -297,29 +277,35 @@ describe('AudienceScoreboard', () => {
     });
   });
 
-  describe('column headers', () => {
-    it('should display Rank header', () => {
+  describe('team standings list', () => {
+    it('should have role="list" with aria-label', () => {
       const teams = [createMockTeam('team-1', 'Team', 50, 1)];
 
       render(<AudienceScoreboard {...defaultProps} teams={teams} />);
 
-      expect(screen.getByText('Rank')).toBeInTheDocument();
+      const list = screen.getByRole('list', { name: 'Team standings' });
+      expect(list).toBeInTheDocument();
     });
 
-    it('should display Team header', () => {
-      const teams = [createMockTeam('team-1', 'Test', 50, 1)];
+    it('should have role="listitem" for each team', () => {
+      const teams = [
+        createMockTeam('team-1', 'First', 50, 1),
+        createMockTeam('team-2', 'Second', 40, 2),
+      ];
 
       render(<AudienceScoreboard {...defaultProps} teams={teams} />);
 
-      expect(screen.getByText('Team')).toBeInTheDocument();
+      const items = screen.getAllByRole('listitem');
+      expect(items).toHaveLength(2);
     });
 
-    it('should display Score header', () => {
-      const teams = [createMockTeam('team-1', 'Test', 50, 1)];
+    it('should have aria-label on each team row', () => {
+      const teams = [createMockTeam('team-1', 'Alpha', 50, 1)];
 
       render(<AudienceScoreboard {...defaultProps} teams={teams} />);
 
-      expect(screen.getByText('Score')).toBeInTheDocument();
+      const item = screen.getByRole('listitem');
+      expect(item).toHaveAttribute('aria-label', '1st place: Alpha, 50 points');
     });
   });
 

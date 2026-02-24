@@ -99,7 +99,7 @@ export function GameEndDisplay({ teams }: GameEndDisplayProps) {
             >
               2ND
             </span>
-            <h3
+            <p
               className="font-bold text-foreground"
               style={{
                 fontSize: 'clamp(1.5rem, 3vw, 2.75rem)',
@@ -107,7 +107,7 @@ export function GameEndDisplay({ teams }: GameEndDisplayProps) {
               }}
             >
               {second.name}
-            </h3>
+            </p>
             <AnimatedScore
               value={second.score}
               className="font-bold"
@@ -234,7 +234,7 @@ export function GameEndDisplay({ teams }: GameEndDisplayProps) {
             >
               3RD
             </span>
-            <h3
+            <p
               className="font-bold text-foreground"
               style={{
                 fontSize: 'clamp(1.5rem, 2.5vw, 2.5rem)',
@@ -242,7 +242,7 @@ export function GameEndDisplay({ teams }: GameEndDisplayProps) {
               }}
             >
               {third.name}
-            </h3>
+            </p>
             <AnimatedScore
               value={third.score}
               className="font-bold"

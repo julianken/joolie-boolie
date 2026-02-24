@@ -2,7 +2,7 @@
  * Sync Session API Route Tests
  *
  * Tests for POST /api/auth/sync-session
- * Covers: JWT decoding, cookie setting, expiration calculation, error handling
+ * Covers: JWT verification, cookie setting, expiration calculation, error handling
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -20,10 +20,11 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(() => Promise.resolve(mockCookieStore)),
 }));
 
-// Mock jwt-decode
-const mockJwtDecode = vi.fn();
-vi.mock('jwt-decode', () => ({
-  jwtDecode: (...args: unknown[]) => mockJwtDecode(...args),
+// Mock jose (used for JWT verification in the route)
+const mockJwtVerify = vi.fn();
+vi.mock('jose', () => ({
+  jwtVerify: (...args: unknown[]) => mockJwtVerify(...args),
+  createRemoteJWKSet: vi.fn(() => vi.fn()),
 }));
 
 // Import after mocks
@@ -43,6 +44,8 @@ describe('POST /api/auth/sync-session', () => {
     vi.clearAllMocks();
     vi.stubEnv('NODE_ENV', 'test');
     process.env.COOKIE_DOMAIN = '';
+    // Set SUPABASE_JWT_SECRET so verifyJwt enters the HS256 verification path
+    process.env.SUPABASE_JWT_SECRET = 'test-jwt-secret';
   });
 
   afterEach(() => {
@@ -87,15 +90,17 @@ describe('POST /api/auth/sync-session', () => {
     });
   });
 
-  // --- JWT decoding and cookie setting ---
+  // --- JWT verification and cookie setting ---
 
   describe('successful session sync', () => {
-    it('should decode JWT and set cookies with user info', async () => {
+    it('should verify JWT and set cookies with user info', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
-      mockJwtDecode.mockReturnValue({
-        sub: 'user-abc-123',
-        email: 'user@example.com',
-        exp: futureExp,
+      mockJwtVerify.mockResolvedValue({
+        payload: {
+          sub: 'user-abc-123',
+          email: 'user@example.com',
+          exp: futureExp,
+        },
       });
 
       const request = createSyncRequest({
@@ -116,9 +121,8 @@ describe('POST /api/auth/sync-session', () => {
 
     it('should set jb_access_token cookie with httpOnly', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 1800;
-      mockJwtDecode.mockReturnValue({
-        sub: 'user-123',
-        exp: futureExp,
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: futureExp },
       });
 
       const request = createSyncRequest({
@@ -141,7 +145,9 @@ describe('POST /api/auth/sync-session', () => {
     });
 
     it('should set jb_refresh_token cookie when refreshToken is provided', async () => {
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -162,7 +168,9 @@ describe('POST /api/auth/sync-session', () => {
     });
 
     it('should NOT set jb_refresh_token cookie when refreshToken is absent', async () => {
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -177,7 +185,9 @@ describe('POST /api/auth/sync-session', () => {
     });
 
     it('should set jb_user_id cookie as non-httpOnly', async () => {
-      mockJwtDecode.mockReturnValue({ sub: 'user-xyz', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-xyz', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -199,7 +209,9 @@ describe('POST /api/auth/sync-session', () => {
     it('should calculate expiresIn from JWT exp claim', async () => {
       // Token that expires in ~2 hours
       const futureExp = Math.floor(Date.now() / 1000) + 7200;
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: futureExp });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: futureExp },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -219,7 +231,9 @@ describe('POST /api/auth/sync-session', () => {
 
     it('should use 0 for expiresIn when token is already expired', async () => {
       const pastExp = Math.floor(Date.now() / 1000) - 100;
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: pastExp });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: pastExp },
+      });
 
       const request = createSyncRequest({
         accessToken: 'expired-jwt',
@@ -235,13 +249,11 @@ describe('POST /api/auth/sync-session', () => {
     });
   });
 
-  // --- JWT decode failure handling ---
+  // --- JWT verification failure handling ---
 
-  describe('JWT decode failure', () => {
-    it('should continue with defaults when JWT decode fails', async () => {
-      mockJwtDecode.mockImplementation(() => {
-        throw new Error('Invalid JWT');
-      });
+  describe('JWT verification failure', () => {
+    it('should return 401 when JWT verification fails', async () => {
+      mockJwtVerify.mockRejectedValue(new Error('Invalid JWT'));
 
       const request = createSyncRequest({
         accessToken: 'invalid-jwt-token',
@@ -251,15 +263,15 @@ describe('POST /api/auth/sync-session', () => {
       const response = await POST(request);
       const data = await response.json();
 
-      // Should succeed despite decode failure
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.user.id).toBe('unknown');
-      expect(data.user.email).toBeUndefined();
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.error).toContain('Invalid or unverifiable access token');
     });
 
     it('should use default expiresIn (3600) when exp claim is missing', async () => {
-      mockJwtDecode.mockReturnValue({ sub: 'user-123' });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123' },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-without-exp',
@@ -275,7 +287,9 @@ describe('POST /api/auth/sync-session', () => {
     });
 
     it('should use "unknown" for userId when sub claim is missing', async () => {
-      mockJwtDecode.mockReturnValue({ email: 'user@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { email: 'user@example.com', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-without-sub',
@@ -294,7 +308,9 @@ describe('POST /api/auth/sync-session', () => {
   describe('environment configuration', () => {
     it('should set secure cookies in production mode', async () => {
       vi.stubEnv('NODE_ENV', 'production');
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -311,7 +327,9 @@ describe('POST /api/auth/sync-session', () => {
 
     it('should set cookie domain when COOKIE_DOMAIN is configured', async () => {
       process.env.COOKIE_DOMAIN = '.joolie-boolie.com';
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -328,7 +346,9 @@ describe('POST /api/auth/sync-session', () => {
 
     it('should trim COOKIE_DOMAIN whitespace', async () => {
       process.env.COOKIE_DOMAIN = '  .joolie-boolie.com  ';
-      mockJwtDecode.mockReturnValue({ sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 });
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
 
       const request = createSyncRequest({
         accessToken: 'jwt-token',
@@ -348,6 +368,10 @@ describe('POST /api/auth/sync-session', () => {
 
   describe('error handling', () => {
     it('should return 500 on unexpected error', async () => {
+      mockJwtVerify.mockResolvedValue({
+        payload: { sub: 'user-123', exp: Math.floor(Date.now() / 1000) + 3600 },
+      });
+
       // Force an error by making cookies() reject
       const { cookies } = await import('next/headers');
       // Use mockImplementationOnce to avoid breaking the mock for subsequent tests

@@ -69,6 +69,7 @@ describe('POST /api/auth/login', () => {
     process.env.E2E_TESTING = '';
     vi.stubEnv('NODE_ENV', 'test');
     process.env.COOKIE_DOMAIN = '';
+    process.env.E2E_JWT_SECRET = 'test-e2e-secret-that-is-at-least-32-chars';
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
   });
@@ -153,7 +154,7 @@ describe('POST /api/auth/login', () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.user).toEqual({
-        id: 'e2e-test-user-00000000-0000-0000-0000-000000000000',
+        id: '00000000-0000-4000-a000-000000000e2e',
         email: 'e2e-test@joolie-boolie.test',
       });
 
@@ -189,7 +190,7 @@ describe('POST /api/auth/login', () => {
 
       // jb_user_id
       expect(cookieCalls[2][0]).toBe('jb_user_id');
-      expect(cookieCalls[2][1]).toBe('e2e-test-user-00000000-0000-0000-0000-000000000000');
+      expect(cookieCalls[2][1]).toBe('00000000-0000-4000-a000-000000000e2e');
       expect(cookieCalls[2][2]).toMatchObject({
         httpOnly: false, // client-side accessible
       });

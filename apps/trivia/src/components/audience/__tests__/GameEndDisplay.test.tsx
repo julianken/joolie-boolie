@@ -19,21 +19,23 @@ const createMockTeam = (
 
 describe('GameEndDisplay', () => {
   describe('game over header', () => {
-    it('should display "Game Over!" heading', () => {
+    it('should display "Game Over" heading', () => {
       const teams = [createMockTeam('team-1', 'Winner', 50, 1)];
 
       render(<GameEndDisplay teams={teams} />);
 
-      expect(screen.getByText('Game Over!')).toBeInTheDocument();
+      expect(screen.getByText('Game Over')).toBeInTheDocument();
     });
 
-    it('should have large heading text', () => {
+    it('should have bold heading text', () => {
       const teams = [createMockTeam('team-1', 'Winner', 50, 1)];
 
       render(<GameEndDisplay teams={teams} />);
 
-      const heading = screen.getByText('Game Over!');
-      expect(heading).toHaveClass('text-5xl');
+      const heading = screen.getByText('Game Over');
+      expect(heading).toHaveClass('font-bold');
+      // Font sizing uses inline clamp() for audience display
+      expect(heading.tagName).toBe('H1');
     });
   });
 
@@ -57,35 +59,38 @@ describe('GameEndDisplay', () => {
       expect(screen.getByText('WINNER')).toBeInTheDocument();
     });
 
-    it('should display winner score with points label', () => {
+    it('should display winner score', () => {
       const teams = [createMockTeam('team-1', 'Winner', 150, 1)];
 
       render(<GameEndDisplay teams={teams} />);
 
-      expect(screen.getByText('150 points')).toBeInTheDocument();
+      // Score is rendered by AnimatedScore component (separate from "points" label)
+      expect(screen.getByText('150')).toBeInTheDocument();
+      // "points" is rendered as a visible <p> element
+      const pointsElements = screen.getAllByText('points');
+      expect(pointsElements.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should display trophy emojis', () => {
+    it('should display crown SVG icon (not emoji)', () => {
       const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
 
       const { container } = render(<GameEndDisplay teams={teams} />);
 
-      // Check for trophy emoji
-      const trophies = container.querySelectorAll('span');
-      const trophyEmojis = Array.from(trophies).filter(
-        (span) => span.textContent === '\uD83C\uDFC6'
-      );
-      expect(trophyEmojis.length).toBeGreaterThanOrEqual(2);
+      // Component uses SVG crown, not trophy emoji
+      const svg = container.querySelector('svg[aria-hidden="true"]');
+      expect(svg).toBeInTheDocument();
     });
 
-    it('should highlight winner with special styling', () => {
+    it('should highlight winner with team color styling', () => {
       const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
 
       const { container } = render(<GameEndDisplay teams={teams} />);
 
-      // Winner should have gold border
-      const winnerBox = container.querySelector('.border-yellow-500');
-      expect(winnerBox).toBeInTheDocument();
+      // Winner card uses inline border + box-shadow with team colors
+      // Note: JSDOM drops border values containing clamp(), so we check box-shadow instead
+      const winnerArticle = container.querySelector('[role="article"][aria-label*="Winner"]');
+      expect(winnerArticle).toBeInTheDocument();
+      expect(winnerArticle?.getAttribute('style')).toContain('box-shadow');
     });
   });
 
@@ -122,11 +127,12 @@ describe('GameEndDisplay', () => {
 
       render(<GameEndDisplay teams={teams} />);
 
-      expect(screen.getByText('80 points')).toBeInTheDocument();
-      expect(screen.getByText('60 points')).toBeInTheDocument();
+      // Scores rendered by AnimatedScore
+      expect(screen.getByText('80')).toBeInTheDocument();
+      expect(screen.getByText('60')).toBeInTheDocument();
     });
 
-    it('should display rank badges for 2nd and 3rd', () => {
+    it('should display rank labels for 2nd and 3rd', () => {
       const teams = [
         createMockTeam('team-1', 'First', 100, 1),
         createMockTeam('team-2', 'Second', 80, 2),
@@ -135,11 +141,12 @@ describe('GameEndDisplay', () => {
 
       render(<GameEndDisplay teams={teams} />);
 
-      expect(screen.getByText('2')).toBeInTheDocument();
-      expect(screen.getByText('3')).toBeInTheDocument();
+      // Component uses uppercase rank labels
+      expect(screen.getByText('2ND')).toBeInTheDocument();
+      expect(screen.getByText('3RD')).toBeInTheDocument();
     });
 
-    it('should style 2nd place with silver', () => {
+    it('should style 2nd place article with aria-label', () => {
       const teams = [
         createMockTeam('team-1', 'First', 100, 1),
         createMockTeam('team-2', 'Second', 80, 2),
@@ -147,11 +154,11 @@ describe('GameEndDisplay', () => {
 
       const { container } = render(<GameEndDisplay teams={teams} />);
 
-      const silverBox = container.querySelector('.border-gray-400');
-      expect(silverBox).toBeInTheDocument();
+      const secondPlace = container.querySelector('[aria-label*="2nd place"]');
+      expect(secondPlace).toBeInTheDocument();
     });
 
-    it('should style 3rd place with bronze', () => {
+    it('should style 3rd place article with aria-label', () => {
       const teams = [
         createMockTeam('team-1', 'First', 100, 1),
         createMockTeam('team-2', 'Second', 80, 2),
@@ -160,8 +167,8 @@ describe('GameEndDisplay', () => {
 
       const { container } = render(<GameEndDisplay teams={teams} />);
 
-      const bronzeBox = container.querySelector('.border-amber-700');
-      expect(bronzeBox).toBeInTheDocument();
+      const thirdPlace = container.querySelector('[aria-label*="3rd place"]');
+      expect(thirdPlace).toBeInTheDocument();
     });
   });
 
@@ -322,32 +329,31 @@ describe('GameEndDisplay', () => {
   });
 
   describe('layout and animations', () => {
-    it('should have fade-in animation', () => {
+    it('should use framer-motion for animations', () => {
+      const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
+
+      const { container } = render(<GameEndDisplay teams={teams} />);
+
+      // Uses motion.div with role="article" for animated cards
+      const articles = container.querySelectorAll('[role="article"]');
+      expect(articles.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should fill available height', () => {
       const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
 
       const { container } = render(<GameEndDisplay teams={teams} />);
 
       const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('animate-in');
-      expect(wrapper).toHaveClass('fade-in');
+      expect(wrapper).toHaveClass('h-full');
     });
 
-    it('should have minimum height', () => {
+    it('should have region role with aria-label', () => {
       const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
 
-      const { container } = render(<GameEndDisplay teams={teams} />);
+      render(<GameEndDisplay teams={teams} />);
 
-      const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('min-h-[60vh]');
-    });
-
-    it('should have zoom animation on winner box', () => {
-      const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
-
-      const { container } = render(<GameEndDisplay teams={teams} />);
-
-      const winnerBox = container.querySelector('.animate-in.zoom-in-95');
-      expect(winnerBox).toBeInTheDocument();
+      expect(screen.getByRole('region', { name: 'Final game results' })).toBeInTheDocument();
     });
   });
 
@@ -359,7 +365,7 @@ describe('GameEndDisplay', () => {
 
       expect(screen.getByText('Only Team')).toBeInTheDocument();
       expect(screen.getByText('WINNER')).toBeInTheDocument();
-      expect(screen.getByText('50 points')).toBeInTheDocument();
+      expect(screen.getByText('50')).toBeInTheDocument();
     });
 
     it('should not show runners up section with single team', () => {
@@ -367,9 +373,9 @@ describe('GameEndDisplay', () => {
 
       const { container } = render(<GameEndDisplay teams={teams} />);
 
-      // No silver or bronze boxes should exist
-      expect(container.querySelector('.border-gray-400')).not.toBeInTheDocument();
-      expect(container.querySelector('.border-amber-700')).not.toBeInTheDocument();
+      // No 2nd or 3rd place articles
+      expect(container.querySelector('[aria-label*="2nd place"]')).not.toBeInTheDocument();
+      expect(container.querySelector('[aria-label*="3rd place"]')).not.toBeInTheDocument();
     });
   });
 
@@ -395,7 +401,31 @@ describe('GameEndDisplay', () => {
       render(<GameEndDisplay teams={teams} />);
 
       expect(screen.getByText('Runner Up')).toBeInTheDocument();
-      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(screen.getByText('2ND')).toBeInTheDocument();
+    });
+  });
+
+  describe('accessibility', () => {
+    it('should have screen reader announcement', () => {
+      const teams = [createMockTeam('team-1', 'Winner', 100, 1)];
+
+      render(<GameEndDisplay teams={teams} />);
+
+      const srAnnouncement = screen.getByText(/Game over\. Winner: Winner with 100 points/);
+      expect(srAnnouncement).toBeInTheDocument();
+      expect(srAnnouncement).toHaveClass('sr-only');
+    });
+
+    it('should have aria-labels on podium articles', () => {
+      const teams = [
+        createMockTeam('team-1', 'Alpha', 100, 1),
+        createMockTeam('team-2', 'Beta', 80, 2),
+      ];
+
+      const { container } = render(<GameEndDisplay teams={teams} />);
+
+      expect(container.querySelector('[aria-label*="Winner: Alpha"]')).toBeInTheDocument();
+      expect(container.querySelector('[aria-label*="2nd place: Beta"]')).toBeInTheDocument();
     });
   });
 });

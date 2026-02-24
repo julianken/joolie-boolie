@@ -72,11 +72,6 @@ describe('Header', () => {
       expect(screen.getByText('Joolie Boolie')).toBeInTheDocument();
     });
 
-    it('renders the tagline on larger screens', () => {
-      render(<Header />);
-      expect(screen.getByText('Fun for Everyone')).toBeInTheDocument();
-    });
-
     it('renders the home link', () => {
       render(<Header />);
       const homeLink = screen.getByLabelText('Joolie Boolie - Home');
@@ -203,16 +198,16 @@ describe('Header', () => {
 
       it('shows Dashboard link when user is authenticated', () => {
         render(<Header />);
-        const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
-        expect(dashboardLink).toBeInTheDocument();
-        expect(dashboardLink).toHaveAttribute('href', '/dashboard');
+        const dashboardLinks = screen.getAllByRole('link', { name: 'Dashboard' });
+        expect(dashboardLinks.length).toBeGreaterThanOrEqual(1);
+        expect(dashboardLinks[0]).toHaveAttribute('href', '/dashboard');
       });
 
       it('shows Settings link when user is authenticated', () => {
         render(<Header />);
-        const settingsLink = screen.getByRole('link', { name: 'Settings' });
-        expect(settingsLink).toBeInTheDocument();
-        expect(settingsLink).toHaveAttribute('href', '/settings');
+        const settingsLinks = screen.getAllByRole('link', { name: 'Settings' });
+        expect(settingsLinks.length).toBeGreaterThanOrEqual(1);
+        expect(settingsLinks[0]).toHaveAttribute('href', '/settings');
       });
 
       it('shows Sign Out button when user is authenticated', () => {

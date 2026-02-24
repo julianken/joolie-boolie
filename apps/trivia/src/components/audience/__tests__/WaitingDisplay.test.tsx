@@ -28,14 +28,15 @@ describe('WaitingDisplay', () => {
   });
 
   describe('text size for readability', () => {
-    it('should have large text for the message', () => {
+    it('should have the message as a distinct paragraph', () => {
       render(
         <WaitingDisplay message="Large readable message" />
       );
 
-      // The message should have large text classes
       const messageElement = screen.getByText('Large readable message');
-      expect(messageElement).toHaveClass('text-3xl');
+      expect(messageElement).toBeInTheDocument();
+      expect(messageElement.tagName).toBe('P');
+      expect(messageElement).toHaveClass('font-medium');
     });
 
     it('should have readable text for the helper', () => {
@@ -44,7 +45,8 @@ describe('WaitingDisplay', () => {
       const helperElement = screen.getByText(
         'The game will appear here when the presenter is ready.'
       );
-      expect(helperElement).toHaveClass('text-xl');
+      expect(helperElement).toBeInTheDocument();
+      expect(helperElement).toHaveClass('text-foreground-secondary');
     });
   });
 
@@ -58,11 +60,11 @@ describe('WaitingDisplay', () => {
       expect(wrapper).toHaveClass('justify-center');
     });
 
-    it('should have minimum height for visibility', () => {
+    it('should fill available height', () => {
       const { container } = render(<WaitingDisplay message="Test" />);
 
       const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('min-h-[60vh]');
+      expect(wrapper).toHaveClass('h-full');
     });
   });
 
@@ -78,10 +80,9 @@ describe('WaitingDisplay', () => {
     it('should have visible spinner styling', () => {
       const { container } = render(<WaitingDisplay message="Loading" />);
 
-      const spinner = container.querySelector('.rounded-full');
+      const spinner = container.querySelector('.rounded-full.animate-spin');
       expect(spinner).toBeInTheDocument();
-      expect(spinner).toHaveClass('w-32');
-      expect(spinner).toHaveClass('h-32');
+      expect(spinner).toHaveAttribute('aria-hidden', 'true');
     });
   });
 
@@ -91,6 +92,17 @@ describe('WaitingDisplay', () => {
 
       const wrapper = container.firstChild;
       expect(wrapper).toHaveClass('text-center');
+    });
+
+    it('should have role="status"', () => {
+      render(<WaitingDisplay message="Test" />);
+      expect(screen.getByRole('status')).toBeInTheDocument();
+    });
+
+    it('should have aria-label matching message', () => {
+      render(<WaitingDisplay message="Game starting soon" />);
+      const status = screen.getByRole('status');
+      expect(status).toHaveAttribute('aria-label', 'Game starting soon');
     });
   });
 });
