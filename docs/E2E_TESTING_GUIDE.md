@@ -81,7 +81,7 @@ pnpm test:e2e:summary
 **Pros:**
 - Stable (no server crashes from resource exhaustion)
 - Matches production environment
-- Maintains parallel execution (6 workers)
+- Maintains parallel execution (2 workers locally, 4 in CI)
 
 **Cons:**
 - Requires 30-60s build step before tests

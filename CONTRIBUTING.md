@@ -15,7 +15,7 @@ Thank you for your interest in contributing to the Joolie Boolie!
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd joolie-boolie-platform
+cd joolie-boolie
 
 # Install dependencies
 pnpm install
@@ -30,11 +30,11 @@ pnpm dev
 
 Use descriptive branch names with prefixes:
 
-- `feature/` - New features (e.g., `feature/bingo-pattern-editor`)
-- `fix/` - Bug fixes (e.g., `fix/audio-volume-persistence`)
-- `refactor/` - Code refactoring (e.g., `refactor/sync-store`)
-- `docs/` - Documentation updates (e.g., `docs/api-reference`)
-- `test/` - Test additions/improvements (e.g., `test/game-engine`)
+- `feat/BEA-###-slug` - New features (e.g., `feat/BEA-123-bingo-pattern-editor`)
+- `fix/BEA-###-slug` - Bug fixes (e.g., `fix/BEA-456-audio-volume-persistence`)
+- `refactor/BEA-###-slug` - Code refactoring (e.g., `refactor/BEA-789-sync-store`)
+- `docs/slug` - Documentation updates (e.g., `docs/api-reference`)
+- `chore/slug` - Build/tooling changes (e.g., `chore/update-deps`)
 
 ### Commit Messages
 

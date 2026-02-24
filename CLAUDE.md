@@ -41,6 +41,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `packages/database` | **Complete** | Type-safe client, CRUD, pagination, hooks, PIN security, API factories |
 | `packages/testing` | **Complete** | BroadcastChannel and Audio mocks |
 | `packages/types` | **Complete** | Shared TypeScript types |
+| `packages/audio` | **Complete** | Shared audio utilities (voice packs, sound effects) |
 | `packages/error-tracking` | **Complete** | Error logging and tracking |
 
 ### Tech Stack
@@ -89,7 +90,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 SESSION_TOKEN_SECRET=your-64-character-hex-string  # openssl rand -hex 32
 
-# Required for bingo/trivia (JWT verification in middleware)
+# Required for all apps (JWT verification in middleware and OAuth token signing)
 SUPABASE_JWT_SECRET=your-supabase-jwt-secret
 
 # Required for bingo/trivia (OAuth flow)

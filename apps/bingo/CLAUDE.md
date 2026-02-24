@@ -134,8 +134,10 @@ pnpm test:coverage    # Run tests with coverage
 | `/api/templates` | GET, POST | Template CRUD |
 | `/api/templates/[id]` | GET, PUT, DELETE | Template by ID |
 | `/api/sessions` | POST | Create game session |
-| `/api/sessions/room` | GET | Get session by room code |
-| `/api/sessions/join-by-pin` | POST | Join session with PIN |
+| `/api/sessions/room/[roomCode]` | GET | Get session by room code |
+| `/api/sessions/[roomCode]/verify-pin` | POST | Verify PIN to join session |
+| `/api/sessions/[roomCode]/state` | PATCH | Update session state |
+| `/api/sessions/[roomCode]/complete` | POST | Complete/end session |
 | `/api/sessions/[roomCode]` | GET | Get session details |
 
 ## Keyboard Shortcuts
@@ -181,7 +183,7 @@ pnpm test:coverage    # With coverage
 ## Future Work (TODO)
 
 - [x] User authentication (OAuth 2.1 via Platform Hub)
-- [ ] Saved game templates
+- [x] Saved game templates
 - [ ] Pattern editor
 - [ ] Voice pack selection UI improvements
 - [ ] Analytics/history tracking

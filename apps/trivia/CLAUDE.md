@@ -165,31 +165,51 @@ pnpm test:coverage     # Run tests with coverage
 
 ## Keyboard Shortcuts
 
-| Key | Action |
-|-----|--------|
-| Arrow Up/Down | Navigate questions |
-| Space | Peek answer (local only, not shown on display) |
-| D | Toggle display question on audience |
-| N | Next round / Skip to next round (from any recap scene: recap_title, recap_qa, recap_scores) |
-| P | Pause/Resume game |
-| E | Emergency pause (blanks audience display) |
-| R | Reset game |
-| M | Mute/unmute TTS |
-| T | Toggle scoreboard |
-| ? | Help modal (keyboard shortcuts) |
-| Arrow Left | Navigate to previous question in recap Q/A cycling (between_rounds only) |
-| Arrow Right | Advance to next question / view scores in recap Q/A cycling |
-| A | Toggle answer reveal in recap Q/A scene (between_rounds only) |
+| Key | Action | Context |
+|-----|--------|---------|
+| Arrow Up | Navigate to previous question | Always |
+| Arrow Down | Navigate to next question | Always |
+| Arrow Left | Previous question in recap Q/A | `between_rounds` + `recap_qa` only |
+| Arrow Right | Advance scene | Always |
+| Space | Peek answer (local only) | Always |
+| D | Toggle display question on audience | Always |
+| N | Next round | `between_rounds`: `round_summary`, `answer_reveal`, `recap_title`, `recap_qa`, `recap_scores` |
+| P | Pause/Resume game | When game is pausable or resumable |
+| E | Emergency pause (blank display) | When game is pausable or resumable |
+| R | Reset game | Always |
+| M | Mute/unmute TTS | Always |
+| T | Start timer / Toggle scoreboard | `question_display`: starts timer; `question_anticipation`: starts timer + advances to `question_display`; otherwise: toggle scoreboard |
+| S | Close question | `question_display` or `question_closed` |
+| Enter | Skip timed scene | Always (advances via `SKIP` trigger) |
+| F | Toggle fullscreen | Always |
+| 1-9, 0 | Quick score: toggle point for team N | Scoring phases: `question_closed`, `answer_reveal`, `round_summary`, `recap_*` |
+| Shift+1-9 | Remove point from team N | Scoring phases |
+| Ctrl/Cmd+Z | Undo last score action | Scoring phases |
+| ? | Show help modal | Always |
 
 ## Architecture Notes
 
 - **BFF Pattern:** Frontend never talks directly to Supabase. All requests go through API routes.
-- **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration.
+- **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration. Engine logic is split across multiple modules in `lib/game/` (engine.ts, scene.ts, buzz-in.ts, etc.) re-exported via barrel pattern.
 - **Buzz-In:** `lib/game/buzz-in.ts` handles buzz-in logic, exposed via `hooks/use-buzz-in.ts`
 - **Timer:** `hooks/use-timer-auto-reveal.ts` manages countdown and auto-reveal behavior
 - **Questions:** `lib/questions/` contains parser, validator, converter, exporter, and types for question import/export
 - **Auth:** OAuth 2.1 via Platform Hub. OAuth client utilities in `lib/auth/` (oauth-client.ts, pkce.ts). Middleware-based JWT verification with lazy JWKS initialization.
 - **Sync:** Session sync wrapper in `lib/sync/session.ts`, built on `@joolie-boolie/sync`
+
+### Scene Engine (AudienceScene)
+
+The AudienceScene system is a visual routing layer orthogonal to the 5-state GameStatus engine (`setup`, `playing`, `between_rounds`, `paused`, `ended`). It controls what the audience display renders without changing game state.
+
+**15 scene values:** `waiting`, `game_intro`, `round_intro`, `question_anticipation`, `question_display`, `question_closed`, `answer_reveal`, `round_summary`, `recap_title`, `recap_qa`, `recap_scores`, `final_buildup`, `final_podium`, `paused`, `emergency_blank`
+
+**Core files:**
+- `types/audience-scene.ts` — `AudienceScene` type, timing constants, scene validity maps
+- `lib/game/scene.ts` — `getNextScene()` state machine, scene triggers, transition logic
+- `hooks/use-audience-scene.ts` — React hook for scene state and auto-advance timers
+- `components/audience/scenes/SceneRouter.tsx` — Routes `audienceScene` value to the correct display component
+
+**Scene transitions** flow through `store.advanceScene(trigger)` which calls `getNextScene()` as the single source of truth. Keyboard handlers dispatch triggers (e.g., `SCENE_TRIGGERS.ADVANCE`, `SCENE_TRIGGERS.SKIP`), never set scenes directly — except P (pause), E (emergency), and R (reset) which bypass the state machine.
 
 ## Design Requirements
 
@@ -213,7 +233,7 @@ pnpm test:coverage    # With coverage
 
 ## Game Mechanics
 
-- **Format:** 2-6 rounds (configurable), 3-10 questions per round
+- **Format:** 1-6 rounds (configurable), 3-10 questions per round
 - **Question Types:** Multiple choice, True/False
 - **Timing:** 30 seconds default (configurable), optional auto-start, auto-reveal
 - **Scoring:** Hybrid - presenter records team answers, auto-scored

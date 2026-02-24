@@ -41,6 +41,10 @@ src/
 | `components/stats/` | Statistics display |
 | `lib/questions/` | Question parser, validator, converter, exporter |
 | `lib/game/buzz-in.ts` | Buzz-in game mechanic |
+| `lib/game/scene.ts` | AudienceScene state machine (15 scenes, orthogonal to GameStatus) |
+| `types/audience-scene.ts` | AudienceScene type, timing constants, scene validity maps |
+| `hooks/use-audience-scene.ts` | Scene state hook with auto-advance timers |
+| `components/audience/scenes/` | SceneRouter and per-scene display components |
 
 ### Bingo-Specific Additions
 
@@ -49,7 +53,8 @@ src/
 | `lib/game/patterns/` | 29 bingo winning patterns across 7 categories |
 | `lib/game/ball-deck.ts` | Fisher-Yates shuffle ball deck |
 | `lib/game/state-machine.ts` | Game status state machine |
-| `app/api/sessions/join-by-pin/` | PIN-based session joining |
+| `app/api/sessions/[roomCode]/verify-pin/` | PIN-based session joining |
+| `app/api/sessions/room/[roomCode]/` | Get session by room code |
 
 ## Platform Hub Layout
 
