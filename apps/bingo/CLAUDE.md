@@ -187,3 +187,15 @@ pnpm test:coverage    # With coverage
 - [ ] Pattern editor
 - [ ] Voice pack selection UI improvements
 - [ ] Analytics/history tracking
+
+## Update Triggers
+
+When modifying any of the files below, update the corresponding section in this CLAUDE.md.
+
+| Source File | Doc Section to Update | What to Check |
+|-------------|----------------------|---------------|
+| `src/app/api/**` | API Routes (under Routes) | New/renamed/removed route directories |
+| `src/hooks/use-audio.ts` | Audio System (under Features) | Changed audio patterns, new sounds |
+| `src/lib/game/patterns/**` | Patterns (under Features) | New/modified bingo patterns |
+| `src/stores/game-store.ts` | Architecture Notes | State transitions, new states |
+| `package.json` | Tech Stack | Major version bumps, new dependencies |
