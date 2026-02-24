@@ -14,7 +14,7 @@ The `BroadcastSync` class in `@joolie-boolie/sync` (`packages/sync/src/broadcast
 
 ## Game Engine Pattern
 
-Pure function-based state management. The engine (`lib/game/engine.ts`) contains pure functions that transform `GameState`. The Zustand store wraps these functions to provide React integration.
+Pure function-based state management. The engine (`lib/game/engine.ts`) contains pure functions that transform `GameState`. The Zustand store wraps these functions to provide React integration. In trivia, the game engine is augmented by a separate AudienceScene layer (`types/audience-scene.ts`, `lib/game/scene.ts`) that controls audience display routing orthogonally to the 5-state GameStatus.
 
 ```
 GameState (immutable) → engine functions → new GameState
@@ -40,6 +40,7 @@ joolie-boolie-platform/
 │   ├── game-engine/     # Abstract game state machine
 │   ├── database/        # Supabase database utilities (268 exports)
 │   ├── types/           # Shared TypeScript type definitions
+│   ├── audio/           # Shared audio utilities (voice packs, sound effects)
 │   ├── error-tracking/  # Error logging and tracking utilities
 │   └── testing/         # Shared test utilities and mocks
 └── supabase/            # Database migrations and functions
