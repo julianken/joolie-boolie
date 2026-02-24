@@ -10,6 +10,8 @@ import { isValidRoomCode } from '@joolie-boolie/sync';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
 import { SceneRouter } from '@/components/audience/scenes';
+import { AudienceTimerDisplay } from '@/components/audience/AudienceTimerDisplay';
+import { useGameStore } from '@/stores/game-store';
 
 /**
  * Invalid Session Error Component
@@ -207,6 +209,9 @@ function AudienceDisplay({
   const displayTheme = useThemeStore((state) => state.displayTheme);
   useApplyTheme(displayTheme);
 
+  // Timer state — targeted selector to minimize re-renders
+  const timer = useGameStore((state) => state.timer);
+
   // Request sync on visibility change (when user switches back to this tab)
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -220,10 +225,15 @@ function AudienceDisplay({
   }, [requestSync]);
 
   return (
-    <main className="h-screen bg-background flex flex-col overflow-hidden" role="main" aria-label="Trivia audience display">
+    <main className="h-screen bg-background flex flex-col overflow-hidden relative" role="main" aria-label="Trivia audience display">
       <div id="display-content" className="flex-1" role="region" aria-label="Game display area" aria-live="polite">
         <SceneRouter isConnected={isConnected} isResolvingRoomCode={isResolvingRoomCode} />
       </div>
+      {timer.isRunning && (
+        <div className="absolute bottom-8 right-8 z-50">
+          <AudienceTimerDisplay timer={timer} />
+        </div>
+      )}
     </main>
   );
 }
