@@ -136,6 +136,8 @@ pnpm test:coverage    # Run tests with coverage
 | `/api/sessions` | POST | Create game session |
 | `/api/sessions/room/[roomCode]` | GET | Get session by room code |
 | `/api/sessions/[roomCode]/verify-pin` | POST | Verify PIN to join session |
+| `/api/sessions/[roomCode]/state` | PATCH | Update session state |
+| `/api/sessions/[roomCode]/complete` | POST | Complete/end session |
 | `/api/sessions/[roomCode]` | GET | Get session details |
 
 ## Keyboard Shortcuts

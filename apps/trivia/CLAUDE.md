@@ -178,7 +178,7 @@ pnpm test:coverage     # Run tests with coverage
 | E | Emergency pause (blank display) | When game is pausable or resumable |
 | R | Reset game | Always |
 | M | Mute/unmute TTS | Always |
-| T | Start timer / Toggle scoreboard | `question_display`/`question_anticipation`: starts timer; otherwise: toggle scoreboard |
+| T | Start timer / Toggle scoreboard | `question_display`: starts timer; `question_anticipation`: starts timer + advances to `question_display`; otherwise: toggle scoreboard |
 | S | Close question | `question_display` or `question_closed` |
 | Enter | Skip timed scene | Always (advances via `SKIP` trigger) |
 | F | Toggle fullscreen | Always |
