@@ -73,7 +73,7 @@ export const springDramatic: Transition = {
 
 /**
  * springUrgent
- * Use for: buzz-in slam, score +1 pop in QuickScoreGrid, timer threshold
+ * Use for: score +1 pop in QuickScoreGrid, timer threshold
  *          visual snap, "TIME'S UP!" badge slam.
  * Character: Fast snap, one crisp rebound, settles immediately (~12% overshoot
  *            at peak, settles in <80ms).

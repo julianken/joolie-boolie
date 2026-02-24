@@ -1,65 +1,116 @@
-# Manual Test Plan - Joolie Boolie
+# Manual Test Plan — Joolie Boolie
 
-> **Purpose:** Human-readable test cases for manual verification using Playwright MCP browser tools.
-> This supplements the ~338 automated E2E tests with interactive validation of visual, audio, and cross-app flows.
->
-> **How to use:** Start dev servers (`pnpm dev`), then walk through each story using `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_evaluate`, and `browser_take_screenshot`.
->
-> **Last executed:** 2026-02-17 (run 8) — **167 PASS, 0 BUGS, 0 NOT TESTED** (from 167 test cases). Full re-verification of all interactive tests. All 164 previously passing tests confirmed stable. 3 newly passing: Tab navigation (Bingo + Trivia) and modal focus trap (Story 5.2). Session recovery, scoring, team rename, pause/resume, emergency pause all re-confirmed.
-> **Auth method:** Authenticated flows tested using `E2E_TESTING=true` mode with Playwright MCP. Login via Platform Hub with E2E credentials (`e2e-test@joolie-boolie.test` / `TestPassword123!`), cookies shared across all ports on `localhost`.
->
-> ### Execution History
-> | Date | Scope | Result |
-> |------|-------|--------|
-> | 2026-02-14 (run 1) | Unauthenticated flows (Sections 1, 2.1, 3.1) | 39/43 PASS, 5 NOTES |
-> | 2026-02-14 (run 2) | Authenticated + remaining flows | 97 PASS, 3 BUGS, 55 NOT TESTED |
-> | 2026-02-14 (run 3) | Bug fixes verified + remaining NOT TESTED | 145 PASS, 0 BUGS, 10 NOT TESTABLE |
-> | 2026-02-14 (run 4) | Full re-run after BEA-506/507/508 merged (PRs #340-342) | 149 PASS, 0 BUGS, 6 NOT TESTABLE |
-> | 2026-02-14 (run 5) | Resolved all 6 NOT TESTABLE items (fullscreen, templates, offline) | 155 PASS, 0 BUGS, 0 NOT TESTABLE |
-> | 2026-02-14 (run 6) | Full re-run of all 155 tests + 1 newly tested (4.3 #1) | 156 PASS, 0 BUGS, 0 NOT TESTABLE |
-> | 2026-02-16 (run 7) | Full re-run after BEA-525/526/527/528/529/530/531 merged (PRs #358-#364) + 11 new Guest Mode tests | 164 PASS, 0 BUGS, 3 NOT TESTED |
-> | 2026-02-17 (run 8) | Full re-verification: game controls, scoring, pause/resume, emergency, team rename, session recovery, tab nav, focus trap | 167 PASS, 0 BUGS, 0 NOT TESTED |
->
-> ### Bugs Found and Fixed
-> | ID | Severity | Description | Fix |
-> |----|----------|-------------|-----|
-> | BEA-503 | Minor | Bingo: Pattern selection doesn't persist across page refresh. | Fixed in PR #337 — pattern now serialized in localStorage |
-> | BEA-504 | Minor | Trivia: Teams and scores don't persist across page refresh. | Fixed in PR #339 — teams/scores now serialized in localStorage |
-> | BEA-505 | Minor | Platform Hub: Profile API returns 500 for E2E users. | Fixed in PR #338 — graceful fallback for missing DB rows |
->
-> ### Notes
-> - Template API returns E2E fixture data (2 templates: "E2E Trivia" + "E2E Bingo Classic") in E2E mode
-> - Playwright's Chromium doesn't inherit macOS dark mode; use `page.emulateMedia({ colorScheme: 'dark' })` to test System Default theme
-> - Trivia scoring controls (+/-) only appear during active gameplay (not during emergency pause)
-> - Presets and Question Set selectors only visible in pre-game setup area, not during gameplay
-> - All security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy) present on all 3 apps
-> - Serwist SW registers in Turbopack dev mode via `@serwist/turbopack` — both Bingo and Trivia have active SWs
-> - Hub mobile overflow at 375px fixed by BEA-527 (PR #359) — body 374px fits within 375px viewport (run 7)
-> - QuestionImporter and CategoryFilter now rendered in page UI (fixed by BEA-506/BEA-507)
-> - Fullscreen API works in Playwright Chromium via `evaluate` (no user gesture required)
-> - Offline mode tested via `context.setOffline(true)` — both apps show banner and continue working
->
-> ### Previously NOT TESTABLE, now PASS
-> | Category | Tests | Resolution |
-> |----------|-------|------------|
-> | File upload/import (3.7 tests 2-4) | 3 | BEA-506 (PR #340) wired QuestionImporter into page UI |
-> | Category filter (3.14 test 2) | 1 | BEA-507 (PR #341) wired CategoryFilter into page UI |
-> | Fullscreen toggle (2.8 test 3) | 1 | Tested via `requestFullscreen()`/`exitFullscreen()` evaluate (run 5) |
-> | Template aggregation (4.4 tests 1-2) | 2 | E2E store provides mock templates — API returns 200 (run 5) |
-> | PWA offline mode (6.1 tests 1-3) | 3 | Serwist SW active in dev mode; tested via `context.setOffline(true)` (run 5) |
-> | Hub mobile overflow (7.1 test 3) | 1 | BEA-527 (PR #359) fixed responsive layout — body 374px within 375px viewport (run 7) |
+The canonical guide for manual QA using **Playwright MCP browser tools**. Covers visual, audio, cross-app, and interactive flows that automated E2E tests cannot.
+
+For automated E2E tests, see [docs/E2E_TESTING_GUIDE.md](E2E_TESTING_GUIDE.md).
+
+---
+
+## Quick Reference
+
+| What | Where |
+|------|-------|
+| Run all stories | Follow Prerequisites below, then walk through sections 1–7 |
+| Run a single story | Search for `Story X.Y` and follow its test cases |
+| Run by app | Section 1 = Platform Hub, Section 2 = Bingo, Section 3 = Trivia |
+| Run cross-app | Section 4 = OAuth/SSO, Section 5 = A11y, Section 6 = PWA, Section 7 = Responsive |
+| Report results | Update the Result column: `**PASS**`, `NOT TESTED`, or `**BUG** — description` |
+| Log a new bug | Add to Bugs Found table below, file a Linear issue (BEA-###) |
+
+**Current status:** 167 PASS, 0 BUGS, 17 NOT TESTED (184 total test cases)
 
 ---
 
 ## Prerequisites
 
+### 1. Start dev servers
+
 ```bash
-# Start all three dev servers
-pnpm dev
-# Bingo:        http://localhost:3000
-# Trivia:       http://localhost:3001
-# Platform Hub: http://localhost:3002
+pnpm dev:e2e    # Starts all 3 apps with E2E_TESTING=true
 ```
+
+| App | Default Port | URL |
+|-----|-------------|-----|
+| Bingo | 3000 | http://localhost:3000 |
+| Trivia | 3001 | http://localhost:3001 |
+| Platform Hub | 3002 | http://localhost:3002 |
+
+> **Worktrees:** If running from `.worktrees/`, ports are hash-offset from the path. Check terminal output for actual ports.
+
+### 2. Playwright MCP browser setup
+
+Always launch the browser in **dark mode** (project convention):
+
+```
+browser_navigate to http://localhost:3000
+browser_evaluate: page.emulateMedia({ colorScheme: 'dark' })
+```
+
+### 3. Authentication
+
+`pnpm dev:e2e` sets `E2E_TESTING=true`, which enables:
+- **Platform Hub** login with E2E credentials: `e2e-test@joolie-boolie.test` / `TestPassword123!`
+- **Bingo/Trivia** middleware accepts E2E JWT tokens automatically
+- Cookies are shared across all `localhost` ports — log in once on Platform Hub, then navigate to game apps
+
+For **unauthenticated flows** (guest mode, public pages), no login is needed.
+
+### 4. Key Playwright MCP tools
+
+| Tool | Use for |
+|------|---------|
+| `browser_navigate` | Go to a URL |
+| `browser_snapshot` | Get page accessibility tree (preferred over screenshot for assertions) |
+| `browser_click` | Click elements by text, role, or ref |
+| `browser_evaluate` | Run JS in page context (API calls, DOM checks, fullscreen, offline) |
+| `browser_take_screenshot` | Visual verification (theme changes, responsive layouts) |
+| `browser_press_key` | Keyboard shortcuts (Space, P, R, U, M, D, E, ?, arrows) |
+| `browser_fill_form` | Fill input fields |
+| `browser_resize` | Test responsive breakpoints (375x667 mobile, 768x1024 tablet) |
+
+### 5. Tips
+
+- Use `browser_snapshot` to verify element presence — it returns the accessibility tree, which is faster and more reliable than screenshots for assertions
+- Use `browser_evaluate` with `fetch()` to test API endpoints directly
+- Use `browser_evaluate` with `context.setOffline(true)` to test offline mode
+- Use `browser_evaluate` with `document.requestFullscreen()` / `document.exitFullscreen()` for fullscreen
+- Playwright Chromium doesn't inherit macOS dark mode — always use `page.emulateMedia({ colorScheme: 'dark' })`
+
+---
+
+## Execution History
+
+| Date | Scope | Result |
+|------|-------|--------|
+| 2026-02-14 (run 1) | Unauthenticated flows (Sections 1, 2.1, 3.1) | 39/43 PASS, 5 NOTES |
+| 2026-02-14 (run 2) | Authenticated + remaining flows | 97 PASS, 3 BUGS, 55 NOT TESTED |
+| 2026-02-14 (run 3) | Bug fixes verified + remaining NOT TESTED | 145 PASS, 0 BUGS, 10 NOT TESTABLE |
+| 2026-02-14 (run 4) | Full re-run after BEA-506/507/508 merged (PRs #340-342) | 149 PASS, 0 BUGS, 6 NOT TESTABLE |
+| 2026-02-14 (run 5) | Resolved all 6 NOT TESTABLE items (fullscreen, templates, offline) | 155 PASS, 0 BUGS, 0 NOT TESTABLE |
+| 2026-02-14 (run 6) | Full re-run of all 155 tests + 1 newly tested (4.3 #1) | 156 PASS, 0 BUGS, 0 NOT TESTABLE |
+| 2026-02-16 (run 7) | Full re-run after BEA-525/526/527/528/529/530/531 merged (PRs #358-#364) + 11 new Guest Mode tests | 164 PASS, 0 BUGS, 3 NOT TESTED |
+| 2026-02-17 (run 8) | Full re-verification: game controls, scoring, pause/resume, emergency, team rename, session recovery, tab nav, focus trap | 167 PASS, 0 BUGS, 0 NOT TESTED |
+| 2026-02-24 | Added 22 test cases for gaps from codebase quality analysis (stories 3.16–3.19) | +22 NOT TESTED |
+| 2026-02-24 | Removed Story 3.17 (Buzz-In) — feature not applicable to this game style (paper-scored pub trivia) | -5 NOT TESTED |
+
+## Bugs Found and Fixed
+
+| ID | Severity | Description | Fix |
+|----|----------|-------------|-----|
+| BEA-503 | Minor | Bingo: Pattern selection doesn't persist across page refresh. | Fixed in PR #337 — pattern now serialized in localStorage |
+| BEA-504 | Minor | Trivia: Teams and scores don't persist across page refresh. | Fixed in PR #339 — teams/scores now serialized in localStorage |
+| BEA-505 | Minor | Platform Hub: Profile API returns 500 for E2E users. | Fixed in PR #338 — graceful fallback for missing DB rows |
+
+## Notes
+
+- Template API returns E2E fixture data (2 templates: "E2E Trivia" + "E2E Bingo Classic") in E2E mode
+- Trivia scoring controls (+/-) only appear during active gameplay (not during emergency pause)
+- Presets and Question Set selectors only visible in pre-game setup area, not during gameplay
+- All security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy) present on all 3 apps
+- Serwist SW registers in Turbopack dev mode via `@serwist/turbopack` — both Bingo and Trivia have active SWs
+- QuestionImporter and CategoryFilter now rendered in page UI (fixed by BEA-506/BEA-507)
+- Fullscreen API works in Playwright Chromium via `evaluate` (no user gesture required)
+- Offline mode tested via `context.setOffline(true)` — both apps show banner and continue working
 
 ---
 
@@ -470,6 +521,43 @@ pnpm dev
 | 2 | Load preset | Select a preset. Verify game settings update (rounds, timer, etc.). | NOT TESTED |
 | 3 | Save preset | Configure settings. Click save preset. Enter name. Verify saved. | **PASS** — "Save Settings as Preset" button visible |
 | 4 | Template selector | Find template selector. Verify it lists templates. | NOT TESTED (Template API 500 in E2E mode) |
+
+### Story 3.16: Audience Display Scene Choreography — **NOT TESTED**
+
+**As an audience member**, I want to see smooth scene transitions on the projector during trivia gameplay.
+
+| # | Test Case | Steps | Result |
+|---|-----------|-------|--------|
+| 1 | SceneRouter renders scenes | Start a game with teams. Progress through: waiting → game_intro → round_intro → question_anticipation → question_display → question_closed → round_summary → recap_title → recap_qa → recap_scores → final_buildup → final_podium. Verify each scene renders on `/display` without blank frames or errors. | NOT TESTED |
+| 2 | answer_reveal 3-beat choreography | Display a question (D), then advance to answer reveal. Verify the 3-beat animation plays (question shown → answer highlighted → scores updated). Navigate away and back to the same question. Verify choreography replays (sceneKey remount). | NOT TESTED |
+| 3 | Scene transitions no flicker | Progress through 3+ scene changes rapidly. Verify no blank frames, no FOUC, and no stale content from previous scene visible during transition. | NOT TESTED |
+| 4 | Scene key remount on question change | On `/display`, advance from Q1 answer_reveal to Q2 question_display. Verify Q2 content appears (not stale Q1 content). Return to Q1. Verify Q1 remounts correctly. | NOT TESTED |
+| 5 | Pre-game waiting scene | Open `/display` before starting game. Verify "Trivia" branding and waiting/idle scene. Verify no JavaScript errors in console. | NOT TESTED |
+| 6 | Final results scene | Complete all rounds. Verify final_results scene shows winner, all team scores sorted descending, and round-by-round breakdown. | NOT TESTED |
+
+### Story 3.18: Timer Auto-Reveal — **NOT TESTED**
+
+**As a presenter**, I want the timer to automatically advance scenes when it expires.
+
+| # | Test Case | Steps | Result |
+|---|-----------|-------|--------|
+| 1 | Timer countdown on display | Enable timer (Settings). Start game, display a question. Verify timer appears on audience display counting down from configured duration. | NOT TESTED |
+| 2 | Timer reaches zero → auto-advance | Let timer reach 0. Verify `timeRemaining=0` triggers `advanceScene('auto')` — the answer reveal scene should appear automatically without presenter input. | NOT TESTED |
+| 3 | Timer reset on new question | After timer expires and auto-advances, navigate to next question. Display it. Verify timer resets to full duration and starts counting down again. | NOT TESTED |
+| 4 | Pause freezes timer | Display a question with timer running. Press P to pause. Verify timer stops. Press P to resume. Verify timer continues from where it stopped (not reset). | NOT TESTED |
+| 5 | Emergency pause hides timer | With timer running on display, press E (emergency). Verify display goes blank (no timer visible). Press E again. Verify timer reappears and continues. | NOT TESTED |
+
+### Story 3.19: Round Recap Flow — **NOT TESTED**
+
+**As a presenter**, I want to see round summaries and progress through the full game arc.
+
+| # | Test Case | Steps | Result |
+|---|-----------|-------|--------|
+| 1 | Complete a round | Navigate through all questions in Round 1. After the last question, verify round recap/summary appears with round scores. | NOT TESTED |
+| 2 | Round recap on display | With `/display` open, complete Round 1. Verify audience display shows round_recap scene with standings. | NOT TESTED |
+| 3 | Advance to next round | From round recap, click "Next Round" or equivalent. Verify Round 2 starts. Verify question list shows Round 2 questions. Verify display shows round_intro scene. | NOT TESTED |
+| 4 | Complete all rounds | Progress through all configured rounds. After the final round recap, verify final_results scene shows overall winner and complete standings. | NOT TESTED |
+| 5 | Recap shows per-round breakdown | On round recap, verify each team's score is broken down by round (R1/R2/R3 columns), not just total. | NOT TESTED |
 
 ---
 

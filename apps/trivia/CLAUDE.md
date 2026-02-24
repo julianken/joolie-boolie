@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Trivia** - A presenter-controlled trivia system for groups and communities. Part of the Joolie Boolie monorepo.
 
-**Current State:** Fully functional with team management, rounds, scoring, TTS, buzz-in, timer auto-reveal, question sets, presets, themes, and dual-screen sync.
+**Current State:** Fully functional with team management, rounds, scoring, TTS, timer auto-reveal, question sets, presets, themes, and dual-screen sync.
 
 ## Tech Stack
 
@@ -41,12 +41,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Display question toggle (show/hide on audience)
 - Peek answer (presenter only, local state)
 - Answer reveal flow
-
-### Buzz-In System
-- Real-time buzz-in for audience participants
-- Presenter buzz-in panel for managing responses (`components/presenter/BuzzInPanel.tsx`)
-- Audience buzz-in display with feedback (`components/audience/BuzzInDisplay.tsx`)
-- Core logic in `lib/game/buzz-in.ts`, exposed via `hooks/use-buzz-in.ts`
 
 ### Timer & Auto-Reveal
 - Configurable question timer with countdown display
@@ -95,7 +89,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Dual-Screen Sync
 - Presenter view (`/play`): Question list, team manager, scoring, controls
-- Audience view (`/display`): Large question display, scoreboard, timer, buzz-in, waiting screen
+- Audience view (`/display`): Large question display, scoreboard, timer, waiting screen
 - BroadcastChannel API for same-device sync via `@joolie-boolie/sync`
 - Emergency pause (blanks audience display)
 
@@ -190,8 +184,7 @@ pnpm test:coverage     # Run tests with coverage
 ## Architecture Notes
 
 - **BFF Pattern:** Frontend never talks directly to Supabase. All requests go through API routes.
-- **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration. Engine logic is split across multiple modules in `lib/game/` (engine.ts, scene.ts, buzz-in.ts, etc.) re-exported via barrel pattern.
-- **Buzz-In:** `lib/game/buzz-in.ts` handles buzz-in logic, exposed via `hooks/use-buzz-in.ts`
+- **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration. Engine logic is split across multiple modules in `lib/game/` (engine.ts, scene.ts, etc.) re-exported via barrel pattern.
 - **Timer:** `hooks/use-timer-auto-reveal.ts` manages countdown and auto-reveal behavior
 - **Questions:** `lib/questions/` contains parser, validator, converter, exporter, and types for question import/export
 - **Auth:** OAuth 2.1 via Platform Hub. OAuth client utilities in `lib/auth/` (oauth-client.ts, pkce.ts). Middleware-based JWT verification with lazy JWKS initialization.

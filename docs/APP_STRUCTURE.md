@@ -40,7 +40,6 @@ src/
 | `components/question-editor/` | Full question editing interface |
 | `components/stats/` | Statistics display |
 | `lib/questions/` | Question parser, validator, converter, exporter |
-| `lib/game/buzz-in.ts` | Buzz-in game mechanic |
 | `lib/game/scene.ts` | AudienceScene state machine (15 scenes, orthogonal to GameStatus) |
 | `types/audience-scene.ts` | AudienceScene type, timing constants, scene validity maps |
 | `hooks/use-audience-scene.ts` | Scene state hook with auto-advance timers |
