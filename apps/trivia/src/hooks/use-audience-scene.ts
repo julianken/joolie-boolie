@@ -27,19 +27,6 @@ export interface UseAudienceSceneReturn {
   scene: AudienceScene;
 
   /**
-   * Skip the current timed scene immediately.
-   * No-op if the current scene has no auto-advance timer running.
-   * Presenter side only; audience side no-ops.
-   */
-  skipScene: () => void;
-
-  /**
-   * Whether the current scene has an active auto-advance timer.
-   * Useful to show a "skip" hint in presenter UI.
-   */
-  isTimedScene: boolean;
-
-  /**
    * Milliseconds remaining before auto-advance, or null if not timed.
    * Updates on a 100ms interval when a timed scene is active.
    */
@@ -137,28 +124,8 @@ export function useAudienceScene(
     };
   }, [scene, isPresenter, getSceneDurationForCurrent]);
 
-  // ---- skipScene: cancel timer and signal skip ----
-  const skipScene = useCallback(() => {
-    if (!isPresenter) return;
-
-    const duration = getSceneDurationForCurrent(scene);
-    if (duration === null) return; // Not a timed scene
-
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setTimeRemaining(null);
-
-    // The actual skip logic (deciding what scene comes next) is handled by
-    // the keyboard handler via getNextScene(current, 'skip', context).
-    // This function simply cancels the auto-advance timer.
-  }, [isPresenter, scene, getSceneDurationForCurrent]);
-
-  const isTimedScene = isPresenter ? getSceneDurationForCurrent(scene) !== null : false;
-
   return {
     scene,
-    skipScene,
-    isTimedScene,
     timeRemaining: isPresenter ? timeRemaining : null,
   };
 }
