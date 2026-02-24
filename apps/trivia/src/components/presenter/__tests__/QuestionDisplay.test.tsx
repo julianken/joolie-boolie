@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestionDisplay } from '../QuestionDisplay';
-import type { Question } from '@/types';
+import type { Question, QuestionId } from '@/types';
 
 // Mock multiple choice question
 const mockMultipleChoiceQuestion: Question = {
-  id: 'q1',
+  id: 'q1' as QuestionId,
   text: 'What is the capital of France?',
   type: 'multiple_choice',
   correctAnswers: ['A'],
@@ -17,7 +17,7 @@ const mockMultipleChoiceQuestion: Question = {
 
 // Mock true/false question
 const mockTrueFalseQuestion: Question = {
-  id: 'q2',
+  id: 'q2' as QuestionId,
   text: 'The Earth is flat.',
   type: 'true_false',
   correctAnswers: ['False'],

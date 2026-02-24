@@ -1,7 +1,7 @@
 'use client';
 
 import { HTMLAttributes, forwardRef } from 'react';
-import { Badge, Card } from '@joolie-boolie/ui';
+import { Badge } from '@joolie-boolie/ui';
 
 export type GameType = 'bingo' | 'trivia';
 

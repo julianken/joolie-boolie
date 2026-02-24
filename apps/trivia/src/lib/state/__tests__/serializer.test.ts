@@ -8,7 +8,9 @@ import {
 import {
   TriviaGameState,
   Question,
+  QuestionId,
   Team,
+  TeamId,
   TeamAnswer,
   Timer,
   GameSettings,
@@ -20,7 +22,7 @@ import {
 describe('serializer', () => {
   // Test data fixtures
   const mockQuestion1: Question = {
-    id: 'q1',
+    id: 'q1' as QuestionId,
     text: 'What is the capital of France?',
     type: 'multiple_choice',
     correctAnswers: ['A'],
@@ -31,7 +33,7 @@ describe('serializer', () => {
   };
 
   const mockQuestion2: Question = {
-    id: 'q2',
+    id: 'q2' as QuestionId,
     text: 'The Earth is flat.',
     type: 'true_false',
     correctAnswers: ['False'],
@@ -42,7 +44,7 @@ describe('serializer', () => {
   };
 
   const mockTeam1: Team = {
-    id: 't1',
+    id: 't1' as TeamId,
     name: 'Table 1',
     score: 10,
     tableNumber: 1,
@@ -50,7 +52,7 @@ describe('serializer', () => {
   };
 
   const mockTeam2: Team = {
-    id: 't2',
+    id: 't2' as TeamId,
     name: 'Table 2',
     score: 8,
     tableNumber: 2,
@@ -58,8 +60,8 @@ describe('serializer', () => {
   };
 
   const mockTeamAnswer1: TeamAnswer = {
-    teamId: 't1',
-    questionId: 'q1',
+    teamId: 't1' as TeamId,
+    questionId: 'q1' as QuestionId,
     answer: 'A',
     isCorrect: true,
     pointsAwarded: 1,
@@ -845,7 +847,7 @@ describe('serializer', () => {
     it('preserves teams with empty roundScores (as created by addTeam)', () => {
       // Teams created by addTeam() have empty roundScores arrays
       const newTeam: Team = {
-        id: 't-new',
+        id: 't-new' as TeamId,
         name: 'Table 1',
         score: 0,
         tableNumber: 1,
@@ -866,9 +868,9 @@ describe('serializer', () => {
     it('preserves teams with scores through JSON round-trip (localStorage simulation)', () => {
       // Simulate the full localStorage round-trip: serialize -> JSON.stringify -> JSON.parse -> deserialize
       const teamsWithScores: Team[] = [
-        { id: 't1', name: 'Eagles', score: 15, tableNumber: 1, roundScores: [5, 5, 5] },
-        { id: 't2', name: 'Hawks', score: 12, tableNumber: 2, roundScores: [4, 4, 4] },
-        { id: 't3', name: 'Table 3', score: 0, tableNumber: 3, roundScores: [0, 0, 0] },
+        { id: 't1' as TeamId, name: 'Eagles', score: 15, tableNumber: 1, roundScores: [5, 5, 5] },
+        { id: 't2' as TeamId, name: 'Hawks', score: 12, tableNumber: 2, roundScores: [4, 4, 4] },
+        { id: 't3' as TeamId, name: 'Table 3', score: 0, tableNumber: 3, roundScores: [0, 0, 0] },
       ];
 
       const state = createMockGameState({
@@ -896,9 +898,9 @@ describe('serializer', () => {
     it('preserves multiple teams with varying states through serialize/deserialize', () => {
       // Typical mid-game scenario: some teams have scores, some just added
       const mixedTeams: Team[] = [
-        { id: 't1', name: 'Table 1', score: 10, tableNumber: 1, roundScores: [5, 3, 2] },
-        { id: 't2', name: 'Custom Name', score: 0, tableNumber: 2, roundScores: [0, 0, 0] },
-        { id: 't3', name: 'Table 3', score: 7, tableNumber: 3, roundScores: [3, 4, 0] },
+        { id: 't1' as TeamId, name: 'Table 1', score: 10, tableNumber: 1, roundScores: [5, 3, 2] },
+        { id: 't2' as TeamId, name: 'Custom Name', score: 0, tableNumber: 2, roundScores: [0, 0, 0] },
+        { id: 't3' as TeamId, name: 'Table 3', score: 7, tableNumber: 3, roundScores: [3, 4, 0] },
       ];
 
       const state = createMockGameState({
@@ -930,7 +932,7 @@ describe('serializer', () => {
         displayQuestionIndex: null,
         currentRound: 0,
         totalRounds: DEFAULT_ROUNDS,
-        teams: [{ id: 't1', name: 'Table 1', score: 0, tableNumber: 1, roundScores: [] }],
+        teams: [{ id: 't1' as TeamId, name: 'Table 1', score: 0, tableNumber: 1, roundScores: [] }],
         teamAnswers: [],
         timer: mockTimer,
         settings: mockSettings,
@@ -955,8 +957,8 @@ describe('serializer', () => {
         currentRound: 0,
         totalRounds: DEFAULT_ROUNDS,
         teams: [
-          { id: 't1', name: 'Table 1', score: 0, tableNumber: 1, roundScores: [] },
-          { id: 't20', name: 'Table 20', score: 5, tableNumber: 20, roundScores: [5] },
+          { id: 't1' as TeamId, name: 'Table 1', score: 0, tableNumber: 1, roundScores: [] },
+          { id: 't20' as TeamId, name: 'Table 20', score: 5, tableNumber: 20, roundScores: [5] },
         ],
         teamAnswers: [],
         timer: mockTimer,

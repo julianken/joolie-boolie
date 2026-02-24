@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { Question } from '@/types';
+import type { Question, QuestionId } from '@/types';
 import type { TriviaQuestion } from '@joolie-boolie/database/types';
 
 // Mock uuid
@@ -17,7 +17,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const mcQuestion: Question = {
-  id: 'q1',
+  id: 'q1' as QuestionId,
   text: 'What is the capital of France?',
   type: 'multiple_choice',
   correctAnswers: ['B'],
@@ -29,7 +29,7 @@ const mcQuestion: Question = {
 };
 
 const tfQuestion: Question = {
-  id: 'q2',
+  id: 'q2' as QuestionId,
   text: 'The Earth is flat.',
   type: 'true_false',
   correctAnswers: ['False'],

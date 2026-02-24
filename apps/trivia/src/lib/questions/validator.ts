@@ -27,8 +27,6 @@ const QUESTION_CATEGORIES = [
   'movies',
   'tv',
 ] as const satisfies readonly string[];
-const CORRECT_ANSWERS = ['A', 'B', 'C', 'D', 'True', 'False'] as const satisfies readonly string[];
-
 export const QuestionSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1),

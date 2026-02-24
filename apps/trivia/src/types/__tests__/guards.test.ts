@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { TriviaGameState } from '@/types';
+import type { TriviaGameState, TeamId } from '@/types';
 import {
   isSetupState,
   isPlayingState,
@@ -360,7 +360,7 @@ describe('Integration with Game Engine Transitions', () => {
       status: 'playing',
       statusBeforePause: null,
       currentRound: 0,
-      teams: [{ id: 't1', name: 'Team A', score: 0, tableNumber: 1, roundScores: [0, 0, 0] }],
+      teams: [{ id: 't1' as TeamId, name: 'Team A', score: 0, tableNumber: 1, roundScores: [0, 0, 0] }],
     });
     expect(isPlayingState(state)).toBe(true);
     expect(isGameActive(state)).toBe(true);

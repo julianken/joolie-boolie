@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestionList } from '../QuestionList';
-import type { Question } from '@/types';
+import type { Question, QuestionId } from '@/types';
 
 // Helper to create mock questions
 const createMockQuestion = (
@@ -10,7 +10,7 @@ const createMockQuestion = (
   roundIndex: number,
   type: 'multiple_choice' | 'true_false' = 'multiple_choice'
 ): Question => ({
-  id,
+  id: id as QuestionId,
   text,
   type,
   correctAnswers: type === 'multiple_choice' ? ['A'] : ['True'],

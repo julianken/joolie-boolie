@@ -24,17 +24,17 @@ import { AudienceScoreboard } from '@/components/audience/AudienceScoreboard';
 import { GameEndDisplay } from '@/components/audience/GameEndDisplay';
 
 // Types
-import type { Team, Question } from '@/types';
+import type { Team, TeamId, Question, QuestionId } from '@/types';
 
 // Test data
 const mockTeams: Team[] = [
-  { id: '1', name: 'Table 1', score: 10, tableNumber: 1, roundScores: [5, 5] },
-  { id: '2', name: 'Table 2', score: 8, tableNumber: 2, roundScores: [4, 4] },
-  { id: '3', name: 'Table 3', score: 6, tableNumber: 3, roundScores: [3, 3] },
+  { id: '1' as TeamId, name: 'Table 1', score: 10, tableNumber: 1, roundScores: [5, 5] },
+  { id: '2' as TeamId, name: 'Table 2', score: 8, tableNumber: 2, roundScores: [4, 4] },
+  { id: '3' as TeamId, name: 'Table 3', score: 6, tableNumber: 3, roundScores: [3, 3] },
 ];
 
 const mockQuestion: Question = {
-  id: 'q1',
+  id: 'q1' as QuestionId,
   text: 'What is the capital of France?',
   type: 'multiple_choice',
   correctAnswers: ['B'],
@@ -45,7 +45,7 @@ const mockQuestion: Question = {
 };
 
 const mockTrueFalseQuestion: Question = {
-  id: 'q2',
+  id: 'q2' as QuestionId,
   text: 'The Earth is flat.',
   type: 'true_false',
   correctAnswers: ['False'],
@@ -57,9 +57,9 @@ const mockTrueFalseQuestion: Question = {
 
 const mockQuestions: Question[] = [
   mockQuestion,
-  { ...mockQuestion, id: 'q2', text: 'Who wrote Romeo and Juliet?', roundIndex: 0 },
-  { ...mockQuestion, id: 'q3', text: 'What year did WWII end?', roundIndex: 1 },
-  { ...mockQuestion, id: 'q4', text: 'Who painted the Mona Lisa?', roundIndex: 1 },
+  { ...mockQuestion, id: 'q2' as QuestionId, text: 'Who wrote Romeo and Juliet?', roundIndex: 0 },
+  { ...mockQuestion, id: 'q3' as QuestionId, text: 'What year did WWII end?', roundIndex: 1 },
+  { ...mockQuestion, id: 'q4' as QuestionId, text: 'Who painted the Mona Lisa?', roundIndex: 1 },
 ];
 
 describe('Accessibility Tests', () => {
@@ -351,8 +351,8 @@ describe('Accessibility Tests', () => {
     it('GameEndDisplay with many teams has no accessibility violations', async () => {
       const manyTeams: Team[] = [
         ...mockTeams,
-        { id: '4', name: 'Table 4', score: 4, tableNumber: 4, roundScores: [2, 2] },
-        { id: '5', name: 'Table 5', score: 2, tableNumber: 5, roundScores: [1, 1] },
+        { id: '4' as TeamId, name: 'Table 4', score: 4, tableNumber: 4, roundScores: [2, 2] },
+        { id: '5' as TeamId, name: 'Table 5', score: 2, tableNumber: 5, roundScores: [1, 1] },
       ];
       const { container } = render(<GameEndDisplay teams={manyTeams} />);
       const results = await axe(container);

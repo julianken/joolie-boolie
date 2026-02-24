@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TeamScoreInput } from '../TeamScoreInput';
-import type { Team } from '@/types';
+import type { Team, TeamId } from '@/types';
 
 // Helper to create mock teams
 const createMockTeam = (
@@ -11,7 +11,7 @@ const createMockTeam = (
   tableNumber: number,
   roundScores: number[] = []
 ): Team => ({
-  id,
+  id: id as TeamId,
   name,
   score,
   tableNumber,

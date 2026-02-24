@@ -6,11 +6,11 @@ import {
   groupQuestionsByRound,
   getExportStats,
 } from '../exporter';
-import type { Question } from '@/types';
+import type { Question, QuestionId } from '@/types';
 
 const sampleQuestions: Question[] = [
   {
-    id: 'q1',
+    id: 'q1' as QuestionId,
     text: 'What is 2 + 2?',
     type: 'multiple_choice',
     options: ['A', 'B', 'C', 'D'],
@@ -21,7 +21,7 @@ const sampleQuestions: Question[] = [
     roundIndex: 0,
   },
   {
-    id: 'q2',
+    id: 'q2' as QuestionId,
     text: 'The sky is blue.',
     type: 'true_false',
     options: ['True', 'False'],
@@ -31,7 +31,7 @@ const sampleQuestions: Question[] = [
     roundIndex: 0,
   },
   {
-    id: 'q3',
+    id: 'q3' as QuestionId,
     text: 'Who wrote Hamlet?',
     type: 'multiple_choice',
     options: ['A', 'B', 'C', 'D'],
@@ -124,7 +124,7 @@ describe('exportToCsv', () => {
   it('should escape fields with commas', () => {
     const questionsWithComma: Question[] = [
       {
-        id: 'q1',
+        id: 'q1' as QuestionId,
         text: 'Hello, world?',
         type: 'multiple_choice',
         options: ['A', 'B', 'C', 'D'],
@@ -144,7 +144,7 @@ describe('exportToCsv', () => {
   it('should escape fields with quotes', () => {
     const questionsWithQuote: Question[] = [
       {
-        id: 'q1',
+        id: 'q1' as QuestionId,
         text: 'What is "this"?',
         type: 'multiple_choice',
         options: ['A', 'B', 'C', 'D'],

@@ -58,24 +58,6 @@ const GameSettingsSchema = z.object({
   ttsEnabled: z.boolean(),
 });
 
-const SerializedTriviaStateSchema = z.object({
-  sessionId: z.string(),
-  status: GameStatusSchema,
-  statusBeforePause: GameStatusSchema.nullable(),
-  questions: z.array(QuestionSchema),
-  selectedQuestionIndex: z.number().min(0),
-  displayQuestionIndex: z.number().min(0).nullable(),
-  currentRound: z.number().min(0),
-  totalRounds: z.number().min(1),
-  teams: z.array(TeamSchema),
-  teamAnswers: z.array(TeamAnswerSchema),
-  timer: TimerSchema,
-  settings: GameSettingsSchema,
-  showScoreboard: z.boolean().default(false),
-  emergencyBlank: z.boolean().default(false),
-  ttsEnabled: z.boolean().default(false),
-});
-
 // =============================================================================
 // PUBLIC TYPES
 // =============================================================================

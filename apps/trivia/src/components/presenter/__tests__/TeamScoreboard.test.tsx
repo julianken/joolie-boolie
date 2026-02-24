@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TeamScoreboard } from '../TeamScoreboard';
-import type { Team } from '@/types';
+import type { Team, TeamId } from '@/types';
 
 // Helper to create mock teams
 const createMockTeam = (
@@ -10,7 +10,7 @@ const createMockTeam = (
   score: number,
   tableNumber: number
 ): Team => ({
-  id,
+  id: id as TeamId,
   name,
   score,
   tableNumber,

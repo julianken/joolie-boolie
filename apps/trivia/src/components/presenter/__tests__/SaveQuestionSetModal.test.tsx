@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SaveQuestionSetModal } from '../SaveQuestionSetModal';
 import { ToastProvider } from "@joolie-boolie/ui";
-import type { Question } from '@/types';
+import type { Question, QuestionId } from '@/types';
 
 global.fetch = vi.fn();
 
 const mockQuestions: Question[] = [
   {
-    id: 'q1',
+    id: 'q1' as QuestionId,
     text: 'What is 2+2?',
     type: 'multiple_choice',
     correctAnswers: ['C'],
@@ -18,7 +18,7 @@ const mockQuestions: Question[] = [
     roundIndex: 0,
   },
   {
-    id: 'q2',
+    id: 'q2' as QuestionId,
     text: 'Is the sky blue?',
     type: 'true_false',
     correctAnswers: ['True'],
@@ -28,7 +28,7 @@ const mockQuestions: Question[] = [
     roundIndex: 0,
   },
   {
-    id: 'q3',
+    id: 'q3' as QuestionId,
     text: 'Who painted the Mona Lisa?',
     type: 'multiple_choice',
     correctAnswers: ['A'],

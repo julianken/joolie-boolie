@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TeamManager } from '../TeamManager';
 import { MAX_TEAMS } from '@/types';
-import type { Team, GameStatus } from '@/types';
+import type { Team, TeamId, GameStatus } from '@/types';
 
 // Helper to create mock teams
 const createMockTeam = (id: string, name: string, tableNumber: number): Team => ({
-  id,
+  id: id as TeamId,
   name,
   score: 0,
   tableNumber,

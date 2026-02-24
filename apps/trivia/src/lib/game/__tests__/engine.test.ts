@@ -53,7 +53,7 @@ import {
   removeQuestion,
   updateQuestion,
 } from '../engine';
-import { MAX_TEAMS, DEFAULT_ROUNDS } from '@/types';
+import { MAX_TEAMS, DEFAULT_ROUNDS, QuestionId } from '@/types';
 
 // Mock uuid to return predictable but unique values
 const mockUuidCounter = vi.hoisted(() => ({ value: 0 }));
@@ -1294,7 +1294,7 @@ describe('Trivia Game Engine', () => {
       const result = recordTeamAnswer(
         state,
         state.teams[0].id,
-        'non-existent',
+        'non-existent' as QuestionId,
         'A',
         10
       );
@@ -1424,7 +1424,7 @@ describe('Trivia Game Engine', () => {
   describe('importQuestions', () => {
     const testQuestions = [
       {
-        id: 'test-q1',
+        id: 'test-q1' as QuestionId,
         text: 'Test question 1',
         type: 'multiple_choice' as const,
         options: ['A', 'B', 'C', 'D'],
@@ -1434,7 +1434,7 @@ describe('Trivia Game Engine', () => {
         roundIndex: 0,
       },
       {
-        id: 'test-q2',
+        id: 'test-q2' as QuestionId,
         text: 'Test question 2',
         type: 'true_false' as const,
         options: ['True', 'False'],
@@ -1534,7 +1534,7 @@ describe('Trivia Game Engine', () => {
       const state = createInitialState();
       const result = exportQuestionsFromState(state);
       result.push({
-        id: 'new',
+        id: 'new' as QuestionId,
         text: 'New question',
         type: 'multiple_choice',
         options: ['A', 'B', 'C', 'D'],
@@ -1584,7 +1584,7 @@ describe('Trivia Game Engine', () => {
 
   describe('addQuestion', () => {
     const newQuestion = {
-      id: 'new-q',
+      id: 'new-q' as QuestionId,
       text: 'New question',
       type: 'multiple_choice' as const,
       options: ['A', 'B', 'C', 'D'],
@@ -1676,7 +1676,7 @@ describe('Trivia Game Engine', () => {
 
   describe('updateQuestion', () => {
     const updatedQuestion = {
-      id: 'updated-q',
+      id: 'updated-q' as QuestionId,
       text: 'Updated question text',
       type: 'true_false' as const,
       options: ['True', 'False'],

@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SettingsPanel, type SettingsPanelProps } from '../SettingsPanel';
 import { SETTINGS_RANGES } from '@/stores/settings-store';
-import type { Team, GameStatus } from '@/types';
+import type { Team, TeamId, GameStatus } from '@/types';
 import type { TeamSetup } from '@/stores/settings-store';
 
 // Helper to create mock teams
 const createMockTeam = (id: string, name: string, tableNumber: number): Team => ({
-  id,
+  id: id as TeamId,
   name,
   score: 0,
   tableNumber,
