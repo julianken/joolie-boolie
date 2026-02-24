@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  shouldRefreshToken,
-  isTokenExpired,
-  refreshTokens,
-} from '@joolie-boolie/auth';
+import { shouldRefreshToken, refreshTokens } from '@joolie-boolie/auth';
 import {
   createJwksGetter,
   verifyAccessToken,
@@ -38,6 +34,7 @@ const logger = createLogger({ service: 'bingo-middleware' });
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const PLATFORM_HUB_URL = process.env.NEXT_PUBLIC_PLATFORM_HUB_URL || 'http://localhost:3002';
+const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN?.trim() || undefined;
 const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID;
 
 // Production guard: E2E mode must never run on actual production (Vercel)
@@ -57,6 +54,25 @@ const PROTECTED_ROUTES = ['/play'];
  */
 const getJWKS = createJwksGetter(SUPABASE_URL);
 
+/**
+ * Create response with updated auth cookies after token refresh
+ */
+function createResponseWithRefreshedTokens(
+  _request: NextRequest,
+  accessToken: string,
+  refreshToken: string
+): NextResponse {
+  const response = NextResponse.next();
+
+  // Access token: 1 hour
+  response.cookies.set('jb_access_token', accessToken, getCookieOptions(3600, COOKIE_DOMAIN));
+
+  // Refresh token: 30 days
+  response.cookies.set('jb_refresh_token', refreshToken, getCookieOptions(30 * 24 * 3600, COOKIE_DOMAIN));
+
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -74,84 +90,47 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if token needs proactive refresh (within 5 minutes of expiry)
-  if (refreshToken && shouldRefreshToken(accessToken)) {
-    logger.info('Token approaching expiry, attempting proactive refresh');
-
+  // Check if token needs proactive refresh (5 minutes before expiry)
+  if (shouldRefreshToken(accessToken) && refreshToken) {
     const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
 
     if (result.success && result.accessToken && result.refreshToken) {
-      logger.info('Token refresh successful');
-
-      // Create response and set new cookies
-      const response = NextResponse.next();
-      const maxAge = 3600; // 1 hour
-
-      response.cookies.set('jb_access_token', result.accessToken, getCookieOptions(maxAge));
-      response.cookies.set('jb_refresh_token', result.refreshToken, getCookieOptions(maxAge));
-
-      return response;
-    } else {
-      logger.warn('Proactive refresh failed, falling back to existing token', { error: result.error });
-      // Continue with existing token - it's still valid, just close to expiry
-    }
-  }
-
-  // Check if token is already expired - try refresh before rejecting
-  if (isTokenExpired(accessToken)) {
-    if (refreshToken) {
-      logger.info('Token expired, attempting refresh');
-
-      const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
-
-      if (result.success && result.accessToken && result.refreshToken) {
-        logger.info('Token refresh successful after expiry');
-
-        // Create response and set new cookies
-        const response = NextResponse.next();
-        const maxAge = 3600; // 1 hour
-
-        response.cookies.set('jb_access_token', result.accessToken, getCookieOptions(maxAge));
-        response.cookies.set('jb_refresh_token', result.refreshToken, getCookieOptions(maxAge));
-
-        return response;
+      // Token refreshed successfully - verify before using
+      const isNewTokenValid = await verifyAccessToken(result.accessToken, getJWKS, SUPABASE_URL);
+      if (isNewTokenValid) {
+        return createResponseWithRefreshedTokens(request, result.accessToken, result.refreshToken);
       }
+      // New token invalid - fall through to normal verification
+      logger.error('Refreshed token failed verification');
+    } else {
+      // Refresh failed - log and fall through to normal verification
+      // The existing token may still be valid if we're within the 5-min buffer
+      logger.warn('Token refresh failed', { error: result.error });
     }
-
-    // Refresh failed or no refresh token - clear cookies and redirect to login
-    logger.info('Token expired and refresh failed, redirecting to login');
-    const response = NextResponse.redirect(new URL('/', request.url));
-    clearAuthCookies(response);
-    return response;
   }
 
   // Verify token is valid
   const isValid = await verifyAccessToken(accessToken, getJWKS, SUPABASE_URL);
 
   if (!isValid) {
-    // Invalid token - try refresh before giving up
+    // Invalid token - try one more time to refresh before giving up
     if (refreshToken) {
-      logger.info('Token invalid, attempting refresh');
-
       const result = await refreshTokens(refreshToken, PLATFORM_HUB_URL, OAUTH_CLIENT_ID);
-
       if (result.success && result.accessToken && result.refreshToken) {
-        logger.info('Token refresh successful after invalid token');
-
-        // Create response and set new cookies
-        const response = NextResponse.next();
-        const maxAge = 3600; // 1 hour
-
-        response.cookies.set('jb_access_token', result.accessToken, getCookieOptions(maxAge));
-        response.cookies.set('jb_refresh_token', result.refreshToken, getCookieOptions(maxAge));
-
-        return response;
+        const isNewTokenValid = await verifyAccessToken(result.accessToken, getJWKS, SUPABASE_URL);
+        if (isNewTokenValid) {
+          return createResponseWithRefreshedTokens(
+            request,
+            result.accessToken,
+            result.refreshToken
+          );
+        }
       }
     }
 
-    // Refresh failed - clear cookies and redirect to login
+    // All refresh attempts failed - clear cookies and redirect to login
     const response = NextResponse.redirect(new URL('/', request.url));
-    clearAuthCookies(response);
+    clearAuthCookies(response, COOKIE_DOMAIN);
     return response;
   }
 
