@@ -5,7 +5,7 @@
  * WITHOUT the E2E_TESTING bypass. These fixtures exercise real auth paths:
  *
  * - Supabase signInWithPassword (real RS256 JWTs)
- * - Platform Hub login API (sets beak_* SSO cookies)
+ * - Platform Hub login API (sets jb_* SSO cookies)
  * - Cross-app cookie propagation (Bingo/Trivia middleware verification)
  *
  * Mirrors the structure of e2e/fixtures/auth.ts but without E2E assumptions.

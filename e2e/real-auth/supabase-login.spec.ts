@@ -44,9 +44,10 @@ test.describe('Real Supabase Login', () => {
     const tokenParts = data.session!.access_token.split('.');
     expect(tokenParts).toHaveLength(3);
 
-    // Decode header to verify RS256 algorithm (Supabase's signing algorithm)
+    // Decode header to verify signing algorithm
+    // Local Supabase uses HS256 by default; production Supabase uses RS256
     const header = JSON.parse(Buffer.from(tokenParts[0], 'base64url').toString());
-    expect(header.alg).toBe('RS256');
+    expect(['HS256', 'RS256']).toContain(header.alg);
 
     // Decode payload to verify standard claims
     const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64url').toString());
@@ -118,12 +119,13 @@ test.describe('Real Supabase Login', () => {
     expect(refreshData.session!.access_token).not.toBe(originalAccessToken);
     expect(refreshData.session!.refresh_token).not.toBe(originalRefreshToken);
 
-    // New access token should be valid RS256 JWT
+    // New access token should be a valid JWT
     const newTokenParts = refreshData.session!.access_token.split('.');
     expect(newTokenParts).toHaveLength(3);
 
+    // Local Supabase uses HS256 by default; production uses RS256
     const header = JSON.parse(Buffer.from(newTokenParts[0], 'base64url').toString());
-    expect(header.alg).toBe('RS256');
+    expect(['HS256', 'RS256']).toContain(header.alg);
 
     // New token should have valid expiry in the future
     const payload = JSON.parse(Buffer.from(newTokenParts[1], 'base64url').toString());

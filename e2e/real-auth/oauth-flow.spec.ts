@@ -3,11 +3,15 @@
  *
  * Tests the complete OAuth authorization code flow against local Supabase:
  * - Authorization code grant with PKCE
- * - Token exchange producing HS256 JWTs signed with SESSION_TOKEN_SECRET
+ * - Token exchange producing HS256 JWTs signed with SUPABASE_JWT_SECRET
  * - Refresh token rotation with old-token invalidation
  *
  * These tests use the Platform Hub API directly (not browser UI) to isolate
  * the OAuth server logic from the client-side callback handler.
+ *
+ * JWT issuer depends on which secret is configured:
+ * - SUPABASE_JWT_SECRET set: issuer = "${SUPABASE_URL}/auth/v1"
+ * - SESSION_TOKEN_SECRET only: issuer = "joolie-boolie-platform"
  */
 
 import { test, expect } from '../fixtures/real-auth';
@@ -108,13 +112,22 @@ test.describe('OAuth 2.1 Authorization Code Flow', () => {
     const tokenParts = tokenData.access_token.split('.');
     expect(tokenParts).toHaveLength(3);
 
-    // Decode header — should be HS256 (signed with SESSION_TOKEN_SECRET)
+    // Decode header — should be HS256 (signed with SUPABASE_JWT_SECRET or SESSION_TOKEN_SECRET)
     const header = JSON.parse(Buffer.from(tokenParts[0], 'base64url').toString());
     expect(header.alg).toBe('HS256');
 
-    // Decode payload — should have joolie-boolie-platform issuer
+    // Decode payload — issuer depends on which secret is configured:
+    // SUPABASE_JWT_SECRET → "${SUPABASE_URL}/auth/v1"
+    // SESSION_TOKEN_SECRET only → "joolie-boolie-platform"
     const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64url').toString());
-    expect(payload.iss).toBe('joolie-boolie-platform');
+    expect(payload.iss).toBeTruthy();
+    // Verify issuer is one of the expected values
+    const validIssuers = ['joolie-boolie-platform'];
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (supabaseUrl) {
+      validIssuers.push(`${supabaseUrl}/auth/v1`);
+    }
+    expect(validIssuers).toContain(payload.iss);
     expect(payload.role).toBe('authenticated');
     expect(payload.aud).toBe('authenticated');
     expect(payload.email).toBe(realTestUser.email);
@@ -217,7 +230,14 @@ test.describe('OAuth 2.1 Authorization Code Flow', () => {
     expect(newHeader.alg).toBe('HS256');
 
     const newPayload = JSON.parse(Buffer.from(newParts[1], 'base64url').toString());
-    expect(newPayload.iss).toBe('joolie-boolie-platform');
+    // Issuer should match the same pattern as the initial token
+    expect(newPayload.iss).toBeTruthy();
+    const refreshValidIssuers = ['joolie-boolie-platform'];
+    const refreshSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (refreshSupabaseUrl) {
+      refreshValidIssuers.push(`${refreshSupabaseUrl}/auth/v1`);
+    }
+    expect(refreshValidIssuers).toContain(newPayload.iss);
     expect(newPayload.email).toBe(realTestUser.email);
 
     // =========================================================================

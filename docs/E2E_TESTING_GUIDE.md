@@ -107,6 +107,38 @@ curl -I http://localhost:3002/login
 
 **WARNING:** Dev servers may crash after ~250 tests (3.9min runtime) due to resource exhaustion. If you see "Could not connect to the server" errors, switch to production build mode.
 
+#### Real-Auth E2E Tests (Local Supabase)
+
+**Tests real authentication paths** against a local Supabase instance (Docker). Unlike standard E2E tests, these do NOT set `E2E_TESTING=true` and exercise actual Supabase auth, OAuth 2.1, and cross-app SSO.
+
+**Prerequisites:**
+```bash
+brew install --cask docker    # Docker Desktop
+brew install supabase/tap/supabase  # Supabase CLI
+```
+
+**Running:**
+```bash
+pnpm test:e2e:real-auth              # Run all 7 real-auth tests
+pnpm test:e2e:real-auth -- --headed  # Run with visible browser
+```
+
+**What the script does:**
+1. Starts local Supabase via Docker (`supabase start`)
+2. Applies migrations + runs `supabase/seed.sql` (creates test users)
+3. Extracts credentials using `supabase status -o env` (robust parsing)
+4. Backs up existing `.env.local` files, writes real-auth env config
+5. Starts dev servers without `E2E_TESTING` flag
+6. Runs the `real-auth` Playwright project (3 spec files, 7 tests)
+7. Restores original `.env.local` files on cleanup
+
+**Test user:** `real-auth-test@joolie-boolie.test` / `RealAuthTest123!` (seeded in `supabase/seed.sql`)
+
+**Specs:**
+- `supabase-login.spec.ts` (2 tests): Direct Supabase signInWithPassword + session refresh
+- `cross-app-sso.spec.ts` (3 tests): Hub login, copy SSO cookies to Bingo/Trivia, verify middleware accepts tokens
+- `oauth-flow.spec.ts` (2 tests): Full OAuth 2.1 code grant with PKCE + refresh token rotation
+
 ### Anti-Pattern: Fixed Timeouts (waitForTimeout)
 
 #### ❌ DO NOT USE Fixed Delays
