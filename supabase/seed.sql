@@ -3,19 +3,21 @@
  *
  * Creates test user accounts needed for Playwright E2E tests.
  *
- * Run this in Supabase SQL Editor or via Supabase CLI:
- *   https://supabase.com/dashboard/project/YOUR_PROJECT/sql
+ * IMPORTANT: Both auth.users AND auth.identities must be populated.
+ * GoTrue v2 (used by modern Supabase) requires a matching identity row
+ * for the "email" provider — without it, signInWithPassword returns
+ * "Invalid login credentials" even if the password hash is correct.
  *
- * Or with CLI (if installed):
- *   supabase db reset --db-url YOUR_DATABASE_URL
+ * Run via Supabase CLI:
+ *   supabase db reset    # Applies migrations + runs seed.sql
+ *   supabase start       # Auto-runs seed.sql on first start
  */
 
--- Create E2E test user for Playwright tests
+-- =============================================================================
+-- E2E test user (used by standard E2E tests with E2E_TESTING=true)
 -- Email: e2e-test@joolie-boolie.test
 -- Password: TestPassword123!
---
--- This uses Supabase Auth's admin API to create the user with a known password.
--- The user is created in the auth.users table with email confirmation bypassed.
+-- =============================================================================
 
 DO $$
 DECLARE
@@ -28,7 +30,8 @@ BEGIN
 
   -- Only create if user doesn't exist
   IF test_user_id IS NULL THEN
-    -- Insert into auth.users (Supabase's auth table)
+    test_user_id := gen_random_uuid();
+
     INSERT INTO auth.users (
       id,
       instance_id,
@@ -48,17 +51,14 @@ BEGIN
       recovery_token
     )
     VALUES (
-      gen_random_uuid(),
+      test_user_id,
       '00000000-0000-0000-0000-000000000000',
       'e2e-test@joolie-boolie.test',
-      -- Password: TestPassword123!
-      -- This is the bcrypt hash for 'TestPassword123!' using Supabase's default bcrypt config
-      -- Generated with: SELECT crypt('TestPassword123!', gen_salt('bf'))
       crypt('TestPassword123!', gen_salt('bf')),
       NOW(),
       NOW(),
       NOW(),
-      '{}',
+      '{"provider": "email", "providers": ["email"]}',
       '{"name": "E2E Test User"}',
       false,
       'authenticated',
@@ -67,33 +67,57 @@ BEGIN
       '',
       '',
       ''
-    )
-    RETURNING id INTO test_user_id;
+    );
 
-    -- Create profile for test user (if profiles table exists)
-    INSERT INTO public.profiles (id, created_at, updated_at)
+    -- GoTrue v2 requires an identity row for signInWithPassword to work.
+    -- Without this, login returns "Invalid login credentials".
+    INSERT INTO auth.identities (
+      id,
+      user_id,
+      identity_data,
+      provider,
+      provider_id,
+      last_sign_in_at,
+      created_at,
+      updated_at
+    )
     VALUES (
       test_user_id,
+      test_user_id,
+      jsonb_build_object(
+        'sub', test_user_id::text,
+        'email', 'e2e-test@joolie-boolie.test',
+        'email_verified', true
+      ),
+      'email',
+      test_user_id::text,
+      NOW(),
       NOW(),
       NOW()
-    )
+    );
+
+    -- Create profile for test user
+    INSERT INTO public.profiles (id, created_at, updated_at)
+    VALUES (test_user_id, NOW(), NOW())
     ON CONFLICT (id) DO NOTHING;
 
-    RAISE NOTICE 'Created E2E test user: e2e-test@joolie-boolie.test';
+    RAISE NOTICE 'Created E2E test user: e2e-test@joolie-boolie.test (id: %)', test_user_id;
   ELSE
-    RAISE NOTICE 'E2E test user already exists: e2e-test@joolie-boolie.test';
+    RAISE NOTICE 'E2E test user already exists: e2e-test@joolie-boolie.test (id: %)', test_user_id;
   END IF;
 END $$;
 
--- Create real-auth test user for local Supabase E2E tests
+-- =============================================================================
+-- Real-auth test user (used by real-auth E2E tests against local Supabase)
 -- Email: real-auth-test@joolie-boolie.test
 -- Password: RealAuthTest123!
 --
 -- This user is used by the `real-auth` Playwright project which runs against
 -- local Supabase (Docker) WITHOUT the E2E_TESTING flag, testing real auth paths:
 -- - Supabase signInWithPassword (RS256 JWKS verification)
--- - Platform Hub OAuth 2.1 flow (HS256 SESSION_TOKEN_SECRET)
+-- - Platform Hub OAuth 2.1 flow (HS256 SUPABASE_JWT_SECRET)
 -- - Cross-app SSO cookie propagation
+-- =============================================================================
 
 DO $$
 DECLARE
@@ -106,6 +130,8 @@ BEGIN
 
   -- Only create if user doesn't exist
   IF real_auth_user_id IS NULL THEN
+    real_auth_user_id := gen_random_uuid();
+
     INSERT INTO auth.users (
       id,
       instance_id,
@@ -125,14 +151,14 @@ BEGIN
       recovery_token
     )
     VALUES (
-      gen_random_uuid(),
+      real_auth_user_id,
       '00000000-0000-0000-0000-000000000000',
       'real-auth-test@joolie-boolie.test',
       crypt('RealAuthTest123!', gen_salt('bf')),
       NOW(),
       NOW(),
       NOW(),
-      '{}',
+      '{"provider": "email", "providers": ["email"]}',
       '{"name": "Real Auth Test User"}',
       false,
       'authenticated',
@@ -141,20 +167,41 @@ BEGIN
       '',
       '',
       ''
+    );
+
+    -- GoTrue v2 requires an identity row for signInWithPassword to work.
+    INSERT INTO auth.identities (
+      id,
+      user_id,
+      identity_data,
+      provider,
+      provider_id,
+      last_sign_in_at,
+      created_at,
+      updated_at
     )
-    RETURNING id INTO real_auth_user_id;
+    VALUES (
+      real_auth_user_id,
+      real_auth_user_id,
+      jsonb_build_object(
+        'sub', real_auth_user_id::text,
+        'email', 'real-auth-test@joolie-boolie.test',
+        'email_verified', true
+      ),
+      'email',
+      real_auth_user_id::text,
+      NOW(),
+      NOW(),
+      NOW()
+    );
 
     -- Create profile for real-auth test user
     INSERT INTO public.profiles (id, created_at, updated_at)
-    VALUES (
-      real_auth_user_id,
-      NOW(),
-      NOW()
-    )
+    VALUES (real_auth_user_id, NOW(), NOW())
     ON CONFLICT (id) DO NOTHING;
 
-    RAISE NOTICE 'Created real-auth test user: real-auth-test@joolie-boolie.test';
+    RAISE NOTICE 'Created real-auth test user: real-auth-test@joolie-boolie.test (id: %)', real_auth_user_id;
   ELSE
-    RAISE NOTICE 'Real-auth test user already exists: real-auth-test@joolie-boolie.test';
+    RAISE NOTICE 'Real-auth test user already exists: real-auth-test@joolie-boolie.test (id: %)', real_auth_user_id;
   END IF;
 END $$;

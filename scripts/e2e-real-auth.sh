@@ -8,7 +8,7 @@ set -euo pipefail
 # Unlike the standard E2E tests (E2E_TESTING=true), this tests actual auth paths:
 #
 #   1. Supabase login (signInWithPassword → RS256 JWT via JWKS)
-#   2. Platform Hub OAuth 2.1 (authorization code → HS256 JWT via SESSION_TOKEN_SECRET)
+#   2. Platform Hub OAuth 2.1 (authorization code → HS256 JWT via SUPABASE_JWT_SECRET)
 #   3. Cross-app SSO (cookie propagation + middleware verification)
 #
 # Prerequisites:
@@ -84,8 +84,8 @@ success "Prerequisites OK"
 # =============================================================================
 log "Starting local Supabase..."
 
-# Check if already running
-if supabase status 2>/dev/null | grep -q "API URL"; then
+# Check if already running using JSON output (robust against format changes)
+if supabase status -o json 2>/dev/null | grep -q '"API_URL"'; then
   warn "Local Supabase already running, reusing existing instance"
 else
   supabase start
@@ -97,13 +97,19 @@ fi
 # =============================================================================
 log "Extracting local Supabase credentials..."
 
-# supabase status outputs key-value pairs, parse them
-LOCAL_URL=$(supabase status 2>/dev/null | grep "API URL" | awk '{print $NF}')
-LOCAL_ANON_KEY=$(supabase status 2>/dev/null | grep "anon key" | awk '{print $NF}')
-LOCAL_SERVICE_KEY=$(supabase status 2>/dev/null | grep "service_role key" | awk '{print $NF}')
+# Use `supabase status -o env` for reliable parsing.
+# The old `awk '{print $NF}'` approach broke when the CLI switched to
+# box-drawing table characters in its pretty-printed output.
+# `-o env` outputs clean KEY=VALUE lines that are trivial to parse.
+eval "$(supabase status -o env 2>/dev/null)"
+
+LOCAL_URL="${API_URL:-}"
+LOCAL_ANON_KEY="${ANON_KEY:-}"
+LOCAL_SERVICE_KEY="${SERVICE_ROLE_KEY:-}"
+LOCAL_JWT_SECRET="${JWT_SECRET:-}"
 
 if [ -z "$LOCAL_URL" ] || [ -z "$LOCAL_ANON_KEY" ] || [ -z "$LOCAL_SERVICE_KEY" ]; then
-  error "Failed to extract Supabase credentials. Check 'supabase status' output."
+  error "Failed to extract Supabase credentials. Check 'supabase status -o env' output."
   exit 1
 fi
 
@@ -126,11 +132,13 @@ cat > .env.real-auth << EOF
 NEXT_PUBLIC_SUPABASE_URL=$LOCAL_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=$LOCAL_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=$LOCAL_SERVICE_KEY
+SUPABASE_JWT_SECRET=$LOCAL_JWT_SECRET
 SESSION_TOKEN_SECRET=$SESSION_SECRET
 NEXT_PUBLIC_APP_URL=http://localhost:3002
 NEXT_PUBLIC_BINGO_URL=http://localhost:3000
 NEXT_PUBLIC_TRIVIA_URL=http://localhost:3001
 NEXT_PUBLIC_PLATFORM_HUB_URL=http://localhost:3002
+NEXT_PUBLIC_OAUTH_CLIENT_ID=0d87a03a-d90a-4ccc-a46b-85fdd8d53c21
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:3002
 EOF
 
@@ -208,6 +216,7 @@ success "All servers ready"
 export NEXT_PUBLIC_SUPABASE_URL="$LOCAL_URL"
 export NEXT_PUBLIC_SUPABASE_ANON_KEY="$LOCAL_ANON_KEY"
 export SUPABASE_SERVICE_ROLE_KEY="$LOCAL_SERVICE_KEY"
+export SUPABASE_JWT_SECRET="$LOCAL_JWT_SECRET"
 export SESSION_TOKEN_SECRET="$SESSION_SECRET"
 
 # Disable E2E bypass — forces Playwright config to NOT set E2E_TESTING=true.

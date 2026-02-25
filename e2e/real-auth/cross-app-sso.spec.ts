@@ -37,9 +37,9 @@ test.describe('Cross-App SSO', () => {
     expect(currentUrl.port).toBe('3000');
 
     // Verify the page rendered game content (not an error or login page)
-    // The play page should have game controls visible
+    // The play page should have a <main> element with game content
     await expect(
-      authenticatedBingoPage.locator('[data-testid="game-controls"], .game-controls, [role="main"]')
+      authenticatedBingoPage.locator('main')
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -54,7 +54,7 @@ test.describe('Cross-App SSO', () => {
 
     // Verify the page rendered game content
     await expect(
-      authenticatedTriviaPage.locator('[data-testid="game-controls"], .game-controls, [role="main"]')
+      authenticatedTriviaPage.locator('main')
     ).toBeVisible({ timeout: 10_000 });
   });
 
