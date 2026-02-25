@@ -254,7 +254,7 @@ export default function PlayPage() {
   /** BEA-600: Mount reveal sequence hook — drives 3-beat choreography on answer_reveal scene */
   const { triggerReveal, resetReveal } = useRevealSequence({
     questionIndex: game.displayQuestionIndex,
-    revealedAnswer: game.displayQuestion?.answer ?? null,
+    revealedAnswer: game.displayQuestion?.correctAnswers[0] ?? null,
     onPhaseChange: (phase) => {
       useGameStore.getState().setRevealPhase(phase);
     },
