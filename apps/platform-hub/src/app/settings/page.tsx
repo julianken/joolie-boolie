@@ -378,6 +378,7 @@ export default function SettingsPage() {
             </Button>
           </div>
         </form>
+
       </div>
     </main>
   );
