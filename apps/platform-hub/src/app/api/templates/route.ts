@@ -5,9 +5,11 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import {
   listAllBingoTemplates,
   listAllTriviaTemplates,
-  type BingoTemplate as DBBingoTemplate,
-  type TriviaTemplate as DBTriviaTemplate,
-} from '@joolie-boolie/database';
+} from '@joolie-boolie/database/tables';
+import type {
+  BingoTemplate as DBBingoTemplate,
+  TriviaTemplate as DBTriviaTemplate,
+} from '@joolie-boolie/database/types';
 import { createLogger } from '@joolie-boolie/error-tracking/server-logger';
 
 const logger = createLogger({ service: 'api-templates' });

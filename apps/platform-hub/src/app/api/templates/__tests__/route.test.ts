@@ -27,7 +27,7 @@ vi.mock('@/lib/supabase/server', () => ({
 // Mock database functions
 const mockListAllBingoTemplates = vi.fn();
 const mockListAllTriviaTemplates = vi.fn();
-vi.mock('@joolie-boolie/database', () => ({
+vi.mock('@joolie-boolie/database/tables', () => ({
   listAllBingoTemplates: (...args: unknown[]) => mockListAllBingoTemplates(...args),
   listAllTriviaTemplates: (...args: unknown[]) => mockListAllTriviaTemplates(...args),
 }));

@@ -7,7 +7,7 @@ import {
   deleteTriviaTemplate,
   userOwnsBingoTemplate,
   userOwnsTriviaTemplate,
-} from '@joolie-boolie/database';
+} from '@joolie-boolie/database/tables';
 import { createLogger } from '@joolie-boolie/error-tracking/server-logger';
 
 const logger = createLogger({ service: 'api-templates' });
