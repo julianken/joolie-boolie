@@ -113,10 +113,13 @@ export function validateSupabaseConfig(): void {
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'This is the anonymous (public) key for your Supabase project. Find it in your Supabase dashboard.'
   );
-  validateRequired(
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'This is the service role key for your Supabase project. Find it in your Supabase dashboard under Settings > API.'
-  );
+  // Service role key not required in E2E mode (uses in-memory stores)
+  if (process.env.E2E_TESTING !== 'true') {
+    validateRequired(
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'This is the service role key for your Supabase project. Find it in your Supabase dashboard under Settings > API.'
+    );
+  }
 }
 
 /**
@@ -125,11 +128,14 @@ export function validateSupabaseConfig(): void {
  * @throws Error if SUPABASE_JWT_SECRET is missing or empty
  */
 export function validateJwtSecret(): void {
-  validateRequired(
-    'SUPABASE_JWT_SECRET',
-    'This is the JWT secret for your Supabase project, used for middleware JWT verification and OAuth token signing.\n' +
-    'Find it in your Supabase dashboard under Settings > API > JWT Secret.'
-  );
+  // In E2E mode, middleware uses E2E_JWT_SECRET instead
+  if (process.env.E2E_TESTING !== 'true') {
+    validateRequired(
+      'SUPABASE_JWT_SECRET',
+      'This is the JWT secret for your Supabase project, used for middleware JWT verification and OAuth token signing.\n' +
+      'Find it in your Supabase dashboard under Settings > API > JWT Secret.'
+    );
+  }
 }
 
 /**
