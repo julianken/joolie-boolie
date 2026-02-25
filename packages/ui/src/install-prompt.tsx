@@ -16,15 +16,13 @@ declare global {
 export interface InstallPromptProps {
   /** Display name of the app (e.g., "Bingo", "Trivia") */
   appName: string;
-  /** Tailwind accent color prefix (e.g., "indigo", "violet"). Defaults to "indigo". */
-  accentColor?: string;
 }
 
 /**
  * Prompt users to install the PWA on their device.
  * Only shows when the browser triggers the beforeinstallprompt event.
  */
-export function InstallPrompt({ appName, accentColor = 'indigo' }: InstallPromptProps) {
+export function InstallPrompt({ appName }: InstallPromptProps) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -92,9 +90,9 @@ export function InstallPrompt({ appName, accentColor = 'indigo' }: InstallPrompt
   return (
     <div className="fixed bottom-4 left-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm z-50">
       <div className="flex items-start gap-3">
-        <div className={`flex-shrink-0 w-12 h-12 bg-${accentColor}-100 rounded-lg flex items-center justify-center`}>
+        <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
           <svg
-            className={`w-6 h-6 text-${accentColor}-600`}
+            className="w-6 h-6 text-primary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -116,7 +114,7 @@ export function InstallPrompt({ appName, accentColor = 'indigo' }: InstallPrompt
           <div className="flex gap-2 mt-3">
             <button
               onClick={handleInstall}
-              className={`min-h-[var(--size-touch)] px-4 py-3 bg-${accentColor}-600 text-white text-base font-medium rounded hover:bg-${accentColor}-700 transition-colors`}
+              className="min-h-[var(--size-touch)] px-4 py-3 bg-primary text-primary-foreground text-base font-medium rounded hover:bg-primary/90 transition-colors"
             >
               Install
             </button>

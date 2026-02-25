@@ -484,7 +484,7 @@ export default function PlayPage() {
         isLoading={session.isLoading}
       />
 
-      <InstallPrompt appName="Bingo" accentColor="indigo" />
+      <InstallPrompt appName="Bingo" />
     </>
   );
 }
