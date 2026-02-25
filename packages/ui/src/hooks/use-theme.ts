@@ -98,7 +98,6 @@ export function useResolvedTheme(mode: ThemeMode): 'light' | 'dark' {
   // which is a valid use case per React docs
   useEffect(() => {
     const newResolved = resolveTheme(mode);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResolved(newResolved);
   }, [mode]);
 
