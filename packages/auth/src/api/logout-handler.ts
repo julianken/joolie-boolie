@@ -33,10 +33,13 @@ export function createLogoutHandler() {
               },
             }
           );
-          await supabase.auth.admin.signOut(userId);
+          const { error: signOutError } = await supabase.auth.admin.signOut(userId);
+          if (signOutError) {
+            console.error('Supabase admin signOut error (non-critical):', signOutError.message);
+          }
         } catch (supabaseError) {
-          // Log but don't fail the request - cookies will be cleared anyway
-          console.error('Supabase admin signOut error (non-critical):', supabaseError);
+          // Network-level error — log but don't fail the request, cookies will be cleared anyway
+          console.error('Supabase admin signOut network error (non-critical):', supabaseError);
         }
       }
 

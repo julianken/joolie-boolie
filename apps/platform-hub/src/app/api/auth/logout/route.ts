@@ -36,10 +36,13 @@ export async function POST() {
             },
           }
         );
-        await supabase.auth.admin.signOut(userId);
+        const { error: signOutError } = await supabase.auth.admin.signOut(userId);
+        if (signOutError) {
+          logger.error('Supabase admin signOut error (non-critical)', { error: signOutError.message });
+        }
       } catch (supabaseError) {
-        // Log but don't fail the request - cookies will be cleared anyway
-        logger.error('Supabase admin signOut error (non-critical)', { error: supabaseError instanceof Error ? supabaseError.message : String(supabaseError) });
+        // Network-level error — log but don't fail the request, cookies will be cleared anyway
+        logger.error('Supabase admin signOut network error (non-critical)', { error: supabaseError instanceof Error ? supabaseError.message : String(supabaseError) });
       }
     }
 

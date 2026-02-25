@@ -61,7 +61,7 @@ describe('createLogoutHandler', () => {
         if (name === 'jb_user_id') return { value: 'user-abc-123' };
         return undefined;
       });
-      mockAdminSignOut.mockResolvedValue({});
+      mockAdminSignOut.mockResolvedValue({ data: null, error: null });
 
       await POST();
 
@@ -73,7 +73,7 @@ describe('createLogoutHandler', () => {
         if (name === 'jb_user_id') return { value: 'user-123' };
         return undefined;
       });
-      mockAdminSignOut.mockResolvedValue({});
+      mockAdminSignOut.mockResolvedValue({ data: null, error: null });
 
       await POST();
 
@@ -124,6 +124,21 @@ describe('createLogoutHandler', () => {
       expect(cookieCalls[2][0]).toBe('jb_user_id');
       expect(cookieCalls[2][1]).toBe('');
       expect(cookieCalls[2][2]).toMatchObject({ maxAge: 0, path: '/' });
+    });
+
+    it('should clear cookies when admin.signOut returns an API error', async () => {
+      mockCookieStore.get.mockImplementation((name: string) => {
+        if (name === 'jb_user_id') return { value: 'user-123' };
+        return undefined;
+      });
+      mockAdminSignOut.mockResolvedValue({ data: null, error: { message: 'Invalid user' } });
+
+      const response = await POST();
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockCookieStore.set).toHaveBeenCalledTimes(3);
     });
 
     it('should clear cookies even when admin.signOut throws', async () => {

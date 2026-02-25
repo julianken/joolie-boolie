@@ -54,7 +54,7 @@ describe('POST /api/auth/logout', () => {
         if (name === 'jb_user_id') return { value: 'user-123' };
         return undefined;
       });
-      mockAdminSignOut.mockResolvedValue({});
+      mockAdminSignOut.mockResolvedValue({ data: null, error: null });
 
       const response = await POST();
       const data = await response.json();
@@ -107,7 +107,7 @@ describe('POST /api/auth/logout', () => {
         if (name === 'jb_user_id') return { value: 'user-abc-123' };
         return undefined;
       });
-      mockAdminSignOut.mockResolvedValue({});
+      mockAdminSignOut.mockResolvedValue({ data: null, error: null });
 
       await POST();
 
@@ -122,7 +122,22 @@ describe('POST /api/auth/logout', () => {
       expect(mockAdminSignOut).not.toHaveBeenCalled();
     });
 
-    it('should still clear cookies even if admin.signOut fails', async () => {
+    it('should still clear cookies when admin.signOut returns an API error', async () => {
+      mockCookieStore.get.mockImplementation((name: string) => {
+        if (name === 'jb_user_id') return { value: 'user-123' };
+        return undefined;
+      });
+      mockAdminSignOut.mockResolvedValue({ data: null, error: { message: 'Invalid user' } });
+
+      const response = await POST();
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockCookieStore.set).toHaveBeenCalledTimes(3);
+    });
+
+    it('should still clear cookies even if admin.signOut throws', async () => {
       mockCookieStore.get.mockImplementation((name: string) => {
         if (name === 'jb_user_id') return { value: 'user-123' };
         return undefined;
