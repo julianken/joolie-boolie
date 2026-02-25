@@ -24,6 +24,11 @@
       "types": "./src/stats/storage.ts",
       "import": "./src/stats/storage.ts",
       "require": "./src/stats/storage.ts"
+    },
+    "./storage-cleanup": {
+      "types": "./src/storage-cleanup.ts",
+      "import": "./src/storage-cleanup.ts",
+      "require": "./src/storage-cleanup.ts"
     }
   },
   "scripts": {
@@ -36,6 +41,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@vitest/coverage-v8": "^4.0.17",
+    "jsdom": "^27.4.0",
     "typescript": "^5",
     "vitest": "^4.0.17"
   }

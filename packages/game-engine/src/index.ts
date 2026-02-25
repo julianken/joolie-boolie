@@ -62,3 +62,15 @@ export function canTransition(current: GameStatus, action: GameTransition): bool
 
 // Export statistics module
 export * from './stats';
+
+// Export storage cleanup utilities
+export {
+  getLocalStorageUsage,
+  clearAllGameState,
+  cleanupExpiredGameState,
+  markKeyAccessed,
+  getKeyLastAccessed,
+  formatStorageSize,
+  type LocalStorageUsage,
+  type CleanupResult,
+} from './storage-cleanup';
