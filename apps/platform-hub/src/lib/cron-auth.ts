@@ -10,6 +10,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'node:crypto';
 import { createLogger } from '@joolie-boolie/error-tracking/server-logger';
 
 const logger = createLogger({ service: 'cron-auth' });
@@ -43,7 +44,9 @@ export function verifyCronAuth(request: Request): NextResponse | null {
 
   const token = authHeader.slice(7); // Remove 'Bearer ' prefix
 
-  if (token !== cronSecret) {
+  const tokenBuffer = Buffer.from(token, 'utf-8');
+  const secretBuffer = Buffer.from(cronSecret, 'utf-8');
+  if (tokenBuffer.length !== secretBuffer.length || !timingSafeEqual(tokenBuffer, secretBuffer)) {
     logger.error('Invalid CRON_SECRET');
     return NextResponse.json(
       { success: false, error: 'Unauthorized' },
