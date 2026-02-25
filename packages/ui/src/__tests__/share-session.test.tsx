@@ -326,7 +326,7 @@ describe('ShareSession', () => {
       vi.useRealTimers();
     });
 
-    it('should start polling session state when panel opens', () => {
+    it('should start polling session state and participant counts when panel opens', () => {
       render(
         <ShareSession
           sessionId="test-session"
@@ -337,12 +337,15 @@ describe('ShareSession', () => {
 
       // Should not poll before panel is open
       expect(mockGetSessionState).not.toHaveBeenCalled();
+      // getParticipantCounts is called once for initial state
+      const initialCountCalls = mockGetParticipantCounts.mock.calls.length;
 
       // Open panel
       fireEvent.click(screen.getByRole('button', { name: 'Share session' }));
 
-      // Should have been called once immediately
+      // Should have been called once immediately (loadState in effect)
       expect(mockGetSessionState).toHaveBeenCalledTimes(1);
+      expect(mockGetParticipantCounts).toHaveBeenCalledTimes(initialCountCalls + 1);
 
       // Advance timer to trigger interval
       act(() => {
@@ -350,6 +353,7 @@ describe('ShareSession', () => {
       });
 
       expect(mockGetSessionState).toHaveBeenCalledTimes(2);
+      expect(mockGetParticipantCounts).toHaveBeenCalledTimes(initialCountCalls + 2);
     });
 
     it('should stop polling when panel closes', () => {
@@ -393,7 +397,7 @@ describe('ShareSession', () => {
       );
     });
 
-    it('should have role="dialog" on the share panel', () => {
+    it('should have role="dialog" with aria-modal on the share panel', () => {
       render(
         <ShareSession
           sessionId="test-session"
@@ -402,7 +406,43 @@ describe('ShareSession', () => {
         />
       );
       fireEvent.click(screen.getByRole('button', { name: 'Share session' }));
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toHaveAttribute('aria-modal', 'true');
+    });
+
+    it('should associate labels with inputs via htmlFor/id', () => {
+      render(
+        <ShareSession
+          sessionId="test-session"
+          isConnected={false}
+          gameType="bingo"
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Share session' }));
+
+      const audienceLabel = screen.getByText('Audience Display Link');
+      expect(audienceLabel).toHaveAttribute('for', 'audience-link-input');
+      expect(document.getElementById('audience-link-input')).toBeInTheDocument();
+
+      const cohostLabel = screen.getByText('Co-Host Link');
+      expect(cohostLabel).toHaveAttribute('for', 'cohost-link-input');
+      expect(document.getElementById('cohost-link-input')).toBeInTheDocument();
+    });
+
+    it('should focus the first focusable element when panel opens', () => {
+      render(
+        <ShareSession
+          sessionId="test-session"
+          isConnected={false}
+          gameType="bingo"
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Share session' }));
+
+      // The first focusable element in the panel should be the audience link input
+      const audienceInput = document.getElementById('audience-link-input');
+      expect(audienceInput).toBe(document.activeElement);
     });
 
     it('should have aria-label on close button', () => {

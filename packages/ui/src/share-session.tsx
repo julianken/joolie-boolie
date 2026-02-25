@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from './button';
 import {
   generateSessionLink,
@@ -31,6 +31,9 @@ export function ShareSession({ sessionId, isConnected, gameType }: ShareSessionP
   const [showPanel, setShowPanel] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sessionState, setSessionState] = useState<SessionState | null>(null);
+  const [counts, setCounts] = useState(() => getParticipantCounts());
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Generate shareable link for audience
   const shareLink = generateSessionLink({
@@ -54,6 +57,7 @@ export function ShareSession({ sessionId, isConnected, gameType }: ShareSessionP
 
     const loadState = () => {
       setSessionState(getSessionState());
+      setCounts(getParticipantCounts());
     };
 
     loadState();
@@ -63,31 +67,44 @@ export function ShareSession({ sessionId, isConnected, gameType }: ShareSessionP
   }, [showPanel]);
 
   // Copy link to clipboard
-  const copyLink = useCallback(
-    async (link: string) => {
-      try {
-        await navigator.clipboard.writeText(link);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = link;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }
-    },
-    []
-  );
+  const copyLink = useCallback(async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = link;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+    if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    setCopied(true);
+    copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
+  }, []);
 
-  // Get participant counts
-  const counts = getParticipantCounts();
+  // Clean up copied timer on unmount
+  useEffect(() => () => {
+    if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+  }, []);
+
+  // Focus the panel when it opens
+  useEffect(() => {
+    if (showPanel && panelRef.current) {
+      // Focus the first focusable element in the panel, or the panel itself
+      const focusable = panelRef.current.querySelector<HTMLElement>(
+        'input, button, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable) {
+        focusable.focus();
+      } else {
+        panelRef.current.focus();
+      }
+    }
+  }, [showPanel]);
 
   return (
     <div className="relative">
@@ -125,9 +142,12 @@ export function ShareSession({ sessionId, isConnected, gameType }: ShareSessionP
       {/* Share panel dropdown */}
       {showPanel && (
         <div
+          ref={panelRef}
           className="absolute right-0 top-full mt-2 w-80 bg-background border border-border rounded-xl p-4 shadow-lg z-50"
           role="dialog"
+          aria-modal="true"
           aria-label="Share session"
+          tabIndex={-1}
         >
           <h3 className="text-lg font-semibold mb-4">Share Session</h3>
 
@@ -145,11 +165,12 @@ export function ShareSession({ sessionId, isConnected, gameType }: ShareSessionP
 
           {/* Audience link */}
           <div className="space-y-2 mb-4">
-            <label className="text-base font-medium text-muted-foreground">
+            <label htmlFor="audience-link-input" className="text-base font-medium text-muted-foreground">
               Audience Display Link
             </label>
             <div className="flex gap-2">
               <input
+                id="audience-link-input"
                 type="text"
                 value={shareLink}
                 readOnly
@@ -173,11 +194,12 @@ export function ShareSession({ sessionId, isConnected, gameType }: ShareSessionP
 
           {/* Presenter link (co-host) */}
           <div className="space-y-2 mb-4">
-            <label className="text-base font-medium text-muted-foreground">
+            <label htmlFor="cohost-link-input" className="text-base font-medium text-muted-foreground">
               Co-Host Link
             </label>
             <div className="flex gap-2">
               <input
+                id="cohost-link-input"
                 type="text"
                 value={presenterLink}
                 readOnly
