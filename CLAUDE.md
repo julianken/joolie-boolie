@@ -41,7 +41,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `packages/game-engine` | **Shared Types** | Base GameStatus type, statistics module (types, calculators, localStorage storage). `transition()` / `canTransition()` are deprecated -- each app has its own state machine. |
 | `packages/auth` | **Complete** | AuthProvider, hooks, ProtectedRoute. Integrated in platform-hub, bingo, trivia |
 | `packages/database` | **Complete** | Type-safe client, CRUD, pagination, hooks, PIN security, API factories |
-| `packages/testing` | **Complete** | BroadcastChannel and Audio mocks |
+| `packages/testing` | **Complete** | BroadcastChannel, Audio, Supabase, Sentry, and OTel mocks |
 | `packages/types` | **Complete** | Shared TypeScript types |
 | `packages/audio` | **Complete** | Shared audio utilities (voice packs, sound effects) |
 | `packages/error-tracking` | **Complete** | Error logging and tracking |
