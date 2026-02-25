@@ -625,6 +625,549 @@ describe('advanceScene() scoreDeltas computation at round completion', () => {
   });
 });
 
+describe('advanceScene() answer_reveal cycling paths', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  /**
+   * Helper: set up a between_rounds state with answer_reveal scene.
+   * displayQuestionIndex points to the Nth question of round 0 (0-based).
+   * Returns the global indices of round 0 questions.
+   */
+  function setupAnswerReview(displayAtRoundIndex: number): number[] {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state = useGameStore.getState();
+    const roundQuestions = state.questions.filter((q) => q.roundIndex === 0);
+    const indices = roundQuestions.map((q) => state.questions.indexOf(q));
+
+    useGameStore.setState({
+      status: 'between_rounds',
+      audienceScene: 'answer_reveal',
+      displayQuestionIndex: indices[displayAtRoundIndex],
+      selectedQuestionIndex: indices[displayAtRoundIndex],
+      revealPhase: null,
+    });
+
+    return indices;
+  }
+
+  it('should cycle to next question when advance on non-last question in answer_reveal', () => {
+    const indices = setupAnswerReview(0);
+
+    useGameStore.getState().advanceScene('advance');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('answer_reveal');
+    expect(state.displayQuestionIndex).toBe(indices[1]);
+    expect(state.selectedQuestionIndex).toBe(indices[1]);
+    expect(state.revealPhase).toBeNull();
+  });
+
+  it('should cycle to next question when skip on non-last question in answer_reveal', () => {
+    const indices = setupAnswerReview(1);
+
+    useGameStore.getState().advanceScene('skip');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('answer_reveal');
+    expect(state.displayQuestionIndex).toBe(indices[2]);
+  });
+
+  it('should transition to round_intro when advance on last question of non-last round', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const roundQuestions = state0.questions.filter((q) => q.roundIndex === 0);
+    const lastQ = roundQuestions[roundQuestions.length - 1];
+    const lastQIndex = state0.questions.indexOf(lastQ);
+
+    useGameStore.setState({
+      status: 'between_rounds',
+      audienceScene: 'answer_reveal',
+      displayQuestionIndex: lastQIndex,
+      selectedQuestionIndex: lastQIndex,
+      currentRound: 0,
+      totalRounds: 3,
+      revealPhase: null,
+    });
+
+    useGameStore.getState().advanceScene('advance');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('round_intro');
+  });
+
+  it('should transition to final_buildup when advance on last question of last round', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const lastRound = state0.totalRounds - 1;
+    const roundQuestions = state0.questions.filter(
+      (q) => q.roundIndex === lastRound,
+    );
+    const lastQ = roundQuestions[roundQuestions.length - 1];
+    const lastQIndex = state0.questions.indexOf(lastQ);
+
+    useGameStore.setState({
+      status: 'between_rounds',
+      audienceScene: 'answer_reveal',
+      displayQuestionIndex: lastQIndex,
+      selectedQuestionIndex: lastQIndex,
+      currentRound: lastRound,
+      revealPhase: null,
+    });
+
+    useGameStore.getState().advanceScene('advance');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('final_buildup');
+    expect(state.status).toBe('ended');
+  });
+});
+
+describe('advanceScene() answer_reveal N key skip', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should skip remaining answers and go to round_intro on next_round trigger', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const roundQuestions = state0.questions.filter((q) => q.roundIndex === 0);
+    const firstQIndex = state0.questions.indexOf(roundQuestions[0]);
+
+    useGameStore.setState({
+      status: 'between_rounds',
+      audienceScene: 'answer_reveal',
+      displayQuestionIndex: firstQIndex,
+      selectedQuestionIndex: firstQIndex,
+      currentRound: 0,
+      totalRounds: 3,
+    });
+
+    useGameStore.getState().advanceScene('next_round');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('round_intro');
+    expect(state.currentRound).toBe(1);
+  });
+
+  it('should skip remaining answers and go to final_buildup on next_round when last round', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const lastRound = state0.totalRounds - 1;
+    const roundQuestions = state0.questions.filter(
+      (q) => q.roundIndex === lastRound,
+    );
+    const firstQIndex = state0.questions.indexOf(roundQuestions[0]);
+
+    useGameStore.setState({
+      status: 'between_rounds',
+      audienceScene: 'answer_reveal',
+      displayQuestionIndex: firstQIndex,
+      selectedQuestionIndex: firstQIndex,
+      currentRound: lastRound,
+    });
+
+    useGameStore.getState().advanceScene('next_round');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('final_buildup');
+    expect(state.status).toBe('ended');
+  });
+});
+
+describe('advanceScene() round_intro from between_rounds', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should call nextRoundEngine when transitioning to round_intro from between_rounds', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.getState().completeRound();
+    expect(useGameStore.getState().status).toBe('between_rounds');
+    expect(useGameStore.getState().currentRound).toBe(0);
+
+    useGameStore.setState({ audienceScene: 'recap_scores' });
+
+    useGameStore.getState().advanceScene('advance');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('round_intro');
+    expect(state.status).toBe('playing');
+    expect(state.currentRound).toBe(1);
+  });
+});
+
+describe('advanceScene() question_anticipation paths', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should advance to next question when entering question_anticipation from question_closed', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const roundQuestions = state0.questions.filter((q) => q.roundIndex === 0);
+    const firstQIndex = state0.questions.indexOf(roundQuestions[0]);
+
+    useGameStore.setState({
+      audienceScene: 'question_closed',
+      displayQuestionIndex: firstQIndex,
+      selectedQuestionIndex: firstQIndex,
+    });
+
+    useGameStore.getState().advanceScene('advance');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('question_anticipation');
+    const secondQIndex = state0.questions.indexOf(roundQuestions[1]);
+    expect(state.displayQuestionIndex).toBe(secondQIndex);
+    expect(state.selectedQuestionIndex).toBe(secondQIndex);
+  });
+
+  it('should show currently selected question when entering question_anticipation from non-question_closed scene', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const roundQuestions = state0.questions.filter((q) => q.roundIndex === 0);
+    const thirdQIndex = state0.questions.indexOf(roundQuestions[2]);
+
+    useGameStore.setState({
+      audienceScene: 'round_intro',
+      selectedQuestionIndex: thirdQIndex,
+    });
+
+    useGameStore.getState().advanceScene('auto');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('question_anticipation');
+    expect(state.displayQuestionIndex).toBe(thirdQIndex);
+  });
+});
+
+describe('advanceScene() generic fallthrough path', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should use buildSceneUpdate for game_intro -> round_intro (no special side effect)', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.setState({ audienceScene: 'game_intro' });
+
+    useGameStore.getState().advanceScene('auto');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('round_intro');
+    expect(state.sceneTimestamp).toBeGreaterThan(0);
+  });
+
+  it('should use buildSceneUpdate for question_display -> question_closed', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    const state0 = useGameStore.getState();
+    const roundQuestions = state0.questions.filter((q) => q.roundIndex === 0);
+    const firstQIndex = state0.questions.indexOf(roundQuestions[0]);
+
+    useGameStore.setState({
+      audienceScene: 'question_display',
+      displayQuestionIndex: firstQIndex,
+      selectedQuestionIndex: firstQIndex,
+    });
+
+    useGameStore.getState().advanceScene('close');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('question_closed');
+    expect(state.sceneTimestamp).toBeGreaterThan(0);
+  });
+});
+
+describe('advanceScene() no-op paths', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should be a no-op when getNextScene returns null', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.setState({ audienceScene: 'waiting' });
+
+    const before = useGameStore.getState();
+    useGameStore.getState().advanceScene('close');
+
+    const after = useGameStore.getState();
+    expect(after.audienceScene).toBe('waiting');
+    expect(after.sceneTimestamp).toBe(before.sceneTimestamp);
+  });
+
+  it('should be a no-op when scene is final_podium (terminal state)', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.setState({ audienceScene: 'final_podium' });
+
+    const before = useGameStore.getState();
+    useGameStore.getState().advanceScene('advance');
+
+    const after = useGameStore.getState();
+    expect(after.audienceScene).toBe('final_podium');
+    expect(after.sceneTimestamp).toBe(before.sceneTimestamp);
+  });
+});
+
+describe('advanceScene() final_buildup side effect', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should call endGame when transitioning to final_buildup', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.getState().completeRound();
+
+    const lastRound = useGameStore.getState().totalRounds - 1;
+
+    useGameStore.setState({
+      audienceScene: 'recap_scores',
+      currentRound: lastRound,
+    });
+
+    useGameStore.getState().advanceScene('advance');
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('final_buildup');
+    expect(state.status).toBe('ended');
+  });
+
+  it('should transition from final_buildup to final_podium on auto', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.getState().endGame();
+    useGameStore.setState({ audienceScene: 'final_buildup' });
+
+    useGameStore.getState().advanceScene('auto');
+
+    expect(useGameStore.getState().audienceScene).toBe('final_podium');
+  });
+
+  it('should transition from final_buildup to final_podium on skip', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.getState().endGame();
+    useGameStore.setState({ audienceScene: 'final_buildup' });
+
+    useGameStore.getState().advanceScene('skip');
+
+    expect(useGameStore.getState().audienceScene).toBe('final_podium');
+  });
+});
+
+describe('advanceScene() setDisplayQuestion scene transitions', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('should transition to question_anticipation when showing question from waiting scene', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.setState({ audienceScene: 'waiting' });
+
+    useGameStore.getState().setDisplayQuestion(0);
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('question_anticipation');
+    expect(state.displayQuestionIndex).toBe(0);
+  });
+
+  it('should transition to waiting scene when hiding question', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.setState({
+      audienceScene: 'question_display',
+      displayQuestionIndex: 0,
+    });
+
+    useGameStore.getState().setDisplayQuestion(null);
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('waiting');
+    expect(state.displayQuestionIndex).toBeNull();
+  });
+
+  it('should not change scene when showing question from non-waiting scene', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+    useGameStore.setState({
+      audienceScene: 'question_display',
+      displayQuestionIndex: 0,
+    });
+
+    useGameStore.getState().setDisplayQuestion(1);
+
+    const state = useGameStore.getState();
+    expect(state.audienceScene).toBe('question_display');
+    expect(state.displayQuestionIndex).toBe(1);
+  });
+});
+
+describe('Store action coverage — minor paths', () => {
+  beforeEach(() => {
+    resetGameStore();
+  });
+
+  it('setRevealPhase should update revealPhase', () => {
+    useGameStore.getState().setRevealPhase('freeze');
+    expect(useGameStore.getState().revealPhase).toBe('freeze');
+  });
+
+  it('setRevealPhase should accept null to clear reveal', () => {
+    useGameStore.getState().setRevealPhase('illuminate');
+    useGameStore.getState().setRevealPhase(null);
+    expect(useGameStore.getState().revealPhase).toBeNull();
+  });
+
+  it('setScoreDeltasBatch should replace scoreDeltas with a new array reference', () => {
+    const deltas = [
+      {
+        teamId: 't1',
+        teamName: 'Team 1',
+        delta: 5,
+        newScore: 10,
+        newRank: 1,
+        previousRank: 2,
+      },
+    ];
+    useGameStore.getState().setScoreDeltasBatch(deltas);
+
+    const state = useGameStore.getState();
+    expect(state.scoreDeltas).toHaveLength(1);
+    expect(state.scoreDeltas[0].delta).toBe(5);
+    expect(state.scoreDeltas).not.toBe(deltas);
+    expect(state.scoreDeltas).toEqual(deltas);
+  });
+
+  it('loadTeamsFromSetup should be a no-op when not in setup status', () => {
+    useGameStore.getState().addTeam('Team A');
+    useGameStore.getState().startGame();
+
+    useGameStore.getState().loadTeamsFromSetup(['New Team']);
+
+    const state = useGameStore.getState();
+    expect(state.teams).toHaveLength(1);
+    expect(state.teams[0].name).toBe('Team A');
+  });
+
+  it('importQuestions should use replace mode by default', () => {
+    const customQuestions: import('@/types').Question[] = [
+      {
+        id: 'custom-1' as import('@/types').QuestionId,
+        text: 'Custom Q1',
+        type: 'multiple_choice',
+        options: ['A', 'B'],
+        optionTexts: ['Option A', 'Option B'],
+        correctAnswers: ['A'],
+        category: 'general_knowledge',
+        explanation: '',
+        roundIndex: 0,
+      },
+    ];
+
+    useGameStore.getState().importQuestions(customQuestions);
+
+    const state = useGameStore.getState();
+    expect(state.questions).toHaveLength(1);
+    expect(state.questions[0].id).toBe('custom-1');
+  });
+
+  it('_hydrate should reconstruct teams array with new references', () => {
+    const teams = [
+      {
+        id: 't1' as import('@/types').TeamId,
+        name: 'Team 1',
+        score: 10,
+        tableNumber: 1,
+        roundScores: [10],
+      },
+    ];
+    useGameStore.getState()._hydrate({ teams });
+
+    const state = useGameStore.getState();
+    expect(state.teams).toHaveLength(1);
+    expect(state.teams[0].name).toBe('Team 1');
+    expect(state.teams).not.toBe(teams);
+  });
+
+  it('_hydrate should reconstruct questions array with new references', () => {
+    const questions: import('@/types').Question[] = [
+      {
+        id: 'q1' as import('@/types').QuestionId,
+        text: 'Test Q',
+        type: 'multiple_choice',
+        options: ['A'],
+        optionTexts: ['Opt A'],
+        correctAnswers: ['A'],
+        category: 'general_knowledge',
+        explanation: '',
+        roundIndex: 0,
+      },
+    ];
+    useGameStore.getState()._hydrate({ questions });
+
+    const state = useGameStore.getState();
+    expect(state.questions).toHaveLength(1);
+    expect(state.questions).not.toBe(questions);
+  });
+
+  it('_hydrate should reconstruct teamAnswers array with new references', () => {
+    const teamAnswers = [
+      {
+        teamId: 't1' as import('@/types').TeamId,
+        questionId: 'q1' as import('@/types').QuestionId,
+        answer: 'A',
+        isCorrect: true,
+        pointsAwarded: 1,
+      },
+    ];
+    useGameStore.getState()._hydrate({ teamAnswers });
+
+    const state = useGameStore.getState();
+    expect(state.teamAnswers).toHaveLength(1);
+    expect(state.teamAnswers).not.toBe(teamAnswers);
+  });
+
+  it('_hydrate should reconstruct scoreDeltas array with new references', () => {
+    const scoreDeltas = [
+      {
+        teamId: 't1',
+        teamName: 'Team 1',
+        delta: 5,
+        newScore: 10,
+        newRank: 1,
+        previousRank: 1,
+      },
+    ];
+    useGameStore.getState()._hydrate({ scoreDeltas });
+
+    const state = useGameStore.getState();
+    expect(state.scoreDeltas).toHaveLength(1);
+    expect(state.scoreDeltas).not.toBe(scoreDeltas);
+  });
+});
+
 describe('useGameSelectors', () => {
   beforeEach(() => {
     resetGameStore();

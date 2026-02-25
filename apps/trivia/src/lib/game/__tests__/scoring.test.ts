@@ -135,4 +135,58 @@ describe('computeScoreDeltas', () => {
     expect(deltas[0].newRank).toBe(1);
     expect(deltas[0].previousRank).toBe(1);
   });
+
+  it('should handle tied scores — teams get sequential ranks based on sort order', () => {
+    const teams = [
+      makeTeam('a', 'Team A', 10),
+      makeTeam('b', 'Team B', 10),
+      makeTeam('c', 'Team C', 5),
+    ];
+    const previousScores: Record<string, number> = { a: 5, b: 5, c: 5 };
+
+    const deltas = computeScoreDeltas(teams, previousScores);
+
+    const deltaA = deltas.find(d => d.teamId === 'a');
+    const deltaB = deltas.find(d => d.teamId === 'b');
+    const deltaC = deltas.find(d => d.teamId === 'c');
+
+    // A and B are tied at 10 — one gets rank 1, the other rank 2
+    expect(deltaA!.newRank + deltaB!.newRank).toBe(3); // 1 + 2
+    expect(deltaC?.newRank).toBe(3);
+
+    expect(deltaA?.delta).toBe(5);
+    expect(deltaB?.delta).toBe(5);
+    expect(deltaC?.delta).toBe(0);
+  });
+
+  it('should compute negative delta when current score is less than previous', () => {
+    const teams = [
+      makeTeam('a', 'Team A', 3),
+      makeTeam('b', 'Team B', 8),
+    ];
+    const previousScores: Record<string, number> = { a: 5, b: 2 };
+
+    const deltas = computeScoreDeltas(teams, previousScores);
+
+    const deltaA = deltas.find(d => d.teamId === 'a');
+    const deltaB = deltas.find(d => d.teamId === 'b');
+
+    expect(deltaA?.delta).toBe(-2); // 3 - 5
+    expect(deltaB?.delta).toBe(6); // 8 - 2
+  });
+
+  it('should handle all teams at zero scores', () => {
+    const teams = [
+      makeTeam('a', 'Team A', 0),
+      makeTeam('b', 'Team B', 0),
+    ];
+    const previousScores: Record<string, number> = { a: 0, b: 0 };
+
+    const deltas = computeScoreDeltas(teams, previousScores);
+
+    for (const d of deltas) {
+      expect(d.delta).toBe(0);
+      expect(d.newScore).toBe(0);
+    }
+  });
 });
