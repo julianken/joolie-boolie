@@ -29,7 +29,7 @@ A unified gaming platform for groups and communities featuring Bingo, Trivia, an
 - `packages/sync` - BroadcastChannel sync + Zustand store
 - `packages/database` - Type-safe Supabase client + CRUD
 - `packages/auth` - AuthProvider, hooks, ProtectedRoute
-- `packages/game-engine` - Base game types and transitions
+- `packages/game-stats` - Game statistics types, calculators, storage
 - `packages/types` - Shared TypeScript types
 - `packages/testing` - Test mocks (BroadcastChannel, Audio)
 - `packages/error-tracking` - Error logging

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { GameStatus, BaseGameState } from '../index';
 
-describe('game-engine', () => {
+describe('game-stats', () => {
   describe('GameStatus type', () => {
     it('should accept all valid status values', () => {
       const statuses: GameStatus[] = ['idle', 'playing', 'paused', 'ended'];

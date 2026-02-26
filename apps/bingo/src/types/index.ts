@@ -1,5 +1,5 @@
 import type { BallNumber as BrandedBallNumber } from '@joolie-boolie/types/branded';
-import type { GameStatus } from '@joolie-boolie/game-engine';
+import type { GameStatus } from '@joolie-boolie/game-stats';
 
 // Bingo column letters
 export type BingoColumn = 'B' | 'I' | 'N' | 'G' | 'O';
@@ -17,7 +17,7 @@ export interface BingoBall {
   label: string; // e.g., "B-1", "O-75"
 }
 
-// Game state (re-exported from @joolie-boolie/game-engine)
+// Game state (re-exported from @joolie-boolie/game-stats)
 export type { GameStatus };
 
 export interface GameState {

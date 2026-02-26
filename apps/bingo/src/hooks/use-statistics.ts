@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { BingoStatistics, BingoSessionRecord } from '@joolie-boolie/game-engine';
+import type { BingoStatistics, BingoSessionRecord } from '@joolie-boolie/game-stats';
 import {
   loadBingoStats,
   addBingoSession,
@@ -10,7 +10,7 @@ import {
   getMostCommonPatterns,
   formatDuration,
   generateSessionId,
-} from '@joolie-boolie/game-engine';
+} from '@joolie-boolie/game-stats';
 
 /**
  * Hook for managing bingo game statistics.

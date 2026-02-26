@@ -1,10 +1,10 @@
-# CLAUDE.md - game-engine
+# CLAUDE.md - game-stats
 
-Shared game types, deprecated state-machine helpers, and statistics module for the Joolie Boolie platform.
+Shared game statistics module and base types for the Joolie Boolie platform.
 
 ## Package Scope
 
-`@joolie-boolie/game-engine`
+`@joolie-boolie/game-stats`
 
 ## What This Package Provides
 
@@ -15,13 +15,6 @@ Shared game types, deprecated state-machine helpers, and statistics module for t
 | `GameStatus` | type | `'idle' \| 'playing' \| 'paused' \| 'ended'` -- base 4-state enum. Bingo re-exports this; Trivia has its own 5-state variant. |
 | `BaseGameState` | interface | `{ status: GameStatus; audioEnabled: boolean }` |
 | `GameTransition` | type | `'START_GAME' \| 'PAUSE_GAME' \| 'RESUME_GAME' \| 'END_GAME' \| 'RESET_GAME'` |
-
-### Deprecated Functions (from `src/index.ts`)
-
-| Export | Deprecated? | Reason |
-|--------|-------------|--------|
-| `transition()` | Yes | Each game app implements its own state machine. Not used by any current app. |
-| `canTransition()` | Yes | Each game app implements its own state machine. Not used by any current app. |
 
 ### Statistics Module (from `src/stats/`)
 
@@ -56,5 +49,5 @@ Provides localStorage-backed statistics tracking for both Bingo and Trivia.
 ## Key Design Decisions
 
 - **Trivia has its own GameStatus.** Trivia uses a 5-state `'setup' | 'playing' | 'between_rounds' | 'paused' | 'ended'` type. Do NOT attempt to unify it with the 4-state base type.
-- **State machines are per-app.** Bingo uses `lib/game/state-machine.ts`; Trivia uses its own. The generic `transition()` / `canTransition()` functions here are unused and deprecated.
+- **State machines are per-app.** Bingo uses `lib/game/state-machine.ts`; Trivia uses its own. The deprecated `transition()` / `canTransition()` functions in `src/index.ts` are unused.
 - **Stats module is the primary value.** The statistics types, calculators, and storage utilities are the main active exports consumed by both apps.
