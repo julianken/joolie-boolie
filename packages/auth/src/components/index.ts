@@ -6,3 +6,4 @@ export {
   type ProtectedRouteProps,
   type GuestOnlyProps,
 } from './protected-route';
+export { OAuthCallbackPage } from './OAuthCallbackPage';
