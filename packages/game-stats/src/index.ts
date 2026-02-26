@@ -1,4 +1,4 @@
-// Game Engine package - Shared game types and statistics
+// Game Stats package - Shared game types and statistics
 // Base types for all games
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'ended';
