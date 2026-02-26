@@ -1,7 +1,7 @@
 /**
  * Refresh Token Store Tests
  *
- * Comprehensive unit tests for all 7 exported functions in refresh-token-store.ts.
+ * Comprehensive unit tests for all 8 exported functions in refresh-token-store.ts.
  * Tests crypto functions with real Node.js crypto; mocks only the DB client and logger.
  */
 
@@ -69,17 +69,10 @@ function mockUpdateEqChain(result: { data: unknown; error: unknown }) {
  * Build a mock chain for revokeAllUserTokens:
  * .from('refresh_tokens').update(...).eq('user_id',...).is('revoked_at',null)[.eq('client_id',...)].select('id')
  */
-function mockRevokeAllChain(
-  result: { data: unknown; error: unknown },
-  options?: { withClientFilter: boolean }
-) {
+function mockRevokeAllChain(result: { data: unknown; error: unknown }) {
   const selectFn = vi.fn().mockResolvedValue(result);
   const eqClientFn = vi.fn().mockReturnValue({ select: selectFn });
-  const isFn = vi.fn().mockReturnValue(
-    options?.withClientFilter
-      ? { eq: eqClientFn, select: selectFn }
-      : { eq: eqClientFn, select: selectFn }
-  );
+  const isFn = vi.fn().mockReturnValue({ eq: eqClientFn, select: selectFn });
   const eqUserFn = vi.fn().mockReturnValue({ is: isFn });
   return {
     update: vi.fn().mockReturnValue({ eq: eqUserFn }),
@@ -144,7 +137,7 @@ describe('refresh-token-store', () => {
   });
 
   // -------------------------------------------------------
-  // storeRefreshToken (6 tests)
+  // storeRefreshToken (8 tests)
   // -------------------------------------------------------
   describe('storeRefreshToken', () => {
     it('stores token with correct fields (user_id, client_id, token_hash, scopes, expires_at)', async () => {
@@ -282,7 +275,7 @@ describe('refresh-token-store', () => {
   });
 
   // -------------------------------------------------------
-  // validateRefreshToken (11 tests)
+  // validateRefreshToken (12 tests)
   // -------------------------------------------------------
   describe('validateRefreshToken', () => {
     const validTokenData = {
@@ -417,31 +410,6 @@ describe('refresh-token-store', () => {
       });
     });
 
-    it('calls revokeTokenFamily on reuse detection', async () => {
-      // This test verifies via rotateRefreshToken, which calls revokeTokenFamily on already_rotated
-      // First call: validateRefreshToken finds rotated token
-      mockDbClient.from.mockReturnValueOnce(
-        mockSelectChain({
-          data: {
-            ...validTokenData,
-            rotated_to: 'other-token-id',
-          },
-          error: null,
-        })
-      );
-
-      // Second call: revokeTokenFamily RPC
-      mockDbClient.rpc.mockResolvedValue({ data: 3, error: null });
-
-      const result = await rotateRefreshToken('rt_reused', 'test-client');
-
-      expect(mockDbClient.rpc).toHaveBeenCalledWith('revoke_token_family', {
-        p_token_id: 'token-id-1',
-      });
-      expect(result.success).toBe(false);
-      expect(result.error).toContain('Token reuse detected');
-    });
-
     it('returns error for database query failure', async () => {
       // Simulate an unexpected throw from the DB client
       mockDbClient.from.mockImplementationOnce(() => {
@@ -529,7 +497,7 @@ describe('refresh-token-store', () => {
   });
 
   // -------------------------------------------------------
-  // rotateRefreshToken (7 tests)
+  // rotateRefreshToken (11 tests)
   // -------------------------------------------------------
   describe('rotateRefreshToken', () => {
     const validTokenData = {
@@ -773,10 +741,34 @@ describe('refresh-token-store', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('Unknown error');
     });
+
+    it('calls revokeTokenFamily on reuse detection', async () => {
+      // Validate finds a rotated token (reuse detection)
+      mockDbClient.from.mockReturnValueOnce(
+        mockSelectChain({
+          data: {
+            ...validTokenData,
+            rotated_to: 'other-token-id',
+          },
+          error: null,
+        })
+      );
+
+      // revokeTokenFamily RPC
+      mockDbClient.rpc.mockResolvedValue({ data: 3, error: null });
+
+      const result = await rotateRefreshToken('rt_reused', 'test-client');
+
+      expect(mockDbClient.rpc).toHaveBeenCalledWith('revoke_token_family', {
+        p_token_id: 'token-id-1',
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Token reuse detected');
+    });
   });
 
   // -------------------------------------------------------
-  // revokeTokenFamily (4 tests)
+  // revokeTokenFamily (7 tests)
   // -------------------------------------------------------
   describe('revokeTokenFamily', () => {
     it('calls RPC function with token_id parameter', async () => {
@@ -854,7 +846,7 @@ describe('refresh-token-store', () => {
   });
 
   // -------------------------------------------------------
-  // revokeRefreshToken (4 tests)
+  // revokeRefreshToken (5 tests)
   // -------------------------------------------------------
   describe('revokeRefreshToken', () => {
     it('revokes token by updating revoked_at in database', async () => {
@@ -931,7 +923,7 @@ describe('refresh-token-store', () => {
   });
 
   // -------------------------------------------------------
-  // revokeAllUserTokens (5 tests)
+  // revokeAllUserTokens (8 tests)
   // -------------------------------------------------------
   describe('revokeAllUserTokens', () => {
     it('revokes all tokens for user_id', async () => {
