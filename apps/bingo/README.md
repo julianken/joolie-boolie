@@ -213,7 +213,7 @@ This app depends on the following shared packages:
 - [`@joolie-boolie/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing)
 - [`@joolie-boolie/database`](../../packages/database/README.md) - Type-safe Supabase client wrappers (268 exports)
 - [`@joolie-boolie/auth`](../../packages/auth/README.md) - Supabase authentication wrappers (34 exports) - *not yet integrated*
-- [`@joolie-boolie/game-engine`](../../packages/game-engine/README.md) - Abstract game state machine (partial usage)
+- [`@joolie-boolie/game-stats`](../../packages/game-stats/README.md) - Game statistics types, calculators, storage
 - [`@joolie-boolie/testing`](../../packages/testing/README.md) - BroadcastChannel and Audio mocks for tests
 
 ## Integration Status

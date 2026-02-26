@@ -37,7 +37,7 @@ joolie-boolie-platform/
 │   ├── ui/              # Shared UI components (Button, Modal, Toggle, Input, etc.)
 │   ├── theme/           # Accessible design tokens and CSS
 │   ├── auth/            # Supabase authentication wrappers
-│   ├── game-engine/     # Abstract game state machine
+│   ├── game-stats/      # Game statistics types, calculators, storage
 │   ├── database/        # Supabase database utilities (268 exports)
 │   ├── types/           # Shared TypeScript type definitions
 │   ├── audio/           # Shared audio utilities (voice packs, sound effects)

@@ -15,7 +15,7 @@ A unified gaming platform for groups and communities, featuring Bingo, Trivia, a
 | **[@joolie-boolie/database](./packages/database/README.md)** | ✅ Complete | Type-safe Supabase client wrappers |
 | **[@joolie-boolie/auth](./packages/auth/README.md)** | ✅ Complete | Supabase authentication wrappers |
 | **[@joolie-boolie/types](./packages/types/README.md)** | ✅ Complete | Shared TypeScript type definitions |
-| **[@joolie-boolie/game-engine](./packages/game-engine/README.md)** | ✅ Shared Types | Base game state types, transitions, statistics. Actual engines live in each app. |
+| **[@joolie-boolie/game-stats](./packages/game-stats/README.md)** | ✅ Shared Types | Base game state types, statistics module (types, calculators, localStorage storage). |
 | **[@joolie-boolie/error-tracking](./packages/error-tracking/README.md)** | ✅ Complete | Error logging and tracking utilities |
 | **[@joolie-boolie/testing](./packages/testing/README.md)** | ✅ Complete | BroadcastChannel and Audio mocks for tests |
 
@@ -75,7 +75,7 @@ joolie-boolie-platform/
 │   ├── ui/              # Shared UI components - See README: packages/ui/README.md
 │   ├── theme/           # Accessible design tokens - See README: packages/theme/README.md
 │   ├── auth/            # Supabase authentication - See README: packages/auth/README.md
-│   ├── game-engine/     # Abstract game state machine - See README: packages/game-engine/README.md
+│   ├── game-stats/      # Game statistics types, calculators, storage - See README: packages/game-stats/README.md
 │   ├── database/        # Database utilities - See README: packages/database/README.md
 │   ├── types/           # Shared TypeScript types - See README: packages/types/README.md
 │   └── testing/         # Shared test utilities - See README: packages/testing/README.md
@@ -84,7 +84,7 @@ joolie-boolie-platform/
 
 **Quick Links:**
 - **Apps:** [Bingo](./apps/bingo/README.md) • [Trivia](./apps/trivia/README.md) • [Platform Hub](./apps/platform-hub/README.md)
-- **Packages:** [sync](./packages/sync/README.md) • [ui](./packages/ui/README.md) • [theme](./packages/theme/README.md) • [database](./packages/database/README.md) • [auth](./packages/auth/README.md) • [types](./packages/types/README.md) • [game-engine](./packages/game-engine/README.md) • [testing](./packages/testing/README.md)
+- **Packages:** [sync](./packages/sync/README.md) • [ui](./packages/ui/README.md) • [theme](./packages/theme/README.md) • [database](./packages/database/README.md) • [auth](./packages/auth/README.md) • [types](./packages/types/README.md) • [game-stats](./packages/game-stats/README.md) • [testing](./packages/testing/README.md)
 
 ## Getting Started
 
@@ -498,7 +498,7 @@ Each shared package has API documentation:
 | **[@joolie-boolie/database](./packages/database/README.md)** | [README](./packages/database/README.md) | Type-safe Supabase utilities |
 | **[@joolie-boolie/auth](./packages/auth/README.md)** | [README](./packages/auth/README.md) | Authentication wrappers |
 | **[@joolie-boolie/types](./packages/types/README.md)** | [README](./packages/types/README.md) | Shared TypeScript types |
-| **[@joolie-boolie/game-engine](./packages/game-engine/README.md)** | [README](./packages/game-engine/README.md) | Base game state types and transitions |
+| **[@joolie-boolie/game-stats](./packages/game-stats/README.md)** | [README](./packages/game-stats/README.md) | Game statistics types, calculators, storage |
 | **[@joolie-boolie/error-tracking](./packages/error-tracking/README.md)** | [README](./packages/error-tracking/README.md) | Error logging and tracking |
 | **[@joolie-boolie/testing](./packages/testing/README.md)** | [README](./packages/testing/README.md) | Test utilities and mocks |
 

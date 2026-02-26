@@ -103,7 +103,7 @@ Examples:
 feat(bingo): add diamond pattern
 fix(trivia): correct score calculation on team removal
 docs(sync): update BroadcastChannel examples
-test(game-engine): add transition edge case tests
+test(game-stats): add statistics calculator tests
 ```
 
 ## Code Style

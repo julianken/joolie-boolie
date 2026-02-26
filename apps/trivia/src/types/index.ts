@@ -105,7 +105,7 @@ export type QuestionCategory =
 /**
  * Trivia-specific game status values.
  *
- * Differs from the shared `GameStatus` in `@joolie-boolie/game-engine`
+ * Differs from the shared `GameStatus` in `@joolie-boolie/game-stats`
  * which uses `'idle'` instead of `'setup'` and lacks `'between_rounds'`.
  * Trivia needs `'setup'` for its configuration phase and `'between_rounds'`
  * for multi-round game flow.

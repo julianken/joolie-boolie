@@ -12,7 +12,7 @@ export default {
       'packages/database/': '@joolie-boolie/database',
       'packages/types/': '@joolie-boolie/types',
       'packages/audio/': '@joolie-boolie/audio',
-      'packages/game-engine/': '@joolie-boolie/game-engine',
+      'packages/game-stats/': '@joolie-boolie/game-stats',
       'packages/error-tracking/': '@joolie-boolie/error-tracking',
       'packages/testing/': '@joolie-boolie/testing',
     };
