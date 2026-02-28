@@ -17,6 +17,40 @@
   --bingo-text-muted: #6B7189;
 
   /* ----------------------------------------------------------------
+     Display page tokens — audience/projector screen layout
+     Dark: glass-dark translucent surfaces over dark radial gradient bg
+     Light: opaque light surfaces over bright subtle gradient bg
+  ---------------------------------------------------------------- */
+  /* Main background radial gradient stops */
+  --display-bg-gradient-inner: #0d1225;
+  --display-bg-gradient-outer: #0a0e1a;
+
+  /* Board container (bingo grid wrapper) */
+  --display-board-bg:     rgba(26, 23, 32, 0.85);
+  --display-board-border: rgba(255, 255, 255, 0.08);
+  --display-board-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* Counter glass pill (balls called/remaining) */
+  --display-counter-bg:     rgba(255, 255, 255, 0.04);
+  --display-counter-border: rgba(255, 255, 255, 0.08);
+  --display-counter-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+
+  /* Pattern display container */
+  --display-pattern-border: rgba(255, 255, 255, 0.08);
+  --display-pattern-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+
+  /* Uncalled board cells */
+  --display-cell-uncalled-bg:     rgba(255, 255, 255, 0.025);
+  --display-cell-uncalled-border: rgba(255, 255, 255, 0.04);
+
+  /* Pattern grid empty cells (compact PatternDisplay) */
+  --display-pattern-cell-empty-bg:     rgba(255, 255, 255, 0.08);
+  --display-pattern-cell-empty-border: rgba(255, 255, 255, 0.15);
+
+  /* Spinner track (loading / waiting states) */
+  --display-spinner-track: rgba(59, 130, 246, 0.20);
+
+  /* ----------------------------------------------------------------
      Ball glow tokens — derived from corrected ball colors (Part 1 §1.11)
   ---------------------------------------------------------------- */
   --bingo-ball-b-glow:         rgba(59, 130, 246, 0.35);
@@ -48,11 +82,28 @@
   --bingo-ease-ball-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Dark mode system pref — re-apply bingo background override */
+/* Dark mode system pref — re-apply bingo background and display token overrides */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --background: #0a0e1a;
     --bingo-bg-glow: #0d1225;
+
+    /* Re-assert display tokens (match :root defaults) */
+    --display-bg-gradient-inner: #0d1225;
+    --display-bg-gradient-outer: #0a0e1a;
+    --display-board-bg:     rgba(26, 23, 32, 0.85);
+    --display-board-border: rgba(255, 255, 255, 0.08);
+    --display-board-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --display-counter-bg:     rgba(255, 255, 255, 0.04);
+    --display-counter-border: rgba(255, 255, 255, 0.08);
+    --display-counter-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    --display-pattern-border: rgba(255, 255, 255, 0.08);
+    --display-pattern-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+    --display-cell-uncalled-bg:     rgba(255, 255, 255, 0.025);
+    --display-cell-uncalled-border: rgba(255, 255, 255, 0.04);
+    --display-pattern-cell-empty-bg:     rgba(255, 255, 255, 0.08);
+    --display-pattern-cell-empty-border: rgba(255, 255, 255, 0.15);
+    --display-spinner-track: rgba(59, 130, 246, 0.20);
   }
 }
 
@@ -60,6 +111,69 @@
 :root.dark {
   --background: #0a0e1a;
   --bingo-bg-glow: #0d1225;
+
+  /* Re-assert display tokens for dark mode (match :root defaults) */
+  --display-bg-gradient-inner: #0d1225;
+  --display-bg-gradient-outer: #0a0e1a;
+  --display-board-bg:     rgba(26, 23, 32, 0.85);
+  --display-board-border: rgba(255, 255, 255, 0.08);
+  --display-board-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --display-counter-bg:     rgba(255, 255, 255, 0.04);
+  --display-counter-border: rgba(255, 255, 255, 0.08);
+  --display-counter-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  --display-pattern-border: rgba(255, 255, 255, 0.08);
+  --display-pattern-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  --display-cell-uncalled-bg:     rgba(255, 255, 255, 0.025);
+  --display-cell-uncalled-border: rgba(255, 255, 255, 0.04);
+  --display-pattern-cell-empty-bg:     rgba(255, 255, 255, 0.08);
+  --display-pattern-cell-empty-border: rgba(255, 255, 255, 0.15);
+  --display-spinner-track: rgba(59, 130, 246, 0.20);
+}
+
+/* ================================================================
+   LIGHT MODE — bingo-specific token overrides
+   Replaces "bingo hall atmosphere" dark with a bright, clean look
+   suitable for well-lit rooms and front-projection screens.
+   All contrast ratios verified against #FAF9FB base.
+   ================================================================ */
+:root.light {
+  /* Restore background to shared light token (overrides :root dark default) */
+  --background: #FAF9FB;
+
+  /* Light-mode bingo-specific glow colours — used in display page gradient */
+  --bingo-bg-glow: #EBE8F5;
+
+  /* Muted text on light bg — 4.5:1 on #FAF9FB */
+  --bingo-text-muted: #6B6880;
+
+  /* Display page tokens — bright surface over subtle lavender gradient */
+  --display-bg-gradient-inner: #EBE8F5;
+  --display-bg-gradient-outer: #FAF9FB;
+
+  /* Board container — opaque white with subtle border */
+  --display-board-bg:     rgba(255, 255, 255, 0.95);
+  --display-board-border: rgba(100, 90, 130, 0.18);
+  --display-board-shadow: 0 8px 32px rgba(80, 60, 120, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.80);
+
+  /* Counter pill — light translucent */
+  --display-counter-bg:     rgba(255, 255, 255, 0.75);
+  --display-counter-border: rgba(100, 90, 130, 0.20);
+  --display-counter-shadow: 0 4px 24px rgba(80, 60, 120, 0.08);
+
+  /* Pattern display container */
+  --display-pattern-border: rgba(100, 90, 130, 0.18);
+  --display-pattern-shadow: 0 2px 16px rgba(80, 60, 120, 0.08);
+
+  /* Uncalled board cells — light neutral with visible border */
+  --display-cell-uncalled-bg:     rgba(0, 0, 0, 0.04);
+  --display-cell-uncalled-border: rgba(0, 0, 0, 0.10);
+
+  /* Pattern grid empty cells (compact PatternDisplay) */
+  --display-pattern-cell-empty-bg:     rgba(0, 0, 0, 0.06);
+  --display-pattern-cell-empty-border: rgba(0, 0, 0, 0.14);
+
+  /* Spinner track (loading / waiting states) — uses violet primary hue */
+  --display-spinner-track: rgba(109, 58, 204, 0.20);
 }
 
 /* ================================================================

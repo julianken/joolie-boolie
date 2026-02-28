@@ -76,7 +76,7 @@ function DisplayLoading() {
     >
       <div
         className="w-32 h-32 rounded-full border-8 border-t-primary animate-spin motion-reduce:animate-none"
-        style={{ borderColor: 'rgba(59, 130, 246, 0.20)', borderTopColor: 'var(--primary)' }}
+        style={{ borderColor: 'var(--display-spinner-track)', borderTopColor: 'var(--primary)' }}
         aria-hidden="true"
       />
       <p className="mt-6 text-2xl text-foreground-secondary" role="status" aria-live="polite">
@@ -259,7 +259,7 @@ function AudienceDisplay({
         role="main"
         style={{
           height: '100dvh',
-          background: 'radial-gradient(ellipse 80% 60% at 50% 35%, #0d1225 0%, #0a0e1a 100%)',
+          background: 'radial-gradient(ellipse 80% 60% at 50% 35%, var(--display-bg-gradient-inner) 0%, var(--display-bg-gradient-outer) 100%)',
         }}
       >
 
@@ -297,7 +297,7 @@ function AudienceDisplay({
             >
               <div
                 className="w-32 h-32 rounded-full border-8 animate-spin motion-reduce:animate-none"
-                style={{ borderColor: 'rgba(59, 130, 246, 0.20)', borderTopColor: 'var(--primary)' }}
+                style={{ borderColor: 'var(--display-spinner-track)', borderTopColor: 'var(--primary)' }}
                 aria-hidden="true"
               />
               <p className="text-4xl md:text-5xl text-foreground-secondary font-semibold" style={{ fontFamily: 'var(--font-display)' }}>
@@ -397,10 +397,10 @@ function AudienceDisplay({
                   className="flex-shrink min-w-0 rounded-2xl"
                   style={{
                     padding: '1.8vh 2.5vw',
-                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: 'var(--display-counter-bg)',
+                    border: '1px solid var(--display-counter-border)',
                     backdropFilter: 'blur(12px)',
-                    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
+                    boxShadow: 'var(--display-counter-shadow)',
                   }}
                 >
                   <BallsCalledCounter called={ballsCalled} remaining={ballsRemaining} />
@@ -426,8 +426,8 @@ function AudienceDisplay({
                       height: 'clamp(100px, 24vh, 280px)',
                       padding: '1.2vh',
                       backgroundColor: 'var(--surface)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      boxShadow: '0 2px 16px rgba(0, 0, 0, 0.12)',
+                      border: '1px solid var(--display-pattern-border)',
+                      boxShadow: 'var(--display-pattern-shadow)',
                     }}
                   >
                     <PatternDisplay pattern={pattern} compact hideLabel />
@@ -442,10 +442,10 @@ function AudienceDisplay({
                   style={{
                     height: '88%',
                     padding: '26px',
-                    backgroundColor: 'rgba(26, 23, 32, 0.85)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: 'var(--display-board-bg)',
+                    border: '1px solid var(--display-board-border)',
                     backdropFilter: 'blur(16px)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                    boxShadow: 'var(--display-board-shadow)',
                   }}
                 >
                   <AudienceBingoBoard calledBalls={calledBalls} />

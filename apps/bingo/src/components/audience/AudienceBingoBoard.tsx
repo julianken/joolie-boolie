@@ -171,10 +171,10 @@ export function AudienceBingoBoard({ calledBalls }: AudienceBingoBoardProps) {
                     ...(isCalled
                       ? getCalledCellStyle(column)
                       : {
-                          backgroundColor: 'rgba(255, 255, 255, 0.025)',
+                          backgroundColor: 'var(--display-cell-uncalled-bg)',
                           color: 'var(--bingo-text-muted)',
                           opacity: 0.5,
-                          border: '1px solid rgba(255, 255, 255, 0.04)',
+                          border: '1px solid var(--display-cell-uncalled-border)',
                         }
                     ),
                   }}

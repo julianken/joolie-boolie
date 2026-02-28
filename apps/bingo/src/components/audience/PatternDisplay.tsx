@@ -73,7 +73,7 @@ export function PatternDisplay({ pattern, compact = false, hideLabel = false }: 
                   style={
                     isMarked
                       ? { backgroundColor: 'var(--primary)' }
-                      : { backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }
+                      : { backgroundColor: 'var(--display-pattern-cell-empty-bg)', border: '1px solid var(--display-pattern-cell-empty-border)' }
                   }
                   aria-hidden="true"
                 >
