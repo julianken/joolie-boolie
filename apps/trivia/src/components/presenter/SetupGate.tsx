@@ -38,7 +38,7 @@ export function SetupGate({
   const loadTeamsFromSetup = useGameStore((state) => state.loadTeamsFromSetup);
 
   // Computed selectors
-  const { canStart } = useGameSelectors();
+  const { canStart, validation } = useGameSelectors();
 
   // Settings store
   const {
@@ -135,6 +135,7 @@ export function SetupGate({
             onLoadTeams={handleLoadTeams}
             onSaveTeams={handleSaveTeams}
             onSavePreset={onSavePreset}
+            validation={validation}
             canStart={canStart}
             onAddTeam={addTeam}
             onRemoveTeam={removeTeam}
