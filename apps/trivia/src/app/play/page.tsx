@@ -484,7 +484,7 @@ export default function PlayPage() {
 
           {/* LEFT RAIL: Question Navigator (w-64) */}
           <aside
-            className="w-64 flex-shrink-0 border-r border-border overflow-y-auto bg-surface/40"
+            className="w-64 flex-shrink-0 border-r border-border overflow-y-auto bg-surface/40 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted/50 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted"
             aria-label="Question navigator"
           >
             <div className="p-3">
