@@ -17,7 +17,8 @@ import { useNavButtonLabels } from '@/hooks/use-nav-button-labels';
  *
  * Forward is disabled during the reveal animation lock on answer_reveal.
  * Forward and back display contextual text labels that change per scene.
- * Visible text IS the accessible name — no aria-label needed (WCAG 2.5.3).
+ * Visible text IS the accessible name when present (WCAG 2.5.3).
+ * When disabled/icon-only, aria-label provides the fallback accessible name.
  */
 export function SceneNavButtons() {
   const labels = useNavButtonLabels();
@@ -85,6 +86,7 @@ export function SceneNavButtons() {
         onClick={handleBack}
         disabled={backDisabled}
         data-testid="nav-back"
+        aria-label={backDisabled ? 'Back' : undefined}
         title="Back (Arrow Left)"
         className="min-w-[44px] min-h-[44px] flex items-center justify-center gap-2 rounded-lg px-3 py-2 bg-surface-elevated hover:bg-surface-hover text-foreground border border-border transition-colors focus-visible:outline-2 focus-visible:outline-primary/40 focus-visible:outline-offset-2 disabled:opacity-[0.38] disabled:cursor-not-allowed disabled:pointer-events-none"
       >
@@ -113,6 +115,7 @@ export function SceneNavButtons() {
         onClick={handleForward}
         disabled={forwardDisabled}
         data-testid="nav-forward"
+        aria-label={forwardDisabled && labels.forward === null ? 'Forward' : undefined}
         title="Forward (Arrow Right)"
         className="min-w-[44px] min-h-[44px] flex items-center justify-center gap-2 rounded-lg px-3 py-2 bg-primary text-primary-foreground hover:bg-primary-hover transition-colors disabled:opacity-[0.38] disabled:cursor-not-allowed disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-primary/40 focus-visible:outline-offset-2"
       >

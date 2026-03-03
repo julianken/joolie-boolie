@@ -13,11 +13,8 @@ const defaultCtx: NavLabelContext = {
   recapShowingAnswer: null,
 };
 
-const notLastCtx: NavLabelContext = {
-  isLastQuestion: false,
-  isLastRound: false,
-  recapShowingAnswer: null,
-};
+// Alias for readability in context-dependent tests
+const notLastCtx = defaultCtx;
 
 const lastQuestionNotLastRoundCtx: NavLabelContext = {
   isLastQuestion: true,
