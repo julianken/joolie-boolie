@@ -25,7 +25,7 @@ export const NEXT_ACTION_HINTS: Record<AudienceScene, string> = {
   emergency_blank: 'EMERGENCY: Display blanked. Press E to restore.',
   answer_reveal: 'Reviewing answers. Right Arrow for next answer. N for next round.',
   // Recap scenes (BEA-587)
-  recap_title: 'Round recap starting. Press N to begin Q&A review.',
+  recap_title: 'Round recap starting. Right Arrow for Q&A review. Left Arrow to return to summary. N to skip.',
   recap_qa: 'Right Arrow to reveal answer. A to toggle answer. Left Arrow for previous. N to skip to scores.',
-  recap_scores: 'Recap scores displayed. Press N to continue to next round.',
+  recap_scores: 'Recap scores displayed. Left Arrow to review Q&A. Right Arrow or N for next round.',
 };

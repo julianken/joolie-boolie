@@ -200,9 +200,11 @@ test.describe('Trivia Dual-Screen Synchronization', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      await page.keyboard.press('KeyS');
+      const completeScoreBtn = page.getByRole('button', { name: /^next$/i });
+      if (await completeScoreBtn.isVisible()) {
+        await completeScoreBtn.click();
 
         // Display should show updated scores
         const scoreDisplay = displayPage.locator('[aria-label*="points"]');
@@ -237,7 +239,9 @@ test.describe('Trivia Dual-Screen Synchronization', () => {
           await page.keyboard.press('ArrowDown');
         }
 
-        const completeBtn = page.getByRole('button', { name: /complete round/i });
+        // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+        await page.keyboard.press('KeyS');
+        const completeBtn = page.getByRole('button', { name: /^next$/i });
         if (await completeBtn.isVisible()) {
           await completeBtn.click();
 
@@ -267,8 +271,10 @@ test.describe('Trivia Dual-Screen Synchronization', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      // Complete round
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      // to trigger round completion (WU-05: action bar removed)
+      await page.keyboard.press('KeyS');
+      const completeBtn = page.getByRole('button', { name: /^next$/i });
       if (await completeBtn.isVisible()) {
         await completeBtn.click();
 
@@ -293,11 +299,13 @@ test.describe('Trivia Dual-Screen Synchronization', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      await page.keyboard.press('KeyS');
+      const completeBtn = page.getByRole('button', { name: /^next$/i });
       if (await completeBtn.isVisible()) {
         await completeBtn.click();
 
-        // Click next round
+        // Click "Next Round" from the RoundSummary overlay (still present in RoundSummary component)
         const nextRoundBtn = page.getByRole('button', { name: /next round/i });
         if (await nextRoundBtn.isVisible()) {
           await nextRoundBtn.click();

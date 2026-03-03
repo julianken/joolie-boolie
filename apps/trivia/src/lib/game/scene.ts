@@ -246,6 +246,8 @@ export function getNextScene(
 
     // -- Recap flow (between-rounds answer review) -------------------------
     case 'recap_title':
+      // Left Arrow: back to round summary
+      if (trigger === 'back') return 'round_summary';
       // Right Arrow: begin Q/A review
       if (trigger === 'advance') return 'recap_qa';
       // N key: skip recap entirely, go to next round
@@ -264,6 +266,8 @@ export function getNextScene(
       return null;
 
     case 'recap_scores':
+      // Left Arrow: back to Q/A review
+      if (trigger === 'back') return 'recap_qa';
       // Right Arrow / Enter / N: proceed to next round
       if (trigger === 'advance' || trigger === 'next_round') {
         return isLastRound ? 'final_buildup' : 'round_intro';

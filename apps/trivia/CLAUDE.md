@@ -173,7 +173,7 @@ pnpm test:coverage     # Run tests with coverage
 |-----|--------|---------|
 | Arrow Up | Navigate to previous question | Always |
 | Arrow Down | Navigate to next question | Always |
-| Arrow Left | Previous question in recap Q/A | `between_rounds` + `recap_qa` only |
+| Arrow Left | Backward navigation in recap flow: `recap_qa` → previous question (or back to `recap_title` at Q1); `recap_title` → `round_summary`; `recap_scores` → `recap_qa` (last question, answer face) | `between_rounds` + `recap_qa`, `recap_title`, or `recap_scores` |
 | Arrow Right | Advance scene | Always |
 | Space | Peek answer (local only) | Always |
 | D | Toggle display question on audience | Always |

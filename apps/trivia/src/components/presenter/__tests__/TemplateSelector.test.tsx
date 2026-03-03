@@ -86,7 +86,7 @@ vi.mock('@/stores/game-store', () => ({
       _hydrate: vi.fn(),
       // Scene action methods (BEA-587/588)
       setAudienceScene: vi.fn(),
-      advanceScene: vi.fn(),
+      advanceScene: vi.fn().mockReturnValue(true),
       setRevealPhase: vi.fn(),
       setScoreDeltasBatch: vi.fn(),
     };
@@ -378,7 +378,7 @@ describe('TemplateSelector', () => {
         _hydrate: vi.fn(),
         // Scene action methods (BEA-587/588)
         setAudienceScene: vi.fn(),
-        advanceScene: vi.fn(),
+        advanceScene: vi.fn().mockReturnValue(true),
         setRevealPhase: vi.fn(),
         setScoreDeltasBatch: vi.fn(),
       };

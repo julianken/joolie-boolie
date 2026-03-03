@@ -329,21 +329,20 @@ test.describe('Trivia Presenter View', () => {
 
   test.describe('Game Flow', () => {
     test('can pause game @critical', async ({ authenticatedTriviaPage: page }) => {
-      const pauseBtn = page.getByRole('button', { name: /^pause$/i });
-      await pauseBtn.click();
+      // Pause is keyboard-only (P) — action bar removed in WU-05
+      await pressKey(page, 'KeyP');
 
       // Wait for paused state (Pattern 2: state change indicator)
       await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
     });
 
     test('can resume game from pause @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Pause first
-      await page.getByRole('button', { name: /^pause$/i }).click();
+      // Pause first (keyboard P)
+      await pressKey(page, 'KeyP');
       await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
 
-      // Resume
-      const resumeBtn = page.getByRole('button', { name: /resume/i });
-      await resumeBtn.click();
+      // Resume (keyboard P)
+      await pressKey(page, 'KeyP');
 
       // Wait for playing state (Pattern 2)
       await expect(page.locator('span').filter({ hasText: /^playing/i })).toBeVisible();
@@ -363,8 +362,8 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('can trigger emergency pause @high', async ({ authenticatedTriviaPage: page }) => {
-      const emergencyBtn = page.getByRole('button', { name: /^emergency$/i });
-      await emergencyBtn.click();
+      // Emergency pause is keyboard-only (E) — action bar removed in WU-05
+      await pressKey(page, 'KeyE');
 
       // Wait for emergency pause state (Pattern 2)
       await expect(page.locator('span').filter({ hasText: /^emergency pause$/i })).toBeVisible();
@@ -379,44 +378,51 @@ test.describe('Trivia Presenter View', () => {
   });
 
   test.describe('Round Completion', () => {
-    test('shows complete round button on last question of round @high', async ({ authenticatedTriviaPage: page }) => {
+    test('shows scene nav Next button at question_closed scene @high', async ({ authenticatedTriviaPage: page }) => {
       // Navigate to last question of round (5 questions per round by default)
       for (let i = 0; i < 4; i++) {
         await pressKey(page, 'ArrowDown');
       }
 
-      // Wait for navigation to complete using .toPass() (Pattern 3)
+      // Close the question (S key) to enter question_closed scene —
+      // SceneNavButtons renders a "Next" button at this scene (WU-05: action bar removed)
+      await pressKey(page, 'KeyS');
+
+      // Wait for the SceneNavButtons "Next" button to appear (Pattern 3)
       await expect(async () => {
-        const completeBtn = page.getByRole('button', { name: /complete round/i });
-        // May not appear if we're not at last question, so check if visible
-        if (await completeBtn.isVisible()) {
-          await expect(completeBtn).toBeVisible();
+        const nextBtn = page.getByRole('button', { name: /^next$/i });
+        if (await nextBtn.isVisible()) {
+          await expect(nextBtn).toBeVisible();
         }
       }).toPass({ timeout: 5000 });
     });
 
     test('can complete round and proceed to next @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to end of round
+      // Navigate to last question of round
       for (let i = 0; i < 4; i++) {
         await pressKey(page, 'ArrowDown');
       }
 
-      // Wait for navigation and complete button (Pattern 3)
+      // Close the question (S key) → question_closed scene → SceneNavButtons shows "Next"
+      await pressKey(page, 'KeyS');
+
+      // Wait for "Next" button from SceneNavButtons (Pattern 3)
       await expect(async () => {
-        const completeBtn = page.getByRole('button', { name: /complete round/i });
-        await expect(completeBtn).toBeVisible({ timeout: 1000 });
+        const nextBtn = page.getByRole('button', { name: /^next$/i });
+        await expect(nextBtn).toBeVisible({ timeout: 1000 });
       }).toPass({ timeout: 5000 });
 
-      // Complete round
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Click "Next" — CLOSE trigger at last question → round_summary scene
+      // auto-show useEffect reveals RoundSummary overlay (WU-04)
+      const nextBtn = page.getByRole('button', { name: /^next$/i });
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click();
 
         // Wait for between rounds state (Pattern 2)
         // Use first() to handle multiple "Round Complete" headings
         await expect(page.getByRole('heading', { name: /round.*complete/i }).first()).toBeVisible();
 
-        // Click next round
+        // Click "Next Round" from the RoundSummary overlay (still present)
         const nextRoundBtn = page.getByRole('button', { name: /next round/i });
         if (await nextRoundBtn.isVisible()) {
           await nextRoundBtn.click();

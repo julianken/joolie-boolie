@@ -334,7 +334,7 @@ describe('advanceScene() recap paths', () => {
       expect(state.audienceScene).toBe('recap_qa'); // Scene unchanged
     });
 
-    it('should be a no-op at the first question', () => {
+    it('should transition to recap_title at the first question (Path B)', () => {
       const indices = setupBetweenRoundsWithQuestions(3);
       useGameStore.setState({
         displayQuestionIndex: indices[0],
@@ -345,9 +345,8 @@ describe('advanceScene() recap paths', () => {
       useGameStore.getState().advanceScene('back');
 
       const state = useGameStore.getState();
-      expect(state.displayQuestionIndex).toBe(indices[0]);
-      expect(state.recapShowingAnswer).toBe(false);
-      expect(state.audienceScene).toBe('recap_qa');
+      expect(state.audienceScene).toBe('recap_title');
+      expect(state.recapShowingAnswer).toBeNull();
     });
   });
 

@@ -244,9 +244,12 @@ test.describe('Trivia Audience Display', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      // to trigger round completion (WU-05: action bar removed)
+      await page.keyboard.press('KeyS');
+      const nextBtn = page.getByRole('button', { name: /^next$/i });
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click();
         await expect(displayPage.getByText(/round.*complete/i)).toBeVisible();
 
         // Display should show scoreboard
@@ -270,9 +273,11 @@ test.describe('Trivia Audience Display', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      await page.keyboard.press('KeyS');
+      const nextBtn = page.getByRole('button', { name: /^next$/i });
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click();
         await expect(displayPage.getByText(/round.*complete/i)).toBeVisible();
 
         // Should show team names
@@ -296,9 +301,11 @@ test.describe('Trivia Audience Display', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      await page.keyboard.press('KeyS');
+      const nextBtn = page.getByRole('button', { name: /^next$/i });
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click();
         await expect(displayPage.getByText(/round.*complete/i)).toBeVisible();
 
         // Should show medal ranks
@@ -329,9 +336,11 @@ test.describe('Trivia Audience Display', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      await page.keyboard.press('KeyS');
+      const nextBtn = page.getByRole('button', { name: /^next$/i });
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click();
         await expect(displayPage.getByText(/round.*complete/i)).toBeVisible();
 
         // Should show scores
@@ -365,9 +374,11 @@ test.describe('Trivia Audience Display', () => {
         await page.keyboard.press('ArrowDown');
       }
 
-      const completeBtn = page.getByRole('button', { name: /complete round/i });
-      if (await completeBtn.isVisible()) {
-        await completeBtn.click();
+      // Close question (S) → question_closed scene → click SceneNavButtons "Next"
+      await page.keyboard.press('KeyS');
+      const nextBtn = page.getByRole('button', { name: /^next$/i });
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click();
 
         // Wait for round summary to appear on display (sync + scene transition)
         await expect(async () => {

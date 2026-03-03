@@ -310,10 +310,62 @@ describe('useGameKeyboard', () => {
       expect(advanceSceneSpy).toHaveBeenCalledWith('back');
     });
 
-    it('should not call advanceScene when ArrowLeft is pressed outside recap_qa', () => {
+    it('should call advanceScene(BACK) when in recap_title during between_rounds', () => {
       const { result } = renderHook(() => useGameKeyboard());
 
-      // Set up game in playing state with answer_reveal scene (not recap_qa)
+      act(() => {
+        result.current.addTeam('Team A');
+      });
+      act(() => {
+        result.current.startGame();
+      });
+      act(() => {
+        result.current.completeRound();
+        useGameStore.getState().setAudienceScene('recap_title');
+      });
+
+      expect(useGameStore.getState().status).toBe('between_rounds');
+      expect(useGameStore.getState().audienceScene).toBe('recap_title');
+
+      const advanceSceneSpy = vi.spyOn(useGameStore.getState(), 'advanceScene');
+
+      act(() => {
+        dispatchKeyDown('ArrowLeft');
+      });
+
+      expect(advanceSceneSpy).toHaveBeenCalledWith('back');
+    });
+
+    it('should call advanceScene(BACK) when in recap_scores during between_rounds', () => {
+      const { result } = renderHook(() => useGameKeyboard());
+
+      act(() => {
+        result.current.addTeam('Team A');
+      });
+      act(() => {
+        result.current.startGame();
+      });
+      act(() => {
+        result.current.completeRound();
+        useGameStore.getState().setAudienceScene('recap_scores');
+      });
+
+      expect(useGameStore.getState().status).toBe('between_rounds');
+      expect(useGameStore.getState().audienceScene).toBe('recap_scores');
+
+      const advanceSceneSpy = vi.spyOn(useGameStore.getState(), 'advanceScene');
+
+      act(() => {
+        dispatchKeyDown('ArrowLeft');
+      });
+
+      expect(advanceSceneSpy).toHaveBeenCalledWith('back');
+    });
+
+    it('should not call advanceScene when ArrowLeft is pressed outside recap scenes', () => {
+      const { result } = renderHook(() => useGameKeyboard());
+
+      // Set up game in playing state (not between_rounds)
       act(() => {
         result.current.addTeam('Team A');
       });

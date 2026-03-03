@@ -46,6 +46,7 @@ import {
   orchestrateSceneTransition,
   validateGameSetup,
 } from '@/lib/game/engine';
+import { clearRevealLock } from '@/lib/game/scene-transitions';
 
 const lifecycleLogger = createGameLifecycleLogger({ game: 'trivia' });
 
@@ -95,8 +96,9 @@ export interface GameStore extends TriviaGameState {
    * Advance the audience scene by consulting getNextScene().
    * This is the SINGLE AUTHORITY for all scene transitions (except pause/emergency).
    * The trigger is one of the SCENE_TRIGGERS constants.
+   * Returns true when a transition was applied, false when rejected or no-op.
    */
-  advanceScene: (trigger: string) => void;
+  advanceScene: (trigger: string) => boolean;
 
   /** Set the reveal phase. Null clears an active reveal. */
   setRevealPhase: (phase: RevealPhase) => void;
@@ -134,6 +136,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
   resetGame: () => {
     lifecycleLogger.emit('game.reset');
+    clearRevealLock();
     set((state) => ({
       ...resetGameEngine(state),
       sceneTimestamp: Date.now(),
@@ -340,12 +343,12 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     set({ audienceScene: scene, sceneTimestamp: Date.now() });
   },
 
-  advanceScene: (trigger: string) => {
+  advanceScene: (trigger: string): boolean => {
     const state = get();
     const update = orchestrateSceneTransition(state, trigger);
 
     // No-op: orchestrator found no valid transition.
-    if (update === null || Object.keys(update).length === 0) return;
+    if (update === null || Object.keys(update).length === 0) return false;
 
     // Lifecycle logging — detect which transition occurred and emit the
     // appropriate log event. These are store-level side effects that the
@@ -360,6 +363,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     }
 
     set(update);
+    return true;
   },
 
   setRevealPhase: (phase: RevealPhase) => {

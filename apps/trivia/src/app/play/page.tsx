@@ -13,7 +13,7 @@ import { QuestionDisplay } from '@/components/presenter/QuestionDisplay';
 import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
 import { TeamManager } from '@/components/presenter/TeamManager';
 import { QuickScoreGrid } from '@/components/presenter/QuickScoreGrid';
-import { NextActionHint } from '@/components/presenter/NextActionHint';
+import { SceneNavButtons } from '@/components/presenter/SceneNavButtons';
 import { useQuickScore } from '@/hooks/use-quick-score';
 import { useGameEventSounds } from '@/hooks/use-sounds';
 import { useRevealSequence } from '@/hooks/use-reveal-sequence';
@@ -28,7 +28,6 @@ import { SaveQuestionSetModal } from '@/components/presenter/SaveQuestionSetModa
 import { Button } from '@joolie-boolie/ui';
 import { serializeTriviaState, deserializeTriviaState } from '@/lib/state/serializer';
 import { SetupGate } from '@/components/presenter/SetupGate';
-import { PresenterActionBar } from '@/components/presenter/PresenterActionBar';
 
 export default function PlayPage() {
   const game = useGameKeyboard();
@@ -84,6 +83,15 @@ export default function PlayPage() {
   useEffect(() => {
     if (game.status === 'between_rounds' && audienceScene !== 'round_summary') {
       setShowRoundSummary(false);
+    }
+  }, [audienceScene, game.status]);
+
+  // WU-04: Auto-show RoundSummary overlay when scene enters round_summary.
+  // Decouples the overlay from handleCompleteRound so SceneNavButtons can
+  // trigger round_summary via advanceScene without knowing about the overlay.
+  useEffect(() => {
+    if (audienceScene === 'round_summary' && game.status === 'between_rounds') {
+      setShowRoundSummary(true);
     }
   }, [audienceScene, game.status]);
 
@@ -191,12 +199,6 @@ export default function PlayPage() {
     game.nextRound();
     setShowRoundSummary(false);
     useGameStore.getState().setAudienceScene('round_intro');
-  };
-
-  const handleCompleteRound = () => {
-    game.completeRound();
-    setShowRoundSummary(true);
-    useGameStore.getState().setAudienceScene('round_summary');
   };
 
   const [showSettings, setShowSettings] = useState(false);
@@ -342,7 +344,6 @@ export default function PlayPage() {
         Left rail: question navigator (w-64)
         Center: hero question panel (flex-1)
         Right: leaderboard sidebar (w-80)
-        Bottom: fixed action bar (h-16)
         No viewport scrolling during gameplay.
       */}
       <div
@@ -524,9 +525,9 @@ export default function PlayPage() {
               />
             </div>
 
-            {/* Next action hint (T3.6) */}
+            {/* Scene navigation buttons (WU-03) */}
             <div className="mb-4 px-1">
-              <NextActionHint />
+              <SceneNavButtons />
             </div>
 
             {/* Keyboard shortcuts reference */}
@@ -680,22 +681,6 @@ export default function PlayPage() {
             </div>
           </aside>
         </div>
-
-        {/* ---- FIXED BOTTOM ACTION BAR (T4.6) ---- */}
-        <PresenterActionBar
-          status={game.status}
-          currentRound={game.currentRound}
-          totalRounds={game.totalRounds}
-          isLastRound={game.isLastRound}
-          isLastQuestionOfRound={game.isLastQuestionOfRound}
-          emergencyBlank={game.emergencyBlank}
-          onCompleteRound={handleCompleteRound}
-          onNextRound={handleNextRound}
-          onShowSummary={() => setShowRoundSummary(true)}
-          onResumeGame={game.resumeGame}
-          onPauseGame={game.pauseGame}
-          onEmergencyPause={game.emergencyPause}
-        />
       </div>
 
       {/* Setup Gate Overlay (z-40) */}

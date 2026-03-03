@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useGame } from './use-game';
 import { useFullscreen } from './use-fullscreen';
 import { useGameStore } from '@/stores/game-store';
 import { useAudienceScene } from './use-audience-scene';
 import type { AudienceScene } from '@/types/audience-scene';
-import { REVEAL_TIMING } from '@/types/audience-scene';
 import { useQuickScore } from './use-quick-score';
 import { SCENE_TRIGGERS } from '@/lib/game/scene';
 
@@ -58,18 +57,6 @@ import { SCENE_TRIGGERS } from '@/lib/game/scene';
  * - ? = Show help modal
  */
 
-/** Scenes that trigger the POST_REVEAL_LOCK */
-const REVEAL_LOCK_SCENES: ReadonlySet<AudienceScene> = new Set([
-  'answer_reveal',
-]);
-
-/** Keys blocked during the reveal lock (advancement keys only) */
-const LOCKED_KEY_CODES: ReadonlySet<string> = new Set([
-  'Enter',
-  'ArrowRight',
-  'Space',
-]);
-
 /**
  * Scenes where 1-9/0 quick-score keys and Shift+digit/-score keys are active.
  * Includes recap scenes so the host can adjust scores while reviewing answers.
@@ -107,11 +94,6 @@ export function useGameKeyboard() {
   // Quick score -- keyed by selectedQuestionIndex so it resets per question
   const quickScore = useQuickScore(game.selectedQuestionIndex);
 
-  // POST_REVEAL_LOCK: prevents premature advancement during reveal animation
-  const isLockedRef = useRef(false);
-  const pendingKeyRef = useRef<string | null>(null);
-  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // useAudienceScene for the presenter -- gives us timeRemaining for auto-advance
   const audienceSceneControls = useAudienceScene({ role: 'presenter' });
 
@@ -125,38 +107,6 @@ export function useGameKeyboard() {
   const toggleTTS = useCallback(() => {
     const state = useGameStore.getState();
     useGameStore.setState({ ttsEnabled: !state.ttsEnabled });
-  }, []);
-
-  // POST_REVEAL_LOCK: Start lock when entering a reveal scene, clear after POST_REVEAL_LOCK_MS.
-  // Queued keypresses are replayed by dispatching a synthetic keydown event.
-  useEffect(() => {
-    const unsub = useGameStore.subscribe((state, prevState) => {
-      const scene = state.audienceScene;
-      const prevScene = prevState.audienceScene;
-      if (scene !== prevScene && REVEAL_LOCK_SCENES.has(scene)) {
-        // POST_REVEAL_LOCK: do not lock during between_rounds (recap navigation).
-        // Without this guard, entering recap_qa from recap_title would be blocked
-        // for 1.1 seconds because answer_reveal is a REVEAL_LOCK_SCENE.
-        if (state.status === 'between_rounds') return;
-        isLockedRef.current = true;
-        pendingKeyRef.current = null;
-        if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
-
-        lockTimerRef.current = setTimeout(() => {
-          isLockedRef.current = false;
-          const pending = pendingKeyRef.current;
-          pendingKeyRef.current = null;
-          if (pending) {
-            window.dispatchEvent(new KeyboardEvent('keydown', { code: pending, bubbles: true }));
-          }
-        }, REVEAL_TIMING.POST_REVEAL_LOCK_MS);
-      }
-    });
-
-    return () => {
-      unsub();
-      if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
-    };
   }, []);
 
   // Auto-advance: when timeRemaining reaches 0, dispatch AUTO trigger.
@@ -175,13 +125,6 @@ export function useGameKeyboard() {
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement
       ) {
-        return;
-      }
-
-      // POST_REVEAL_LOCK: Queue advancement keys during reveal animation
-      if (isLockedRef.current && LOCKED_KEY_CODES.has(event.code)) {
-        event.preventDefault();
-        pendingKeyRef.current = event.code;
         return;
       }
 
@@ -225,9 +168,12 @@ export function useGameKeyboard() {
           }
           break;
 
-        // Left Arrow -- recap backward navigation (recap_qa only)
+        // Left Arrow -- recap backward navigation (all recap scenes)
         case 'ArrowLeft':
-          if (currentScene === 'recap_qa' && store.status === 'between_rounds') {
+          if (
+            store.status === 'between_rounds' &&
+            (currentScene === 'recap_qa' || currentScene === 'recap_title' || currentScene === 'recap_scores')
+          ) {
             event.preventDefault();
             store.advanceScene(SCENE_TRIGGERS.BACK);
           }
