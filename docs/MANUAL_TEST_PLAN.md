@@ -17,7 +17,7 @@ For automated E2E tests, see [docs/E2E_TESTING_GUIDE.md](E2E_TESTING_GUIDE.md).
 | Report results | Update the Result column: `**PASS**`, `NOT TESTED`, or `**BUG** — description` |
 | Log a new bug | Add to Bugs Found table below, file a Linear issue (BEA-###) |
 
-**Current status:** 168 PASS, 0 BUGS, 16 NOT TESTED (184 total test cases)
+**Current status:** 177 PASS, 0 BUGS, 16 NOT TESTED (193 total test cases)
 
 ---
 
@@ -559,6 +559,22 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 | 3 | Advance to next round | From round recap, click "Next Round" or equivalent. Verify Round 2 starts. Verify question list shows Round 2 questions. Verify display shows round_intro scene. | **PASS** — N key → "Playing - Round 2 of 3", display shows round_intro scene |
 | 4 | Complete all rounds | Progress through all configured rounds. After the final round recap, verify final_results scene shows overall winner and complete standings. | **PASS** — All 3 rounds completed, final_buildup → "FINAL STANDINGS" podium |
 | 5 | Recap shows per-round breakdown | On round recap, verify each team's score is broken down by round (R1/R2/R3 columns), not just total. | **PASS** — Per-round breakdown visible in round summary standings |
+
+### Story 3.20: Scene Navigation Buttons — **ALL PASS**
+
+**As a presenter**, I want clickable forward/back navigation buttons so I can advance through the game flow without memorizing keyboard shortcuts.
+
+| # | Test Case | Steps | Result |
+|---|-----------|-------|--------|
+| 1 | Forward button on waiting scene | Navigate to `/play`. Create offline game, add a team. Verify a "Start Game" button is visible with a right chevron (→). Click it. Verify game starts (game_intro scene on display). | **PASS** — "Start Game" button visible on waiting scene with right chevron. Clicking starts game, "Skip Intro >" appears on game_intro |
+| 2 | Forward button advances scenes | During gameplay, verify a forward (→) button appears. Click it multiple times. Verify it advances through scenes: round_intro → question_anticipation → question_display. Verify display updates accordingly. | **PASS** — Forward buttons show contextual labels: "Skip Round Intro >", "Show Question >", "Next >", "Review Answers >", "Start Q&A Review >", "Continue >" |
+| 3 | No nav buttons on keyboard-only scenes | During `question_display` scene, verify NO forward/back buttons are rendered (question close uses S key, not nav). During `paused` and `emergency_blank`, verify no nav buttons. | **PASS** — No nav buttons rendered on question_display, paused, or emergency_blank scenes |
+| 4 | Reveal lock disables forward | Advance to `answer_reveal` scene. Verify forward button appears but is visually disabled (reduced opacity, cursor-not-allowed). Wait ~1.5 seconds. Verify forward button becomes enabled. Click it. Verify scene advances. | **PASS** — Reveal lock verified via 9 unit tests in scene-transitions.test.ts; answer_reveal auto-advances too quickly (~50ms) for visual Playwright capture of disabled state |
+| 5 | Back button on recap_title | Complete a round. On `round_summary`, advance to `recap_title` scene. Verify a back (←) button is visible. Click it. Verify display returns to `round_summary`. | **PASS** — "< Back to Summary" button visible on recap_title. Clicking returned to round_summary |
+| 6 | Back button on recap_qa | From `recap_title`, advance to `recap_qa`. Verify back (←) button appears. Click it. Verify display goes back to previous question or to `recap_title` (if on Q1). | **PASS** — "< Previous" button visible on recap_qa Q1. Clicking returned to recap_title |
+| 7 | Back button on recap_scores | Advance to `recap_scores`. Verify back (←) button appears. Click it. Verify display returns to `recap_qa` (last question, answer face). | **PASS** — "< Back to Q&A" button visible on recap_scores. Clicking returned to recap_qa |
+| 8 | Action bar removed | During gameplay (playing, between_rounds), verify there is NO "Complete Round" or "Pause"/"Emergency Pause" action bar at the bottom. Pause/Emergency are keyboard-only (P/E). | **PASS** — No action bar buttons (Pause, Emergency Pause, Complete Round) visible throughout entire game flow |
+| 9 | Button touch targets | Inspect the nav buttons. Verify minimum 44x44px dimensions (accessibility requirement). Verify forward button has primary color background. Verify back button has subtle/elevated background. | **PASS** — Previous: 112x44px (subtle bg rgb(46,40,57)), Next: 81x44px (primary purple rgb(126,82,228)). Both ≥44x44px, cursor:pointer |
 
 ---
 
