@@ -44,12 +44,10 @@ export function SceneNavButtons() {
         store.advanceScene(SCENE_TRIGGERS.SKIP);
         break;
 
-      // Question showing: close it and advance past question_closed in one step
+      // Question showing: skip question_closed and advance directly to next
       case 'question_display':
         if (store.timer.isRunning) store.stopTimer();
-        store.advanceScene(SCENE_TRIGGERS.CLOSE);
-        // State is now question_closed — advance again to next question or round_summary
-        store.advanceScene(SCENE_TRIGGERS.CLOSE);
+        store.advanceScene(SCENE_TRIGGERS.ADVANCE);
         break;
 
       // Question closed (if reached via S key): advance to next question or round_summary

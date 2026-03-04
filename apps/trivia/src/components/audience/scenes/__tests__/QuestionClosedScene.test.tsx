@@ -25,6 +25,7 @@ vi.mock('motion/react', () => ({
     },
   },
   useReducedMotion: vi.fn(() => false),
+  useIsPresent: vi.fn(() => true),
 }));
 
 // ---------------------------------------------------------------------------

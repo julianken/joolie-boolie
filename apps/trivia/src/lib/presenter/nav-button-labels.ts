@@ -73,8 +73,6 @@ function getForwardLabel(
       return 'Skip';
 
     case 'question_display':
-      return 'Close Question';
-
     case 'question_closed':
       return isLastQuestion ? 'End Round' : 'Next Question';
 
