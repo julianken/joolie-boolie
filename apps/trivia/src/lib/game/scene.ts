@@ -201,6 +201,10 @@ export function getNextScene(
     case 'question_display':
       if (trigger === 'close') return 'question_closed';
       if (trigger === 'auto') return 'question_closed'; // timer expired
+      // Advance skips question_closed entirely (nav button shortcut)
+      if (trigger === 'advance') {
+        return isLastQuestion ? 'round_summary' : 'question_anticipation';
+      }
       return null;
 
     case 'question_closed':

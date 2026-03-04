@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
+import { useFrozenOnExit } from '@/hooks/use-frozen-on-exit';
 import { AudienceQuestion } from '@/components/audience/AudienceQuestion';
 import { WaitingDisplay } from '@/components/audience/WaitingDisplay';
 import { springUrgent } from '@/lib/motion/presets';
@@ -16,6 +17,8 @@ import { springUrgent } from '@/lib/motion/presets';
  *
  * The badge slams in using springUrgent (per motion spec for "TIME'S UP!").
  * Reduced motion: badge appears instantly.
+ *
+ * Uses useFrozenOnExit to prevent visual glitches during AnimatePresence exit.
  */
 export function QuestionClosedScene() {
   const shouldReduceMotion = useReducedMotion();
@@ -38,7 +41,14 @@ export function QuestionClosedScene() {
       ? (displayQuestionIndex % Math.max(questionsPerRound, 1)) + 1
       : 1;
 
-  if (!displayQuestion) {
+  // Freeze all rendered data during exit animation
+  const frozenQuestion = useFrozenOnExit(displayQuestion);
+  const frozenQuestionInRound = useFrozenOnExit(questionInRound);
+  const frozenQuestionsPerRound = useFrozenOnExit(questionsPerRound);
+  const frozenCurrentRound = useFrozenOnExit(currentRound);
+  const frozenTotalRounds = useFrozenOnExit(totalRounds);
+
+  if (!frozenQuestion) {
     return <WaitingDisplay message="Time's up!" />;
   }
 
@@ -47,11 +57,11 @@ export function QuestionClosedScene() {
       {/* Question and options — dimmed to indicate time has passed */}
       <div style={{ opacity: 0.7 }}>
         <AudienceQuestion
-          question={displayQuestion}
-          questionNumber={questionInRound}
-          totalQuestions={questionsPerRound}
-          roundNumber={currentRound + 1}
-          totalRounds={totalRounds}
+          question={frozenQuestion}
+          questionNumber={frozenQuestionInRound}
+          totalQuestions={frozenQuestionsPerRound}
+          roundNumber={frozenCurrentRound + 1}
+          totalRounds={frozenTotalRounds}
         />
       </div>
 

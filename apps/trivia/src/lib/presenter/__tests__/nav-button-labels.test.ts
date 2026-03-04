@@ -41,7 +41,7 @@ describe('getNavButtonLabels', () => {
       ['game_intro', 'Skip Intro'],
       ['round_intro', 'Skip Intro'],
       ['question_anticipation', 'Skip'],
-      ['question_display', 'Close Question'],
+      ['question_display', 'Next Question'],
       ['round_summary', 'Review Answers'],
       ['recap_title', 'Start Review'],
       ['final_buildup', 'Skip'],
@@ -54,16 +54,22 @@ describe('getNavButtonLabels', () => {
     });
   });
 
-  describe('question_closed — context-dependent forward', () => {
-    it('returns "Next Question" when !isLastQuestion', () => {
-      const result = getNavButtonLabels('question_closed', notLastCtx);
-      expect(result.forward).toBe('Next Question');
-    });
+  describe('question_display / question_closed — context-dependent forward', () => {
+    it.each<[AudienceScene]>([['question_display'], ['question_closed']])(
+      '%s returns "Next Question" when !isLastQuestion',
+      (scene) => {
+        const result = getNavButtonLabels(scene, notLastCtx);
+        expect(result.forward).toBe('Next Question');
+      },
+    );
 
-    it('returns "End Round" when isLastQuestion', () => {
-      const result = getNavButtonLabels('question_closed', lastQuestionNotLastRoundCtx);
-      expect(result.forward).toBe('End Round');
-    });
+    it.each<[AudienceScene]>([['question_display'], ['question_closed']])(
+      '%s returns "End Round" when isLastQuestion',
+      (scene) => {
+        const result = getNavButtonLabels(scene, lastQuestionNotLastRoundCtx);
+        expect(result.forward).toBe('End Round');
+      },
+    );
   });
 
   describe('answer_reveal — context-dependent forward', () => {

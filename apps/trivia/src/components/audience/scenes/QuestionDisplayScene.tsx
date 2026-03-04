@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
+import { useFrozenOnExit } from '@/hooks/use-frozen-on-exit';
 import { AudienceQuestion } from '@/components/audience/AudienceQuestion';
 import { WaitingDisplay } from '@/components/audience/WaitingDisplay';
 
@@ -22,6 +23,9 @@ export interface QuestionDisplaySceneProps {
  * scene layer (AudienceTimerDisplay), not by this component.
  *
  * Reads question data from the game store.
+ * Uses useFrozenOnExit to prevent visual glitches during AnimatePresence exit —
+ * without it, store updates (e.g. displayQuestionIndex advancing) would cause
+ * the exiting component to briefly show the next question's content.
  */
 export function QuestionDisplayScene({ answersEnabled: _answersEnabled }: QuestionDisplaySceneProps) {
   const displayQuestionIndex = useGameStore((state) => state.displayQuestionIndex);
@@ -42,17 +46,24 @@ export function QuestionDisplayScene({ answersEnabled: _answersEnabled }: Questi
     ? (displayQuestionIndex % Math.max(questionsPerRound, 1)) + 1
     : 1;
 
-  if (!displayQuestion) {
+  // Freeze all rendered data during exit animation to prevent flash of next question
+  const frozenQuestion = useFrozenOnExit(displayQuestion);
+  const frozenQuestionInRound = useFrozenOnExit(questionInRound);
+  const frozenQuestionsPerRound = useFrozenOnExit(questionsPerRound);
+  const frozenCurrentRound = useFrozenOnExit(currentRound);
+  const frozenTotalRounds = useFrozenOnExit(totalRounds);
+
+  if (!frozenQuestion) {
     return <WaitingDisplay message="Get ready..." />;
   }
 
   return (
     <AudienceQuestion
-      question={displayQuestion}
-      questionNumber={questionInRound}
-      totalQuestions={questionsPerRound}
-      roundNumber={currentRound + 1}
-      totalRounds={totalRounds}
+      question={frozenQuestion}
+      questionNumber={frozenQuestionInRound}
+      totalQuestions={frozenQuestionsPerRound}
+      roundNumber={frozenCurrentRound + 1}
+      totalRounds={frozenTotalRounds}
     />
   );
 }

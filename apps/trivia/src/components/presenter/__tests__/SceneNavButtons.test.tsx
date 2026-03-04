@@ -105,7 +105,7 @@ describe('SceneNavButtons', () => {
     setSceneState('question_display');
     render(<SceneNavButtons />);
 
-    expect(screen.getByRole('button', { name: 'Close Question' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next Question' })).toBeInTheDocument();
     expect(screen.getByTestId('nav-back')).toBeInTheDocument();
   });
 
@@ -152,7 +152,7 @@ describe('SceneNavButtons', () => {
       expect(advanceSceneMock).toHaveBeenCalledWith('skip');
     });
 
-    it('stops timer and chains two CLOSE advances on question_display', () => {
+    it('stops timer and advances with ADVANCE on question_display', () => {
       setSceneState('question_display');
       const advanceSceneMock = vi.fn().mockReturnValue(true);
       const stopTimerMock = vi.fn();
@@ -165,12 +165,11 @@ describe('SceneNavButtons', () => {
       });
 
       render(<SceneNavButtons />);
-      fireEvent.click(screen.getByRole('button', { name: 'Close Question' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Next Question' }));
 
       expect(stopTimerMock).toHaveBeenCalled();
-      expect(advanceSceneMock).toHaveBeenCalledTimes(2);
-      expect(advanceSceneMock).toHaveBeenNthCalledWith(1, 'close');
-      expect(advanceSceneMock).toHaveBeenNthCalledWith(2, 'close');
+      expect(advanceSceneMock).toHaveBeenCalledTimes(1);
+      expect(advanceSceneMock).toHaveBeenCalledWith('advance');
     });
 
     it('calls advanceScene with CLOSE on question_closed', () => {

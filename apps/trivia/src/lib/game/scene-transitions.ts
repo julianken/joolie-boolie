@@ -322,8 +322,11 @@ function applyTransitionSideEffects(
 
   // Side effect: auto-show question when entering question_anticipation.
   if (nextScene === 'question_anticipation') {
-    if (state.audienceScene === 'question_closed') {
-      // From question_closed: advance to the next question in the round
+    if (
+      state.audienceScene === 'question_closed' ||
+      state.audienceScene === 'question_display'
+    ) {
+      // From question_closed or question_display: advance to the next question
       const nextQIndex = ctx.currentRoundQIndex + 1;
       if (nextQIndex < roundQuestions.length) {
         const globalIndex = state.questions.indexOf(
