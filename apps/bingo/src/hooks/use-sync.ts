@@ -54,6 +54,10 @@ class BingoBroadcastSync extends BroadcastSync<BingoSyncPayload> {
   broadcastPlayBallVoice(ball: BingoBall): void {
     this.send('PLAY_BALL_VOICE', ball);
   }
+
+  broadcastDisplayClosing(): void {
+    this.send('DISPLAY_CLOSING', null);
+  }
 }
 
 /**
@@ -83,6 +87,7 @@ export function createMessageRouter(handlers: Partial<{
   onPlayRevealChime: () => void;
   onPlayBallVoice: (ball: BingoBall) => void;
   onAudioUnlocked: () => void;
+  onDisplayClosing: () => void;
 }>): MessageHandler {
   return (message: BingoSyncMessage) => {
     switch (message.type) {
@@ -121,6 +126,9 @@ export function createMessageRouter(handlers: Partial<{
         break;
       case 'AUDIO_UNLOCKED':
         handlers.onAudioUnlocked?.();
+        break;
+      case 'DISPLAY_CLOSING':
+        handlers.onDisplayClosing?.();
         break;
     }
   };
@@ -221,6 +229,13 @@ export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOption
     // Also broadcast current display theme
     const { displayTheme } = useThemeStore.getState();
     broadcastSyncRef.current.broadcastDisplayTheme(displayTheme);
+    // Also broadcast current audio settings
+    const { voicePack, voiceVolume, enabled } = useAudioStore.getState();
+    broadcastSyncRef.current.broadcastAudioSettings({
+      voicePack,
+      volume: voiceVolume,
+      enabled,
+    });
   }, [role, getCurrentState]);
 
   // Handle display theme change from presenter (audience only)
@@ -294,10 +309,24 @@ export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOption
         const audioStore = useAudioStore.getState();
         audioStore.playBallVoice(ball);
       },
+      // Audience receives audio settings changes from presenter
+      onAudioSettingsChanged: (settings) => {
+        if (role !== 'audience') return;
+        const audioStore = useAudioStore.getState();
+        audioStore.setVoicePack(settings.voicePack);
+        audioStore.setVoiceVolume(settings.volume);
+        audioStore.setEnabled(settings.enabled);
+        useSyncStore.getState().updateLastSync();
+      },
       // Presenter receives this when display audio is unlocked
       onAudioUnlocked: () => {
         if (role !== 'presenter') return;
         setDisplayAudioActive(true);
+      },
+      // Presenter receives this when display window is closing
+      onDisplayClosing: () => {
+        if (role !== 'presenter') return;
+        setDisplayAudioActive(false);
       },
     });
 
@@ -412,6 +441,44 @@ export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOption
 
     return unsubscribe;
   }, [role, sessionId]); // Re-subscribe when sessionId changes (new channel)
+
+  // Subscribe to audio settings changes (presenter only)
+  // Broadcasts AUDIO_SETTINGS_CHANGED so the display uses the same voice pack, volume, and enabled state
+  useEffect(() => {
+    if (role !== 'presenter') return;
+    if (!broadcastSyncRef.current) return;
+
+    const sync = broadcastSyncRef.current;
+    const unsubscribe = useAudioStore.subscribe((state, prevState) => {
+      if (
+        state.voicePack !== prevState.voicePack ||
+        state.voiceVolume !== prevState.voiceVolume ||
+        state.enabled !== prevState.enabled
+      ) {
+        sync.broadcastAudioSettings({
+          voicePack: state.voicePack,
+          volume: state.voiceVolume,
+          enabled: state.enabled,
+        });
+      }
+    });
+
+    return unsubscribe;
+  }, [role, sessionId]); // Re-subscribe when sessionId changes (new channel)
+
+  // Broadcast DISPLAY_CLOSING on beforeunload (audience only)
+  useEffect(() => {
+    if (role !== 'audience') return;
+    if (!broadcastSyncRef.current) return;
+
+    const sync = broadcastSyncRef.current;
+    const handleBeforeUnload = () => {
+      sync.send('DISPLAY_CLOSING', null);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [role, sessionId]);
 
   // Broadcast AUDIO_UNLOCKED when display audio is unlocked (audience only)
   useEffect(() => {

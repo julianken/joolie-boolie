@@ -32,8 +32,9 @@ vi.mock('@/stores/theme-store', () => {
 import { useSync } from '../use-sync';
 import { useSyncStore } from '@joolie-boolie/sync';
 import { useGameStore } from '@/stores/game-store';
+import { useAudioStore } from '@/stores/audio-store';
 import { createMessageRouter } from '../use-sync';
-import { BallNumber, BingoSyncMessage, BingoPattern, BingoBall, GameState } from '@/types';
+import { BallNumber, BingoSyncMessage, BingoPattern, BingoBall, GameState, AudioSettingsPayload } from '@/types';
 
 // Test session ID for all tests
 const TEST_SESSION_ID = '550e8400-e29b-41d4-a716-446655440000';
@@ -79,6 +80,13 @@ describe('use-sync', () => {
       autoCallSpeed: 10,
       audioEnabled: true,
       _isHydrating: false,
+    });
+    useAudioStore.setState({
+      enabled: true,
+      voicePack: 'standard',
+      voiceVolume: 0.7,
+      rollSoundVolume: 0.8,
+      chimeVolume: 0.8,
     });
 
   });
@@ -746,6 +754,226 @@ describe('use-sync', () => {
         const ballVoiceCall = calls.find(call => call.type === 'PLAY_BALL_VOICE');
         expect(ballVoiceCall).toBeDefined();
         expect(ballVoiceCall.payload).toEqual(mockBall);
+      });
+    });
+
+    describe('createMessageRouter AUDIO_SETTINGS_CHANGED handler', () => {
+      it('routes AUDIO_SETTINGS_CHANGED to onAudioSettingsChanged', () => {
+        const onAudioSettingsChanged = vi.fn();
+        const router = createMessageRouter({ onAudioSettingsChanged });
+
+        const settings: AudioSettingsPayload = {
+          voicePack: 'british',
+          volume: 0.5,
+          enabled: true,
+        };
+
+        router({
+          type: 'AUDIO_SETTINGS_CHANGED',
+          payload: settings,
+          timestamp: Date.now(),
+        });
+
+        expect(onAudioSettingsChanged).toHaveBeenCalledWith(settings);
+      });
+    });
+
+    describe('createMessageRouter DISPLAY_CLOSING handler', () => {
+      it('routes DISPLAY_CLOSING to onDisplayClosing', () => {
+        const onDisplayClosing = vi.fn();
+        const router = createMessageRouter({ onDisplayClosing });
+
+        router({
+          type: 'DISPLAY_CLOSING',
+          payload: null,
+          timestamp: Date.now(),
+        });
+
+        expect(onDisplayClosing).toHaveBeenCalled();
+      });
+    });
+
+    describe('audio settings sync', () => {
+      it('presenter broadcasts AUDIO_SETTINGS_CHANGED when audio store changes', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        // Change voice pack in audio store
+        act(() => {
+          useAudioStore.getState().setVoicePack('british');
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        const settingsCall = calls.find(call => call.type === 'AUDIO_SETTINGS_CHANGED');
+        expect(settingsCall).toBeDefined();
+        expect(settingsCall.payload.voicePack).toBe('british');
+      });
+
+      it('presenter broadcasts AUDIO_SETTINGS_CHANGED when voice volume changes', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        act(() => {
+          useAudioStore.getState().setVoiceVolume(0.3);
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        const settingsCall = calls.find(call => call.type === 'AUDIO_SETTINGS_CHANGED');
+        expect(settingsCall).toBeDefined();
+        expect(settingsCall.payload.volume).toBe(0.3);
+      });
+
+      it('audience updates audio store when receiving AUDIO_SETTINGS_CHANGED', () => {
+        renderHook(() => useSync({ role: 'audience', sessionId: TEST_SESSION_ID }));
+
+        // Set initial audio store state
+        act(() => {
+          useAudioStore.getState().setVoicePack('standard');
+          useAudioStore.getState().setVoiceVolume(0.7);
+        });
+
+        // Simulate receiving AUDIO_SETTINGS_CHANGED from presenter
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'AUDIO_SETTINGS_CHANGED',
+            payload: { voicePack: 'british-hall', volume: 0.4, enabled: true },
+            timestamp: Date.now(),
+          });
+        });
+
+        expect(useAudioStore.getState().voicePack).toBe('british-hall');
+        expect(useAudioStore.getState().voiceVolume).toBe(0.4);
+        expect(useAudioStore.getState().enabled).toBe(true);
+      });
+
+      it('presenter includes audio settings in REQUEST_SYNC response', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        // Set specific audio settings before init
+        useAudioStore.getState().setVoicePack('british');
+        useAudioStore.getState().setVoiceVolume(0.5);
+
+        renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        // Simulate REQUEST_SYNC from display
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'REQUEST_SYNC',
+            payload: null,
+            timestamp: Date.now(),
+          });
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        const settingsCall = calls.find(call => call.type === 'AUDIO_SETTINGS_CHANGED');
+        expect(settingsCall).toBeDefined();
+        expect(settingsCall.payload.voicePack).toBe('british');
+        expect(settingsCall.payload.volume).toBe(0.5);
+      });
+    });
+
+    describe('display close fallback', () => {
+      it('presenter resets displayAudioActive when DISPLAY_CLOSING received', () => {
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        // First, set displayAudioActive to true
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'AUDIO_UNLOCKED',
+            payload: null,
+            timestamp: Date.now(),
+          });
+        });
+
+        expect(result.current.displayAudioActive).toBe(true);
+
+        // Now simulate display closing
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'DISPLAY_CLOSING',
+            payload: null,
+            timestamp: Date.now(),
+          });
+        });
+
+        expect(result.current.displayAudioActive).toBe(false);
+      });
+
+      it('audience ignores DISPLAY_CLOSING messages', () => {
+        const { result } = renderHook(() => useSync({ role: 'audience', sessionId: TEST_SESSION_ID }));
+
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'DISPLAY_CLOSING',
+            payload: null,
+            timestamp: Date.now(),
+          });
+        });
+
+        // displayAudioActive is presenter-only state, audience should still be false
+        expect(result.current.displayAudioActive).toBe(false);
+      });
+
+      it('audience registers beforeunload handler', () => {
+        const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+        renderHook(() => useSync({ role: 'audience', sessionId: TEST_SESSION_ID }));
+
+        expect(addEventListenerSpy).toHaveBeenCalledWith(
+          'beforeunload',
+          expect.any(Function)
+        );
+
+        addEventListenerSpy.mockRestore();
+      });
+
+      it('audience sends DISPLAY_CLOSING on beforeunload', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        renderHook(() => useSync({ role: 'audience', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        // Trigger beforeunload
+        act(() => {
+          window.dispatchEvent(new Event('beforeunload'));
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        expect(calls.some(call => call.type === 'DISPLAY_CLOSING')).toBe(true);
+      });
+
+      it('presenter does not register beforeunload handler', () => {
+        const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+        renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        const beforeUnloadCalls = addEventListenerSpy.mock.calls.filter(
+          call => call[0] === 'beforeunload'
+        );
+        expect(beforeUnloadCalls).toHaveLength(0);
+
+        addEventListenerSpy.mockRestore();
       });
     });
 
