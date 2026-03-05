@@ -274,7 +274,7 @@ export function TriviaApiImporter({
                     aria-pressed={isSelected}
                     className={`
                       min-h-[44px] px-3 py-1.5 rounded-full border text-base font-medium
-                      transition-colors
+                      inline-flex items-center gap-1.5 transition-colors
                       focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-1
                       ${isSelected
                         ? getCategoryFilterActiveClasses(cat.id)
@@ -282,6 +282,11 @@ export function TriviaApiImporter({
                       }
                     `}
                   >
+                    {isSelected && (
+                      <span className="text-base font-bold" aria-hidden="true">
+                        &#10003;
+                      </span>
+                    )}
                     {cat.name}
                   </button>
                 );
