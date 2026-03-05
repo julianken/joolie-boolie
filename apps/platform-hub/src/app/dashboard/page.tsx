@@ -9,7 +9,6 @@ import {
   RecentTemplates,
   UserPreferences,
 } from '@/components/dashboard';
-import type { GameSession } from '@/components/dashboard/RecentSessions';
 import type { Template } from '@/app/api/templates/route';
 import { Badge } from '@joolie-boolie/ui';
 
@@ -57,40 +56,6 @@ async function fetchRecentTemplates(): Promise<Template[]> {
 }
 
 /**
- * Fetch recent game sessions for a user from the database
- */
-async function fetchRecentSessions(userId: string): Promise<GameSession[]> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('game_sessions')
-    .select('id, game_type, created_at, updated_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(10);
-
-  if (error) {
-    console.error('Error fetching recent sessions:', error);
-    return [];
-  }
-
-  // Transform database records to GameSession format
-  return (data || []).map((session) => {
-    const createdAt = new Date(session.created_at);
-    const updatedAt = new Date(session.updated_at);
-    const durationMs = updatedAt.getTime() - createdAt.getTime();
-    const durationMinutes = Math.max(1, Math.round(durationMs / (1000 * 60)));
-
-    return {
-      id: session.id,
-      gameType: session.game_type as 'bingo' | 'trivia',
-      startedAt: session.created_at,
-      durationMinutes,
-    };
-  });
-}
-
-/**
  * Fetch user profile data including avatar URL
  * Uses E2E profile store for E2E testing, database for production
  */
@@ -111,29 +76,6 @@ async function fetchProfile(
     gameRemindersEnabled: false,
     weeklySummaryEnabled: false,
     marketingEmailsEnabled: false,
-  };
-}
-
-/**
- * Calculate game statistics from recent sessions
- */
-function calculateGameStats(sessions: GameSession[]) {
-  const bingoSessions = sessions.filter((s) => s.gameType === 'bingo');
-  const triviaSessions = sessions.filter((s) => s.gameType === 'trivia');
-
-  return {
-    bingo: {
-      lastPlayed:
-        bingoSessions.length > 0 ? new Date(bingoSessions[0].startedAt) : null,
-      timesPlayed: bingoSessions.length,
-    },
-    trivia: {
-      lastPlayed:
-        triviaSessions.length > 0
-          ? new Date(triviaSessions[0].startedAt)
-          : null,
-      timesPlayed: triviaSessions.length,
-    },
   };
 }
 
@@ -178,9 +120,9 @@ function TriviaIcon() {
 }
 
 /**
- * Generate game cards configuration with real statistics
+ * Generate game cards configuration
  */
-function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
+function getGamesConfig() {
   return [
     {
       id: 'bingo',
@@ -193,8 +135,8 @@ function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
       icon: <BingoIcon />,
       colorClass: '',
       accentColor: 'var(--game-bingo)',
-      lastPlayed: stats.bingo.lastPlayed,
-      timesPlayed: stats.bingo.timesPlayed,
+      lastPlayed: null,
+      timesPlayed: 0,
     },
     {
       id: 'trivia',
@@ -207,8 +149,8 @@ function getGamesConfig(stats: ReturnType<typeof calculateGameStats>) {
       icon: <TriviaIcon />,
       colorClass: '',
       accentColor: 'var(--game-trivia)',
-      lastPlayed: stats.trivia.lastPlayed,
-      timesPlayed: stats.trivia.timesPlayed,
+      lastPlayed: null,
+      timesPlayed: 0,
     },
   ];
 }
@@ -229,7 +171,6 @@ interface DashboardContentProps {
   userEmail: string;
   games: ReturnType<typeof getGamesConfig>;
   recentTemplates: Template[];
-  recentSessions: GameSession[];
   profile: {
     emailNotificationsEnabled: boolean;
     gameRemindersEnabled: boolean;
@@ -243,7 +184,6 @@ function DashboardContent({
   userEmail,
   games,
   recentTemplates,
-  recentSessions,
   profile,
 }: DashboardContentProps) {
   return (
@@ -290,7 +230,7 @@ function DashboardContent({
 
         {/* Bottom bento row — Recent Sessions + Preferences */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-          <RecentSessions sessions={recentSessions} maxSessions={4} />
+          <RecentSessions sessions={[]} maxSessions={4} />
           <UserPreferences
             preferences={{
               emailNotificationsEnabled: profile.emailNotificationsEnabled,
@@ -316,9 +256,7 @@ export default async function DashboardPage() {
   // Check for E2E cookie BEFORE Supabase auth to avoid unnecessary API calls
   if (e2eToken && e2eUserId) {
     // E2E user is authenticated - use mock user data
-    const recentSessions: GameSession[] = [];
-    const gameStats = calculateGameStats(recentSessions);
-    const games = getGamesConfig(gameStats);
+    const games = getGamesConfig();
     const userName = resolveDisplayName(null, E2E_TEST_EMAIL, 'Activity Director');
     const recentTemplates = await fetchRecentTemplates();
 
@@ -331,7 +269,6 @@ export default async function DashboardPage() {
         userEmail={E2E_TEST_EMAIL}
         games={games}
         recentTemplates={recentTemplates}
-        recentSessions={recentSessions}
         profile={profile}
       />
     );
@@ -349,10 +286,7 @@ export default async function DashboardPage() {
     redirect('/login?redirect=%2Fdashboard');
   }
 
-  // Fetch recent sessions and calculate statistics
-  const recentSessions = await fetchRecentSessions(user.id);
-  const gameStats = calculateGameStats(recentSessions);
-  const games = getGamesConfig(gameStats);
+  const games = getGamesConfig();
   const recentTemplates = await fetchRecentTemplates();
 
   // Fetch user profile (including avatar + notification preferences)
@@ -371,7 +305,6 @@ export default async function DashboardPage() {
       userEmail={user.email || ''}
       games={games}
       recentTemplates={recentTemplates}
-      recentSessions={recentSessions}
       profile={profile}
     />
   );

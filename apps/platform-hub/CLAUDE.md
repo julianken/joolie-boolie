@@ -39,7 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Dashboard
 - Game selection home page with cards for Bingo and Trivia
-- User dashboard with real data (game stats, recent sessions, recent templates)
+- User dashboard with real data (recent templates, preferences)
 - Welcome header with resolved user display name
 - User preferences section
 
@@ -128,7 +128,6 @@ pnpm test:run          # Run tests once
 | `/api/templates` | GET | Aggregate templates from game APIs |
 | `/api/templates/[id]` | DELETE | Proxy delete to game API |
 | `/api/cron/cleanup-authorizations` | GET | Vercel Cron: clean expired authorizations |
-| `/api/cron/cleanup-sessions` | GET | Vercel Cron: mark expired sessions |
 
 ## Architecture Notes
 
