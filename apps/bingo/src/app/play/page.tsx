@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
 import { useSync } from '@/hooks/use-sync';
 import { generateSessionId } from '@/lib/sync/session';
@@ -22,8 +22,6 @@ import { useThemeStore } from '@/stores/theme-store';
 import { InstallPrompt } from '@joolie-boolie/ui';
 
 export default function PlayPage() {
-  const game = useGameKeyboard();
-
   // Theme store selectors
   const presenterTheme = useThemeStore((state) => state.presenterTheme);
   const displayTheme = useThemeStore((state) => state.displayTheme);
@@ -37,7 +35,22 @@ export default function PlayPage() {
   const [sessionId] = useState(generateSessionId);
 
   // Initialize sync as presenter role with session-scoped channel
-  const { isConnected } = useSync({ role: 'presenter', sessionId });
+  const {
+    isConnected,
+    displayAudioActive,
+    broadcastPlayRollSound,
+    broadcastPlayRevealChime,
+    broadcastPlayBallVoice,
+  } = useSync({ role: 'presenter', sessionId });
+
+  // Memoize audio broadcast object to avoid re-renders
+  const audioBroadcast = useMemo(() => ({
+    broadcastPlayRollSound,
+    broadcastPlayRevealChime,
+    broadcastPlayBallVoice,
+  }), [broadcastPlayRollSound, broadcastPlayRevealChime, broadcastPlayBallVoice]);
+
+  const game = useGameKeyboard({ audioBroadcast, displayAudioActive });
 
   // Audio preloading and controls
   const { preloadProgress } = useAudioPreload();
@@ -62,7 +75,21 @@ export default function PlayPage() {
   // Open display window with session ID in URL
   const openDisplay = useCallback(() => {
     const displayUrl = `${window.location.origin}/display?session=${sessionId}`;
-    window.open(displayUrl, `bingo-display-${sessionId}`, 'popup');
+    const displayWindow = window.open(displayUrl, `bingo-display-${sessionId}`, 'popup');
+
+    // Attempt to send audio unlock signal after display loads
+    if (displayWindow) {
+      setTimeout(() => {
+        try {
+          displayWindow.postMessage(
+            { type: 'UNLOCK_AUDIO' },
+            window.location.origin
+          );
+        } catch {
+          // Silently fail — popup may be blocked, closed, or cross-origin
+        }
+      }, 500);
+    }
   }, [sessionId]);
 
   // Audience state label (Issue 2.3 -- presenter audience-state indicator)
@@ -110,6 +137,13 @@ export default function PlayPage() {
 
             {/* Controls row */}
             <div className="flex flex-wrap items-center gap-3">
+              {/* Audio output indicator */}
+              <div className="flex items-center gap-2" data-testid="audio-output-indicator">
+                <span className="text-sm text-foreground-secondary hidden sm:block">
+                  Audio: {displayAudioActive ? 'Display' : 'Presenter'}
+                </span>
+              </div>
+
               {/* Connection status */}
               <div className="flex items-center gap-2" data-testid="sync-indicator">
                 <div

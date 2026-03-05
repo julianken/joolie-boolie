@@ -7,26 +7,54 @@ import { BingoPattern, GameStatus } from '@/types';
 import { getRecentBalls } from '@/lib/game';
 
 /**
+ * Audio broadcast functions for routing sound to the display window.
+ */
+interface AudioBroadcast {
+  broadcastPlayRollSound: () => void;
+  broadcastPlayRevealChime: () => void;
+  broadcastPlayBallVoice: (ball: import('@/types').BingoBall) => void;
+}
+
+/**
  * Executes the audio call sequence for a bingo ball: roll sound → call → reveal chime → voice.
  * Returns the called ball, or null if no ball was called.
+ *
+ * When display audio is active, audio events are broadcast to the display window
+ * instead of playing locally on the presenter. If display audio is NOT active,
+ * falls back to playing audio locally on the presenter.
  *
  * @param audioStore - The audio store instance (from hook capture or getState())
  * @param callBallFn - Function that calls the next ball and returns it
  * @param audioEnabled - Whether audio is enabled
+ * @param audioBroadcast - Optional broadcast functions for routing audio to display
+ * @param displayAudioActive - Whether display audio has been confirmed active
  */
 async function executeCallSequence(
   audioStore: ReturnType<typeof useAudioStore.getState>,
   callBallFn: () => ReturnType<ReturnType<typeof useGameStore.getState>['callBall']>,
-  audioEnabled: boolean
+  audioEnabled: boolean,
+  audioBroadcast?: AudioBroadcast,
+  displayAudioActive?: boolean
 ) {
+  const useDisplayAudio = displayAudioActive && audioBroadcast;
+
   if (audioEnabled) {
-    await audioStore.playRollSound();
+    if (useDisplayAudio) {
+      audioBroadcast.broadcastPlayRollSound();
+    } else {
+      await audioStore.playRollSound();
+    }
   }
   const ball = callBallFn(); // Ball appears — animation starts slightly before chime
   if (ball && audioEnabled) {
     await new Promise<void>((r) => setTimeout(r, 400));
-    await audioStore.playRevealChime();
-    await audioStore.playBallVoice(ball);
+    if (useDisplayAudio) {
+      audioBroadcast.broadcastPlayRevealChime();
+      audioBroadcast.broadcastPlayBallVoice(ball);
+    } else {
+      await audioStore.playRevealChime();
+      await audioStore.playBallVoice(ball);
+    }
   }
   return ball;
 }
@@ -39,10 +67,18 @@ function requiresResetConfirmation(status: GameStatus): boolean {
   return status === 'playing' || status === 'paused';
 }
 
+interface UseGameOptions {
+  /** Optional audio broadcast functions for routing sound to display */
+  audioBroadcast?: AudioBroadcast;
+  /** Whether display audio has been confirmed active */
+  displayAudioActive?: boolean;
+}
+
 /**
  * Main game hook combining game state, audio, and auto-call functionality.
  */
-export function useGame() {
+export function useGame(options?: UseGameOptions) {
+  const { audioBroadcast, displayAudioActive } = options ?? {};
   const gameStore = useGameStore();
   const audioStore = useAudioStore();
   const selectors = useGameSelectors();
@@ -84,12 +120,18 @@ export function useGame() {
     isProcessingRef.current = true;
     setIsProcessing(true);
     try {
-      return await executeCallSequence(audioStore, () => gameStore.callBall(), audioEnabled);
+      return await executeCallSequence(
+        audioStore,
+        () => gameStore.callBall(),
+        audioEnabled,
+        audioBroadcast,
+        displayAudioActive
+      );
     } finally {
       isProcessingRef.current = false;
       setIsProcessing(false);
     }
-  }, [gameStore, audioStore, audioEnabled]);
+  }, [gameStore, audioStore, audioEnabled, audioBroadcast, displayAudioActive]);
 
   const undoCall = useCallback(() => {
     return gameStore.undoCall();
@@ -193,7 +235,13 @@ export function useGame() {
           setIsProcessing(true);
           try {
             const audioStoreState = useAudioStore.getState();
-            await executeCallSequence(audioStoreState, () => state.callBall(), state.audioEnabled);
+            await executeCallSequence(
+              audioStoreState,
+              () => state.callBall(),
+              state.audioEnabled,
+              audioBroadcast,
+              displayAudioActive
+            );
           } finally {
             isProcessingRef.current = false;
             setIsProcessing(false);
@@ -216,7 +264,7 @@ export function useGame() {
 
     // Cleanup on unmount or when dependencies change
     return clearAutoCallTimeout;
-  }, [status, autoCallEnabled, autoCallSpeed]);
+  }, [status, autoCallEnabled, autoCallSpeed, audioBroadcast, displayAudioActive]);
 
   // Computed values
   const recentBalls = getRecentBalls(gameStore, 5);
@@ -269,8 +317,8 @@ export function useGame() {
  * Keyboard shortcut hook for game controls.
  * Space=roll, P=pause, R=reset, U=undo, M=mute
  */
-export function useGameKeyboard() {
-  const game = useGame();
+export function useGameKeyboard(options?: UseGameOptions) {
+  const game = useGame(options);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
