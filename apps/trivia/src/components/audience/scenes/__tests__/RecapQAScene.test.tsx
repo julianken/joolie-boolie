@@ -133,29 +133,16 @@ describe('RecapQAScene', () => {
     expect(screen.getByRole('region', { name: 'Correct answer' })).toBeInTheDocument();
   });
 
-  it('shows "View scores" footer on the answer face of the last question', () => {
-    // Last question in round (index 2 out of 3 questions)
-    setState({ recapShowingAnswer: true, displayQuestionIndex: 2 });
-    render(<RecapQAScene />);
-
-    expect(screen.getByText(/View scores/)).toBeInTheDocument();
-  });
-
-  it('shows "Next question" footer on the answer face when not the last question', () => {
-    // First question answer (not last)
+  it('does not show navigation instructions on the audience display', () => {
     setState({ recapShowingAnswer: true, displayQuestionIndex: 0 });
     render(<RecapQAScene />);
 
-    expect(screen.getByText(/Next question/)).toBeInTheDocument();
-  });
-
-  it('hides the "Previous" navigation hint on the first question face', () => {
-    setState({ recapShowingAnswer: null, displayQuestionIndex: 0 });
-    render(<RecapQAScene />);
-
-    // First question should show "Show answer" but NOT "Previous"
-    expect(screen.getByText(/Show answer/)).toBeInTheDocument();
+    // Navigation hints have been moved to the presenter view (BEA-659)
+    expect(screen.queryByText(/Next question/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/View scores/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Show answer/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Previous/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Next round/)).not.toBeInTheDocument();
   });
 
   it('renders WaitingDisplay when currentQuestion is null (displayQuestionIndex is null)', () => {

@@ -17,8 +17,6 @@ import { ScoreboardRows } from './shared/ScoreboardRows';
  * - Rank change indicators
  * - Team accent colors via getTeamColor()
  *
- * Footer: "Press Enter or N for next round"
- *
  * Motion: staggered row entry from left (via ScoreboardRows).
  * Reduced motion: rows appear instantly.
  */
@@ -76,15 +74,6 @@ export function RecapScoresScene() {
         maxScore={maxScore}
       />
 
-      {/* Navigation footer */}
-      <div className="text-center mt-4" role="status" aria-live="polite">
-        <p
-          className="text-foreground-secondary"
-          style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1.25rem)' }}
-        >
-          Press Enter or N for next round
-        </p>
-      </div>
     </section>
   );
 }
