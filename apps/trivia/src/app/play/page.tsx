@@ -14,6 +14,7 @@ import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
 import { TeamManager } from '@/components/presenter/TeamManager';
 import { QuickScoreGrid } from '@/components/presenter/QuickScoreGrid';
 import { SceneNavButtons } from '@/components/presenter/SceneNavButtons';
+import { NextActionHint } from '@/components/presenter/NextActionHint';
 import { useQuickScore } from '@/hooks/use-quick-score';
 import { useGameEventSounds } from '@/hooks/use-sounds';
 import { useRevealSequence } from '@/hooks/use-reveal-sequence';
@@ -385,9 +386,10 @@ export default function PlayPage() {
               />
             </div>
 
-            {/* Scene navigation buttons (WU-03) */}
-            <div className="mb-4 px-1">
+            {/* Scene navigation buttons (WU-03) + contextual action hint */}
+            <div className="mb-4 px-1 flex flex-col gap-1.5">
               <SceneNavButtons />
+              <NextActionHint />
             </div>
 
             {/* Keyboard shortcuts reference */}

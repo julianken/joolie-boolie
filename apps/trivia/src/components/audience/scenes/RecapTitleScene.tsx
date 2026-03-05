@@ -13,7 +13,6 @@ import { heroSceneEnter, heroSceneEnterReduced } from '@/lib/motion/presets';
  * Pattern mirrors RoundIntroScene: hero display-font number inside a bordered card
  * with motion entrance animation.
  *
- * Footer: "→ Begin · N Skip to next round"
  * Motion: heroSceneEnter (scaleUp + fade, springDramatic).
  * Reduced motion: instant fade-in.
  */
@@ -103,17 +102,6 @@ export function RecapTitleScene() {
         </motion.p>
       </motion.div>
 
-      {/* Navigation footer */}
-      <div
-        className="text-center"
-        role="status"
-        aria-live="polite"
-        style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1.25rem)' }}
-      >
-        <p className="text-foreground-secondary">
-          &rarr; Begin &middot; N Skip to next round
-        </p>
-      </div>
     </section>
   );
 }

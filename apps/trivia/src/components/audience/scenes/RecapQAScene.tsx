@@ -14,20 +14,14 @@ import { WaitingDisplay } from '@/components/audience/WaitingDisplay';
  * toggling between the question face and answer face for each.
  *
  * Two faces controlled by recapShowingAnswer:
- *   false / null  -> Question face: question text + "→ Show answer" footer
- *   true          -> Answer face: question text + green answer block + "→ Next question" footer
+ *   false / null  -> Question face: question text
+ *   true          -> Answer face: question text + green answer block
  *
  * Key transitions:
  *   AnimatePresence mode="wait" with key on `recapShowingAnswer`
  *   drives a cross-fade between question face and answer face.
  *
  * Progress indicator: "Round X · Question N of M"
- *
- * Navigation footers:
- *   Question face: "→ Show answer · ← Previous · N Next round"
- *     (hide ← on first question)
- *   Answer face (not last): "→ Next question · ← Back · N Next round"
- *   Answer face (last question): "→ View scores · ← Back · N Next round"
  *
  * Motion: heroSceneEnter on outer container.
  * Reduced motion: heroSceneEnterReduced.
@@ -64,8 +58,6 @@ export function RecapQAScene() {
   const safeQuestionIndex = questionIndexInRound === -1 ? 0 : questionIndexInRound;
 
   const totalQuestionsInRound = questionsInRound.length;
-  const isFirstQuestion = safeQuestionIndex === 0;
-  const isLastQuestion = safeQuestionIndex >= totalQuestionsInRound - 1;
   const isAnswerFace = recapShowingAnswer === true;
 
   const roundNumber = currentRound + 1;
@@ -187,18 +179,6 @@ export function RecapQAScene() {
                 </p>
               </div>
 
-              {/* Answer navigation footer */}
-              <div
-                className="text-center mt-2"
-                role="status"
-                style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1.25rem)' }}
-              >
-                <p className="text-foreground-secondary">
-                  {isLastQuestion
-                    ? <>&rarr; View scores &middot; &larr; Back &middot; N Next round</>
-                    : <>&rarr; Next question &middot; &larr; Back &middot; N Next round</>}
-                </p>
-              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -230,18 +210,6 @@ export function RecapQAScene() {
                 </h2>
               </div>
 
-              {/* Question navigation footer */}
-              <div
-                className="text-center mt-2"
-                role="status"
-                style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1.25rem)' }}
-              >
-                <p className="text-foreground-secondary">
-                  {isFirstQuestion
-                    ? <>&rarr; Show answer &middot; N Next round</>
-                    : <>&rarr; Show answer &middot; &larr; Previous &middot; N Next round</>}
-                </p>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
