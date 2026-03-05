@@ -181,6 +181,11 @@ export default function PlayPage() {
     useGameStore.getState().advanceScene('advance');
   }, []);
 
+  /** Sync round scoring progress to audience display */
+  const handleRoundScoringProgress = useCallback((entries: Record<string, number>) => {
+    useGameStore.getState().updateRoundScoringProgress(entries);
+  }, []);
+
   /** Status badge for the presenter header */
   const getStatusDisplay = () => {
     switch (game.status) {
@@ -519,6 +524,7 @@ export default function PlayPage() {
                     teams={game.teams}
                     currentRound={game.currentRound}
                     onSubmitScores={handleRoundScoresSubmitted}
+                    onProgressChange={handleRoundScoringProgress}
                   />
                 </div>
               )}

@@ -51,10 +51,14 @@ describe('round_scoring scene transitions', () => {
       expect(next).toBe('final_buildup');
     });
 
+    it('should transition from round_scoring to recap_scores on skip (Enter key)', () => {
+      const next = getNextScene('round_scoring', 'skip', defaultCtx);
+      expect(next).toBe('recap_scores');
+    });
+
     it('should return null for unsupported triggers', () => {
       expect(getNextScene('round_scoring', 'close', defaultCtx)).toBeNull();
       expect(getNextScene('round_scoring', 'back', defaultCtx)).toBeNull();
-      expect(getNextScene('round_scoring', 'skip', defaultCtx)).toBeNull();
       expect(getNextScene('round_scoring', 'auto', defaultCtx)).toBeNull();
     });
   });

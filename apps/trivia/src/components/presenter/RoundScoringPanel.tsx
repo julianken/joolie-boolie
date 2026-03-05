@@ -8,6 +8,7 @@ export interface RoundScoringPanelProps {
   teams: Team[];
   currentRound: number;
   onSubmitScores: (scores: Record<string, number>) => void;
+  onProgressChange?: (entries: Record<string, number>) => void;
 }
 
 interface UndoEntry {
@@ -31,6 +32,7 @@ export function RoundScoringPanel({
   teams,
   currentRound,
   onSubmitScores,
+  onProgressChange,
 }: RoundScoringPanelProps) {
   const [entries, setEntries] = useState<Record<string, number | null>>(() => {
     const initial: Record<string, number | null> = {};
@@ -46,6 +48,18 @@ export function RoundScoringPanel({
   const enteredCount = Object.values(entries).filter((v) => v !== null).length;
   const allEntered = enteredCount === teams.length;
   const roundNumber = currentRound + 1;
+
+  // Sync progress to audience display via store
+  useEffect(() => {
+    if (!onProgressChange) return;
+    const filled: Record<string, number> = {};
+    for (const [teamId, value] of Object.entries(entries)) {
+      if (value !== null) {
+        filled[teamId] = value;
+      }
+    }
+    onProgressChange(filled);
+  }, [entries, onProgressChange]);
 
   // Sort teams by current total score descending (highest first)
   const sortedTeams = [...teams].sort((a, b) => b.score - a.score);

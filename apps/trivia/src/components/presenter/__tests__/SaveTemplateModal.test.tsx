@@ -359,6 +359,7 @@ describe('SaveTemplateModal', () => {
         advanceScene: vi.fn().mockReturnValue(true),
         setRevealPhase: vi.fn(),
         setScoreDeltasBatch: vi.fn(),
+        updateRoundScoringProgress: vi.fn(),
       };
       return selector ? selector(store) : store;
     });
@@ -443,6 +444,7 @@ describe('SaveTemplateModal', () => {
         advanceScene: vi.fn().mockReturnValue(true),
         setRevealPhase: vi.fn(),
         setScoreDeltasBatch: vi.fn(),
+        updateRoundScoringProgress: vi.fn(),
       };
       return selector ? selector(store) : store;
     });

@@ -86,6 +86,7 @@ export interface GameStore extends TriviaGameState {
 
   // Per-round scoring (bar trivia)
   setRoundScores: (teamScoresMap: Record<string, number>) => void;
+  updateRoundScoringProgress: (entries: Record<string, number>) => void;
 
   // Hydration for sync
   _hydrate: (state: Partial<TriviaGameState>) => void;
@@ -245,6 +246,10 @@ export const useGameStore = create<GameStore>()((set, get) => ({
         roundScoringEntries: {},
       };
     });
+  },
+
+  updateRoundScoringProgress: (entries: Record<string, number>) => {
+    set({ roundScoringEntries: entries });
   },
 
   completeRound: () => {

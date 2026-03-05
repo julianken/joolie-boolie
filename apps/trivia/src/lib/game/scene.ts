@@ -268,8 +268,8 @@ export function getNextScene(
       return null;
 
     case 'round_scoring':
-      // Right Arrow / advance: proceed to recap_scores (show updated leaderboard)
-      if (trigger === 'advance') return 'recap_scores';
+      // Right Arrow / advance / Enter (skip): proceed to recap_scores (show updated leaderboard)
+      if (trigger === 'advance' || trigger === 'skip') return 'recap_scores';
       // N key: skip scores display, go directly to next round
       if (trigger === 'next_round') {
         return isLastRound ? 'final_buildup' : 'round_intro';
