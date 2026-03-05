@@ -53,7 +53,13 @@ vi.mock('@/hooks/use-game', () => ({
 }));
 
 vi.mock('@/hooks/use-sync', () => ({
-  useSync: () => ({ isConnected: true }),
+  useSync: () => ({
+    isConnected: true,
+    displayAudioActive: false,
+    broadcastPlayRollSound: vi.fn(),
+    broadcastPlayRevealChime: vi.fn(),
+    broadcastPlayBallVoice: vi.fn(),
+  }),
 }));
 
 vi.mock('@/hooks/use-audio', () => ({

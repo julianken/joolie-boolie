@@ -157,7 +157,11 @@ export type SyncMessageType =
   | 'REQUEST_SYNC'
   | 'AUDIO_SETTINGS_CHANGED'
   | 'DISPLAY_THEME_CHANGED'
-  | 'CHANNEL_READY';
+  | 'CHANNEL_READY'
+  | 'PLAY_ROLL_SOUND'
+  | 'PLAY_REVEAL_CHIME'
+  | 'PLAY_BALL_VOICE'
+  | 'AUDIO_UNLOCKED';
 
 export interface AudioSettingsPayload {
   voicePack: VoicePackId;
@@ -189,7 +193,11 @@ export type BingoSyncMessage =
   | (SyncMessageBase & { type: 'REQUEST_SYNC'; payload: null })
   | (SyncMessageBase & { type: 'AUDIO_SETTINGS_CHANGED'; payload: AudioSettingsPayload })
   | (SyncMessageBase & { type: 'DISPLAY_THEME_CHANGED'; payload: ThemePayload })
-  | (SyncMessageBase & { type: 'CHANNEL_READY'; payload: null });
+  | (SyncMessageBase & { type: 'CHANNEL_READY'; payload: null })
+  | (SyncMessageBase & { type: 'PLAY_ROLL_SOUND'; payload: null })
+  | (SyncMessageBase & { type: 'PLAY_REVEAL_CHIME'; payload: null })
+  | (SyncMessageBase & { type: 'PLAY_BALL_VOICE'; payload: BingoBall })
+  | (SyncMessageBase & { type: 'AUDIO_UNLOCKED'; payload: null });
 
 /**
  * @deprecated Use `BingoSyncMessage` instead. Kept for backwards compatibility.

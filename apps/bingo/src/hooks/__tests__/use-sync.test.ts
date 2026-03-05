@@ -621,4 +621,191 @@ describe('use-sync', () => {
       expect(result.current.isConnected).toBe(true);
     });
   });
+
+  describe('audio message routing (BEA-664)', () => {
+    const mockBall: BingoBall = {
+      column: 'B',
+      number: 5 as BallNumber,
+      label: 'B-5',
+    };
+
+    describe('createMessageRouter audio handlers', () => {
+      it('routes PLAY_ROLL_SOUND to onPlayRollSound', () => {
+        const onPlayRollSound = vi.fn();
+        const router = createMessageRouter({ onPlayRollSound });
+
+        router({
+          type: 'PLAY_ROLL_SOUND',
+          payload: null,
+          timestamp: Date.now(),
+        });
+
+        expect(onPlayRollSound).toHaveBeenCalled();
+      });
+
+      it('routes PLAY_REVEAL_CHIME to onPlayRevealChime', () => {
+        const onPlayRevealChime = vi.fn();
+        const router = createMessageRouter({ onPlayRevealChime });
+
+        router({
+          type: 'PLAY_REVEAL_CHIME',
+          payload: null,
+          timestamp: Date.now(),
+        });
+
+        expect(onPlayRevealChime).toHaveBeenCalled();
+      });
+
+      it('routes PLAY_BALL_VOICE to onPlayBallVoice with ball payload', () => {
+        const onPlayBallVoice = vi.fn();
+        const router = createMessageRouter({ onPlayBallVoice });
+
+        router({
+          type: 'PLAY_BALL_VOICE',
+          payload: mockBall,
+          timestamp: Date.now(),
+        });
+
+        expect(onPlayBallVoice).toHaveBeenCalledWith(mockBall);
+      });
+
+      it('routes AUDIO_UNLOCKED to onAudioUnlocked', () => {
+        const onAudioUnlocked = vi.fn();
+        const router = createMessageRouter({ onAudioUnlocked });
+
+        router({
+          type: 'AUDIO_UNLOCKED',
+          payload: null,
+          timestamp: Date.now(),
+        });
+
+        expect(onAudioUnlocked).toHaveBeenCalled();
+      });
+    });
+
+    describe('presenter audio broadcast methods', () => {
+      it('returns audio broadcast methods for presenter role', () => {
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        expect(typeof result.current.broadcastPlayRollSound).toBe('function');
+        expect(typeof result.current.broadcastPlayRevealChime).toBe('function');
+        expect(typeof result.current.broadcastPlayBallVoice).toBe('function');
+      });
+
+      it('broadcastPlayRollSound sends PLAY_ROLL_SOUND message', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        act(() => {
+          result.current.broadcastPlayRollSound();
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        expect(calls.some(call => call.type === 'PLAY_ROLL_SOUND')).toBe(true);
+      });
+
+      it('broadcastPlayRevealChime sends PLAY_REVEAL_CHIME message', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        act(() => {
+          result.current.broadcastPlayRevealChime();
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        expect(calls.some(call => call.type === 'PLAY_REVEAL_CHIME')).toBe(true);
+      });
+
+      it('broadcastPlayBallVoice sends PLAY_BALL_VOICE message with ball payload', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        postMessageSpy.mockClear();
+
+        act(() => {
+          result.current.broadcastPlayBallVoice(mockBall);
+        });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        const ballVoiceCall = calls.find(call => call.type === 'PLAY_BALL_VOICE');
+        expect(ballVoiceCall).toBeDefined();
+        expect(ballVoiceCall.payload).toEqual(mockBall);
+      });
+    });
+
+    describe('display audio active tracking', () => {
+      it('displayAudioActive starts as false', () => {
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        expect(result.current.displayAudioActive).toBe(false);
+      });
+
+      it('displayAudioActive becomes true when AUDIO_UNLOCKED received by presenter', () => {
+        const { result } = renderHook(() => useSync({ role: 'presenter', sessionId: TEST_SESSION_ID }));
+
+        expect(result.current.displayAudioActive).toBe(false);
+
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'AUDIO_UNLOCKED',
+            payload: null,
+            timestamp: Date.now(),
+          });
+        });
+
+        expect(result.current.displayAudioActive).toBe(true);
+      });
+
+      it('audience ignores AUDIO_UNLOCKED messages', () => {
+        const { result } = renderHook(() => useSync({ role: 'audience', sessionId: TEST_SESSION_ID }));
+
+        act(() => {
+          lastChannelInstance?.simulateMessage({
+            type: 'AUDIO_UNLOCKED',
+            payload: null,
+            timestamp: Date.now(),
+          });
+        });
+
+        // displayAudioActive is presenter-only state, audience should still be false
+        expect(result.current.displayAudioActive).toBe(false);
+      });
+
+      it('audience broadcasts AUDIO_UNLOCKED when displayAudioUnlocked is set', () => {
+        const postMessageSpy = vi.fn();
+        vi.stubGlobal('BroadcastChannel', class extends MockBroadcastChannel {
+          postMessage = postMessageSpy;
+        });
+
+        const { rerender } = renderHook(
+          ({ displayAudioUnlocked }: { displayAudioUnlocked: boolean }) =>
+            useSync({ role: 'audience', sessionId: TEST_SESSION_ID, displayAudioUnlocked }),
+          { initialProps: { displayAudioUnlocked: false } }
+        );
+
+        postMessageSpy.mockClear();
+
+        rerender({ displayAudioUnlocked: true });
+
+        const calls = postMessageSpy.mock.calls.map(call => call[0]);
+        expect(calls.some(call => call.type === 'AUDIO_UNLOCKED')).toBe(true);
+      });
+    });
+  });
 });

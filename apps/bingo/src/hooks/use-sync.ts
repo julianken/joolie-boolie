@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useCallback, useRef, useMemo, useState } from 'react';
 import { useSyncStore, useSyncHeartbeat, type SyncRole } from '@joolie-boolie/sync';
 import { useGameStore } from '@/stores/game-store';
 import { BroadcastSync } from '@joolie-boolie/sync';
 import { getChannelName } from '@/lib/sync/session';
 import type { GameState, BingoBall, BingoPattern, ThemeMode, AudioSettingsPayload, BingoSyncMessage } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';
+import { useAudioStore } from '@/stores/audio-store';
 
 // Bingo-specific payload union type (used for BroadcastSync generic parameter)
 type BingoSyncPayload = GameState | BingoBall | BingoPattern | AudioSettingsPayload | { theme: ThemeMode } | null;
@@ -41,6 +42,18 @@ class BingoBroadcastSync extends BroadcastSync<BingoSyncPayload> {
   broadcastDisplayTheme(theme: ThemeMode): void {
     this.send('DISPLAY_THEME_CHANGED', { theme });
   }
+
+  broadcastPlayRollSound(): void {
+    this.send('PLAY_ROLL_SOUND', null);
+  }
+
+  broadcastPlayRevealChime(): void {
+    this.send('PLAY_REVEAL_CHIME', null);
+  }
+
+  broadcastPlayBallVoice(ball: BingoBall): void {
+    this.send('PLAY_BALL_VOICE', ball);
+  }
 }
 
 /**
@@ -66,6 +79,10 @@ export function createMessageRouter(handlers: Partial<{
   onAudioSettingsChanged: (settings: AudioSettingsPayload) => void;
   onDisplayThemeChanged: (theme: ThemeMode) => void;
   onChannelReady: () => void;
+  onPlayRollSound: () => void;
+  onPlayRevealChime: () => void;
+  onPlayBallVoice: (ball: BingoBall) => void;
+  onAudioUnlocked: () => void;
 }>): MessageHandler {
   return (message: BingoSyncMessage) => {
     switch (message.type) {
@@ -93,6 +110,18 @@ export function createMessageRouter(handlers: Partial<{
       case 'CHANNEL_READY':
         handlers.onChannelReady?.();
         break;
+      case 'PLAY_ROLL_SOUND':
+        handlers.onPlayRollSound?.();
+        break;
+      case 'PLAY_REVEAL_CHIME':
+        handlers.onPlayRevealChime?.();
+        break;
+      case 'PLAY_BALL_VOICE':
+        handlers.onPlayBallVoice?.(message.payload);
+        break;
+      case 'AUDIO_UNLOCKED':
+        handlers.onAudioUnlocked?.();
+        break;
     }
   };
 }
@@ -100,6 +129,8 @@ export function createMessageRouter(handlers: Partial<{
 interface UseSyncOptions {
   role: SyncRole;
   sessionId: string;
+  /** Whether audio has been unlocked on the display window (audience role only) */
+  displayAudioUnlocked?: boolean;
 }
 
 /**
@@ -108,8 +139,10 @@ interface UseSyncOptions {
  * Presenter: Broadcasts state changes to audience windows.
  * Audience: Receives and applies state updates from presenter.
  */
-export function useSync({ role, sessionId }: UseSyncOptions) {
+export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOptions) {
   const isInitializedRef = useRef(false);
+  // Track whether the display has confirmed audio is active (presenter uses this)
+  const [displayAudioActive, setDisplayAudioActive] = useState(false);
 
   // Create a session-scoped BroadcastSync instance
   const broadcastSyncRef = useRef<BingoBroadcastSync | null>(null);
@@ -245,6 +278,27 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
           sync.requestSync();
         }
       },
+      // Audio playback handlers (audience/display receives these from presenter)
+      onPlayRollSound: () => {
+        if (role !== 'audience') return;
+        const audioStore = useAudioStore.getState();
+        audioStore.playRollSound();
+      },
+      onPlayRevealChime: () => {
+        if (role !== 'audience') return;
+        const audioStore = useAudioStore.getState();
+        audioStore.playRevealChime();
+      },
+      onPlayBallVoice: (ball) => {
+        if (role !== 'audience') return;
+        const audioStore = useAudioStore.getState();
+        audioStore.playBallVoice(ball);
+      },
+      // Presenter receives this when display audio is unlocked
+      onAudioUnlocked: () => {
+        if (role !== 'presenter') return;
+        setDisplayAudioActive(true);
+      },
     });
 
     // Cast at the transport boundary: BroadcastSync uses a generic SyncMessage<TPayload>
@@ -359,6 +413,31 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     return unsubscribe;
   }, [role, sessionId]); // Re-subscribe when sessionId changes (new channel)
 
+  // Broadcast AUDIO_UNLOCKED when display audio is unlocked (audience only)
+  useEffect(() => {
+    if (role !== 'audience') return;
+    if (!displayAudioUnlocked) return;
+    if (!broadcastSyncRef.current) return;
+
+    broadcastSyncRef.current.send('AUDIO_UNLOCKED', null);
+  }, [role, displayAudioUnlocked]);
+
+  // Broadcast audio event methods (presenter sends these to display)
+  const broadcastPlayRollSound = useCallback(() => {
+    if (role !== 'presenter') return;
+    broadcastSyncRef.current?.broadcastPlayRollSound();
+  }, [role]);
+
+  const broadcastPlayRevealChime = useCallback(() => {
+    if (role !== 'presenter') return;
+    broadcastSyncRef.current?.broadcastPlayRevealChime();
+  }, [role]);
+
+  const broadcastPlayBallVoice = useCallback((ball: BingoBall) => {
+    if (role !== 'presenter') return;
+    broadcastSyncRef.current?.broadcastPlayBallVoice(ball);
+  }, [role]);
+
   // Heartbeat monitoring for state divergence detection
   const getHeartbeatState = useCallback(() => {
     return getCurrentState() as BingoSyncPayload;
@@ -377,5 +456,10 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     connectionError: useSyncStore((state) => state.connectionError),
     broadcastState,
     requestSync: () => broadcastSyncRef.current?.requestSync(),
+    // Audio routing
+    displayAudioActive,
+    broadcastPlayRollSound,
+    broadcastPlayRevealChime,
+    broadcastPlayBallVoice,
   };
 }

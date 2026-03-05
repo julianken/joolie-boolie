@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
 import { useSync } from '@/hooks/use-sync';
@@ -15,6 +15,7 @@ import {
 import { KeyboardShortcutsModal } from '@/components/ui/KeyboardShortcutsModal';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
+import { useAudioStore } from '@/stores/audio-store';
 
 /**
  * Display-specific keyboard shortcuts (view-only mode)
@@ -106,9 +107,14 @@ function DisplayContent() {
  * Keyboard shortcuts (F=fullscreen, ?=help) remain active.
  */
 function AudienceDisplay({ sessionId }: { sessionId: string }) {
+  // Audio unlock state
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+
   const { isConnected, connectionError, requestSync } = useSync({
     role: 'audience',
     sessionId,
+    displayAudioUnlocked: audioUnlocked,
   });
 
   const { toggleFullscreen } = useFullscreen();
@@ -119,6 +125,12 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
   const displayTheme = useThemeStore((state) => state.displayTheme);
   useApplyTheme(displayTheme);
 
+  // Initialize audio store (loads manifest for playback)
+  const loadManifest = useAudioStore((state) => state.loadManifest);
+  useEffect(() => {
+    loadManifest();
+  }, [loadManifest]);
+
   const currentBall = useGameStore((state) => state.currentBall);
   const calledBalls = useGameStore((state) => state.calledBalls);
   const pattern = useGameStore((state) => state.pattern);
@@ -126,6 +138,52 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
   const autoCallEnabled = useGameStore((state) => state.autoCallEnabled);
   const autoCallSpeed = useGameStore((state) => state.autoCallSpeed);
   const { ballsCalled, ballsRemaining } = useGameSelectors();
+
+  // Unlock audio via user click
+  const handleAudioUnlock = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        ctx.resume().then(() => {
+          audioContextRef.current = ctx;
+          setAudioUnlocked(true);
+        }).catch(() => {
+          // Best effort — still mark as unlocked since user clicked
+          setAudioUnlocked(true);
+        });
+      } else {
+        setAudioUnlocked(true);
+      }
+    } catch {
+      setAudioUnlocked(true);
+    }
+  }, []);
+
+  // Listen for UNLOCK_AUDIO postMessage from presenter window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'UNLOCK_AUDIO' && event.origin === window.location.origin) {
+        try {
+          const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+          if (AudioCtx) {
+            const ctx = new AudioCtx();
+            ctx.resume().then(() => {
+              audioContextRef.current = ctx;
+              setAudioUnlocked(true);
+            }).catch(() => {
+              // Browser blocked auto-resume — user must click overlay
+            });
+          }
+        } catch {
+          // Silent failure — user must click overlay
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   // Request sync on visibility change
   useEffect(() => {
@@ -171,6 +229,35 @@ function AudienceDisplay({ sessionId }: { sessionId: string }) {
 
   return (
     <>
+      {/* Audio unlock overlay — shown until user clicks to activate audio */}
+      {!audioUnlocked && (
+        <div
+          data-testid="audio-unlock-overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(4px)',
+          }}
+          onClick={handleAudioUnlock}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleAudioUnlock();
+            }
+          }}
+          aria-label="Click here to activate window audio"
+        >
+          <p
+            className="text-3xl md:text-5xl font-semibold text-white text-center px-8"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Click here to activate window audio
+          </p>
+        </div>
+      )}
+
       {/* Skip link */}
       <a
         href="#main-display"
