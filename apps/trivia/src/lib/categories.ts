@@ -206,14 +206,16 @@ export function getCategoryBadgeClasses(id: QuestionCategory): string {
 export function getCategoryFilterActiveClasses(id: QuestionCategory): string {
   const color = getCategoryColor(id);
 
+  // Use -700 backgrounds in light mode and -800 in dark mode for WCAG AA contrast with white text.
+  // The -500 shades previously used here failed contrast checks (e.g. green-500, amber-500, cyan-500).
   const colorClasses: Record<string, string> = {
-    slate: 'bg-slate-500 text-white border-slate-600',
-    green: 'bg-green-500 text-white border-green-600',
-    amber: 'bg-amber-500 text-white border-amber-600',
-    cyan: 'bg-cyan-500 text-white border-cyan-600',
-    purple: 'bg-purple-500 text-white border-purple-600',
-    orange: 'bg-orange-500 text-white border-orange-600',
-    rose: 'bg-rose-500 text-white border-rose-600',
+    slate: 'bg-slate-700 text-white border-slate-800 dark:bg-slate-600 dark:border-slate-500',
+    green: 'bg-green-700 text-white border-green-800 dark:bg-green-800 dark:border-green-700',
+    amber: 'bg-amber-700 text-white border-amber-800 dark:bg-amber-800 dark:border-amber-700',
+    cyan: 'bg-cyan-700 text-white border-cyan-800 dark:bg-cyan-800 dark:border-cyan-700',
+    purple: 'bg-purple-700 text-white border-purple-800 dark:bg-purple-800 dark:border-purple-700',
+    orange: 'bg-orange-700 text-white border-orange-800 dark:bg-orange-800 dark:border-orange-700',
+    rose: 'bg-rose-700 text-white border-rose-800 dark:bg-rose-800 dark:border-rose-700',
   };
 
   return colorClasses[color] ?? colorClasses.slate;
