@@ -58,6 +58,7 @@ export function SceneNavButtons() {
       // Results, recap, and answer review: advance through the flow
       case 'answer_reveal':
       case 'round_summary':
+      case 'round_scoring':
       case 'recap_title':
       case 'recap_qa':
       case 'recap_scores':
