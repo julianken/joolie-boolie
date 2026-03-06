@@ -1,4 +1,5 @@
-import type { TriviaGameState, Team, Question } from '@/types';
+import type { TriviaGameState, Team, Question, PerRoundBreakdown, RoundCategoryEntry, QuestionCategory } from '@/types';
+import { normalizeCategoryId } from '@/lib/categories';
 
 // =============================================================================
 // SELECTORS (computed values)
@@ -211,4 +212,70 @@ export function toggleScoreboard(state: TriviaGameState): TriviaGameState {
     ...state,
     showScoreboard: !state.showScoreboard,
   };
+}
+
+// =============================================================================
+// ROUND BREAKDOWN (display utility — not part of engine barrel)
+// =============================================================================
+
+/**
+ * Derive per-round question distribution breakdown for display components.
+ *
+ * Used by WizardStepSettings (badge pills) and WizardStepReview (grid coloring).
+ * Pure function — no side effects. Do NOT re-export via engine.ts barrel.
+ *
+ * @param questions - All questions for the game (with roundIndex set)
+ * @param roundsCount - Total number of rounds
+ * @param isByCategory - True = By Category distribution mode; false = By Count mode
+ * @param questionsPerRound - Target questions per round (used in By Count mode only)
+ */
+export function derivePerRoundBreakdown(
+  questions: Question[],
+  roundsCount: number,
+  isByCategory: boolean,
+  questionsPerRound: number
+): PerRoundBreakdown[] {
+  // Zero-questions fast path: all rounds are empty and unmatched.
+  // isMatch: false is critical — prevents false-green pills alongside the "No questions" error banner.
+  if (questions.length === 0) {
+    return Array.from({ length: roundsCount }, (_, i) => ({
+      roundIndex: i,
+      totalCount: 0,
+      expectedCount: isByCategory ? 0 : questionsPerRound,
+      isMatch: false,
+      categories: [],
+    }));
+  }
+
+  // Group questions by roundIndex for O(n) lookup.
+  const byRound = new Map<number, Question[]>();
+  for (const q of questions) {
+    const bucket = byRound.get(q.roundIndex);
+    if (bucket) {
+      bucket.push(q);
+    } else {
+      byRound.set(q.roundIndex, [q]);
+    }
+  }
+
+  return Array.from({ length: roundsCount }, (_, roundIndex) => {
+    const roundQuestions = byRound.get(roundIndex) ?? [];
+    const totalCount = roundQuestions.length;
+
+    // Aggregate question counts per normalized category.
+    const catMap = new Map<QuestionCategory, number>();
+    for (const q of roundQuestions) {
+      const catId = normalizeCategoryId(q.category);
+      catMap.set(catId, (catMap.get(catId) ?? 0) + 1);
+    }
+    const categories: RoundCategoryEntry[] = Array.from(catMap.entries()).map(
+      ([categoryId, questionCount]) => ({ categoryId, questionCount })
+    );
+
+    // expectedCount and isMatch differ by distribution mode.
+    const expectedCount = isByCategory ? totalCount : questionsPerRound;
+    const isMatch = isByCategory ? totalCount > 0 : totalCount === questionsPerRound;
+
+    return { roundIndex, totalCount, expectedCount, isMatch, categories };
+  });
 }

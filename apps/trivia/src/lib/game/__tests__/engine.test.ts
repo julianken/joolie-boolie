@@ -1431,21 +1431,15 @@ describe('Trivia Game Engine', () => {
       expect(result.questions[result.questions.length - 1]).toEqual(newQuestion);
     });
 
-    it('should update totalRounds if question has higher roundIndex', () => {
+    it('should not modify totalRounds or settings.roundsCount (redistribution is handled separately)', () => {
       let state = createInitialState();
       const highRoundQuestion = { ...newQuestion, roundIndex: 10 };
       const result = addQuestion(state, highRoundQuestion);
 
-      expect(result.totalRounds).toBe(11);
-      expect(result.settings.roundsCount).toBe(11);
-    });
-
-    it('should not decrease totalRounds', () => {
-      let state = createInitialState();
-      state = { ...state, totalRounds: 10, settings: { ...state.settings, roundsCount: 10 } };
-      const result = addQuestion(state, newQuestion);
-
-      expect(result.totalRounds).toBe(10);
+      // addQuestion no longer auto-updates totalRounds or roundsCount;
+      // call redistributeQuestions separately to reassign roundIndex values.
+      expect(result.totalRounds).toBe(state.totalRounds);
+      expect(result.settings.roundsCount).toBe(state.settings.roundsCount);
     });
 
     it('should return unchanged if not in setup mode', () => {
@@ -1521,11 +1515,14 @@ describe('Trivia Game Engine', () => {
       expect(result.questions[0]).toEqual(updatedQuestion);
     });
 
-    it('should update totalRounds if new question has higher roundIndex', () => {
+    it('should not modify totalRounds or settings.roundsCount (redistribution is handled separately)', () => {
       let state = createInitialState();
       const result = updateQuestion(state, 0, updatedQuestion);
 
-      expect(result.totalRounds).toBeGreaterThanOrEqual(6);
+      // updateQuestion no longer auto-updates totalRounds or roundsCount;
+      // call redistributeQuestions separately to reassign roundIndex values.
+      expect(result.totalRounds).toBe(state.totalRounds);
+      expect(result.settings.roundsCount).toBe(state.settings.roundsCount);
     });
 
     it('should not affect other questions', () => {

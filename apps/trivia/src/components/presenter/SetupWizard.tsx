@@ -28,7 +28,7 @@ import { WizardStepTeams } from '@/components/presenter/WizardStepTeams';
 import { WizardStepReview } from '@/components/presenter/WizardStepReview';
 import type { GameSetupValidation } from '@/lib/game/selectors';
 import type { TeamSetup, SettingsState } from '@/stores/settings-store';
-import type { Team, Question } from '@/types';
+import type { Team, Question, PerRoundBreakdown } from '@/types';
 
 export interface SetupWizardProps {
   // Questions
@@ -40,6 +40,11 @@ export interface SetupWizardProps {
   lastTeamSetup: TeamSetup | null;
   currentTeams: Team[];
   onUpdateSetting: <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => void;
+
+  // Round distribution (WU-4: computed by SetupGate, consumed by WU-5/WU-6 steps)
+  isByCategory: boolean;
+  perRoundBreakdown: PerRoundBreakdown[];
+  onToggleByCategory: (value: boolean) => void;
 
   // Validation & launch
   validation: GameSetupValidation;
@@ -68,6 +73,11 @@ export function SetupWizard({
   lastTeamSetup,
   currentTeams,
   onUpdateSetting,
+
+  // Round distribution
+  isByCategory,
+  perRoundBreakdown,
+  onToggleByCategory,
 
   // Validation & launch
   validation,
@@ -182,7 +192,10 @@ export function SetupWizard({
               <WizardStepSettings
                 roundsCount={roundsCount}
                 questionsPerRound={questionsPerRound}
+                isByCategory={isByCategory}
+                perRoundBreakdown={perRoundBreakdown}
                 onUpdateSetting={onUpdateSetting}
+                onToggleByCategory={onToggleByCategory}
               />
             )}
 
@@ -207,6 +220,8 @@ export function SetupWizard({
                 teams={currentTeams}
                 roundsCount={roundsCount}
                 questionsPerRound={questionsPerRound}
+                isByCategory={isByCategory}
+                perRoundBreakdown={perRoundBreakdown}
                 onGoToStep={goToStep}
                 onStartGame={onStartGame}
               />

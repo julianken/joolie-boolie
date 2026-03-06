@@ -29,6 +29,7 @@ import {
   resetTimer as resetTimerEngine,
   updateSettings as updateSettingsEngine,
   importQuestions as importQuestionsEngine,
+  redistributeQuestions as redistributeQuestionsEngine,
   getSelectedQuestion,
   getDisplayQuestion,
   getProgress,
@@ -83,6 +84,7 @@ export interface GameStore extends TriviaGameState {
 
   // Question management
   importQuestions: (questions: import('@/types').Question[], mode?: 'replace' | 'append') => void;
+  redistributeQuestions: (roundsCount: number, questionsPerRound: number, mode: 'by_count' | 'by_category') => void;
 
   // Per-round scoring (bar trivia)
   setRoundScores: (teamScoresMap: Record<string, number>) => void;
@@ -381,6 +383,10 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
   importQuestions: (questions: import('@/types').Question[], mode: 'replace' | 'append' = 'replace') => {
     set((state) => importQuestionsEngine(state, questions, mode));
+  },
+
+  redistributeQuestions: (roundsCount: number, questionsPerRound: number, mode: 'by_count' | 'by_category') => {
+    set((state) => redistributeQuestionsEngine(state, roundsCount, questionsPerRound, mode));
   },
 
   // -- Scene control actions -------------------------------------------

@@ -14,7 +14,7 @@
  */
 
 import type { GameSetupValidation } from '@/lib/game/selectors';
-import type { Team, Question } from '@/types';
+import type { Team, Question, PerRoundBreakdown } from '@/types';
 
 export interface WizardStepReviewProps {
   validation: GameSetupValidation;
@@ -25,6 +25,8 @@ export interface WizardStepReviewProps {
   questionsPerRound: number;
   onGoToStep: (step: number) => void;
   onStartGame: () => void;
+  isByCategory?: boolean;
+  perRoundBreakdown?: PerRoundBreakdown[];
 }
 
 export function WizardStepReview({
@@ -36,6 +38,8 @@ export function WizardStepReview({
   questionsPerRound,
   onGoToStep,
   onStartGame,
+  isByCategory,
+  perRoundBreakdown,
 }: WizardStepReviewProps) {
   return (
     <div className="space-y-4" data-testid="wizard-step-review">
@@ -93,8 +97,10 @@ export function WizardStepReview({
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {Array.from({ length: roundsCount }, (_, i) => {
-            const count = questions.filter((q) => q.roundIndex === i).length;
-            const isMatch = count === questionsPerRound;
+            const bd = perRoundBreakdown?.[i];
+            const count = bd?.totalCount ?? questions.filter((q) => q.roundIndex === i).length;
+            const expected = bd ? bd.expectedCount : questionsPerRound;
+            const isMatch = bd ? bd.isMatch : count === questionsPerRound;
             return (
               <div
                 key={i}
@@ -105,6 +111,9 @@ export function WizardStepReview({
                 }`}
               >
                 Round {i + 1}: {count} question{count !== 1 ? 's' : ''}
+                {isByCategory && !isMatch && expected > 0 && (
+                  <span className="text-xs opacity-70 ml-1">(expected {expected})</span>
+                )}
               </div>
             );
           })}

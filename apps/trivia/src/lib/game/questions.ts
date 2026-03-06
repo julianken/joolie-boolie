@@ -1,5 +1,6 @@
 import type { TriviaGameState, Question } from '@/types';
 import { deepFreeze } from './helpers';
+import { normalizeCategoryId } from '@/lib/categories';
 
 // =============================================================================
 // QUESTION NAVIGATION
@@ -100,6 +101,66 @@ export function clearQuestions(state: TriviaGameState): TriviaGameState {
 }
 
 /**
+ * Reassign each question's `roundIndex` field based on the chosen mode.
+ *
+ * Only runs during setup and when questions exist. Returns the same state
+ * reference when the resulting assignments are already correct (idempotent),
+ * so Zustand skips unnecessary re-renders.
+ *
+ * Modes:
+ *   - 'by_count'    : Fill each round sequentially, `questionsPerRound` per round.
+ *   - 'by_category' : Walk questions in order; each unique (normalized) category
+ *                     gets its own round index, assigned on first occurrence.
+ *
+ * Hard constraint: MUST NOT write settings.roundsCount, totalRounds, or
+ * selectedQuestionIndex.
+ */
+export function redistributeQuestions(
+  state: TriviaGameState,
+  roundsCount: number,
+  questionsPerRound: number,
+  mode: 'by_count' | 'by_category'
+): TriviaGameState {
+  // Guard: only during setup
+  if (state.status !== 'setup') return state;
+  // Guard: nothing to do when question list is empty
+  if (state.questions.length === 0) return state;
+
+  // Compute target roundIndex for every question
+  let targetAssignments: number[];
+
+  if (mode === 'by_count') {
+    targetAssignments = state.questions.map((_, i) =>
+      Math.floor(i / questionsPerRound)
+    );
+  } else {
+    // by_category: first-occurrence ordering
+    const categoryToRound = new Map<string, number>();
+    targetAssignments = state.questions.map((q) => {
+      const key = normalizeCategoryId(q.category);
+      if (!categoryToRound.has(key)) {
+        categoryToRound.set(key, categoryToRound.size);
+      }
+      return categoryToRound.get(key)!;
+    });
+  }
+
+  // Idempotency: return the same reference when nothing would change
+  if (state.questions.every((q, i) => q.roundIndex === targetAssignments[i])) {
+    return state;
+  }
+
+  return deepFreeze({
+    ...state,
+    questions: state.questions.map((q, i) =>
+      q.roundIndex === targetAssignments[i]
+        ? q
+        : { ...q, roundIndex: targetAssignments[i] }
+    ),
+  });
+}
+
+/**
  * Add a single question to the game state.
  * Only allowed during setup phase.
  */
@@ -111,18 +172,9 @@ export function addQuestion(
 
   const newQuestions = [...state.questions, question];
 
-  // Update total rounds if needed
-  const maxRoundIndex = Math.max(...newQuestions.map(q => q.roundIndex));
-  const totalRounds = Math.max(state.totalRounds, maxRoundIndex + 1);
-
   return deepFreeze({
     ...state,
     questions: newQuestions,
-    totalRounds,
-    settings: {
-      ...state.settings,
-      roundsCount: totalRounds,
-    },
   });
 }
 
@@ -169,17 +221,8 @@ export function updateQuestion(
     i === index ? question : q
   );
 
-  // Update total rounds if needed
-  const maxRoundIndex = Math.max(...newQuestions.map(q => q.roundIndex));
-  const totalRounds = Math.max(state.totalRounds, maxRoundIndex + 1);
-
   return deepFreeze({
     ...state,
     questions: newQuestions,
-    totalRounds,
-    settings: {
-      ...state.settings,
-      roundsCount: totalRounds,
-    },
   });
 }

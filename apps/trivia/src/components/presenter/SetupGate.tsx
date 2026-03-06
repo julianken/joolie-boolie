@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { SetupWizard } from '@/components/presenter/SetupWizard';
+import { derivePerRoundBreakdown } from '@/lib/game/selectors';
+import type { PerRoundBreakdown } from '@/types';
 
 interface SetupGateProps {
   isConnected: boolean;
@@ -36,6 +38,33 @@ export function SetupGate({
     lastTeamSetup,
     updateSetting,
   } = useSettingsStore();
+  const isByCategory = useSettingsStore((s) => s.isByCategory);
+
+  // Game store actions
+  const redistributeQuestions = useGameStore((s) => s.redistributeQuestions);
+
+  // Redistribute questions whenever the question list or distribution settings change.
+  // All five deps are required — redistributeQuestions is a Zustand action (stable reference).
+  // The engine's idempotency contract (same-reference return) prevents feedback loops.
+  useEffect(() => {
+    redistributeQuestions(
+      roundsCount,
+      questionsPerRound,
+      isByCategory ? 'by_category' : 'by_count'
+    );
+  }, [questions, roundsCount, questionsPerRound, isByCategory, redistributeQuestions]);
+
+  // Derive per-round breakdown for display in settings and review steps.
+  const perRoundBreakdown: PerRoundBreakdown[] = useMemo(
+    () => derivePerRoundBreakdown(questions, roundsCount, isByCategory, questionsPerRound),
+    [questions, roundsCount, isByCategory, questionsPerRound]
+  );
+
+  // Toggle the isByCategory setting
+  const handleToggleByCategory = useCallback(
+    (value: boolean) => updateSetting('isByCategory', value),
+    [updateSetting]
+  );
 
   // Two-phase exit: fade out then call onStartGame
   const handleStartGame = useCallback(() => {
@@ -97,6 +126,9 @@ export function SetupGate({
             onRenameTeam={renameTeam}
             onLoadTeamsFromSetup={loadTeamsFromSetup}
             onStartGame={handleStartGame}
+            isByCategory={isByCategory}
+            perRoundBreakdown={perRoundBreakdown}
+            onToggleByCategory={handleToggleByCategory}
           />
         </div>
       </div>
