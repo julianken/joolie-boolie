@@ -111,8 +111,9 @@ export interface GameStore extends TriviaGameState {
 }
 
 export const useGameStore = create<GameStore>()((set, get) => ({
-  // Initial state
+  // Initial state (start with empty questions — user must fetch/load explicitly)
   ...createInitialState(),
+  questions: [],
   _isHydrating: false,
 
   // Actions
