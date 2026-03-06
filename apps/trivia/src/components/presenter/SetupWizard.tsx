@@ -36,13 +36,13 @@ export interface SetupWizardProps {
 
   // Settings
   roundsCount: number;
-  questionsPerRound: number;
   lastTeamSetup: TeamSetup | null;
   currentTeams: Team[];
   onUpdateSetting: <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => void;
 
   // Round distribution (WU-4: computed by SetupGate, consumed by WU-5/WU-6 steps)
   isByCategory: boolean;
+  canUseByCategory: boolean;
   perRoundBreakdown: PerRoundBreakdown[];
   onToggleByCategory: (value: boolean) => void;
 
@@ -69,13 +69,13 @@ export function SetupWizard({
 
   // Settings
   roundsCount,
-  questionsPerRound,
   lastTeamSetup,
   currentTeams,
   onUpdateSetting,
 
   // Round distribution
   isByCategory,
+  canUseByCategory,
   perRoundBreakdown,
   onToggleByCategory,
 
@@ -191,8 +191,8 @@ export function SetupWizard({
             {currentStep === 1 && (
               <WizardStepSettings
                 roundsCount={roundsCount}
-                questionsPerRound={questionsPerRound}
                 isByCategory={isByCategory}
+                canUseByCategory={canUseByCategory}
                 perRoundBreakdown={perRoundBreakdown}
                 onUpdateSetting={onUpdateSetting}
                 onToggleByCategory={onToggleByCategory}
@@ -219,7 +219,6 @@ export function SetupWizard({
                 questions={questions}
                 teams={currentTeams}
                 roundsCount={roundsCount}
-                questionsPerRound={questionsPerRound}
                 isByCategory={isByCategory}
                 perRoundBreakdown={perRoundBreakdown}
                 onGoToStep={goToStep}

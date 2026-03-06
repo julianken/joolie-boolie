@@ -4,13 +4,13 @@
  * T4.3: WizardStepSettings
  *
  * Step 2 of the SetupWizard. Handles game settings:
- * rounds and questions per round configuration.
+ * rounds configuration.
  *
  * Fully presentational — zero store access, zero hooks, zero effects.
  * Supports three render states:
- *   A) isByCategory=false → Rounds slider + QPR slider
- *   B) isByCategory=true, questions loaded → Rounds slider + category badge pills
- *   C) isByCategory=true, no questions → Rounds slider + empty-state message
+ *   A) isByCategory=false → toggle + Rounds slider only
+ *   B) isByCategory=true, questions loaded → toggle + Rounds slider + category badge pills
+ *   C) isByCategory=true, no questions → toggle + Rounds slider + empty-state message
  */
 
 import { Slider, Toggle } from '@joolie-boolie/ui';
@@ -21,8 +21,8 @@ import { getCategoryName, getCategoryBadgeClasses } from '@/lib/categories';
 
 export interface WizardStepSettingsProps {
   roundsCount: number;
-  questionsPerRound: number;
   isByCategory: boolean;
+  canUseByCategory: boolean;
   perRoundBreakdown: PerRoundBreakdown[];
   onUpdateSetting: <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => void;
   onToggleByCategory: (isByCategory: boolean) => void;
@@ -30,8 +30,8 @@ export interface WizardStepSettingsProps {
 
 export function WizardStepSettings({
   roundsCount,
-  questionsPerRound,
   isByCategory,
+  canUseByCategory,
   perRoundBreakdown,
   onUpdateSetting,
   onToggleByCategory,
@@ -39,19 +39,6 @@ export function WizardStepSettings({
   // Determine which state we're in
   const firstRound = perRoundBreakdown[0];
   const hasBreakdown = !!firstRound && firstRound.categories.length > 0;
-
-  // Aggregate category totals across all rounds for badge display
-  const categoryTotals = new Map<string, number>();
-  if (isByCategory && hasBreakdown) {
-    for (const round of perRoundBreakdown) {
-      for (const cat of round.categories) {
-        categoryTotals.set(
-          cat.categoryId,
-          (categoryTotals.get(cat.categoryId) ?? 0) + cat.questionCount
-        );
-      }
-    }
-  }
 
   // Total questions across all rounds
   const totalQuestions = perRoundBreakdown.reduce((sum, r) => sum + r.totalCount, 0);
@@ -67,12 +54,14 @@ export function WizardStepSettings({
 
       {/* Game Configuration */}
       <div className="bg-surface border border-border rounded-xl p-4 space-y-6">
-        {/* By Category toggle — always visible */}
-        <Toggle
-          checked={isByCategory}
-          onChange={onToggleByCategory}
-          label="By Category"
-        />
+        {/* By Category toggle — only shown when ≤ 4 unique categories */}
+        {canUseByCategory && (
+          <Toggle
+            checked={isByCategory}
+            onChange={onToggleByCategory}
+            label="By Category"
+          />
+        )}
 
         {/* Rounds slider — always visible */}
         <Slider
@@ -84,37 +73,45 @@ export function WizardStepSettings({
           label="Number of Rounds"
         />
 
-        {/* State A: QPR slider (By Count mode) */}
-        {!isByCategory && (
-          <Slider
-            value={questionsPerRound}
-            onChange={(value) => onUpdateSetting('questionsPerRound', value)}
-            min={SETTINGS_RANGES.questionsPerRound.min}
-            max={SETTINGS_RANGES.questionsPerRound.max}
-            step={1}
-            label="Questions Per Round"
-          />
+        {/* Questions-per-round hint (shown in by-count mode when questions are loaded) */}
+        {!isByCategory && totalQuestions > 0 && (
+          <p className="text-sm text-foreground-secondary">
+            ~{Math.ceil(totalQuestions / roundsCount)} questions per round
+          </p>
         )}
 
-        {/* State B: Category badge pills (By Category, questions loaded) */}
+        {/* State B: Per-round breakdown (By Category, questions loaded) */}
         {isByCategory && hasBreakdown && (
           <div className="space-y-3">
             <p className="text-sm text-foreground-secondary">
               {roundsCount} {roundsCount === 1 ? 'round' : 'rounds'} &bull; {totalQuestions}{' '}
               {totalQuestions === 1 ? 'question' : 'questions'}
             </p>
-            <div className="flex flex-wrap gap-2">
-              {Array.from(categoryTotals.entries()).map(([categoryId, count]) => (
-                <span
-                  key={categoryId}
-                  className={[
-                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border',
-                    getCategoryBadgeClasses(categoryId as Parameters<typeof getCategoryBadgeClasses>[0]),
-                  ].join(' ')}
-                >
-                  {getCategoryName(categoryId as Parameters<typeof getCategoryName>[0])}: {count}
-                </span>
-              ))}
+            <div className="flex flex-col gap-1.5">
+              {perRoundBreakdown.map((round) => {
+                const cat = round.categories[0];
+                const badgeClasses = cat
+                  ? getCategoryBadgeClasses(cat.categoryId)
+                  : '';
+                const label = cat
+                  ? getCategoryName(cat.categoryId)
+                  : 'Empty';
+                return (
+                  <div
+                    key={round.roundIndex}
+                    className={[
+                      'flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium border',
+                      cat ? badgeClasses : 'bg-surface-elevated border-border text-foreground-secondary',
+                    ].join(' ')}
+                  >
+                    <span>
+                      <span className="opacity-70">Round {round.roundIndex + 1}</span>{' '}
+                      &mdash; {label}
+                    </span>
+                    <span>{round.totalCount} question{round.totalCount !== 1 ? 's' : ''}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

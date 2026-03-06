@@ -74,22 +74,6 @@ export function validateGameSetup(state: TriviaGameState): GameSetupValidation {
     issues.push({ id: 'V5', severity: 'warn', message: 'Timer duration is very short' });
   }
 
-  // V6 WARN: Per-round question count mismatch
-  if (state.questions.length > 0) {
-    for (let i = 0; i < state.settings.roundsCount; i++) {
-      const actual = getQuestionsForRound(state, i).length;
-      const expected = state.settings.questionsPerRound;
-      if (actual !== expected && actual > 0) {
-        issues.push({
-          id: 'V6',
-          severity: 'warn',
-          message: `Round ${i + 1} has ${actual} questions but ${expected} are configured`,
-          roundIndex: i,
-        });
-      }
-    }
-  }
-
   // V7 WARN: Only one team
   if (state.teams.length === 1) {
     issues.push({ id: 'V7', severity: 'warn', message: 'Only one team — consider adding more' });
@@ -227,21 +211,22 @@ export function toggleScoreboard(state: TriviaGameState): TriviaGameState {
  * @param questions - All questions for the game (with roundIndex set)
  * @param roundsCount - Total number of rounds
  * @param isByCategory - True = By Category distribution mode; false = By Count mode
- * @param questionsPerRound - Target questions per round (used in By Count mode only)
  */
 export function derivePerRoundBreakdown(
   questions: Question[],
   roundsCount: number,
   isByCategory: boolean,
-  questionsPerRound: number
 ): PerRoundBreakdown[] {
+  // In by_count mode, expected questions per round is derived from total / rounds (not the static setting).
+  const evenPerRound = questions.length > 0 ? Math.ceil(questions.length / roundsCount) : 0;
+
   // Zero-questions fast path: all rounds are empty and unmatched.
   // isMatch: false is critical — prevents false-green pills alongside the "No questions" error banner.
   if (questions.length === 0) {
     return Array.from({ length: roundsCount }, (_, i) => ({
       roundIndex: i,
       totalCount: 0,
-      expectedCount: isByCategory ? 0 : questionsPerRound,
+      expectedCount: 0,
       isMatch: false,
       categories: [],
     }));
@@ -273,8 +258,8 @@ export function derivePerRoundBreakdown(
     );
 
     // expectedCount and isMatch differ by distribution mode.
-    const expectedCount = isByCategory ? totalCount : questionsPerRound;
-    const isMatch = isByCategory ? totalCount > 0 : totalCount === questionsPerRound;
+    const expectedCount = isByCategory ? totalCount : evenPerRound;
+    const isMatch = isByCategory ? totalCount > 0 : totalCount > 0;
 
     return { roundIndex, totalCount, expectedCount, isMatch, categories };
   });

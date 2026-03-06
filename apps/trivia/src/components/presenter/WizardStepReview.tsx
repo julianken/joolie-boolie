@@ -22,7 +22,6 @@ export interface WizardStepReviewProps {
   questions: Question[];
   teams: Team[];
   roundsCount: number;
-  questionsPerRound: number;
   onGoToStep: (step: number) => void;
   onStartGame: () => void;
   isByCategory?: boolean;
@@ -35,7 +34,6 @@ export function WizardStepReview({
   questions,
   teams,
   roundsCount,
-  questionsPerRound,
   onGoToStep,
   onStartGame,
   isByCategory,
@@ -99,8 +97,7 @@ export function WizardStepReview({
           {Array.from({ length: roundsCount }, (_, i) => {
             const bd = perRoundBreakdown?.[i];
             const count = bd?.totalCount ?? questions.filter((q) => q.roundIndex === i).length;
-            const expected = bd ? bd.expectedCount : questionsPerRound;
-            const isMatch = bd ? bd.isMatch : count === questionsPerRound;
+            const isMatch = bd ? bd.isMatch : count > 0;
             return (
               <div
                 key={i}
@@ -111,8 +108,8 @@ export function WizardStepReview({
                 }`}
               >
                 Round {i + 1}: {count} question{count !== 1 ? 's' : ''}
-                {isByCategory && !isMatch && expected > 0 && (
-                  <span className="text-xs opacity-70 ml-1">(expected {expected})</span>
+                {isByCategory && !isMatch && bd && bd.expectedCount > 0 && (
+                  <span className="text-xs opacity-70 ml-1">(expected {bd.expectedCount})</span>
                 )}
               </div>
             );
@@ -137,9 +134,11 @@ export function WizardStepReview({
           <span>
             <span className="font-medium text-foreground">{roundsCount}</span> round{roundsCount !== 1 ? 's' : ''}
           </span>
-          <span>
-            <span className="font-medium text-foreground">{questionsPerRound}</span> questions/round
-          </span>
+          {questions.length > 0 && (
+            <span>
+              ~<span className="font-medium text-foreground">{Math.ceil(questions.length / roundsCount)}</span> questions/round
+            </span>
+          )}
         </div>
       </div>
 

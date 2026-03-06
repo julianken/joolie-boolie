@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
-import { useSettingsStore } from '@/stores/settings-store';
+import { useSettingsStore, SETTINGS_RANGES } from '@/stores/settings-store';
+import { getUniqueCategories } from '@/lib/categories';
 import { SetupWizard } from '@/components/presenter/SetupWizard';
 import { derivePerRoundBreakdown } from '@/lib/game/selectors';
 import type { PerRoundBreakdown } from '@/types';
@@ -34,7 +35,6 @@ export function SetupGate({
   // Settings store
   const {
     roundsCount,
-    questionsPerRound,
     lastTeamSetup,
     updateSetting,
   } = useSettingsStore();
@@ -42,23 +42,56 @@ export function SetupGate({
 
   // Game store actions
   const redistributeQuestions = useGameStore((s) => s.redistributeQuestions);
+  const updateGameSettings = useGameStore((s) => s.updateSettings);
+
+  // Sync settings store → game store so validation reads the current roundsCount.
+  // The settings store is the source of truth during setup; the game store needs
+  // its copy updated for validateGameSetup to work correctly.
+  useEffect(() => {
+    updateGameSettings({ roundsCount });
+  }, [roundsCount, updateGameSettings]);
 
   // Redistribute questions whenever the question list or distribution settings change.
-  // All five deps are required — redistributeQuestions is a Zustand action (stable reference).
+  // redistributeQuestions is a Zustand action (stable reference).
   // The engine's idempotency contract (same-reference return) prevents feedback loops.
   useEffect(() => {
     redistributeQuestions(
       roundsCount,
-      questionsPerRound,
       isByCategory ? 'by_category' : 'by_count'
     );
-  }, [questions, roundsCount, questionsPerRound, isByCategory, redistributeQuestions]);
+  }, [questions, roundsCount, isByCategory, redistributeQuestions]);
 
   // Derive per-round breakdown for display in settings and review steps.
   const perRoundBreakdown: PerRoundBreakdown[] = useMemo(
-    () => derivePerRoundBreakdown(questions, roundsCount, isByCategory, questionsPerRound),
-    [questions, roundsCount, isByCategory, questionsPerRound]
+    () => derivePerRoundBreakdown(questions, roundsCount, isByCategory),
+    [questions, roundsCount, isByCategory]
   );
+
+  // Count unique categories (stable: doesn't change when only roundIndex changes)
+  const uniqueCategoryCount = useMemo(
+    () => (questions.length > 0 ? getUniqueCategories(questions).length : 0),
+    [questions]
+  );
+
+  // By-category mode is only available with ≤ 4 unique categories.
+  // Auto-disable if questions change and now have too many categories.
+  const canUseByCategory = uniqueCategoryCount > 0 && uniqueCategoryCount <= 4;
+
+  useEffect(() => {
+    if (isByCategory && !canUseByCategory) {
+      updateSetting('isByCategory', false);
+    }
+  }, [isByCategory, canUseByCategory, updateSetting]);
+
+  // Auto-default roundsCount to category count when in by-category mode.
+  // Fires when toggle changes or question set changes (new import).
+  // Does NOT fire on redistribution (uniqueCategoryCount is stable across roundIndex changes).
+  useEffect(() => {
+    if (isByCategory && uniqueCategoryCount > 0) {
+      const target = Math.min(uniqueCategoryCount, SETTINGS_RANGES.roundsCount.max);
+      updateSetting('roundsCount', target);
+    }
+  }, [isByCategory, uniqueCategoryCount, updateSetting]);
 
   // Toggle the isByCategory setting
   const handleToggleByCategory = useCallback(
@@ -115,7 +148,6 @@ export function SetupGate({
           <SetupWizard
             questions={questions}
             roundsCount={roundsCount}
-            questionsPerRound={questionsPerRound}
             lastTeamSetup={lastTeamSetup}
             currentTeams={teams}
             onUpdateSetting={updateSetting}
@@ -127,6 +159,7 @@ export function SetupGate({
             onLoadTeamsFromSetup={loadTeamsFromSetup}
             onStartGame={handleStartGame}
             isByCategory={isByCategory}
+            canUseByCategory={canUseByCategory}
             perRoundBreakdown={perRoundBreakdown}
             onToggleByCategory={handleToggleByCategory}
           />

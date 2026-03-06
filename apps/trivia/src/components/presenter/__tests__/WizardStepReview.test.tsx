@@ -45,7 +45,6 @@ const defaultProps = () => ({
   questions: [mockQuestion(0), mockQuestion(0), mockQuestion(1)],
   teams: [mockTeam('t1', 'Table 1'), mockTeam('t2', 'Table 2')],
   roundsCount: 2,
-  questionsPerRound: 2,
   onGoToStep: vi.fn(),
   onStartGame: vi.fn(),
 });
@@ -173,16 +172,15 @@ describe('WizardStepReview — perRoundBreakdown prop', () => {
     expect(screen.getByText('Round 2: 1 question')).toBeInTheDocument();
   });
 
-  it('without perRoundBreakdown: isMatch falls back to count === questionsPerRound', () => {
+  it('without perRoundBreakdown: isMatch falls back to count > 0', () => {
     const props = {
       ...defaultProps(),
-      // questionsPerRound = 2; Round 1 has 2 (match), Round 2 has 1 (no match)
       perRoundBreakdown: undefined,
       isByCategory: true,
     };
     render(<WizardStepReview {...props} />);
-    // Round 2 has count=1, expected=2 — hint span should appear
-    expect(screen.getByText('(expected 2)')).toBeInTheDocument();
+    // Without breakdown, hint span never renders (bd is undefined)
+    expect(screen.queryByText(/expected/)).not.toBeInTheDocument();
   });
 
   it('with perRoundBreakdown: uses breakdown totalCount instead of question filter', () => {

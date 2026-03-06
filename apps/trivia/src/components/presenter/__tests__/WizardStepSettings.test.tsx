@@ -37,8 +37,8 @@ function createDefaultProps(
 ): WizardStepSettingsProps {
   return {
     roundsCount: 3,
-    questionsPerRound: 5,
     isByCategory: false,
+    canUseByCategory: true,
     perRoundBreakdown: emptyBreakdown,
     onUpdateSetting: vi.fn(),
     onToggleByCategory: vi.fn(),
@@ -60,11 +60,13 @@ describe('WizardStepSettings', () => {
   // -------------------------------------------------------------------------
 
   describe('State A: isByCategory=false', () => {
-    it('renders both Rounds and Questions Per Round sliders', () => {
+    it('renders only the Rounds slider (QPR slider is never present)', () => {
       render(<WizardStepSettings {...createDefaultProps({ isByCategory: false })} />);
 
       expect(screen.getByRole('slider', { name: /number of rounds/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /questions per round/i })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('slider', { name: /questions per round/i })
+      ).not.toBeInTheDocument();
     });
 
     it('does not render category badge pills', () => {
@@ -112,7 +114,7 @@ describe('WizardStepSettings', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('renders aggregated category badge pills', () => {
+    it('renders per-round breakdown pills', () => {
       render(
         <WizardStepSettings
           {...createDefaultProps({
@@ -122,12 +124,14 @@ describe('WizardStepSettings', () => {
         />
       );
 
-      // Science appears in both rounds: 3 + 1 = 4
-      expect(screen.getByText(/science.*4|4.*science/i)).toBeInTheDocument();
-      // History appears in round 0: 2
-      expect(screen.getByText(/history.*2|2.*history/i)).toBeInTheDocument();
-      // Geography appears in round 1: 3
-      expect(screen.getByText(/geography.*3|3.*geography/i)).toBeInTheDocument();
+      // Per-round rows show "Round N — {category}" and "{count} questions"
+      const rows = screen.getAllByText((_content, element) => {
+        const text = element?.textContent ?? '';
+        return /Round 1.*Science/.test(text) || /Round 2.*Science/.test(text);
+      });
+      expect(rows.length).toBeGreaterThanOrEqual(2);
+      expect(screen.getByText('5 questions')).toBeInTheDocument();
+      expect(screen.getByText('4 questions')).toBeInTheDocument();
     });
 
     it('renders the summary text with round and question counts', () => {
@@ -277,8 +281,16 @@ describe('WizardStepSettings', () => {
       ).toBeInTheDocument();
     });
 
-    it('getByRole("slider", { name: /questions per round/i }) is NOT present when isByCategory=true', () => {
-      render(
+    it('getByRole("slider", { name: /questions per round/i }) is NEVER present (regardless of isByCategory)', () => {
+      const { rerender } = render(
+        <WizardStepSettings {...createDefaultProps({ isByCategory: false })} />
+      );
+
+      expect(
+        screen.queryByRole('slider', { name: /questions per round/i })
+      ).not.toBeInTheDocument();
+
+      rerender(
         <WizardStepSettings
           {...createDefaultProps({
             isByCategory: true,
