@@ -30,14 +30,14 @@ export function WizardStepQuestions({
   onCategoryChange,
   onSaveQuestionSet,
 }: WizardStepQuestionsProps) {
-  const [showApiImporter, setShowApiImporter] = useState(false);
+  const [showFileImport, setShowFileImport] = useState(false);
 
   return (
     <div className="space-y-4">
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground">Questions</h2>
         <p className="text-sm text-foreground-secondary mt-0.5">
-          Import or select your trivia questions
+          Fetch from our trivia database or import your own
         </p>
       </div>
 
@@ -50,10 +50,14 @@ export function WizardStepQuestions({
         </div>
       )}
 
-      {/* CSV / JSON Import */}
-      <div className="bg-surface border border-border rounded-xl p-4">
-        <h3 className="text-sm font-semibold text-foreground mb-3">Import Questions</h3>
-        <QuestionImporter status="setup" onImport={onImport} />
+      {/* Trivia API Importer (primary, always visible) */}
+      <div className="bg-surface border-2 border-primary rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-semibold">
+            RECOMMENDED
+          </span>
+        </div>
+        <TriviaApiImporter disabled={false} />
       </div>
 
       {/* Question Set Selector */}
@@ -62,24 +66,24 @@ export function WizardStepQuestions({
         <QuestionSetSelector disabled={false} />
       </div>
 
-      {/* Trivia API Importer (collapsible) */}
+      {/* CSV / JSON Import (collapsible) */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <button
           type="button"
-          onClick={() => setShowApiImporter((prev) => !prev)}
-          aria-expanded={showApiImporter}
+          onClick={() => setShowFileImport((prev) => !prev)}
+          aria-expanded={showFileImport}
           className="w-full min-h-[44px] px-4 py-3 flex items-center justify-between
             text-sm font-medium text-left hover:bg-surface-hover transition-colors
             focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
-          <span>Fetch from Trivia API</span>
+          <span>Import from File</span>
           <span aria-hidden="true" className="text-foreground-secondary text-xs">
-            {showApiImporter ? 'Hide' : 'Show'}
+            {showFileImport ? 'Hide' : 'Show'}
           </span>
         </button>
-        {showApiImporter && (
+        {showFileImport && (
           <div className="border-t border-border p-4">
-            <TriviaApiImporter disabled={false} />
+            <QuestionImporter status="setup" onImport={onImport} />
           </div>
         )}
       </div>
