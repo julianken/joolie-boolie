@@ -306,11 +306,10 @@ function applyTransitionSideEffects(
     };
   }
 
-  // Side effect: entering round_scoring — set flag and clear entries.
+  // Side effect: entering round_scoring — clear entries.
   if (nextScene === 'round_scoring') {
     return {
       ...buildSceneUpdate(nextScene),
-      roundScoringInProgress: true,
       roundScoringEntries: {},
       recapShowingAnswer: null,
     };

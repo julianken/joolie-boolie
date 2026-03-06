@@ -436,7 +436,6 @@ describe('orchestrateSceneTransition() — state machine transitions', () => {
       expect(result).not.toBeNull();
       expect(result!.audienceScene).toBe('round_scoring');
       expect(result!.recapShowingAnswer).toBeNull();
-      expect(result!.roundScoringInProgress).toBe(true);
       expect(result!.roundScoringEntries).toEqual({});
     });
   });

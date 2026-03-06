@@ -59,7 +59,6 @@ vi.mock('@/stores/game-store', () => ({
       recapShowingAnswer: null,
       // Round start score snapshot (BEA-601)
       questionStartScores: {},
-      roundScoringInProgress: false,
       roundScoringEntries: {},
       startGame: vi.fn(),
       endGame: vi.fn(),

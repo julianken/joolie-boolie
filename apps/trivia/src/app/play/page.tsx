@@ -20,6 +20,7 @@ import { useQuickScore } from '@/hooks/use-quick-score';
 import { useGameEventSounds } from '@/hooks/use-sounds';
 import { useRevealSequence } from '@/hooks/use-reveal-sequence';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
+import { RoundScoringView } from '@/components/presenter/RoundScoringView';
 import { ThemeSelector } from '@joolie-boolie/ui';
 import { SettingsPanel } from '@/components/presenter/SettingsPanel';
 import { KeyboardShortcutsModal } from '@/components/ui/KeyboardShortcutsModal';
@@ -385,20 +386,24 @@ export default function PlayPage() {
             aria-label="Current question"
             tabIndex={-1}
           >
-            {/* Question display */}
+            {/* Question display / Round scoring view */}
             <div className="bg-surface border border-border rounded-xl p-4 shadow-md mb-3">
-              <QuestionDisplay
-                question={game.selectedQuestion}
-                peekAnswer={game.peekAnswer}
-                onTogglePeek={() => game.setPeekAnswer(!game.peekAnswer)}
-                onToggleDisplay={() => {
-                  const isCurrentlyOnDisplay = game.displayQuestionIndex === game.selectedQuestionIndex;
-                  game.setDisplayQuestion(isCurrentlyOnDisplay ? null : game.selectedQuestionIndex);
-                }}
-                progress={game.questionInRoundProgress}
-                roundProgress={game.roundProgress}
-                isOnDisplay={game.displayQuestionIndex === game.selectedQuestionIndex}
-              />
+              {isRoundScoringScene ? (
+                <RoundScoringView />
+              ) : (
+                <QuestionDisplay
+                  question={game.selectedQuestion}
+                  peekAnswer={game.peekAnswer}
+                  onTogglePeek={() => game.setPeekAnswer(!game.peekAnswer)}
+                  onToggleDisplay={() => {
+                    const isCurrentlyOnDisplay = game.displayQuestionIndex === game.selectedQuestionIndex;
+                    game.setDisplayQuestion(isCurrentlyOnDisplay ? null : game.selectedQuestionIndex);
+                  }}
+                  progress={game.questionInRoundProgress}
+                  roundProgress={game.roundProgress}
+                  isOnDisplay={game.displayQuestionIndex === game.selectedQuestionIndex}
+                />
+              )}
             </div>
 
             {/* Scene navigation buttons (WU-03) + contextual action hint */}

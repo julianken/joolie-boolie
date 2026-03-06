@@ -101,12 +101,11 @@ describe('setRoundScores store action', () => {
     expect(d3?.newScore).toBe(7);
   });
 
-  it('should clear roundScoringInProgress and roundScoringEntries', () => {
+  it('should clear roundScoringEntries', () => {
     setupGameInRoundScoring();
 
     // Simulate entering round_scoring state
     useGameStore.setState({
-      roundScoringInProgress: true,
       roundScoringEntries: { 'some-team': 5 },
     });
 
@@ -119,7 +118,6 @@ describe('setRoundScores store action', () => {
     useGameStore.getState().setRoundScores(scoresMap);
 
     const state = useGameStore.getState();
-    expect(state.roundScoringInProgress).toBe(false);
     expect(state.roundScoringEntries).toEqual({});
   });
 

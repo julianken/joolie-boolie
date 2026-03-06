@@ -52,7 +52,6 @@ function useGameStateSnapshot(): TriviaGameState {
   // Round start score snapshot (BEA-601)
   const questionStartScores = useGameStore((s) => s.questionStartScores);
   // Per-round scoring (BEA-662)
-  const roundScoringInProgress = useGameStore((s) => s.roundScoringInProgress);
   const roundScoringEntries = useGameStore((s) => s.roundScoringEntries);
 
   return useMemo<TriviaGameState>(() => ({
@@ -80,7 +79,6 @@ function useGameStateSnapshot(): TriviaGameState {
     // Round start score snapshot (BEA-601)
     questionStartScores,
     // Per-round scoring (BEA-662)
-    roundScoringInProgress,
     roundScoringEntries,
   }), [
     status,
@@ -107,7 +105,6 @@ function useGameStateSnapshot(): TriviaGameState {
     // Round start score snapshot (BEA-601)
     questionStartScores,
     // Per-round scoring (BEA-662)
-    roundScoringInProgress,
     roundScoringEntries,
   ]);
 }

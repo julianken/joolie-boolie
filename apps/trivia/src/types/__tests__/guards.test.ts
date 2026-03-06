@@ -60,7 +60,6 @@ function createMockState(overrides?: Partial<TriviaGameState>): TriviaGameState 
     // Round start score snapshot (BEA-601)
     questionStartScores: {},
     // Per-round scoring (BEA-662)
-    roundScoringInProgress: false,
     roundScoringEntries: {},
     ...overrides,
   };
