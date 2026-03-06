@@ -27,6 +27,6 @@ export const NEXT_ACTION_HINTS: Record<AudienceScene, string> = {
   // Recap scenes (BEA-587)
   recap_title: 'Round recap starting. Right Arrow for Q&A review. Left Arrow to return to summary. N to skip.',
   recap_qa: 'Right Arrow to reveal answer. A to toggle answer. Left Arrow for previous. N to skip to scores.',
-  round_scoring: 'Enter scores for each team, then click Done or Right Arrow. N to skip to next round.',
+  round_scoring: 'Enter scores in sidebar. Right Arrow to advance, Left Arrow to review Q&A. Enter is blocked.',
   recap_scores: 'Recap scores displayed. Left Arrow to review Q&A. Right Arrow or N for next round.',
 };

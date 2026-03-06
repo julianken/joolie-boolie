@@ -57,7 +57,6 @@ function makeState(overrides?: Partial<TriviaGameState>): TriviaGameState {
     revealPhase: null,
     recapShowingAnswer: null,
     questionStartScores: {},
-    roundScoringInProgress: false,
     roundScoringEntries: {},
     ...overrides,
   } as TriviaGameState;
