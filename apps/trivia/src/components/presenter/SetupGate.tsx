@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 import { useGameStore, useGameSelectors } from '@/stores/game-store';
 import { useSettingsStore, type TeamSetup } from '@/stores/settings-store';
 import { SetupWizard } from '@/components/presenter/SetupWizard';
-import type { QuestionCategory } from '@/types';
 
 interface SetupGateProps {
   isConnected: boolean;
@@ -24,11 +23,9 @@ export function SetupGate({
   onSaveQuestionSet,
 }: SetupGateProps) {
   const [isExiting, setIsExiting] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<QuestionCategory[]>([]);
 
   // Game store selectors
   const questions = useGameStore((state) => state.questions);
-  const importQuestions = useGameStore((state) => state.importQuestions);
   const teams = useGameStore((state) => state.teams);
   const addTeam = useGameStore((state) => state.addTeam);
   const removeTeam = useGameStore((state) => state.removeTeam);
@@ -111,9 +108,6 @@ export function SetupGate({
         <div className="max-w-2xl mx-auto p-4">
           <SetupWizard
             questions={questions}
-            onImport={importQuestions}
-            selectedCategories={selectedCategories}
-            onCategoryChange={setSelectedCategories}
             onSaveQuestionSet={onSaveQuestionSet}
             roundsCount={roundsCount}
             questionsPerRound={questionsPerRound}

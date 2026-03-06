@@ -8,29 +8,19 @@
  * question count display, and save-as-set button.
  */
 
-import { useState } from 'react';
-import { QuestionImporter } from '@/components/presenter/QuestionImporter';
 import { QuestionSetSelector } from '@/components/presenter/QuestionSetSelector';
 import { TriviaApiImporter } from '@/components/presenter/TriviaApiImporter';
-import { CategoryFilterCompact } from '@/components/presenter/CategoryFilter';
-import type { QuestionCategory, Question } from '@/types';
+import type { Question } from '@/types';
 
 export interface WizardStepQuestionsProps {
   questions: Question[];
-  onImport: (questions: Question[], mode?: 'replace' | 'append') => void;
-  selectedCategories: QuestionCategory[];
-  onCategoryChange: (categories: QuestionCategory[]) => void;
   onSaveQuestionSet: () => void;
 }
 
 export function WizardStepQuestions({
   questions,
-  onImport,
-  selectedCategories,
-  onCategoryChange,
   onSaveQuestionSet,
 }: WizardStepQuestionsProps) {
-  const [showFileImport, setShowFileImport] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -65,40 +55,6 @@ export function WizardStepQuestions({
         <h3 className="text-sm font-semibold text-foreground mb-3">Load from Saved Set</h3>
         <QuestionSetSelector disabled={false} />
       </div>
-
-      {/* CSV / JSON Import (collapsible) */}
-      <div className="bg-surface border border-border rounded-xl overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setShowFileImport((prev) => !prev)}
-          aria-expanded={showFileImport}
-          className="w-full min-h-[44px] px-4 py-3 flex items-center justify-between
-            text-sm font-medium text-left hover:bg-surface-hover transition-colors
-            focus:outline-none focus:ring-2 focus:ring-primary/50"
-        >
-          <span>Import from File</span>
-          <span aria-hidden="true" className="text-foreground-secondary text-xs">
-            {showFileImport ? 'Hide' : 'Show'}
-          </span>
-        </button>
-        {showFileImport && (
-          <div className="border-t border-border p-4">
-            <QuestionImporter status="setup" onImport={onImport} />
-          </div>
-        )}
-      </div>
-
-      {/* Category Filter */}
-      {questions.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Filter by Category</h3>
-          <CategoryFilterCompact
-            selectedCategories={selectedCategories}
-            onCategoryChange={onCategoryChange}
-            questions={questions}
-          />
-        </div>
-      )}
 
       {/* Save Questions as Set */}
       <button

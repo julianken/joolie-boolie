@@ -29,14 +29,11 @@ import { WizardStepReview } from '@/components/presenter/WizardStepReview';
 import { useAutoLoadDefaultTemplate } from '@/hooks/use-auto-load-default-template';
 import type { GameSetupValidation } from '@/lib/game/selectors';
 import type { TeamSetup, SettingsState } from '@/stores/settings-store';
-import type { Team, Question, QuestionCategory } from '@/types';
+import type { Team, Question } from '@/types';
 
 export interface SetupWizardProps {
   // Questions
   questions: Question[];
-  onImport: (questions: Question[], mode?: 'replace' | 'append') => void;
-  selectedCategories: QuestionCategory[];
-  onCategoryChange: (categories: QuestionCategory[]) => void;
   onSaveQuestionSet: () => void;
 
   // Settings
@@ -74,9 +71,6 @@ const STEPS = [
 export function SetupWizard({
   // Questions
   questions,
-  onImport,
-  selectedCategories,
-  onCategoryChange,
   onSaveQuestionSet,
 
   // Settings
@@ -177,9 +171,6 @@ export function SetupWizard({
             {currentStep === 0 && (
               <WizardStepQuestions
                 questions={questions}
-                onImport={onImport}
-                selectedCategories={selectedCategories}
-                onCategoryChange={onCategoryChange}
                 onSaveQuestionSet={onSaveQuestionSet}
               />
             )}
