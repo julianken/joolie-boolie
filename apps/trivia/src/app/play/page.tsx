@@ -525,7 +525,7 @@ export default function PlayPage() {
               )}
 
               {/* Round Scoring Panel (BEA-662) — shown during round_scoring scene */}
-              {game.status === 'between_rounds' && isRoundScoringScene && (
+              {isRoundScoringScene && (
                 <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
                   <RoundScoringPanel
                     teams={game.teams}
