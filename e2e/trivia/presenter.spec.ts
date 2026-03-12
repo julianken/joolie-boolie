@@ -308,96 +308,26 @@ test.describe('Trivia Presenter View', () => {
     });
   });
 
-  test.describe('Score Adjustment', () => {
-    test('shows team score input during game @high', async ({ authenticatedTriviaPage: page }) => {
-      await expect(page.getByRole('heading', { name: /team scores/i })).toBeVisible();
-    });
+  test.describe('Keyboard Scoring', () => {
+    test('keyboard 1-key during scoring phase does not crash @high', async ({ authenticatedTriviaPage: page }) => {
+      // Close a question to enter question_closed scene (a scoring phase)
+      await pressKey(page, 'KeyS');
 
-    test('can increase team score with + button @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Scope to team scores section
-      const scoresSection = page.locator('section, div').filter({ has: page.getByRole('heading', { name: /team scores/i }) });
-
-      // Find the plus button within scores section
-      const plusBtn = scoresSection.getByRole('button', { name: /add 1 point/i });
-      await expect(plusBtn).toBeVisible();
-
-      // Initial score should be 0
-      const scoreDisplay = scoresSection.getByRole('button', { name: /score.*0|0.*click to edit/i });
-      if (await scoreDisplay.isVisible()) {
-        await plusBtn.click();
-
-        // Wait for score to update (Pattern 3: use .toPass() for state change)
-        await expect(async () => {
-          const newScoreDisplay = scoresSection.getByRole('button', { name: /score.*1|1.*click to edit/i });
-          await expect(newScoreDisplay).toBeVisible({ timeout: 1000 });
-        }).toPass({ timeout: 5000 });
-      }
-    });
-
-    test('can decrease team score with - button @high', async ({ authenticatedTriviaPage: page }) => {
-      // Scope to team scores section
-      const scoresSection = page.locator('section, div').filter({ has: page.getByRole('heading', { name: /team scores/i }) });
-
-      // First increase score twice
-      const plusBtn = scoresSection.getByRole('button', { name: /add 1 point/i });
-      await plusBtn.click();
+      // Wait for question_closed scene — SceneNavButtons shows "Next" at this scene
       await expect(async () => {
-        await expect(scoresSection.getByRole('button', { name: /score.*1|1.*click to edit/i })).toBeVisible({ timeout: 1000 });
+        const nextBtn = page.getByRole('button', { name: /^next$/i });
+        await expect(nextBtn).toBeVisible({ timeout: 1000 });
       }).toPass({ timeout: 5000 });
 
-      await plusBtn.click();
-      await expect(async () => {
-        await expect(scoresSection.getByRole('button', { name: /score.*2|2.*click to edit/i })).toBeVisible({ timeout: 1000 });
-      }).toPass({ timeout: 5000 });
+      // Press '1' to quick-score team 1 via keyboard (Instance 1 in use-game-keyboard.ts)
+      // Verifies the keyboard handler doesn't crash after sidebar removal
+      // (Instance 2 of useQuickScore was deleted, Instance 1 must survive)
+      await page.keyboard.press('Digit1');
 
-      // Now decrease
-      const minusBtn = scoresSection.getByRole('button', { name: /subtract 1 point/i });
-      await minusBtn.click();
-
-      // Wait for score to decrease (Pattern 3)
-      await expect(async () => {
-        await expect(scoresSection.getByRole('button', { name: /score.*1|1.*click to edit/i })).toBeVisible({ timeout: 1000 });
-      }).toPass({ timeout: 5000 });
-    });
-
-    test('can edit score directly by clicking @medium', async ({ authenticatedTriviaPage: page }) => {
-      // Scope to team scores section
-      const scoresSection = page.locator('section, div').filter({ has: page.getByRole('heading', { name: /team scores/i }) });
-      const scoreDisplay = scoresSection.getByRole('button', { name: /click to edit/i });
-
-      if (await scoreDisplay.isVisible()) {
-        await scoreDisplay.click();
-
-        // Wait for input to appear (Pattern 1)
-        const input = scoresSection.locator('input[type="number"]');
-        await expect(input).toBeVisible();
-
-        await input.fill('5');
-        await input.press('Enter');
-
-        // Wait for score to update (Pattern 3)
-        await expect(async () => {
-          await expect(scoresSection.getByRole('button', { name: /score.*5|5.*click to edit/i })).toBeVisible({ timeout: 1000 });
-        }).toPass({ timeout: 5000 });
-      }
-    });
-
-    test('shows per-round score breakdown @medium', async ({ authenticatedTriviaPage: page }) => {
-      // Scope to team scores section
-      const scoresSection = page.locator('section, div').filter({ has: page.getByRole('heading', { name: /team scores/i }) });
-
-      // Add some points
-      const plusBtn = scoresSection.getByRole('button', { name: /add 1 point/i });
-      await plusBtn.click();
-
-      // Wait for score update first
-      await expect(async () => {
-        await expect(scoresSection.getByRole('button', { name: /score.*1|1.*click to edit/i })).toBeVisible({ timeout: 1000 });
-      }).toPass({ timeout: 5000 });
-
-      // Check for round indicator
-      // Use aria-label to target specific round indicator element
-      await expect(page.getByLabel(/current round/i)).toBeVisible();
+      // The status should remain playing (no crash, no navigation away)
+      await expect(
+        page.locator('span').filter({ hasText: /^Playing/i })
+      ).toBeVisible();
     });
   });
 
