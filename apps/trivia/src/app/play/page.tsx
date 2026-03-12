@@ -10,13 +10,9 @@ import { useGameStore } from '@/stores/game-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { QuestionList } from '@/components/presenter/QuestionList';
 import { QuestionDisplay } from '@/components/presenter/QuestionDisplay';
-import { TeamScoreInput } from '@/components/presenter/TeamScoreInput';
-import { TeamManager } from '@/components/presenter/TeamManager';
-import { QuickScoreGrid } from '@/components/presenter/QuickScoreGrid';
 import { RoundScoringPanel } from '@/components/presenter/RoundScoringPanel';
 import { SceneNavButtons } from '@/components/presenter/SceneNavButtons';
 import { NextActionHint } from '@/components/presenter/NextActionHint';
-import { useQuickScore } from '@/hooks/use-quick-score';
 import { useGameEventSounds } from '@/hooks/use-sounds';
 import { useRevealSequence } from '@/hooks/use-reveal-sequence';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
@@ -186,16 +182,6 @@ export default function PlayPage() {
     timerIsRunning,
   });
 
-  /** Quick score hook (T3.6) — wired to selected question index */
-  const quickScore = useQuickScore(game.selectedQuestionIndex);
-
-  /** Scoring-phase scenes where QuickScoreGrid should appear (T3.6) */
-  const isScoringScene = (
-    audienceScene === 'question_closed' ||
-    audienceScene === 'answer_reveal' ||
-    audienceScene === 'round_summary'
-  );
-
   /** Per-round scoring scene (BEA-662) */
   const isRoundScoringScene = audienceScene === 'round_scoring';
 
@@ -254,10 +240,9 @@ export default function PlayPage() {
       </a>
 
       {/*
-        Fixed-viewport 3-column layout during gameplay (Issue 6.5).
+        Fixed-viewport 2-column layout during gameplay (Issue 6.5).
         Left rail: question navigator (w-64)
         Center: hero question panel (flex-1)
-        Right: leaderboard sidebar (w-80)
         No viewport scrolling during gameplay.
       */}
       <div
@@ -366,7 +351,7 @@ export default function PlayPage() {
           </div>
         </header>
 
-        {/* ---- MAIN 3-COLUMN AREA ---- */}
+        {/* ---- MAIN 2-COLUMN AREA ---- */}
         <div
           className="flex flex-1 overflow-hidden"
           aria-hidden={game.status === 'setup' ? true : undefined}
@@ -525,74 +510,6 @@ export default function PlayPage() {
             )}
           </main>
 
-          {/* RIGHT SIDEBAR: Leaderboard + Team Controls (w-80) — suppressed during round_scoring */}
-          {!isRoundScoringScene && (
-          <aside
-            id="game-controls"
-            className="w-80 flex-shrink-0 border-l border-border overflow-y-auto bg-surface/40"
-            aria-label="Game controls and team management"
-          >
-            <div className="p-3 space-y-3">
-              {/* Team Manager */}
-              <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
-                <TeamManager
-                  teams={game.teams}
-                  status={game.status}
-                  onAddTeam={game.addTeam}
-                  onRemoveTeam={game.removeTeam}
-                  onRenameTeam={game.renameTeam}
-                />
-              </div>
-
-              {/* Quick Score Grid (T3.6) — shown during scoring-phase scenes */}
-              {(game.status === 'playing' || game.status === 'between_rounds') && isScoringScene && !isRoundScoringScene && (
-                <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
-                  <QuickScoreGrid
-                    teams={game.teams}
-                    quickScore={quickScore}
-                  />
-                </div>
-              )}
-
-              {/* Team Score Input */}
-              {(game.status === 'playing' || game.status === 'between_rounds') && !isScoringScene && !isRoundScoringScene && (
-                <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
-                  <TeamScoreInput
-                    teams={game.teams}
-                    currentRound={game.currentRound}
-                    onAdjustScore={game.adjustTeamScore}
-                    onSetScore={game.setTeamScore}
-                  />
-                </div>
-              )}
-
-              {/* Game ended state */}
-              {game.status === 'ended' && (
-                <div className="bg-surface border border-border rounded-xl p-3 shadow-sm">
-                  <h2 className="text-base font-semibold mb-3 text-center text-foreground">Game Over</h2>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setShowRoundSummary(true)}
-                      className="w-full px-4 py-3 rounded-xl text-sm font-medium
-                        bg-surface-elevated hover:bg-surface-hover text-foreground
-                        border border-border transition-colors min-h-[44px]"
-                    >
-                      View Final Results
-                    </button>
-                    <button
-                      onClick={game.resetGame}
-                      className="w-full px-4 py-3 rounded-xl text-sm font-medium
-                        bg-primary hover:bg-primary-hover text-primary-foreground
-                        transition-colors min-h-[44px]"
-                    >
-                      Start New Game
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </aside>
-          )}
         </div>
       </div>
 
