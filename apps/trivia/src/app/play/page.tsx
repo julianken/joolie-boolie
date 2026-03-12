@@ -242,8 +242,12 @@ export default function PlayPage() {
       {/*
         Fixed-viewport 2-column layout during gameplay (Issue 6.5).
         Left rail: question navigator (w-64)
-        Center: hero question panel (flex-1)
+        Center: hero question panel (flex-1, max-w-3xl when not round_scoring)
         No viewport scrolling during gameplay.
+        The center panel uses max-w-3xl mx-auto for non-scoring content to
+        prevent line lengths from becoming unreadable on wide monitors (1920px+).
+        The round_scoring scene renders full-width (no max-w wrapper) so the
+        side-by-side scoring form + Q&A reference layout has full space.
       */}
       <div
         id="main"
@@ -407,7 +411,7 @@ export default function PlayPage() {
                 </div>
               </div>
             ) : (
-              <>
+              <div className="max-w-3xl mx-auto w-full">
             {/* Question display */}
             <div className="bg-surface border border-border rounded-xl p-4 shadow-md mb-3">
                 <QuestionDisplay
@@ -506,7 +510,7 @@ export default function PlayPage() {
                 />
               </div>
             )}
-              </>
+              </div>
             )}
           </main>
 
