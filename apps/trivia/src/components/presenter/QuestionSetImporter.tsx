@@ -6,6 +6,7 @@ import { parseJsonQuestions, readFileContent } from '@/lib/questions/parser';
 import { useGameStore } from '@/stores/game-store';
 import { useToast } from '@joolie-boolie/ui';
 import { getCategoryBadgeClasses } from '@/lib/categories';
+import { ChatGptGuide } from './ChatGptGuide';
 
 interface QuestionSetImporterProps {
   onImportSuccess: () => void;
@@ -138,6 +139,8 @@ export function QuestionSetImporter({ onImportSuccess }: QuestionSetImporterProp
       {/* Idle state: drag-drop + paste */}
       {state === 'idle' && (
         <>
+          <ChatGptGuide />
+
           {/* Drag-and-drop zone */}
           <div
             onDragOver={handleDragOver}
