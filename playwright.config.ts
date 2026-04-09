@@ -1,31 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { getE2EPortConfig } from './e2e/utils/port-config';
 
-// Load .env file manually (Playwright doesn't auto-load it)
-// Respects existing env vars — runner scripts (e.g., e2e-real-auth.sh) can
-// export values that take precedence over the .env file.
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.join(__dirname, '.env');
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf-8');
-  envContent.split('\n').forEach((line) => {
-    const match = line.match(/^([^=]+)=(.*)$/);
-    if (match) {
-      const [, key, value] = match;
-      const trimmedKey = key.trim();
-      // Don't overwrite env vars already set (e.g., by e2e-real-auth.sh)
-      if (process.env[trimmedKey] === undefined) {
-        process.env[trimmedKey] = value.trim();
-      }
-    }
-  });
-}
-
-// Set E2E testing flag unless explicitly disabled (e.g., for real-auth tests).
-// This signals to Platform Hub to bypass Supabase auth and generate JWTs locally.
+// Set E2E testing flag.
+// This signals to apps to use E2E bypass mode (local JWT generation, no Supabase).
 process.env.E2E_TESTING ??= 'true';
 
 const isCI = !!process.env.CI;
@@ -37,7 +14,7 @@ const isCI = !!process.env.CI;
 // auth fixtures via e2e/utils/port-config.ts (single source of truth).
 //
 // How it works:
-// 1. Main repo uses default ports: 3000 (bingo), 3001 (trivia), 3002 (hub)
+// 1. Main repo uses default ports: 3000 (bingo), 3001 (trivia)
 // 2. Worktrees use hash-based port offsets derived from their path
 // 3. Environment variables can override: E2E_PORT_BASE, E2E_*_PORT
 //
@@ -56,7 +33,6 @@ if (portConfig.isWorktree) {
 }
 console.log(`  Bingo: http://localhost:${portConfig.bingoPort}`);
 console.log(`  Trivia: http://localhost:${portConfig.triviaPort}`);
-console.log(`  Hub: http://localhost:${portConfig.hubPort}`);
 
 // Export port config for use in fixtures and tests
 export { portConfig };
@@ -67,10 +43,9 @@ export { portConfig };
  * Configured with projects for:
  * - Bingo app (dynamic port, default 3000)
  * - Trivia app (dynamic port, default 3001)
- * - Platform Hub (dynamic port, default 3002)
  *
  * Port Isolation:
- * - Main repo uses default ports (3000, 3001, 3002)
+ * - Main repo uses default ports (3000, 3001)
  * - Worktrees use hash-based port offsets for parallel testing
  * - Environment variables can override: E2E_PORT_BASE, E2E_*_PORT
  *
@@ -132,62 +107,12 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
       },
     },
-    {
-      name: 'platform-hub',
-      testDir: './e2e/platform-hub',
-      use: {
-        ...devices['Desktop Chrome'],
-        baseURL: `http://localhost:${portConfig.hubPort}`,
-        viewport: { width: 1280, height: 720 },
-      },
-    },
-    /* Mobile testing for accessibility (optional) */
-    {
-      name: 'bingo-mobile',
-      testDir: './e2e/bingo',
-      testMatch: ['**/home.spec.ts', '**/accessibility.spec.ts'],
-      use: {
-        ...devices['iPhone 13'],
-        baseURL: `http://localhost:${portConfig.bingoPort}`,
-        // Mobile viewports have slower auth navigation due to smaller viewport rendering
-        // and potential auth redirect race conditions (BEA-375)
-        navigationTimeout: 15000,
-      },
-    },
-    /**
-     * Real-Auth project: Tests real authentication paths against local Supabase (Docker).
-     *
-     * Unlike the other projects (which use E2E_TESTING=true to bypass Supabase),
-     * this project tests:
-     * - Supabase signInWithPassword (RS256 JWT verified via JWKS)
-     * - Platform Hub OAuth 2.1 (HS256 JWT via SESSION_TOKEN_SECRET)
-     * - Cross-app SSO (cookie propagation + middleware verification)
-     *
-     * Run separately: pnpm test:e2e:real-auth
-     * (uses scripts/e2e-real-auth.sh which starts local Supabase + dev servers)
-     */
-    {
-      name: 'real-auth',
-      testDir: './e2e/real-auth',
-      use: {
-        ...devices['Desktop Chrome'],
-        baseURL: `http://localhost:${portConfig.hubPort}`,
-        viewport: { width: 1280, height: 720 },
-      },
-      timeout: 90_000, // Real Supabase calls are slower than E2E bypass
-      retries: 0, // No retries — avoid compounding rate limit issues
-    },
   ],
 
   /**
    * Web server configuration:
    * - CI: Use production servers (next start) - apps are pre-built by workflow
    * - Local: Disabled - assumes dev servers are manually started
-   *
-   * REASON: webServer with reuseExistingServer causes Playwright to hang
-   * during initialization even when servers are already running. This appears
-   * to be a Playwright bug with the health check logic. Manual server startup
-   * works reliably.
    *
    * To run E2E tests locally:
    * 1. Start servers: pnpm dev (or with port overrides for worktrees)
@@ -207,7 +132,7 @@ export default defineConfig({
           timeout: 120 * 1000,
           stdout: 'ignore',
           stderr: 'ignore',
-          env: { E2E_TESTING: 'true', E2E_JWT_SECRET: process.env.E2E_JWT_SECRET ?? 'e2e-test-secret-key-that-is-at-least-32-characters-long', PORT: String(portConfig.bingoPort) },
+          env: { E2E_TESTING: 'true', PORT: String(portConfig.bingoPort) },
         },
         {
           command: 'pnpm --filter @joolie-boolie/trivia start',
@@ -216,16 +141,7 @@ export default defineConfig({
           timeout: 120 * 1000,
           stdout: 'ignore',
           stderr: 'ignore',
-          env: { E2E_TESTING: 'true', E2E_JWT_SECRET: process.env.E2E_JWT_SECRET ?? 'e2e-test-secret-key-that-is-at-least-32-characters-long', PORT: String(portConfig.triviaPort) },
-        },
-        {
-          command: 'pnpm --filter @joolie-boolie/platform-hub start',
-          url: `http://localhost:${portConfig.hubPort}`,
-          reuseExistingServer: false,
-          timeout: 120 * 1000,
-          stdout: 'ignore',
-          stderr: 'ignore',
-          env: { E2E_TESTING: 'true', E2E_JWT_SECRET: process.env.E2E_JWT_SECRET ?? 'e2e-test-secret-key-that-is-at-least-32-characters-long', PORT: String(portConfig.hubPort) },
+          env: { E2E_TESTING: 'true', PORT: String(portConfig.triviaPort) },
         },
       ]
     : undefined,

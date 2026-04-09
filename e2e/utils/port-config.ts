@@ -8,6 +8,8 @@
  *
  * Port isolation enables parallel E2E testing across git worktrees.
  * See docs/E2E_TESTING_GUIDE.md for details.
+ *
+ * Default ports: 3000 (bingo), 3001 (trivia)
  */
 
 import * as fs from 'fs';
@@ -17,7 +19,6 @@ import * as crypto from 'crypto';
 export interface E2EPortConfig {
   bingoPort: number;
   triviaPort: number;
-  hubPort: number;
   portOffset: number;
   isWorktree: boolean;
   repoPath: string;
@@ -108,24 +109,21 @@ function hashPathToPortOffset(pathToHash: string): number {
 export function getE2EPortConfig(): E2EPortConfig {
   const DEFAULT_BINGO_PORT = 3000;
   const DEFAULT_TRIVIA_PORT = 3001;
-  const DEFAULT_HUB_PORT = 3002;
 
   const currentDir = process.cwd();
   const envPortBase = process.env.E2E_PORT_BASE;
   const envBingoPort = process.env.E2E_BINGO_PORT;
   const envTriviaPort = process.env.E2E_TRIVIA_PORT;
-  const envHubPort = process.env.E2E_HUB_PORT;
 
   const worktreeInfo = detectWorktree(currentDir);
 
   // Priority 1: Environment variable overrides
-  if (envBingoPort || envTriviaPort || envHubPort || envPortBase) {
+  if (envBingoPort || envTriviaPort || envPortBase) {
     const baseOffset = envPortBase ? parseInt(envPortBase, 10) - DEFAULT_BINGO_PORT : 0;
 
     return {
       bingoPort: envBingoPort ? parseInt(envBingoPort, 10) : DEFAULT_BINGO_PORT + baseOffset,
       triviaPort: envTriviaPort ? parseInt(envTriviaPort, 10) : DEFAULT_TRIVIA_PORT + baseOffset,
-      hubPort: envHubPort ? parseInt(envHubPort, 10) : DEFAULT_HUB_PORT + baseOffset,
       portOffset: baseOffset,
       isWorktree: worktreeInfo.isWorktree,
       repoPath: worktreeInfo.worktreePath || worktreeInfo.mainRepoPath || currentDir,
@@ -140,7 +138,6 @@ export function getE2EPortConfig(): E2EPortConfig {
     return {
       bingoPort: DEFAULT_BINGO_PORT + portOffset,
       triviaPort: DEFAULT_TRIVIA_PORT + portOffset,
-      hubPort: DEFAULT_HUB_PORT + portOffset,
       portOffset,
       isWorktree: true,
       repoPath: worktreeInfo.worktreePath,
@@ -152,7 +149,6 @@ export function getE2EPortConfig(): E2EPortConfig {
   return {
     bingoPort: DEFAULT_BINGO_PORT,
     triviaPort: DEFAULT_TRIVIA_PORT,
-    hubPort: DEFAULT_HUB_PORT,
     portOffset: 0,
     isWorktree: false,
     repoPath: worktreeInfo.mainRepoPath || currentDir,
