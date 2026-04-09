@@ -1,14 +1,7 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { StatsDisplay } from '@/components/stats';
-import { LoginButton } from '@joolie-boolie/ui';
 
-export default async function Home() {
-  // Check authentication state via cookie
-  const cookieStore = await cookies();
-  const isSignedIn = !!cookieStore.get('jb_access_token')?.value;
-
-
+export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -34,44 +27,22 @@ export default async function Home() {
               Large fonts, high contrast, and audio announcements make every game accessible and fun.
             </p>
 
-            {/* CTA Buttons - Conditional based on auth state */}
+            {/* CTA Button */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              {isSignedIn ? (
-                // Signed In: Show only "Play" button
-                <Link
-                  href="/play"
-                  className="
-                    inline-flex items-center justify-center
-                    min-h-[64px] px-12 py-4
-                    text-2xl font-bold
-                    bg-primary text-primary-foreground
-                    rounded-xl shadow-lg
-                    hover:bg-primary/90 transition-colors
-                    focus:outline-none focus:ring-4 focus:ring-primary/50
-                  "
-                >
-                  Play
-                </Link>
-              ) : (
-                // Not Signed In: Show "Sign in" (primary) + "Play as Guest" (secondary)
-                <>
-                  <LoginButton returnTo="/play" />
-                  <Link
-                    href="/play"
-                    className="
-                      inline-flex items-center justify-center
-                      min-h-[56px] px-8 py-4
-                      text-xl font-semibold
-                      bg-muted text-foreground
-                      rounded-lg
-                      hover:bg-muted/80 transition-colors
-                      focus:outline-none focus:ring-4 focus:ring-muted/50
-                    "
-                  >
-                    Play as Guest
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/play"
+                className="
+                  inline-flex items-center justify-center
+                  min-h-[64px] px-12 py-4
+                  text-2xl font-bold
+                  bg-primary text-primary-foreground
+                  rounded-xl shadow-lg
+                  hover:bg-primary/90 transition-colors
+                  focus:outline-none focus:ring-4 focus:ring-primary/50
+                "
+              >
+                Play Now
+              </Link>
             </div>
           </div>
         </div>
