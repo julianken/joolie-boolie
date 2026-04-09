@@ -19,8 +19,7 @@
 #   - Your manually-started dev servers are PRESERVED (not killed)
 #
 # Prerequisites:
-#   - .env.local files must exist in apps/bingo, apps/trivia, apps/platform-hub
-#   - SESSION_TOKEN_SECRET must be set in all .env.local files
+#   - .env.local files must exist in apps/bingo, apps/trivia
 #
 # Why Production Builds:
 #   - 50-70% lower memory footprint (no webpack dev server)
@@ -57,7 +56,7 @@ if [ ! -f "$REPO_ROOT/.env" ]; then
   exit 1
 fi
 
-for app in bingo trivia platform-hub; do
+for app in bingo trivia; do
   if [ ! -f "$REPO_ROOT/apps/$app/.env.local" ]; then
     echo -e "${RED}✗ Missing .env.local in apps/$app${NC}"
     exit 1
@@ -87,15 +86,13 @@ echo -e "${YELLOW}[3/5] Checking for existing servers...${NC}"
 SERVERS_ALREADY_RUNNING=false
 BINGO_PID=""
 TRIVIA_PID=""
-HUB_PID=""
 
 # Check if servers are already running and responsive
-for port in 3000 3001 3002; do
+for port in 3000 3001; do
   if curl -s -f "http://localhost:$port" > /dev/null 2>&1; then
     case $port in
       3000) app="Bingo" ;;
       3001) app="Trivia" ;;
-      3002) app="Platform Hub" ;;
     esac
     PID=$(lsof -ti:$port 2>/dev/null || true)
     echo "  ✓ $app already running on port $port (PID: $PID)"
@@ -131,22 +128,18 @@ else
   TRIVIA_PID=$!
   echo "  Trivia server started (PID: $TRIVIA_PID, port 3001)"
 
-  pnpm --filter @joolie-boolie/platform-hub start > /tmp/e2e-hub.log 2>&1 &
-  HUB_PID=$!
-  echo "  Platform Hub server started (PID: $HUB_PID, port 3002)"
-
   # Wait for servers to be ready
   echo ""
   echo "  Waiting for servers to be ready..."
   sleep 5
 
   # Health check
-  for port in 3000 3001 3002; do
+  for port in 3000 3001; do
     if ! curl -s -f "http://localhost:$port" > /dev/null 2>&1; then
       echo -e "${RED}✗ Server on port $port is not responding${NC}"
       echo "  Check /tmp/e2e-*.log files for errors"
       # Kill all servers we started
-      kill $BINGO_PID $TRIVIA_PID $HUB_PID 2>/dev/null || true
+      kill $BINGO_PID $TRIVIA_PID 2>/dev/null || true
       exit 1
     fi
   done
@@ -162,12 +155,11 @@ echo ""
 # Function to cleanup servers on exit
 cleanup() {
   # Only kill servers if we started them (PIDs are set)
-  if [ -n "$BINGO_PID" ] || [ -n "$TRIVIA_PID" ] || [ -n "$HUB_PID" ]; then
+  if [ -n "$BINGO_PID" ] || [ -n "$TRIVIA_PID" ]; then
     echo ""
     echo -e "${YELLOW}Cleaning up servers started by script...${NC}"
     [ -n "$BINGO_PID" ] && kill $BINGO_PID 2>/dev/null || true
     [ -n "$TRIVIA_PID" ] && kill $TRIVIA_PID 2>/dev/null || true
-    [ -n "$HUB_PID" ] && kill $HUB_PID 2>/dev/null || true
     echo -e "${GREEN}✓ Cleanup complete${NC}"
   fi
 }
