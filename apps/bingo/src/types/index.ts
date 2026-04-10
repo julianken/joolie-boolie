@@ -108,6 +108,9 @@ export type SyncMessageType =
   | 'AUDIO_SETTINGS_CHANGED'
   | 'DISPLAY_THEME_CHANGED'
   | 'CHANNEL_READY'
+  | 'PLAY_BALL_SEQUENCE'
+  | 'BALL_REVEAL_READY'
+  | 'BALL_SEQUENCE_COMPLETE'
   | 'PLAY_ROLL_SOUND'
   | 'PLAY_REVEAL_CHIME'
   | 'PLAY_BALL_VOICE'
@@ -150,6 +153,9 @@ export type BingoSyncMessage =
   | (SyncMessageBase & { type: 'AUDIO_SETTINGS_CHANGED'; payload: AudioSettingsPayload })
   | (SyncMessageBase & { type: 'DISPLAY_THEME_CHANGED'; payload: ThemePayload })
   | (SyncMessageBase & { type: 'CHANNEL_READY'; payload: null })
+  | (SyncMessageBase & { type: 'PLAY_BALL_SEQUENCE'; payload: BingoBall })
+  | (SyncMessageBase & { type: 'BALL_REVEAL_READY'; payload: null })
+  | (SyncMessageBase & { type: 'BALL_SEQUENCE_COMPLETE'; payload: null })
   | (SyncMessageBase & { type: 'PLAY_ROLL_SOUND'; payload: null })
   | (SyncMessageBase & { type: 'PLAY_REVEAL_CHIME'; payload: null })
   | (SyncMessageBase & { type: 'PLAY_BALL_VOICE'; payload: BingoBall })
