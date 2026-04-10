@@ -55,6 +55,18 @@ class BingoBroadcastSync extends BroadcastSync<BingoSyncPayload> {
     this.send('PLAY_BALL_VOICE', ball);
   }
 
+  broadcastPlayBallSequence(ball: BingoBall): void {
+    this.send('PLAY_BALL_SEQUENCE', ball);
+  }
+
+  broadcastBallRevealReady(): void {
+    this.send('BALL_REVEAL_READY', null);
+  }
+
+  broadcastBallSequenceComplete(): void {
+    this.send('BALL_SEQUENCE_COMPLETE', null);
+  }
+
   broadcastDisplayClosing(): void {
     this.send('DISPLAY_CLOSING', null);
   }
@@ -86,6 +98,9 @@ export function createMessageRouter(handlers: Partial<{
   onPlayRollSound: () => void;
   onPlayRevealChime: () => void;
   onPlayBallVoice: (ball: BingoBall) => void;
+  onPlayBallSequence: (ball: BingoBall) => void;
+  onBallRevealReady: () => void;
+  onBallSequenceComplete: () => void;
   onAudioUnlocked: () => void;
   onDisplayClosing: () => void;
 }>): MessageHandler {
@@ -124,6 +139,15 @@ export function createMessageRouter(handlers: Partial<{
       case 'PLAY_BALL_VOICE':
         handlers.onPlayBallVoice?.(message.payload);
         break;
+      case 'PLAY_BALL_SEQUENCE':
+        handlers.onPlayBallSequence?.(message.payload);
+        break;
+      case 'BALL_REVEAL_READY':
+        handlers.onBallRevealReady?.();
+        break;
+      case 'BALL_SEQUENCE_COMPLETE':
+        handlers.onBallSequenceComplete?.();
+        break;
       case 'AUDIO_UNLOCKED':
         handlers.onAudioUnlocked?.();
         break;
@@ -139,6 +163,10 @@ interface UseSyncOptions {
   sessionId: string;
   /** Whether audio has been unlocked on the display window (audience role only) */
   displayAudioUnlocked?: boolean;
+  /** Callback invoked on the audience when a PLAY_BALL_SEQUENCE message arrives.
+   *  Must return a Promise that resolves when the full display-side sequence
+   *  (roll → reveal → chime → voice) is complete. */
+  onPlayBallSequence?: (ball: BingoBall) => Promise<void>;
 }
 
 /**
@@ -147,8 +175,19 @@ interface UseSyncOptions {
  * Presenter: Broadcasts state changes to audience windows.
  * Audience: Receives and applies state updates from presenter.
  */
-export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOptions) {
+export function useSync({ role, sessionId, displayAudioUnlocked, onPlayBallSequence }: UseSyncOptions) {
   const isInitializedRef = useRef(false);
+
+  // Latest onPlayBallSequence callback (ref so init effect doesn't need re-run on every render)
+  const onPlayBallSequenceRef = useRef(onPlayBallSequence);
+  useEffect(() => {
+    onPlayBallSequenceRef.current = onPlayBallSequence;
+  }, [onPlayBallSequence]);
+
+  // One-shot resolvers for ack-based Promises on the presenter side
+  const pendingRevealResolverRef = useRef<(() => void) | null>(null);
+  const pendingCompleteResolverRef = useRef<(() => void) | null>(null);
+
   // Track whether the display has confirmed audio is active (presenter uses this)
   const [displayAudioActive, setDisplayAudioActive] = useState(false);
 
@@ -313,6 +352,32 @@ export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOption
         if (role !== 'audience') return;
         const audioStore = useAudioStore.getState();
         audioStore.playBallVoice(ball);
+      },
+      // Audience runs the full audio sequence locally via the onPlayBallSequence callback.
+      // After chime+voice finish it acks BALL_SEQUENCE_COMPLETE. The REVEAL ack is sent
+      // mid-sequence by the caller via sendBallRevealReady.
+      onPlayBallSequence: async (ball) => {
+        if (role !== 'audience') return;
+        const callback = onPlayBallSequenceRef.current;
+        if (!callback) return;
+        try {
+          await callback(ball);
+        } finally {
+          sync.broadcastBallSequenceComplete();
+        }
+      },
+      // Presenter receives these acks from the display
+      onBallRevealReady: () => {
+        if (role !== 'presenter') return;
+        const resolver = pendingRevealResolverRef.current;
+        pendingRevealResolverRef.current = null;
+        resolver?.();
+      },
+      onBallSequenceComplete: () => {
+        if (role !== 'presenter') return;
+        const resolver = pendingCompleteResolverRef.current;
+        pendingCompleteResolverRef.current = null;
+        resolver?.();
       },
       // Audience receives audio settings changes from presenter
       onAudioSettingsChanged: (settings) => {
@@ -524,6 +589,65 @@ export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOption
     broadcastSyncRef.current?.broadcastPlayBallVoice(ball);
   }, [role]);
 
+  const REVEAL_TIMEOUT_MS = 15_000;
+  const COMPLETE_TIMEOUT_MS = 15_000;
+
+  // Broadcast PLAY_BALL_SEQUENCE (presenter only).
+  const broadcastPlayBallSequence = useCallback((ball: BingoBall) => {
+    if (role !== 'presenter') return;
+    broadcastSyncRef.current?.broadcastPlayBallSequence(ball);
+  }, [role]);
+
+  // Returns a Promise that resolves when the next BALL_REVEAL_READY arrives,
+  // or after REVEAL_TIMEOUT_MS as a safety fallback.
+  const waitForReveal = useCallback((): Promise<void> => {
+    if (role !== 'presenter') return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      // `resolverWithTimeout` and `timeoutId` reference each other. Because
+      // closures capture bindings (not values), both are initialized by the
+      // time either function actually runs.
+      const resolverWithTimeout = () => {
+        clearTimeout(timeoutId);
+        resolve();
+      };
+      const timeoutId = setTimeout(() => {
+        if (pendingRevealResolverRef.current === resolverWithTimeout) {
+          pendingRevealResolverRef.current = null;
+          console.warn('[Bingo sync] BALL_REVEAL_READY timed out after', REVEAL_TIMEOUT_MS, 'ms');
+          resolve();
+        }
+      }, REVEAL_TIMEOUT_MS);
+      pendingRevealResolverRef.current = resolverWithTimeout;
+    });
+  }, [role]);
+
+  // Returns a Promise that resolves when the next BALL_SEQUENCE_COMPLETE arrives,
+  // or after COMPLETE_TIMEOUT_MS as a safety fallback.
+  const waitForComplete = useCallback((): Promise<void> => {
+    if (role !== 'presenter') return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      // Same closure-capture pattern as waitForReveal above.
+      const resolverWithTimeout = () => {
+        clearTimeout(timeoutId);
+        resolve();
+      };
+      const timeoutId = setTimeout(() => {
+        if (pendingCompleteResolverRef.current === resolverWithTimeout) {
+          pendingCompleteResolverRef.current = null;
+          console.warn('[Bingo sync] BALL_SEQUENCE_COMPLETE timed out after', COMPLETE_TIMEOUT_MS, 'ms');
+          resolve();
+        }
+      }, COMPLETE_TIMEOUT_MS);
+      pendingCompleteResolverRef.current = resolverWithTimeout;
+    });
+  }, [role]);
+
+  // Audience ack: "my roll sound is done, presenter can commit the ball now"
+  const sendBallRevealReady = useCallback(() => {
+    if (role !== 'audience') return;
+    broadcastSyncRef.current?.broadcastBallRevealReady();
+  }, [role]);
+
   // Heartbeat monitoring for state divergence detection
   const getHeartbeatState = useCallback(() => {
     return getCurrentState() as BingoSyncPayload;
@@ -547,5 +671,9 @@ export function useSync({ role, sessionId, displayAudioUnlocked }: UseSyncOption
     broadcastPlayRollSound,
     broadcastPlayRevealChime,
     broadcastPlayBallVoice,
+    broadcastPlayBallSequence,
+    waitForReveal,
+    waitForComplete,
+    sendBallRevealReady,
   };
 }
