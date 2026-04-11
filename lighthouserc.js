@@ -8,7 +8,6 @@
  *   pnpm lighthouse          # Run on all apps
  *   pnpm lighthouse:bingo    # Run on bingo only
  *   pnpm lighthouse:trivia   # Run on trivia only
- *   pnpm lighthouse:hub      # Run on platform-hub only
  */
 
 const performanceConfig = require('./performance.config.js');
@@ -29,7 +28,6 @@ module.exports = {
       url: [
         'http://localhost:3000/', // Bingo home
         'http://localhost:3001/', // Trivia home
-        'http://localhost:3002/', // Platform hub home
       ],
 
       // Lighthouse settings

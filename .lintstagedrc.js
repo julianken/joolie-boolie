@@ -4,7 +4,6 @@ export default {
     const packageMap = {
       'apps/bingo/': '@joolie-boolie/bingo',
       'apps/trivia/': '@joolie-boolie/trivia',
-      'apps/platform-hub/': '@joolie-boolie/platform-hub',
       'packages/sync/': '@joolie-boolie/sync',
       'packages/ui/': '@joolie-boolie/ui',
       'packages/theme/': '@joolie-boolie/theme',

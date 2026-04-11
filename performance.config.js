@@ -140,17 +140,6 @@ const performanceConfig = {
         },
       },
     },
-    'platform-hub': {
-      // Hub should be lighter
-      bundles: {
-        javascript: {
-          routeTotal: 300 * 1024, // 300KB
-        },
-      },
-      lighthouse: {
-        performance: 95, // Simple app should score high
-      },
-    },
   },
 };
 
