@@ -83,7 +83,7 @@ function getBallBoxShadow(column: BingoColumn): string {
   ].join(', ');
 }
 
-function getBallTextColor(_column: BingoColumn): string {
+function getBallTextColor(): string {
   // All text is dark — sits on the white inner face
   return '#1A1720';
 }
@@ -187,7 +187,7 @@ export function BallReveal({ ball, autoCallInterval, isAutoCall, size = 'hero' }
             borderRadius: '9999px',
             background: getBallBackground(ball.column),
             boxShadow: getBallBoxShadow(ball.column),
-            color: getBallTextColor(ball.column),
+            color: getBallTextColor(),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
