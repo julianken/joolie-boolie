@@ -4,6 +4,10 @@ A dual-screen gaming platform for groups and communities. Run trivia nights and 
 
 **[Play Bingo](https://bingo.joolie-boolie.com)** · **[Play Trivia](https://trivia.joolie-boolie.com)**
 
+<p align="center">
+  <img src="./assets/screenshots/bingo-display.png" alt="Joolie Boolie Bingo audience display — a large gold O-72 ball on the left, X-Pattern preview on the right, and a full 75-number bingo board below with called balls highlighted in traditional B-I-N-G-O colors" width="100%" />
+</p>
+
 ---
 
 ## What This Is
@@ -78,9 +82,33 @@ No server involved. Works offline. Sub-10ms latency on the same device.
 ## Features
 
 ### Bingo
+
+<table>
+  <tr>
+    <td width="50%"><img src="./assets/screenshots/bingo-presenter.png" alt="Bingo presenter view showing the called-number grid, current ball, recent calls, roll controls, pattern selector set to X Pattern, and audio/appearance settings" /></td>
+    <td width="50%"><img src="./assets/screenshots/bingo-display.png" alt="Bingo audience display showing a gold O-72 ball, counter, X Pattern preview, and a full 75-number board with called balls in B-I-N-G-O colors" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Presenter</b> — host controls on a laptop</sub></td>
+    <td align="center"><sub><b>Audience</b> — projector-optimized board</sub></td>
+  </tr>
+</table>
+
 75-ball bingo (B-I-N-G-O columns), 29 patterns from simple lines to letters and blackout. Voice packs with British slang variant, configurable roll sounds (metal cage, tumbler, lottery), auto-call mode at adjustable speed. Full keyboard control.
 
 ### Trivia
+
+<table>
+  <tr>
+    <td width="50%"><img src="./assets/screenshots/trivia-presenter.png" alt="Trivia presenter view showing the questions sidebar, a multiple-choice question card with four answer options, Show/Peek controls, and theme panel" /></td>
+    <td width="50%"><img src="./assets/screenshots/trivia-display-question.png" alt="Trivia audience display showing a multiple-choice question blown up with four color-coded answer chips A through D" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Presenter</b> — question sidebar and scene controls</sub></td>
+    <td align="center"><sub><b>Audience</b> — dramatic question scene</sub></td>
+  </tr>
+</table>
+
 Multi-round team trivia with configurable rounds and questions per round. Up to 20 teams with live scoring. Text-to-speech for questions and answers. Three ways to add questions: fetch from an external trivia API, upload a JSON file, or create manually. Built-in ChatGPT prompt guide for generating question sets. 16-scene audience display with timed transitions and emergency blank.
 
 ### Both Apps
