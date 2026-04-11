@@ -107,8 +107,7 @@ API routes are minimal -- only CSP reports, monitoring tunnels, and the trivia-a
 
 ## Docs & App-Specific Context
 
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - Monorepo structure, dual-screen system, game engine
-- [docs/APP_STRUCTURE.md](docs/APP_STRUCTURE.md) - Canonical `lib/` layout
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - Monorepo structure, app layout, dual-screen system, game engine
 - [docs/E2E_TESTING_GUIDE.md](docs/E2E_TESTING_GUIDE.md) - E2E commands, checklist, port isolation, troubleshooting
 - [docs/MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md) - Playwright MCP manual test cases (visual/audio)
 - `apps/bingo/CLAUDE.md` - 75-ball bingo, 29 patterns, game mechanics, keyboard shortcuts

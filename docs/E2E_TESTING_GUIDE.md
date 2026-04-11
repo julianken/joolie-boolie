@@ -12,28 +12,15 @@ GitHub Actions are disabled to avoid billing costs. Local E2E validation is mand
 
 ### Prerequisites
 
+E2E tests have a minimal env surface after the standalone conversion (BEA-682–696).
+
 ```bash
-# 1. Valid .env files in both apps
-# - .env (root - for Playwright global setup)
-# - apps/bingo/.env.local
-# - apps/trivia/.env.local
-
-# Each file needs:
-E2E_JWT_SECRET=e2e-test-secret-key-that-is-at-least-32-characters-long
+# Only trivia needs an env var for the trivia-api proxy:
+# apps/trivia/.env.local
+THE_TRIVIA_API_KEY=your-trivia-api-key
 ```
 
-### E2E JWT Secret (`E2E_JWT_SECRET`)
-
-The `E2E_JWT_SECRET` environment variable is **required** when `E2E_TESTING=true`. It is used to sign and verify test JWTs across both apps.
-
-**The same value must be set in all app `.env.local` files.** A suggested development value:
-```
-E2E_JWT_SECRET=e2e-test-secret-key-that-is-at-least-32-characters-long
-```
-
-**Safety guards:**
-- If `E2E_TESTING=true` and `E2E_JWT_SECRET` is not set, the app will throw an error at startup
-- If `E2E_TESTING=true` and `NODE_ENV=production`, the app will refuse to start (prevents E2E bypass in production)
+`playwright.config.ts` sets `E2E_TESTING=true` automatically. No source file reads `E2E_JWT_SECRET` — the JWT bypass documented by the (now superseded) [ADR-002](adr/ADR-002-synthetic-jwt-auth-e2e.md) was removed with the auth infrastructure. There are no startup guards for that variable.
 
 ### Running E2E Tests
 
@@ -160,7 +147,7 @@ await expect(async () => {
 import { test } from '../fixtures/auth';
 
 test('my bingo test', async ({ authenticatedBingoPage: page }) => {
-  // Page is already authenticated and on /play with modal dismissed
+  // Page is on /play with startup modal dismissed
   await expect(page.getByRole('button', { name: /roll/i })).toBeVisible();
 });
 ```
@@ -171,7 +158,7 @@ test('my bingo test', async ({ authenticatedBingoPage: page }) => {
 import { test } from '../fixtures/auth';
 
 test('my trivia test', async ({ authenticatedTriviaPage: page }) => {
-  // Page is already authenticated and on /play with modal dismissed
+  // Page is on /play with startup modal dismissed
   await expect(page.getByRole('button', { name: /start/i })).toBeVisible();
 });
 ```
@@ -180,7 +167,14 @@ test('my trivia test', async ({ authenticatedTriviaPage: page }) => {
 
 1. Navigates to `/play` on the target app
 2. Auto-dismisses any startup modal (room setup, etc.)
-3. Retries up to 3x on rate limit errors (exponential backoff)
+
+> **Historical note:** The fixture names `authenticatedBingoPage` / `authenticatedTriviaPage` are
+> misleading artifacts from the pre-standalone auth era. No authentication occurs — both apps are
+> standalone after BEA-682–696 and do not require login. The fixture name is preserved only to
+> avoid a large rename across every E2E test file. The name does **not** mean any auth setup
+> happens; treat it as "pre-navigated-to-/play-with-modal-dismissed." Earlier versions of this
+> guide claimed the fixture "retries up to 3x on rate limit errors" — that referred to Supabase
+> auth rate limits which no longer apply.
 
 ### Key Imports
 

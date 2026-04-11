@@ -2,7 +2,15 @@
 
 ## Status
 
-Accepted
+Superseded (2026-Q1)
+
+> **Superseded (2026-Q1):** Platform Hub, `packages/auth`, and bingo/trivia middleware were
+> removed in the standalone conversion (BEA-682–696). No authentication infrastructure exists
+> in the current codebase. `E2E_JWT_SECRET` is no longer read by any source file.
+> `e2e/fixtures/auth.ts` navigates directly to `/play` — no JWT setup occurs.
+>
+> This ADR is preserved as an immutable historical record of a decision made and later reversed.
+> Do not rely on any of the files, env vars, or flows described below — they no longer exist.
 
 ## Context
 

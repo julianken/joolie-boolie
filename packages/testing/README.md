@@ -2,7 +2,7 @@
 
 **Status:** ✅ Production Ready (100% Complete)
 
-Shared test utilities and mocks for the Joolie Boolie. Provides mock implementations for BroadcastChannel, Audio, and Supabase, plus jest-dom matchers. Enables consistent testing patterns across all apps and packages.
+Shared test utilities and mocks for the Joolie Boolie. Provides mock implementations for BroadcastChannel and Audio, plus jest-dom matchers. Enables consistent testing patterns across all apps and packages.
 
 ## Installation
 
@@ -24,10 +24,10 @@ The package provides multiple export paths for different use cases:
 
 ```typescript
 // Main export - includes mocks and helpers
-import { mockBroadcastChannel, createMockSupabaseClient } from '@joolie-boolie/testing';
+import { mockBroadcastChannel, mockAudio } from '@joolie-boolie/testing';
 
 // Mocks only
-import { mockAudio, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
 
 // Jest-dom setup (add to vitest setupFiles)
 import '@joolie-boolie/testing/setup';
@@ -40,7 +40,6 @@ import { HELPERS_PLACEHOLDER } from '@joolie-boolie/testing/helpers';
 
 - ✅ **BroadcastChannel Mock** - Full mock for dual-screen sync testing
 - ✅ **Audio Mock** - HTML5 Audio API mock for sound testing
-- ✅ **Supabase Mock** - Client and auth mocking utilities
 - ✅ **jest-dom Setup** - Automatic setup for DOM matchers
 - ✅ **Multiple Export Paths** - Granular imports for mocks, setup, helpers
 - ✅ **TypeScript Support** - Full type definitions for all mocks
@@ -105,44 +104,6 @@ test('tracks audio behavior', () => {
   const audio = createMockAudio();
   audio.volume = 0.5;
   expect(audio.volume).toBe(0.5);
-});
-```
-
-### Supabase Mock
-
-Mock for Supabase client and authentication.
-
-```typescript
-import { createMockSupabaseClient, createMockUser, createMockSession } from '@joolie-boolie/testing/mocks';
-
-// Create mock users
-test('creates users', () => {
-  const user = createMockUser({
-    email: 'user@example.com',
-    user_metadata: { firstName: 'John' },
-  });
-  expect(user.email).toBe('user@example.com');
-});
-
-// Create mock sessions
-test('creates sessions', () => {
-  const session = createMockSession({}, { expires_in: 7200 });
-  expect(session.expires_in).toBe(7200);
-  expect(session.user).toBeDefined();
-});
-
-// Create a mock Supabase client
-test('mocks Supabase auth', async () => {
-  const mockClient = createMockSupabaseClient();
-  const { data: { session } } = await mockClient.auth.getSession();
-  expect(session).toBeNull();
-
-  // Simulate sign in
-  mockClient.__helpers.simulateAuthChange('SIGNED_IN', createMockSession());
-
-  // Use getState to inspect current auth state
-  const state = mockClient.__helpers.getState();
-  expect(state.user).toBeDefined();
 });
 ```
 
@@ -281,7 +242,6 @@ export { mockMyService } from './my-mock';
 Planned utilities:
 - React component test helpers
 - Zustand store test utilities
-- Supabase mock helpers
 - Common fixture generators
 
 ## Integration Status

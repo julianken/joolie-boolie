@@ -40,6 +40,8 @@ Docker isolation was rejected. The project uses hash-based port isolation with d
 - No database-level isolation across parallel worktrees (mitigated by `E2E_TESTING=true` bypass).
 - If Docker-based CI is adopted later, tooling must be built from scratch.
 
+> **Note:** ADR-002 (Synthetic JWT Auth), referenced in rationale point 4, was subsequently superseded when the standalone conversion (BEA-682–696) removed authentication infrastructure entirely. The rationale below is preserved as the historical decision context.
+
 **Reference:**
 - `docs/archive/decision-funnels/e2e-docker-isolation-architecture.md` -- full Docker architecture analysis
 - `docs/archive/decision-funnels/e2e-test-isolation-strategy.md` -- decision rationale

@@ -8,7 +8,7 @@ Accepted
 
 The project uses a parallel AI-agent development workflow where multiple features are developed simultaneously in separate git worktrees (e.g., `.worktrees/wt-BEA-334`). Each worktree needs to run E2E tests independently against its own server instances.
 
-The original E2E configuration hardcoded ports 3000 (Bingo), 3001 (Trivia), and 3002 (Platform Hub). This meant only one worktree could run E2E tests at a time -- parallel worktrees either connected to the wrong server or failed with port conflicts.
+The original E2E configuration hardcoded ports 3000 (Bingo), 3001 (Trivia), and 3002 (Platform Hub, since removed in the standalone conversion BEA-682–696). This meant only one worktree could run E2E tests at a time -- parallel worktrees either connected to the wrong server or failed with port conflicts.
 
 ## Decision
 
@@ -21,9 +21,9 @@ Assign deterministic port offsets to each worktree based on a SHA-256 hash of th
 3. Take the first 8 hex characters and parse as an integer.
 4. Map to range 0-332: `offsetIndex = hashInt % 333`.
 5. Multiply by 3: `portOffset = offsetIndex * 3`.
-6. Final ports: `3000 + portOffset`, `3001 + portOffset`, `3002 + portOffset`.
+6. Final ports: `3000 + portOffset` (Bingo), `3001 + portOffset` (Trivia), `3002 + portOffset` (reserved/unused). Only the first two slots are consumed after the standalone conversion removed Platform Hub (BEA-682–696); the third slot remains in the range allocation to keep the arithmetic stable and avoid renumbering every existing worktree.
 
-The main repo always gets the default ports (3000, 3001, 3002).
+The main repo always gets the default ports (3000, 3001, with 3002 reserved).
 
 **Priority system** (highest to lowest):
 1. Environment variable overrides (`E2E_PORT_BASE`, `E2E_BINGO_PORT`, etc.)
@@ -48,5 +48,6 @@ The main repo always gets the default ports (3000, 3001, 3002).
 - `e2e/utils/port-isolation.ts` -- core hash and detection logic
 - `e2e/utils/port-config.ts` -- shared `getE2EPortConfig()` function
 - `playwright.config.ts` -- consumes port config for project `baseURL` values
-- `e2e/fixtures/auth.ts` -- consumes port config for hub/app URLs
 - `scripts/setup-worktree-e2e.sh` -- generates `.env.e2e` with port assignments
+
+Note: `e2e/fixtures/auth.ts` previously consumed the port config for Platform Hub URLs. After the standalone conversion (BEA-682–696), it navigates directly to `/play` on the target app and no longer reads hub URLs.
