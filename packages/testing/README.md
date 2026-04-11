@@ -290,7 +290,6 @@ Planned utilities:
 |-------------|--------|------------|
 | **apps/bingo** | ✅ Integrated | BroadcastChannel, Audio, jest-dom |
 | **apps/trivia** | ✅ Integrated | BroadcastChannel, Audio, jest-dom |
-| **apps/platform-hub** | ✅ Integrated | jest-dom, Supabase (partial) |
 | **@joolie-boolie/sync** | ✅ Integrated | BroadcastChannel for testing |
 | **@joolie-boolie/ui** | ✅ Integrated | jest-dom for component tests |
 

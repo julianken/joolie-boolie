@@ -333,5 +333,4 @@ pnpm test:coverage
 ## Related Packages
 
 - `@joolie-boolie/sync` - Dual-screen synchronization
-- `@joolie-boolie/auth` - Authentication
 - `@joolie-boolie/ui` - Shared UI components

@@ -197,7 +197,6 @@ export type TouchTargetSize = keyof typeof touchTargets;
 |-------------|--------|-------|
 | **apps/bingo** | ✅ Integrated | Full theme system + custom ball colors |
 | **apps/trivia** | ✅ Integrated | Full theme system + custom team colors |
-| **apps/platform-hub** | ✅ Integrated | Full theme system |
 | **@joolie-boolie/ui** | ✅ Required | All components use theme CSS variables |
 
 ## Related Packages

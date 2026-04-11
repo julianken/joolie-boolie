@@ -211,7 +211,6 @@ export { Slider, type SliderProps } from './slider';
 |-------------|--------|-----------------|
 | **apps/bingo** | ✅ Integrated | Button, Toggle, Slider, Card, Modal, Toast |
 | **apps/trivia** | ✅ Integrated | Button, Toggle, Slider, Card, Modal, Toast |
-| **apps/platform-hub** | ✅ Integrated | Button, Card, Modal (partial usage) |
 
 ## Related Packages
 

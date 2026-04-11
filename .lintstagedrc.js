@@ -7,8 +7,6 @@ export default {
       'packages/sync/': '@joolie-boolie/sync',
       'packages/ui/': '@joolie-boolie/ui',
       'packages/theme/': '@joolie-boolie/theme',
-      'packages/auth/': '@joolie-boolie/auth',
-      'packages/database/': '@joolie-boolie/database',
       'packages/types/': '@joolie-boolie/types',
       'packages/audio/': '@joolie-boolie/audio',
       'packages/game-stats/': '@joolie-boolie/game-stats',

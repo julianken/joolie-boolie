@@ -13,32 +13,18 @@ GitHub Actions are disabled to avoid billing costs. Local E2E validation is mand
 ### Prerequisites
 
 ```bash
-# 1. Valid .env files in ALL apps (required for Next.js middleware)
-# Generate SESSION_TOKEN_SECRET with:
-openssl rand -hex 32
-
-# Required in .env files:
+# 1. Valid .env files in both apps
 # - .env (root - for Playwright global setup)
 # - apps/bingo/.env.local
 # - apps/trivia/.env.local
-# - apps/platform-hub/.env.local
 
-# Each file needs (copy values from your .env.local or run `supabase status` for local Supabase):
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
-SESSION_TOKEN_SECRET=<64-character-hex-string-from-openssl>
+# Each file needs:
 E2E_JWT_SECRET=e2e-test-secret-key-that-is-at-least-32-characters-long
 ```
 
 ### E2E JWT Secret (`E2E_JWT_SECRET`)
 
-The `E2E_JWT_SECRET` environment variable is **required** when `E2E_TESTING=true`. It is used to sign and verify test JWTs across all apps:
-
-- **Platform Hub** (`login/route.ts`, `token/route.ts`): Signs E2E test JWTs
-- **Bingo** (`middleware.ts`): Verifies E2E test JWTs
-- **Trivia** (`middleware.ts`): Verifies E2E test JWTs
-- **`@joolie-boolie/auth`** (`api-auth.ts`): Verifies E2E test JWTs in API routes
+The `E2E_JWT_SECRET` environment variable is **required** when `E2E_TESTING=true`. It is used to sign and verify test JWTs across both apps.
 
 **The same value must be set in all app `.env.local` files.** A suggested development value:
 ```
@@ -71,10 +57,10 @@ pnpm test:e2e:summary
 ```
 
 **What happens:**
-1. Script builds all 3 apps (`pnpm build`)
+1. Script builds both apps (`pnpm build`)
 2. **Checks if servers are already running** (NEW: preserves dev servers!)
 3. If servers found: Uses existing servers (dev or production)
-4. If no servers: Starts production servers on ports 3000-3002
+4. If no servers: Starts production servers on ports 3000-3001
 5. Runs Playwright tests
 6. Cleans up ONLY servers started by script (preserves dev servers)
 
@@ -93,7 +79,7 @@ pnpm test:e2e:summary
 
 ```bash
 # 1. Start dev servers manually
-pnpm dev:e2e    # Includes E2E_TESTING=true for auth bypass
+pnpm dev:e2e    # Includes E2E_TESTING=true
 
 # 2. Run tests against dev servers
 pnpm test:e2e:dev
@@ -102,42 +88,9 @@ pnpm test:e2e:dev
 ps aux | grep next-server    # Should show 0-10% CPU when idle
 curl -I http://localhost:3000
 curl -I http://localhost:3001
-curl -I http://localhost:3002/login
 ```
 
 **WARNING:** Dev servers may crash after ~250 tests (3.9min runtime) due to resource exhaustion. If you see "Could not connect to the server" errors, switch to production build mode.
-
-#### Real-Auth E2E Tests (Local Supabase)
-
-**Tests real authentication paths** against a local Supabase instance (Docker). Unlike standard E2E tests, these do NOT set `E2E_TESTING=true` and exercise actual Supabase auth, OAuth 2.1, and cross-app SSO.
-
-**Prerequisites:**
-```bash
-brew install --cask docker    # Docker Desktop
-brew install supabase/tap/supabase  # Supabase CLI
-```
-
-**Running:**
-```bash
-pnpm test:e2e:real-auth              # Run all 7 real-auth tests
-pnpm test:e2e:real-auth -- --headed  # Run with visible browser
-```
-
-**What the script does:**
-1. Starts local Supabase via Docker (`supabase start`)
-2. Applies migrations + runs `supabase/seed.sql` (creates test users)
-3. Extracts credentials using `supabase status -o env` (robust parsing)
-4. Backs up existing `.env.local` files, writes real-auth env config
-5. Starts dev servers without `E2E_TESTING` flag
-6. Runs the `real-auth` Playwright project (3 spec files, 7 tests)
-7. Restores original `.env.local` files on cleanup
-
-**Test user:** `real-auth-test@joolie-boolie.test` / `RealAuthTest123!` (seeded in `supabase/seed.sql`)
-
-**Specs:**
-- `supabase-login.spec.ts` (2 tests): Direct Supabase signInWithPassword + session refresh
-- `cross-app-sso.spec.ts` (3 tests): Hub login, copy SSO cookies to Bingo/Trivia, verify middleware accepts tokens
-- `oauth-flow.spec.ts` (2 tests): Full OAuth 2.1 code grant with PKCE + refresh token rotation
 
 ### Anti-Pattern: Fixed Timeouts (waitForTimeout)
 
@@ -225,11 +178,9 @@ test('my trivia test', async ({ authenticatedTriviaPage: page }) => {
 
 ### What the Auth Fixture Does
 
-1. Authenticates via Platform Hub OAuth (`/login` page)
-2. Copies auth cookies from Hub to target app domain
-3. Navigates to `/play` on the target app
-4. Auto-dismisses any startup modal (room setup, etc.)
-5. Retries up to 3x on rate limit errors (exponential backoff)
+1. Navigates to `/play` on the target app
+2. Auto-dismisses any startup modal (room setup, etc.)
+3. Retries up to 3x on rate limit errors (exponential backoff)
 
 ### Key Imports
 
@@ -340,40 +291,6 @@ Service workers don't register in dev mode:
 cp apps/bingo/.env.local .env
 ```
 
-### Issue: "Test timeout at login page"
-
-**Symptom**: All tests timeout at `page.goto('http://localhost:3002/login')`
-
-**Cause**: Platform Hub server not running or crashed
-
-**Fix**:
-```bash
-# Check Platform Hub logs
-pnpm dev:hub
-
-# If server hung (100%+ CPU), kill and restart
-pkill -f next-server
-pnpm dev:hub
-```
-
-### Issue: "SESSION_TOKEN_SECRET must contain only hexadecimal characters"
-
-**Symptom**: Next.js Runtime Error dialog in test screenshots
-
-**Cause**: Invalid SESSION_TOKEN_SECRET in .env.local files
-
-**Fix**:
-```bash
-# Generate valid secret
-openssl rand -hex 32
-
-# Update ALL .env.local files with the SAME value:
-# - apps/bingo/.env.local
-# - apps/trivia/.env.local
-# - apps/platform-hub/.env.local
-# - .env (root)
-```
-
 ### Issue: "page.reload: net::ERR_INTERNET_DISCONNECTED"
 
 **Symptom**: Tests that set offline mode fail on reload
@@ -430,7 +347,7 @@ Each agent in a separate worktree can run E2E tests **truly in parallel** using 
 
 **How Port Isolation Works:**
 
-1. **Main repo**: Uses default ports 3000, 3001, 3002
+1. **Main repo**: Uses default ports 3000, 3001
 2. **Worktrees**: Use hash-based port offsets derived from the worktree path
 3. **Environment variables**: Can override ports manually if needed
 
@@ -456,13 +373,13 @@ pnpm test:e2e
 # The Playwright config auto-detects worktree and calculates ports
 # Just run tests - ports are determined by the worktree path hash
 
-# Worktree A: Agent fixing BEA-334 (gets ports like 3156, 3157, 3158)
+# Worktree A: Agent fixing BEA-334 (gets ports like 3156, 3157)
 cd .worktrees/wt-BEA-334
 source .env.e2e  # If setup script was run
 ./start-e2e-servers.sh
 pnpm test:e2e e2e/bingo/room-setup.spec.ts
 
-# Worktree B: Agent fixing BEA-335 (gets different ports like 3279, 3280, 3281)
+# Worktree B: Agent fixing BEA-335 (gets different ports like 3279, 3280)
 cd .worktrees/wt-BEA-335
 source .env.e2e
 ./start-e2e-servers.sh
@@ -478,10 +395,10 @@ pnpm test:e2e e2e/trivia/other-feature.spec.ts
 **Environment Variable Overrides:**
 ```bash
 # Override all ports with a base
-E2E_PORT_BASE=3100 pnpm test:e2e  # Uses 3100, 3101, 3102
+E2E_PORT_BASE=3100 pnpm test:e2e  # Uses 3100, 3101
 
 # Override individual ports
-E2E_BINGO_PORT=3100 E2E_TRIVIA_PORT=3101 E2E_HUB_PORT=3102 pnpm test:e2e
+E2E_BINGO_PORT=3100 E2E_TRIVIA_PORT=3101 pnpm test:e2e
 ```
 
 ---
@@ -490,10 +407,9 @@ E2E_BINGO_PORT=3100 E2E_TRIVIA_PORT=3101 E2E_HUB_PORT=3102 pnpm test:e2e
 
 Before committing ANY code that affects UI or user flows:
 
-- [ ] All dev servers running (bingo, trivia, platform-hub)
+- [ ] All dev servers running (bingo, trivia)
 - [ ] Servers responding to requests (curl checks pass)
 - [ ] `.env.local` files present in all apps
-- [ ] SESSION_TOKEN_SECRET is valid 64-char hex string
 - [ ] E2E tests for affected features run locally
 - [ ] ALL relevant E2E tests pass (0 failures)
 - [ ] Test screenshots reviewed (no unexpected UI states)
@@ -628,18 +544,17 @@ Since GitHub Actions are disabled:
 |---------|------|-----|
 | Bingo | 3000 | http://localhost:3000 |
 | Trivia | 3001 | http://localhost:3001 |
-| Platform Hub | 3002 | http://localhost:3002 |
 
 ### Dynamic Ports (Worktrees)
 
 When running in a git worktree, ports are automatically calculated based on the worktree path:
 
-| Scenario | Bingo | Trivia | Hub | How Determined |
-|----------|-------|--------|-----|----------------|
-| Main repo | 3000 | 3001 | 3002 | Default |
-| Worktree A | 3XXX | 3XXX+1 | 3XXX+2 | Hash of path |
-| Worktree B | 3YYY | 3YYY+1 | 3YYY+2 | Hash of path |
-| E2E_PORT_BASE=3100 | 3100 | 3101 | 3102 | Environment |
+| Scenario | Bingo | Trivia | How Determined |
+|----------|-------|--------|----------------|
+| Main repo | 3000 | 3001 | Default |
+| Worktree A | 3XXX | 3XXX+1 | Hash of path |
+| Worktree B | 3YYY | 3YYY+1 | Hash of path |
+| E2E_PORT_BASE=3100 | 3100 | 3101 | Environment |
 
 **Playwright auto-detects ports** based on whether you're in a worktree or main repo.
 
@@ -656,7 +571,6 @@ pnpm test:e2e
 #   Worktree Path: /path/to/.worktrees/wt-BEA-XXX
 #   Bingo: http://localhost:3156
 #   Trivia: http://localhost:3157
-#   Hub: http://localhost:3158
 ```
 
 ### Implementation Details
@@ -668,4 +582,4 @@ Port calculation formula:
 2. Take first 8 hex characters (32 bits)
 3. Map to range 0-332: `offset_index = hash % 333`
 4. Multiply by 3: `port_offset = offset_index * 3`
-5. Final ports: `3000 + offset`, `3001 + offset`, `3002 + offset`
+5. Final ports: `3000 + offset`, `3001 + offset`

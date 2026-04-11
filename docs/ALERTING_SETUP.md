@@ -14,11 +14,11 @@ Each Sentry project needs an alert rule to catch recurring errors.
 | **Trigger** | New issue, first seen in last 1 hour |
 | **Threshold** | Count > 3 in 1 hour |
 | **Action** | Email notification |
-| **Projects** | `jb-bingo`, `jb-trivia`, `jb-platform-hub` |
+| **Projects** | `jb-bingo`, `jb-trivia` |
 
 ### Steps (Sentry UI)
 
-For each project (`jb-bingo`, `jb-trivia`, `jb-platform-hub`):
+For each project (`jb-bingo`, `jb-trivia`):
 
 1. Go to **Settings > Projects > [project] > Alerts**
 2. Click **Create Alert Rule**
@@ -35,7 +35,6 @@ For each project (`jb-bingo`, `jb-trivia`, `jb-platform-hub`):
 - Organization: https://detached-node.sentry.io/
 - Bingo alerts: https://detached-node.sentry.io/alerts/rules/?project=jb-bingo
 - Trivia alerts: https://detached-node.sentry.io/alerts/rules/?project=jb-trivia
-- Platform Hub alerts: https://detached-node.sentry.io/alerts/rules/?project=jb-platform-hub
 
 ### API Token Note
 
@@ -44,7 +43,7 @@ To automate alert configuration, create a new token at https://sentry.io/setting
 
 ## Grafana Synthetic Monitoring
 
-HTTP health checks for all 3 apps with downtime alerting.
+HTTP health checks for both apps with downtime alerting.
 
 ### Check Configuration
 
@@ -52,14 +51,13 @@ HTTP health checks for all 3 apps with downtime alerting.
 |-------|-----|-----------|
 | `jb-bingo-health` | `https://bingo.joolie-boolie.com/api/health` | 60s |
 | `jb-trivia-health` | `https://trivia.joolie-boolie.com/api/health` | 60s |
-| `jb-hub-health` | `https://joolie-boolie.com/api/health` | 60s |
 
 ### Steps (Grafana UI)
 
 1. Go to https://julianken.grafana.net/a/grafana-synthetic-monitoring-app
 2. Click **Add new check** > **HTTP**
 3. For each app:
-   - **Job name:** `jb-bingo-health` (or `jb-trivia-health`, `jb-hub-health`)
+   - **Job name:** `jb-bingo-health` (or `jb-trivia-health`)
    - **Target URL:** the health endpoint URL from the table above
    - **Frequency:** 60 seconds
    - **Timeout:** 10 seconds

@@ -567,12 +567,9 @@ if (isApiError(response)) {
 
 | App/Package | Status | Usage |
 |-------------|--------|-------|
-| `apps/bingo` | ✅ Active | Uses SyncMessage for dual-screen sync, GameSession via database package |
+| `apps/bingo` | ✅ Active | Uses SyncMessage for dual-screen sync |
 | `apps/trivia` | ✅ Active | Uses TriviaGameStatus, SyncMessage for dual-screen sync |
-| `apps/platform-hub` | ⚠️ Partial | Will use User, AuthResponse when auth is integrated |
 | `packages/sync` | ✅ Active | Re-exports SyncRole, ConnectionState, SyncMessage types |
-| `packages/database` | ✅ Active | Defines GameType, SessionStatus based on these types |
-| `packages/auth` | ✅ Active | Uses User, Session, AuthResponse types |
 | `packages/ui` | ❌ N/A | UI components don't need game types |
 | `packages/theme` | ❌ N/A | Uses ThemeMode, ColorTheme indirectly |
 
@@ -613,9 +610,7 @@ Every exported type includes comprehensive JSDoc comments with descriptions, exa
 
 ## Related Documentation
 
-- **Database Package**: `/Users/j/repos/joolie-boolie-platform/packages/database/README.md` - Uses GameType, SessionStatus
 - **Sync Package**: `/Users/j/repos/joolie-boolie-platform/packages/sync/README.md` - Re-exports and extends SyncMessage types
-- **Auth Package**: `/Users/j/repos/joolie-boolie-platform/packages/auth/README.md` - Uses User, Session, AuthResponse
 - **Main CLAUDE.md**: `/Users/j/repos/joolie-boolie-platform/CLAUDE.md` - Project overview and architecture
 
 ## Development
@@ -656,8 +651,4 @@ pnpm typecheck
 
 # Verify exports compile
 pnpm build
-
-# Test in a dependent package
-cd ../database
-pnpm typecheck
 ```

@@ -19,8 +19,8 @@
 # 5. Displays configuration summary
 #
 # Port Allocation:
-# - Main repo: 3000, 3001, 3002 (no offset)
-# - Worktrees: 3000 + offset, 3001 + offset, 3002 + offset
+# - Main repo: 3000, 3001 (no offset)
+# - Worktrees: 3000 + offset, 3001 + offset
 # - Offset is deterministic (same worktree path = same offset)
 # - Max 333 unique worktrees (offsets 0, 3, 6, ..., 996)
 #
@@ -88,14 +88,12 @@ fi
 
 BINGO_PORT=$((3000 + PORT_OFFSET))
 TRIVIA_PORT=$((3001 + PORT_OFFSET))
-HUB_PORT=$((3002 + PORT_OFFSET))
 
 echo ""
 echo -e "${BLUE}Port Configuration:${NC}"
 echo "  Offset: $PORT_OFFSET"
 echo "  Bingo:  http://localhost:$BINGO_PORT"
 echo "  Trivia: http://localhost:$TRIVIA_PORT"
-echo "  Hub:    http://localhost:$HUB_PORT"
 
 # -----------------------------------------------------------------------------
 # Step 3: Create .env.e2e file
@@ -127,14 +125,12 @@ cat > "$ENV_FILE" << EOF
 export E2E_PORT_BASE=$BINGO_PORT
 export E2E_BINGO_PORT=$BINGO_PORT
 export E2E_TRIVIA_PORT=$TRIVIA_PORT
-export E2E_HUB_PORT=$HUB_PORT
 
 # Individual app port variables (used by Next.js)
 export BINGO_PORT=$BINGO_PORT
 export TRIVIA_PORT=$TRIVIA_PORT
-export HUB_PORT=$HUB_PORT
 
-# E2E Testing flag (enables auth bypass in Platform Hub)
+# E2E Testing flag
 export E2E_TESTING=true
 
 # E2E JWT signing secret (required when E2E_TESTING=true)
@@ -160,7 +156,7 @@ cat > "$HELPER_SCRIPT" << 'SCRIPT_EOF'
 # =============================================================================
 # Start E2E Testing Servers
 # =============================================================================
-# This script starts all three dev servers with the correct ports for this
+# This script starts both dev servers with the correct ports for this
 # worktree's E2E testing environment.
 #
 # Usage:
@@ -185,7 +181,6 @@ fi
 echo "Starting E2E testing servers..."
 echo "  Bingo:  http://localhost:$BINGO_PORT"
 echo "  Trivia: http://localhost:$TRIVIA_PORT"
-echo "  Hub:    http://localhost:$HUB_PORT"
 echo ""
 
 # Start servers in background
@@ -196,9 +191,6 @@ PORT=$BINGO_PORT pnpm --filter @joolie-boolie/bingo dev &
 
 echo "Starting Trivia (port $TRIVIA_PORT)..."
 PORT=$TRIVIA_PORT pnpm --filter @joolie-boolie/trivia dev &
-
-echo "Starting Platform Hub (port $HUB_PORT)..."
-PORT=$HUB_PORT pnpm --filter @joolie-boolie/platform-hub dev &
 
 echo ""
 echo "All servers starting in background."
@@ -220,7 +212,6 @@ check_server() {
 
 check_server "http://localhost:$BINGO_PORT" "Bingo"
 check_server "http://localhost:$TRIVIA_PORT" "Trivia"
-check_server "http://localhost:$HUB_PORT" "Hub"
 
 echo ""
 echo "Run E2E tests with: pnpm test:e2e"
@@ -261,7 +252,6 @@ echo "Or manually:"
 echo "  source .env.e2e"
 echo "  PORT=\$BINGO_PORT pnpm --filter @joolie-boolie/bingo dev &"
 echo "  PORT=\$TRIVIA_PORT pnpm --filter @joolie-boolie/trivia dev &"
-echo "  PORT=\$HUB_PORT pnpm --filter @joolie-boolie/platform-hub dev &"
 echo ""
 echo "To run E2E tests:"
 echo "  pnpm test:e2e"

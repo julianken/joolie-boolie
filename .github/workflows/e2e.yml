@@ -59,12 +59,6 @@ jobs:
 
       - name: Build all apps
         run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
-          SESSION_TOKEN_SECRET: "0000000000000000000000000000000000000000000000000000000000000000"
-          NEXT_PUBLIC_PLATFORM_HUB_URL: http://localhost:3002
-          NEXT_PUBLIC_OAUTH_CLIENT_ID: placeholder-oauth-client-id
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -73,7 +67,6 @@ jobs:
           path: |
             apps/bingo/.next
             apps/trivia/.next
-            apps/platform-hub/.next
           retention-days: 1
 
   e2e:
@@ -143,7 +136,7 @@ jobs:
       - name: Verify build artifact structure
         shell: bash
         run: |
-          for app in bingo trivia platform-hub; do
+          for app in bingo trivia; do
             if [ ! -d "apps/${app}/.next" ]; then
               echo "ERROR: apps/${app}/.next not found after artifact download"
               exit 1
@@ -156,19 +149,10 @@ jobs:
           pnpm playwright test \
             --project=bingo \
             --project=trivia \
-            --project=platform-hub \
             --project=bingo-mobile
         env:
           CI: true
           SHARD: ${{ matrix.shard }}
-          E2E_TESTING: "true"
-          E2E_JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
-          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
-          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
-          SESSION_TOKEN_SECRET: "0000000000000000000000000000000000000000000000000000000000000000"
-          NEXT_PUBLIC_PLATFORM_HUB_URL: http://localhost:3002
-          NEXT_PUBLIC_OAUTH_CLIENT_ID: placeholder-oauth-client-id
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

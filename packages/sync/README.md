@@ -303,7 +303,6 @@ interface SyncState {
 |-------------|--------|-------|
 | **apps/bingo** | ✅ Integrated | Dual-screen sync for presenter/audience views |
 | **apps/trivia** | ✅ Integrated | Dual-screen sync for presenter/audience views |
-| **apps/platform-hub** | ❌ Not Used | No dual-screen requirement |
 | **@joolie-boolie/testing** | ✅ Integrated | MockBroadcastChannel for tests |
 
 ## Related Packages
