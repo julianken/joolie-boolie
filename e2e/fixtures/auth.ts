@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { getE2EPortConfig } from '../utils/port-config';
 import { startGameViaWizard } from '../utils/helpers';
+import { buildTriviaSeedInitScript } from '../utils/trivia-fixtures';
 
 // -----------------------------------------------------------------------------
 // Dynamic URL Constants for Worktree Isolation
@@ -89,8 +90,21 @@ export const test = base.extend<GameFixtures>({
    * Trivia page fixture.
    * Navigates directly to Trivia /play and dismisses the setup wizard
    * (unless skipSetupDismissal is true).
+   *
+   * Before navigation, seeds window.__triviaE2EQuestions via addInitScript so
+   * the game store's initial state includes a valid 15-question canned set.
+   * This keeps SetupWizard's step-0 (Questions) gate open so startGameViaWizard
+   * can advance to the Teams step without a network-dependent API fetch.
+   *
+   * See e2e/utils/trivia-fixtures.ts and docs/plans/BEA-697-e2e-baseline-fix.md
+   * (Part C) for the full rationale.
    */
   authenticatedTriviaPage: async ({ page, skipSetupDismissal, navigationTimeout }, use) => {
+    // Seed canned trivia questions before navigation so the game store picks
+    // them up on create(). addInitScript runs on every frame including popups
+    // (so /display inherits the seeded state automatically).
+    await page.addInitScript({ content: buildTriviaSeedInitScript() });
+
     await page.goto(`${TRIVIA_URL}/play`, {
       waitUntil: 'load',
       timeout: navigationTimeout,

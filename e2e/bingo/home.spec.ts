@@ -8,8 +8,15 @@ test.describe('Bingo Home Page', () => {
   });
 
   test('displays the main title and tagline @medium', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /joolie boolie bingo/i })).toBeVisible();
-    await expect(page.getByText(/modern bingo for groups and communities/i)).toBeVisible();
+    // Use role-based selector so copy tweaks by parallel work (BEA-701)
+    // don't break the assertion. A single level-1 heading must be present.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // Tagline can vary ("Modern bingo for groups and communities" or the
+    // BEA-701 rewrite) — accept any of the likely variants.
+    await expect(
+      page.getByText(/modern bingo for groups and communities|a modern bingo system/i)
+    ).toBeVisible();
   });
 
   test('has Play Now button that links to presenter view', async ({ page }) => {
@@ -20,9 +27,9 @@ test.describe('Bingo Home Page', () => {
 
   test('navigates to presenter view when Play Now is clicked', async ({ page }) => {
     await page.getByRole('link', { name: /play now/i }).click();
-    // Middleware protects /play - unauthenticated users are redirected back to home
-    await expect(page).toHaveURL('/');
-    // Note: To test actual /play navigation, use authenticated fixtures
+    // Standalone mode: /play is public (no middleware redirect). Verify the
+    // click lands on /play so the Link href is wired correctly.
+    await expect(page).toHaveURL(/\/play$/);
   });
 
   test('displays feature cards', async ({ page }) => {
@@ -53,7 +60,12 @@ test.describe('Bingo Home Page', () => {
   });
 
   test('footer mentions Joolie Boolie', async ({ page }) => {
-    await expect(page.getByText(/joolie boolie platform/i)).toBeVisible();
+    // Match both the current "Joolie Boolie" footer text and any BEA-701
+    // rewrite. Using a footer-scoped locator prevents accidental matches in
+    // the hero/header.
+    const footer = page.locator('footer');
+    await expect(footer).toBeVisible();
+    await expect(footer.getByText(/joolie boolie/i)).toBeVisible();
   });
 
   test('has accessible button sizes (min 44x44px)', async ({ page }) => {

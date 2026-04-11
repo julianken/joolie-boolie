@@ -112,10 +112,26 @@ export interface GameStore extends TriviaGameState {
   setScoreDeltasBatch: (deltas: ScoreDelta[]) => void;
 }
 
+/**
+ * E2E-only seed hook: Playwright tests inject a canned question set via
+ * `page.addInitScript` by assigning to `window.__triviaE2EQuestions` before
+ * navigation. Production users never set this global, so the default is `[]`
+ * which preserves the standalone-conversion intent (no auto-loaded template).
+ *
+ * See e2e/fixtures/auth.ts and docs/plans/BEA-697-e2e-baseline-fix.md (Part C).
+ */
+function readInitialQuestions(): import('@/types').Question[] {
+  if (typeof window === 'undefined') return [];
+  const seeded = (window as unknown as { __triviaE2EQuestions?: import('@/types').Question[] })
+    .__triviaE2EQuestions;
+  return Array.isArray(seeded) ? seeded : [];
+}
+
 export const useGameStore = create<GameStore>()((set, get) => ({
-  // Initial state (start with empty questions — user must fetch/load explicitly)
+  // Initial state (start with empty questions — user must fetch/load explicitly,
+  // unless an E2E test has pre-seeded window.__triviaE2EQuestions via addInitScript).
   ...createInitialState(),
-  questions: [],
+  questions: readInitialQuestions(),
   _isHydrating: false,
 
   // Actions
