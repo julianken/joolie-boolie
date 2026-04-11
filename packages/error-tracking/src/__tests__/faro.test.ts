@@ -88,7 +88,7 @@ describe('initFaro', () => {
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA = 'abc123def';
     process.env.NEXT_PUBLIC_VERCEL_ENV = 'production';
 
-    initFaro({ appName: 'platform-hub', url: 'https://example.com/collect' });
+    initFaro({ appName: 'bingo', url: 'https://example.com/collect' });
 
     const config = mockInitializeFaro.mock.calls[0]![0];
     expect(config.app.version).toBe('abc123def');

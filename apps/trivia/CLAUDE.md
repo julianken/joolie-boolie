@@ -169,7 +169,6 @@ pnpm test:coverage     # Run tests with coverage
 - **localStorage Stores:**
   - `useTriviaTemplateStore` (key: `jb-trivia-templates`) -- saved game templates
   - `useTriviaPresetStore` (key: `jb-trivia-presets`) -- game configuration presets
-- **Middleware:** Passthrough -- no auth verification (`middleware.ts` returns `NextResponse.next()`).
 - **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration. Engine logic is split across multiple modules in `lib/game/` (engine.ts, scene.ts, etc.) re-exported via barrel pattern.
 - **Timer:** `hooks/use-timer-auto-reveal.ts` manages countdown and auto-reveal behavior
 - **Questions:** `lib/questions/` contains parser, validator, converter, exporter, and types for question import/export

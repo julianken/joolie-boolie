@@ -126,7 +126,6 @@ pnpm test:coverage    # Run tests with coverage
 - **Standalone:** No backend or auth. All data (templates, settings) stored in localStorage.
 - **Templates:** Stored in localStorage via `useBingoTemplateStore` (key: `jb-bingo-templates`).
 - **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration.
-- **Middleware:** Passthrough -- no auth verification (`middleware.ts` returns `NextResponse.next()`).
 - **Audio:** Audio logic lives in `hooks/use-audio.ts` and `stores/audio-store.ts`. The `lib/audio/` directory is a placeholder (`.gitkeep` only).
 - **Sync:** Session ID generation and BroadcastChannel naming in `lib/sync/session.ts`, built on `@joolie-boolie/sync`
 - **Patterns:** 29 patterns defined in `lib/game/patterns/` across 7 category files using `createPattern()`
