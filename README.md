@@ -16,7 +16,7 @@ Two standalone game apps (Bingo and Trivia) built as a Turborepo monorepo with 8
 
 ### Why It's Built This Way
 
-- **Dual-screen sync** — Presenter and audience windows communicate via [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel_API) with state hash verification, message deduplication, and latency monitoring. No WebSocket server needed.
+- **Dual-screen sync** — Presenter and audience windows communicate via [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) with state hash verification, message deduplication, and latency monitoring. No WebSocket server needed.
 - **Pure function game engines** — Game state flows through pure functions (`GameState in → engine function → GameState out`), wrapped by Zustand stores for React integration. Deep freeze in development catches accidental mutations.
 - **Accessibility as architecture** — 168 design tokens enforce WCAG compliance at the token level: 44px minimum touch targets, 18px minimum body text, contrast ratios calculated per color. Not bolted on — it's the foundation.
 - **Zero-config setup** — Clone, install, run. No environment variables, no database, no API keys required for local development.
