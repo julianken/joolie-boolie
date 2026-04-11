@@ -1,19 +1,15 @@
 # @joolie-boolie/types
 
-**Status:** ✅ Production Ready (100% Complete)
+**Status:** Production Ready
 
-Comprehensive type-safe TypeScript definitions for the Joolie Boolie. Provides shared types for games, users, APIs, and dual-screen synchronization to ensure consistency across the monorepo and prevent type drift.
+Shared TypeScript definitions for the Joolie Boolie monorepo. Provides a small, well-scoped surface of theme, sync, and branded types that are used across apps and packages.
 
 ## Features
 
-- ✅ Game session interfaces and enums
-- ✅ User and authentication types
-- ✅ Standardized API request/response wrappers
-- ✅ Generic sync message types for dual-screen system
-- ✅ Timestamp and metadata utilities
-- ✅ Comprehensive JSDoc documentation
-- ✅ 30 exported types and interfaces
-- ✅ Zero runtime dependencies
+- Theme mode type for the light/dark/system selector
+- Generic sync message types for the dual-screen system
+- Branded primitive types for compile-time safety (ball numbers, team IDs, question IDs)
+- Zero runtime dependencies
 
 ## Installation
 
@@ -27,56 +23,15 @@ Comprehensive type-safe TypeScript definitions for the Joolie Boolie. Provides s
 
 ## Quick Start
 
-### 1. Game Types
+### 1. Theme Mode
 
 ```typescript
-import type { GameSession, GameStatus, GameType } from '@joolie-boolie/types';
+import type { ThemeMode } from '@joolie-boolie/types';
 
-// Create a game session
-const session: GameSession = {
-  id: 'abc123',
-  name: 'Bingo Night',
-  status: 'playing',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-// Check game type
-const gameType: GameType = 'bingo'; // 'bingo' | 'trivia'
-const displayName = GAME_TYPE_NAMES[gameType]; // 'Bingo'
+const mode: ThemeMode = 'dark'; // 'light' | 'dark' | 'system'
 ```
 
-### 2. API Response Wrappers
-
-```typescript
-import type { ApiResponse, PaginatedResponse } from '@joolie-boolie/types';
-
-// Standard API response
-async function getProfile(userId: string): Promise<ApiResponse<UserProfile>> {
-  try {
-    const profile = await fetchProfile(userId);
-    return { data: profile, error: null };
-  } catch (err) {
-    return { data: null, error: 'Profile not found' };
-  }
-}
-
-// Paginated list response
-async function listTemplates(
-  page: number
-): Promise<PaginatedResponse<BingoTemplate>> {
-  const templates = await fetchTemplates(page);
-  return {
-    data: templates,
-    total: 100,
-    page: 1,
-    pageSize: 20,
-    error: null,
-  };
-}
-```
-
-### 3. Generic Sync Messages
+### 2. Generic Sync Messages
 
 ```typescript
 import type { SyncMessage } from '@joolie-boolie/types';
@@ -87,7 +42,7 @@ type BingoSyncMessage =
   | SyncMessage<'PATTERN_CHANGED', { patternId: string }>
   | SyncMessage<'GAME_RESET', null>;
 
-// Send sync message
+// Send a sync message
 function sendBallCalled(number: number) {
   const message: SyncMessage<'BALL_CALLED', { number: number }> = {
     type: 'BALL_CALLED',
@@ -114,336 +69,26 @@ function handleMessage(message: BingoSyncMessage) {
 }
 ```
 
-### 4. User and Session Types
+### 3. Branded Types
 
 ```typescript
-import type { User, UserProfile, Session } from '@joolie-boolie/types';
+import type { BallNumber, TeamId, QuestionId } from '@joolie-boolie/types';
+import { makeBallNumber, makeTeamId, makeQuestionId } from '@joolie-boolie/types';
 
-// Basic user
-const user: User = {
-  id: 'uuid-123',
-  email: 'director@sunnyacres.com',
-  displayName: 'Jane Smith',
-  createdAt: new Date().toISOString(),
-};
-
-// Extended profile
-const profile: UserProfile = {
-  ...user,
-  facilityName: 'Sunny Acres Retirement Community',
-  logoUrl: 'https://example.com/logo.png',
-  defaultGameTitle: 'Game Night',
-  updatedAt: new Date().toISOString(),
-};
-```
-
-### 5. Extending Base Types
-
-```typescript
-import type { GameSession, GameStatus, Timestamps } from '@joolie-boolie/types';
-
-// Extend base GameSession with game-specific fields
-interface BingoSession extends GameSession {
-  ballsCalled: number[];
-  patternId: string;
-  autoCallEnabled: boolean;
-}
-
-// Extend GameStatus for game-specific states
-type TriviaGameStatus = GameStatus | 'setup' | 'between_rounds';
-
-// Use Timestamps mixin
-interface BingoTemplate extends Timestamps {
-  id: string;
-  name: string;
-  patternId: string;
-  // createdAt and updatedAt inherited from Timestamps
-}
+const ball: BallNumber = makeBallNumber(42); // throws if out of 1..75 range
+const team: TeamId = makeTeamId('team-alpha');
+const question: QuestionId = makeQuestionId('q-1');
 ```
 
 ## API Reference
 
-### Game Types
-
-#### `GameStatus`
-```typescript
-type GameStatus = 'idle' | 'playing' | 'paused' | 'ended';
-```
-Base game status shared across all games. Individual games may extend with additional statuses.
-
-#### `TriviaGameStatus`
-```typescript
-type TriviaGameStatus = GameStatus | 'setup' | 'between_rounds';
-```
-Extended game status for trivia that includes additional states beyond the base statuses.
-
-#### `GameType`
-```typescript
-type GameType = 'bingo' | 'trivia';
-```
-Available game types in the Joolie Boolie.
-
-#### `GAME_TYPE_NAMES`
-```typescript
-const GAME_TYPE_NAMES: Record<GameType, string> = {
-  bingo: 'Bingo',
-  trivia: 'Trivia',
-};
-```
-Map of game types to their display names.
-
-#### `GameSession`
-```typescript
-interface GameSession {
-  id: string;
-  name: string;
-  status: GameStatus;
-  createdAt: string;  // ISO 8601 timestamp
-  updatedAt: string;  // ISO 8601 timestamp
-}
-```
-Base interface for a game session. Individual games should extend this with game-specific fields.
-
-**Example:**
-```typescript
-const session: GameSession = {
-  id: crypto.randomUUID(),
-  name: 'Friday Night Bingo',
-  status: 'idle',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-```
+### Theme Types
 
 #### `ThemeMode`
 ```typescript
 type ThemeMode = 'light' | 'dark' | 'system';
 ```
-Theme mode for the application.
-
-#### `ColorTheme`
-```typescript
-type ColorTheme =
-  | 'blue' | 'green' | 'purple' | 'orange' | 'red'
-  | 'teal' | 'pink' | 'amber' | 'indigo' | 'cyan';
-```
-Available color themes in the platform.
-
-#### `Timestamps`
-```typescript
-interface Timestamps {
-  createdAt: string;  // ISO 8601 timestamp
-  updatedAt: string;  // ISO 8601 timestamp
-}
-```
-Standard timestamp fields for database entities. Use as a mixin interface.
-
-**Example:**
-```typescript
-interface MyEntity extends Timestamps {
-  id: string;
-  name: string;
-  // createdAt and updatedAt inherited
-}
-```
-
-### User Types
-
-#### `User`
-```typescript
-interface User {
-  id: string;              // UUID from Supabase Auth
-  email: string;
-  displayName: string | null;
-  createdAt: string;       // ISO 8601 timestamp
-}
-```
-Core user type representing an authenticated user.
-
-#### `UserProfile`
-```typescript
-interface UserProfile extends User, Timestamps {
-  facilityName: string | null;     // e.g., 'Sunny Acres Retirement Community'
-  logoUrl: string | null;
-  defaultGameTitle: string;
-}
-```
-Extended user profile with additional platform-specific fields.
-
-#### `LoginRequest`
-```typescript
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-```
-Request payload for user login.
-
-#### `RegisterRequest`
-```typescript
-interface RegisterRequest {
-  email: string;
-  password: string;
-  facilityName?: string;
-  displayName?: string;
-}
-```
-Request payload for user registration.
-
-#### `AuthResponse`
-```typescript
-interface AuthResponse {
-  user: User | null;
-  error: string | null;
-}
-```
-Response from authentication endpoints.
-
-#### `UpdateProfileRequest`
-```typescript
-interface UpdateProfileRequest {
-  displayName?: string;
-  facilityName?: string;
-  defaultGameTitle?: string;
-}
-```
-Request payload for updating user profile.
-
-#### `Session`
-```typescript
-interface Session {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: number;      // Unix milliseconds
-  user: User;
-}
-```
-Represents an authenticated session.
-
-### API Types
-
-#### `ApiResponse<T>`
-```typescript
-interface ApiResponse<T> {
-  data: T | null;
-  error: string | null;
-}
-```
-Standard API response wrapper. All API endpoints should return data in this format.
-
-**Example:**
-```typescript
-// Success
-const success: ApiResponse<User> = {
-  data: { id: '123', email: 'user@example.com', ... },
-  error: null
-};
-
-// Error
-const error: ApiResponse<User> = {
-  data: null,
-  error: 'User not found'
-};
-```
-
-#### `PaginatedResponse<T>`
-```typescript
-interface PaginatedResponse<T> {
-  data: T[];
-  total: number;          // Total items across all pages
-  page: number;           // Current page (1-indexed)
-  pageSize: number;       // Items per page
-  error: string | null;
-}
-```
-Paginated API response wrapper for list endpoints.
-
-**Example:**
-```typescript
-const response: PaginatedResponse<GameSession> = {
-  data: [{ id: '1', ... }, { id: '2', ... }],
-  total: 100,
-  page: 1,
-  pageSize: 20,
-  error: null
-};
-```
-
-#### `PaginationParams`
-```typescript
-interface PaginationParams {
-  page?: number;          // 1-indexed, defaults to 1
-  pageSize?: number;      // Defaults to 20
-}
-```
-Standard pagination parameters for list requests.
-
-#### `SortDirection`
-```typescript
-type SortDirection = 'asc' | 'desc';
-```
-Sort direction for list requests.
-
-#### `SortParams<T>`
-```typescript
-interface SortParams<T extends string = string> {
-  sortBy?: T;
-  sortDirection?: SortDirection;
-}
-```
-Standard sort parameters for list requests.
-
-#### `ListParams<T>`
-```typescript
-interface ListParams<T extends string = string>
-  extends PaginationParams, SortParams<T> {}
-```
-Combined list request parameters with pagination and sorting.
-
-**Example:**
-```typescript
-interface TemplateListParams extends ListParams<'name' | 'created_at'> {}
-
-const params: TemplateListParams = {
-  page: 1,
-  pageSize: 10,
-  sortBy: 'created_at',
-  sortDirection: 'desc'
-};
-```
-
-#### `ApiError`
-```typescript
-interface ApiError {
-  code: string;
-  message: string;
-  statusCode: number;
-  details?: Record<string, unknown>;
-}
-```
-Structured API error with additional context.
-
-#### `ApiErrorCode`
-```typescript
-type ApiErrorCode =
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN'
-  | 'NOT_FOUND'
-  | 'VALIDATION_ERROR'
-  | 'INTERNAL_ERROR'
-  | 'RATE_LIMITED'
-  | 'SERVICE_UNAVAILABLE';
-```
-Common API error codes used across the platform.
-
-#### `RequestMetadata`
-```typescript
-interface RequestMetadata {
-  requestId?: string;     // Client request ID for tracing
-  timestamp?: number;     // Unix milliseconds
-}
-```
-Metadata that can be included with API requests.
+Theme mode for the application. Consumed by `packages/ui` theme components.
 
 ### Sync Types
 
@@ -526,129 +171,82 @@ interface BingoSyncState extends BaseSyncState {
 }
 ```
 
-## Type Guards
+### Branded Types
 
-While this package primarily exports type definitions, you can create type guards for runtime checks:
-
+#### `Branded<T, B>`
 ```typescript
-import type { GameType, GameStatus, ApiResponse } from '@joolie-boolie/types';
-
-// Game type guard
-function isValidGameType(value: unknown): value is GameType {
-  return typeof value === 'string' && ['bingo', 'trivia'].includes(value);
-}
-
-// Game status guard
-function isValidGameStatus(value: unknown): value is GameStatus {
-  return typeof value === 'string' &&
-    ['idle', 'playing', 'paused', 'ended'].includes(value);
-}
-
-// API response guard
-function isApiError<T>(response: ApiResponse<T>): response is ApiResponse<T> & { error: string } {
-  return response.error !== null;
-}
-
-// Usage
-const gameType: unknown = 'bingo';
-if (isValidGameType(gameType)) {
-  console.log(`Valid game: ${GAME_TYPE_NAMES[gameType]}`);
-}
-
-const response = await fetchProfile(userId);
-if (isApiError(response)) {
-  console.error(response.error);
-} else {
-  console.log(response.data);
-}
+type Branded<T, B> = T & { readonly __brand: B };
 ```
+Nominal typing helper: a primitive type `T` tagged with brand `B` so two
+branded types with the same underlying primitive are not assignable to each
+other.
+
+#### `BallNumber`
+```typescript
+type BallNumber = Branded<number, 'BallNumber'>;
+```
+Valid bingo ball number in the range `1..75`. Construct with `makeBallNumber(n)`
+which throws on out-of-range input.
+
+#### `TeamId`
+```typescript
+type TeamId = Branded<string, 'TeamId'>;
+```
+Trivia team identifier. Construct with `makeTeamId(id)`.
+
+#### `QuestionId`
+```typescript
+type QuestionId = Branded<string, 'QuestionId'>;
+```
+Trivia question identifier. Construct with `makeQuestionId(id)`.
 
 ## Integration Status
 
 | App/Package | Status | Usage |
 |-------------|--------|-------|
-| `apps/bingo` | ✅ Active | Uses SyncMessage for dual-screen sync |
-| `apps/trivia` | ✅ Active | Uses TriviaGameStatus, SyncMessage for dual-screen sync |
-| `packages/sync` | ✅ Active | Re-exports SyncRole, ConnectionState, SyncMessage types |
-| `packages/ui` | ❌ N/A | UI components don't need game types |
-| `packages/theme` | ❌ N/A | Uses ThemeMode, ColorTheme indirectly |
+| `apps/bingo` | Active | `BallNumber` branded type, sync message patterns |
+| `apps/trivia` | Active | `TeamId`, `QuestionId` branded types |
+| `packages/sync` | Active | Re-exports `SyncRole`, `ConnectionState`, `SyncMessage` |
+| `packages/ui` | Active | Imports `ThemeMode` for theme components |
 
 ## Design Philosophy
 
 ### 1. Type Safety First
-All types use strict TypeScript with no `any` types. Union types and enums are preferred over string literals for better IDE autocomplete.
+All types use strict TypeScript with no `any` types. Union types are preferred over
+string literals for IDE autocomplete.
 
-### 2. Consistency Across Apps
-Types are defined once and shared across all apps to prevent drift. For example, `GameType` is used consistently in database schemas, API routes, and UI components.
+### 2. Minimal Shared Surface
+Only types that are genuinely shared across multiple packages live here. Each app
+owns its own domain types (game state, patterns, scoring) inside `apps/<app>/src/types/`.
 
 ### 3. Generic Types for Flexibility
-The `SyncMessage<TType, TPayload>` and `ApiResponse<T>` types are generic, allowing each game to extend them with specific payloads while maintaining a consistent structure.
+The `SyncMessage<TType, TPayload>` type is generic, letting each game extend it with
+specific payloads while keeping a consistent message envelope.
 
-### 4. ISO 8601 Timestamps
-All timestamp fields use ISO 8601 string format (`YYYY-MM-DDTHH:mm:ss.sssZ`) for consistency with Supabase and JavaScript Date APIs.
-
-### 5. Nullable vs Optional
-- Use `null` for fields that may not have a value at runtime (e.g., `displayName: string | null`)
-- Use `?` for fields that may be omitted entirely (e.g., `facilityName?: string`)
-
-### 6. Extensibility
-Base types like `GameSession`, `GameStatus`, and `BaseSyncState` are designed to be extended by individual games:
-
-```typescript
-// Trivia extends base GameStatus
-type TriviaGameStatus = GameStatus | 'setup' | 'between_rounds';
-
-// Bingo extends base GameSession
-interface BingoSession extends GameSession {
-  ballsCalled: number[];
-  patternId: string;
-}
-```
-
-### 7. Documentation as Code
-Every exported type includes comprehensive JSDoc comments with descriptions, examples, and usage notes.
-
-## Related Documentation
-
-- **Sync Package**: `/Users/j/repos/joolie-boolie-platform/packages/sync/README.md` - Re-exports and extends SyncMessage types
-- **Main CLAUDE.md**: `/Users/j/repos/joolie-boolie-platform/CLAUDE.md` - Project overview and architecture
+### 4. Nominal Types via Branding
+The `Branded<T, B>` pattern is used to distinguish primitives that share the same
+underlying type (for example, `BallNumber` vs raw `number`) without adding runtime overhead.
 
 ## Development
 
 ### Adding New Types
 
 1. Add the type definition to the appropriate file:
-   - `src/game.ts` - Game-related types
-   - `src/user.ts` - User and auth types
-   - `src/api.ts` - API request/response types
+   - `src/game.ts` - Theme-related types
    - `src/sync.ts` - Sync and dual-screen types
+   - `src/branded.ts` - Branded primitive types
 
 2. Export from `src/index.ts`:
 ```typescript
 export type { MyNewType } from './game';
 ```
 
-3. Add JSDoc documentation:
-```typescript
-/**
- * Description of what this type represents.
- *
- * @example
- * const example: MyNewType = { ... };
- */
-export interface MyNewType {
-  // ...
-}
-```
+3. Add JSDoc documentation.
 
 4. Update this README with the new type in the API Reference section.
 
 ### Testing Type Exports
 
 ```bash
-# Type check
 pnpm typecheck
-
-# Verify exports compile
-pnpm build
 ```

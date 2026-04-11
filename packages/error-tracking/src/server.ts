@@ -86,8 +86,7 @@ export function resetServerErrorTracking(): void {
 }
 
 /**
- * Auto-categorize error (server-specific patterns: ECONNREFUSED, ENOTFOUND,
- * jwt, postgres, supabase, etc.)
+ * Auto-categorize error (server-specific patterns: ECONNREFUSED, ENOTFOUND, etc.)
  */
 function categorizeError(error: Error): ErrorCategory {
   const message = error.message.toLowerCase();
@@ -106,8 +105,7 @@ function categorizeError(error: Error): ErrorCategory {
   if (
     message.includes('unauthorized') ||
     message.includes('forbidden') ||
-    message.includes('authentication') ||
-    message.includes('jwt')
+    message.includes('authentication')
   ) {
     return 'auth';
   }
@@ -122,8 +120,6 @@ function categorizeError(error: Error): ErrorCategory {
 
   if (
     message.includes('database') ||
-    message.includes('postgres') ||
-    message.includes('supabase') ||
     message.includes('query')
   ) {
     return 'storage';

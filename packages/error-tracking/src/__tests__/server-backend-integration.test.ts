@@ -82,14 +82,14 @@ describe('error-tracking server <-> backend integration', () => {
     });
 
     it('should auto-categorize auth errors', () => {
-      captureServerError(new Error('jwt expired'));
+      captureServerError(new Error('unauthorized request'));
 
       const trackedError: TrackedError = mockBackend.captureError.mock.calls[0][0];
       expect(trackedError.category).toBe('auth');
     });
 
     it('should auto-categorize storage errors', () => {
-      captureServerError(new Error('postgres connection failed'));
+      captureServerError(new Error('database query failed'));
 
       const trackedError: TrackedError = mockBackend.captureError.mock.calls[0][0];
       expect(trackedError.category).toBe('storage');
