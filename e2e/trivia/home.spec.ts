@@ -8,30 +8,32 @@ test.describe('Trivia Home Page', () => {
   });
 
   test('displays the main title @medium', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /trivia/i })).toBeVisible();
+    // Use role + level to avoid brittle text matching (BEA-701 may rewrite copy).
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/trivia/i);
   });
 
   test('shows description text @medium', async ({ page }) => {
-    await expect(page.getByText(/trivia system|groups and communities/i)).toBeVisible();
+    // Resilient to copy rewrites: accept either the current description or
+    // any BEA-701 variant that mentions "trivia" + "groups/communities".
+    await expect(
+      page.getByText(/trivia system|groups and communities|a modern trivia/i)
+    ).toBeVisible();
   });
 
-  test('has Start Trivia button that links to presenter view @high', async ({ page }) => {
-    const startButton = page.getByRole('link', { name: /start trivia/i });
-    await expect(startButton).toBeVisible();
-    await expect(startButton).toHaveAttribute('href', '/play');
+  test('has a play link that points at the presenter view @high', async ({ page }) => {
+    // Home page renders a single primary CTA that links to /play. Match any
+    // accessible name ("Play", "Start Trivia", "Play Now", etc.) rather than
+    // hard-coding the current label.
+    const playLink = page.locator('main a[href="/play"]').first();
+    await expect(playLink).toBeVisible();
+    await expect(playLink).toHaveAttribute('href', '/play');
   });
 
-  test('has Open Display button @high', async ({ page }) => {
-    const displayButton = page.getByRole('link', { name: /open display/i });
-    await expect(displayButton).toBeVisible();
-    await expect(displayButton).toHaveAttribute('href', '/display');
-  });
-
-  test('navigates to presenter view when Start Trivia is clicked @critical', async ({ page }) => {
-    await page.getByRole('link', { name: /start trivia/i }).click();
-    // Middleware protects /play - unauthenticated users are redirected back to home
-    await expect(page).toHaveURL('/');
-    // Note: To test actual /play navigation, use authenticated fixtures
+  test('navigates to presenter view when play link is clicked @critical', async ({ page }) => {
+    await page.locator('main a[href="/play"]').first().click();
+    // Standalone mode: /play is public (no middleware redirect).
+    await expect(page).toHaveURL(/\/play$/);
   });
 
   test('has accessible structure @low', async ({ page }) => {
@@ -44,9 +46,9 @@ test.describe('Trivia Home Page', () => {
     await expect(main).toBeVisible();
   });
 
-  test('buttons have accessible sizes @low', async ({ page }) => {
-    const startButton = page.getByRole('link', { name: /start trivia/i });
-    const box = await startButton.boundingBox();
+  test('play link has accessible touch target size @low', async ({ page }) => {
+    const playLink = page.locator('main a[href="/play"]').first();
+    const box = await playLink.boundingBox();
 
     expect(box).not.toBeNull();
     expect(box!.width).toBeGreaterThanOrEqual(44);

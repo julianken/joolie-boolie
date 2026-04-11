@@ -2,16 +2,28 @@ import { Page, expect } from '@playwright/test';
 
 /**
  * Wait for the Next.js app to fully hydrate.
- * Waits for network idle and checks for React hydration markers.
- * Pattern 1: Wait for element visibility (React hydration complete)
+ *
+ * Asserts that <main> has rendered at least one visible child element. This is
+ * a "DOM exists" smoke check, intentionally agnostic to specific element types
+ * (button, link, heading, svg). Post-standalone-conversion the home pages and
+ * invalid-session display screens use only <Link>/<a> and <svg> elements, so
+ * the previous "must have a button" contract was too strict.
+ *
+ * Real test assertions that follow waitForHydration still verify specific UI
+ * (getByRole('heading'), getByRole('link'), etc.), so this helper acts as a
+ * lightweight smoke gate rather than a full hydration probe.
+ *
+ * Behavior-based (not copy-based) so it is robust to user-facing copy edits.
+ *
+ * See docs/plans/BEA-697-e2e-baseline-fix.md for the full rationale (Option B).
  */
 export async function waitForHydration(page: Page): Promise<void> {
   await page.waitForLoadState('domcontentloaded');
-  // Wait for React hydration by checking for interactive elements
-  // The page should have at least one button or interactive element when hydrated
+  // A hydrated page must render at least one visible element inside <main>.
+  // Both bingo and trivia apps use <main> as the primary landmark on every page.
   await expect(async () => {
-    const hasInteractiveElement = await page.locator('button, input, [role="button"]').first().isVisible({ timeout: 1000 });
-    expect(hasInteractiveElement).toBe(true);
+    const mainContent = page.locator('main').locator(':visible').first();
+    await expect(mainContent).toBeVisible({ timeout: 1000 });
   }).toPass({ timeout: 5000 });
 }
 
@@ -283,12 +295,31 @@ export async function startGameViaWizard(page: Page, teamCount = 2, timeout = 15
   // Scope all interactions to the overlay to avoid strict-mode violations
   // (the dashboard behind the overlay also has matching elements)
 
-  // Navigate to Teams step (wizard step index 2)
+  // Navigate to Teams step (wizard step index 2).
+  // SetupWizard.goToStep silently refuses to advance past step 0 (Questions)
+  // if questions.length === 0. The authenticatedTriviaPage fixture seeds
+  // questions via window.__triviaE2EQuestions (see e2e/utils/trivia-fixtures.ts);
+  // if that seed is missing, the click below will be a no-op and the Add Team
+  // button lookup will time out with a cryptic "element not visible" error.
+  // Assert the Teams step actually activated so the failure mode is explicit.
   await gate.locator('[data-testid="wizard-step-2"]').click();
+
+  const addTeamBtn = gate.getByRole('button', { name: /add team/i });
+  try {
+    await expect(addTeamBtn).toBeVisible({ timeout: 5000 });
+  } catch (err) {
+    throw new Error(
+      '[startGameViaWizard] Wizard step 2 (Teams) did not activate after click. ' +
+        'Most likely cause: the trivia game store has zero questions, so ' +
+        'SetupWizard.isStepComplete(0) returned false and goToStep(2) was a ' +
+        'no-op. Check that e2e/fixtures/auth.ts calls addInitScript with ' +
+        'buildTriviaSeedInitScript() before navigating. ' +
+        `Underlying error: ${(err as Error).message}`
+    );
+  }
 
   // Add the requested number of teams
   for (let i = 0; i < teamCount; i++) {
-    const addTeamBtn = gate.getByRole('button', { name: /add team/i });
     await addTeamBtn.click();
     // Wait for team to appear within the overlay
     await expect(gate.getByText(new RegExp(`table ${i + 1}`, 'i'))).toBeVisible();
