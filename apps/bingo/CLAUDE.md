@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Bingo** - A cloud-based, web-accessible Bingo system designed for groups and communities. Replaces USB-based solutions with a modern PWA that works offline, supports dual-screen presentation (presenter controls + audience display), and provides admin accounts for saved configurations.
+**Bingo** - A standalone, web-accessible Bingo PWA for groups and communities. Works offline with no accounts or backend — all configuration saved locally via localStorage. Supports dual-screen presentation (presenter controls + audience display) via BroadcastChannel.
 
 **Current State:** Fully functional with audio, patterns, themes, and dual-screen sync.
 

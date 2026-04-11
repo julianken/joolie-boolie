@@ -239,13 +239,15 @@ All PRs must use the template at `.github/PULL_REQUEST_TEMPLATE.md`. It includes
 
 ## Architecture Guidelines
 
-### BFF Pattern
+### API Routes
 
-Apps use the Backend-for-Frontend pattern. Frontend never talks directly to Supabase:
+API routes are minimal. The only server-side routes are:
+- CSP report endpoint (`/api/csp-report`)
+- Monitoring tunnel (`/api/monitoring`)
+- Trivia API proxy (`/api/trivia` — keeps the API key server-side)
 
-```
-Frontend → API Routes → Supabase
-```
+All data persistence is localStorage via Zustand persist middleware.
+There is no database or auth backend.
 
 ### Dual-Screen Sync
 

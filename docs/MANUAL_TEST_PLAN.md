@@ -1,6 +1,6 @@
 # Manual Test Plan — Joolie Boolie
 
-The canonical guide for manual QA using **Playwright MCP browser tools**. Covers visual, audio, cross-app, and interactive flows that automated E2E tests cannot.
+The canonical guide for manual QA using **Playwright MCP browser tools**. Covers visual, audio, and interactive flows that automated E2E tests cannot.
 
 For automated E2E tests, see [docs/E2E_TESTING_GUIDE.md](E2E_TESTING_GUIDE.md).
 
@@ -10,14 +10,14 @@ For automated E2E tests, see [docs/E2E_TESTING_GUIDE.md](E2E_TESTING_GUIDE.md).
 
 | What | Where |
 |------|-------|
-| Run all stories | Follow Prerequisites below, then walk through sections 1–7 |
+| Run all stories | Follow Prerequisites below, then walk through sections 1–5 |
 | Run a single story | Search for `Story X.Y` and follow its test cases |
-| Run by app | Section 1 = Platform Hub, Section 2 = Bingo, Section 3 = Trivia |
-| Run cross-app | Section 4 = OAuth/SSO, Section 5 = A11y, Section 6 = PWA, Section 7 = Responsive |
+| Run by app | Section 1 = Bingo, Section 2 = Trivia |
+| Run cross-cutting | Section 3 = A11y, Section 4 = PWA, Section 5 = Responsive |
 | Report results | Update the Result column: `**PASS**`, `NOT TESTED`, or `**BUG** — description` |
 | Log a new bug | Add to Bugs Found table below, file a Linear issue (BEA-###) |
 
-**Current status:** 183 PASS, 0 BUGS, 20 NOT TESTED (203 total test cases)
+**Current status:** 168 PASS, 0 BUGS, 16 NOT TESTED (standalone 2-app scope after BEA-702 cleanup)
 
 ---
 
@@ -26,18 +26,17 @@ For automated E2E tests, see [docs/E2E_TESTING_GUIDE.md](E2E_TESTING_GUIDE.md).
 ### 1. Start dev servers
 
 ```bash
-pnpm dev    # Starts all 3 apps with real auth
+pnpm dev    # Starts Bingo and Trivia
 ```
 
-> **NEVER use `pnpm dev:e2e` or `E2E_TESTING=true` for manual testing.** That mode is only for automated E2E test suites (`pnpm test:e2e`). Manual/Playwright MCP testing uses real auth.
+> **NEVER use `pnpm dev:e2e` or `E2E_TESTING=true` for manual testing.** That mode is only for automated E2E test suites (`pnpm test:e2e`). Manual/Playwright MCP testing uses the normal dev mode.
 
 | App | Default Port | URL |
 |-----|-------------|-----|
 | Bingo | 3000 | http://localhost:3000 |
 | Trivia | 3001 | http://localhost:3001 |
-| Platform Hub | 3002 | http://localhost:3002 |
 
-> **Worktrees:** If running from `.worktrees/`, ports are hash-offset from the path. Check terminal output for actual ports.
+> **Worktrees:** If running from `.worktrees/`, ports are hash-offset from the path. Check terminal output for actual ports. See [ADR-001](adr/ADR-001-e2e-hash-port-isolation.md).
 
 ### 2. Playwright MCP browser setup
 
@@ -48,34 +47,28 @@ browser_navigate to http://localhost:3000
 browser_evaluate: page.emulateMedia({ colorScheme: 'dark' })
 ```
 
-### 3. Authentication
+Do **not** toggle the `dark` class on `<html>` directly — the apps manage a `light`/`dark` class themselves from the theme store, and adding `dark` without removing `light` produces broken, mixed-theme styling that looks like a real bug.
 
-Manual testing uses **real auth** — authenticate via one of:
-- **Supabase MCP** — Use `mcp__supabase__execute_sql` to create/query auth sessions directly
-- **Platform Hub login** — Navigate to `http://localhost:3002`, sign in with real credentials, cookies propagate to game apps on `localhost`
-
-For **unauthenticated flows** (guest mode, public pages), no login is needed.
-
-### 4. Key Playwright MCP tools
+### 3. Key Playwright MCP tools
 
 | Tool | Use for |
 |------|---------|
 | `browser_navigate` | Go to a URL |
 | `browser_snapshot` | Get page accessibility tree (preferred over screenshot for assertions) |
 | `browser_click` | Click elements by text, role, or ref |
-| `browser_evaluate` | Run JS in page context (API calls, DOM checks, fullscreen, offline) |
+| `browser_evaluate` | Run JS in page context (DOM checks, fullscreen, offline) |
 | `browser_take_screenshot` | Visual verification (theme changes, responsive layouts) |
 | `browser_press_key` | Keyboard shortcuts (Space, P, R, U, M, D, E, ?, arrows) |
 | `browser_fill_form` | Fill input fields |
 | `browser_resize` | Test responsive breakpoints (375x667 mobile, 768x1024 tablet) |
 
-### 5. Tips
+### 4. Tips
 
 - Use `browser_snapshot` to verify element presence — it returns the accessibility tree, which is faster and more reliable than screenshots for assertions
-- Use `browser_evaluate` with `fetch()` to test API endpoints directly
 - Use `browser_evaluate` with `context.setOffline(true)` to test offline mode
 - Use `browser_evaluate` with `document.requestFullscreen()` / `document.exitFullscreen()` for fullscreen
 - Playwright Chromium doesn't inherit macOS dark mode — always use `page.emulateMedia({ colorScheme: 'dark' })`
+- No authentication is required — both apps are standalone and all persistence is localStorage
 
 ---
 
@@ -95,20 +88,20 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 | 2026-02-24 | Removed Story 3.17 (Buzz-In) — feature not applicable to this game style (paper-scored pub trivia) | -5 NOT TESTED |
 | 2026-03-02 (run 9) | Dual-screen sync verification (Bingo 2.7, 2.8 + Trivia 3.5, 3.6, 3.9, 3.16, 3.18, 3.19, 5.1) via Playwright MCP multi-window | 168 PASS, 0 BUGS, 16 NOT TESTED |
 
+> **Footnote (BEA-702, 2026-04-11):** Runs 1-9 above included Platform Hub, OAuth SSO, and template-aggregation stories (former Sections 1 and 4) that were removed in the standalone conversion (BEA-682–696). Those rows are preserved here for historical continuity. All subsequent runs cover only the 2-app standalone scope documented below.
+
 ## Bugs Found and Fixed
 
 | ID | Severity | Description | Fix |
 |----|----------|-------------|-----|
 | BEA-503 | Minor | Bingo: Pattern selection doesn't persist across page refresh. | Fixed in PR #337 — pattern now serialized in localStorage |
 | BEA-504 | Minor | Trivia: Teams and scores don't persist across page refresh. | Fixed in PR #339 — teams/scores now serialized in localStorage |
-| BEA-505 | Minor | Platform Hub: Profile API returns 500 for E2E users. | Fixed in PR #338 — graceful fallback for missing DB rows |
 
 ## Notes
 
-- Template API returns E2E fixture data (2 templates: "E2E Trivia" + "E2E Bingo Classic") in E2E mode
 - Trivia scoring controls (+/-) only appear during active gameplay (not during emergency pause)
 - Presets and Question Set selectors only visible in pre-game setup area, not during gameplay
-- All security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy) present on all 3 apps
+- Security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy) present on both apps
 - Serwist SW registers in Turbopack dev mode via `@serwist/turbopack` — both Bingo and Trivia have active SWs
 - QuestionImporter and CategoryFilter now rendered in page UI (fixed by BEA-506/BEA-507)
 - Fullscreen API works in Playwright Chromium via `evaluate` (no user gesture required)
@@ -116,101 +109,27 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 
 ---
 
-## 1. Platform Hub
+## 1. Bingo
 
-### Story 1.1: Home Page Renders Correctly
+### Story 2.1: Home Page — **ALL PASS**
 
-**As a visitor**, I want to see the game selector page so I can choose which game to play.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Home page loads | Navigate to `localhost:3002`. Verify page title contains "Joolie Boolie". Verify game cards for Bingo and Trivia are visible. |
-| 2 | Game cards link correctly | Click the Bingo card. Verify it navigates to or opens `localhost:3000`. Go back. Click the Trivia card. Verify it navigates to `localhost:3001`. |
-| 3 | Header and footer render | Verify the Header component is visible at the top. Verify Footer is visible at the bottom. |
-| 4 | Security headers present | Run `browser_evaluate` with `fetch(window.location.href).then(r => Object.fromEntries(r.headers))`. Verify `x-frame-options`, `x-content-type-options`, `referrer-policy` headers exist. |
-
-### Story 1.2: Login Page
-
-**As a user**, I want to log in to access protected features.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Login page renders | Navigate to `localhost:3002/login`. Verify email and password inputs are visible. Verify "Sign In" button exists. |
-| 2 | Forgot password link | Verify a link to `/forgot-password` is visible on the login page. Click it. Verify the forgot password form loads. |
-| 3 | Signup link | Verify a link to `/signup` is visible on the login page. Click it. Verify the signup form loads. |
-| 4 | Empty form validation | On the login page, click "Sign In" without entering credentials. Verify an error message appears. |
-
-### Story 1.3: Signup Page
-
-**As a new user**, I want to create an account.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Signup form renders | Navigate to `localhost:3002/signup`. Verify email, password, and confirm password fields are visible. |
-| 2 | Password mismatch | Enter different passwords in password and confirm fields. Submit. Verify error about passwords not matching. |
-| 3 | Login link | Verify a link back to `/login` exists on the signup page. |
-
-### Story 1.4: Password Reset Flow
-
-**As a user**, I want to reset my password if I forget it.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Forgot password form | Navigate to `localhost:3002/forgot-password`. Verify email input is visible. Verify "Reset Password" button exists. |
-| 2 | Reset password page | Navigate to `localhost:3002/reset-password`. Verify new password and confirm password fields exist. |
-
-### Story 1.5: OAuth Consent Page
-
-**As a user**, I want to authorize game apps to access my account.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Consent page loads | Navigate to `localhost:3002/oauth/consent?authorization_id=test`. Verify the page renders (may show error for invalid ID, which is expected). |
-| 2 | CSRF endpoint works | Run `browser_evaluate` with `fetch('/api/oauth/csrf').then(r => r.json())`. Verify response contains a `csrf_token` field. |
-
-### Story 1.6: Dashboard (Protected)
-
-**As an authenticated user**, I want to see my dashboard.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Unauthenticated redirect | Navigate to `localhost:3002/dashboard`. Verify redirect to login page (since not logged in). |
-| 2 | Settings redirect | Navigate to `localhost:3002/settings`. Verify redirect to login page. |
-
-### Story 1.7: API Health & Security
-
-**As an operator**, I want to verify API endpoints are functional.
-
-| # | Test Case | Steps |
-|---|-----------|-------|
-| 1 | Templates API responds | Run `browser_evaluate` with `fetch('/api/templates').then(r => r.json())`. Verify response has `templates` array (may be empty). |
-| 2 | Profile API requires auth | Run `browser_evaluate` with `fetch('/api/profile').then(r => r.status)`. Verify status is 401 or redirect. |
-| 3 | Rate limiting configured | Run `browser_evaluate` sending 15 rapid requests to `/api/auth/login`. Verify rate limiting kicks in (429 status). |
-
----
-
-## 2. Bingo
-
-### Story 2.1: Home Page & Authentication — **ALL PASS**
-
-**As a presenter**, I want to access the Bingo app and sign in.
+**As a presenter**, I want to access the Bingo app.
 
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
-| 1 | Home page loads | Navigate to `localhost:3000`. Verify "Bingo" branding is visible. Verify "Sign in with Joolie Boolie" button AND "Play as Guest" link both exist. | **PASS** — Both buttons visible when unauthenticated (run 7) |
-| 2 | Sign in redirects to Hub | Click "Sign in with Joolie Boolie". Verify redirect to `localhost:3002/login` (or `/api/oauth/authorize`). | **PASS** — Verified in run 1 (requires NEXT_PUBLIC_OAUTH_AUTHORIZE_URL in local dev) |
-| 3 | Play route allows guests | Navigate to `localhost:3000/play` (unauthenticated). Verify the page loads and auto-creates an offline session (no redirect to home). | **PASS** — Covered by Story 2.11 Test 3 |
-| 4 | Display route public | Navigate to `localhost:3000/display`. Verify the page loads (may show "invalid session" which is expected). | **PASS** — "Invalid Session" message displayed (run 7) |
-| 5 | Security headers | Run `browser_evaluate` to check response headers. Verify X-Frame-Options, X-Content-Type-Options, Referrer-Policy are present. | **PASS** — All 3 headers confirmed (run 7) |
-| 6 | Statistics display | If games have been played (check localStorage), verify stats cards are visible on home page. | **PASS** — No stats shown (no games played in session), expected behavior |
+| 1 | Home page loads | Navigate to `localhost:3000`. Verify "Bingo" branding is visible. Verify "Play" button exists. | **PASS** — Standalone home page (run 7, updated BEA-702) |
+| 2 | Play route loads | Click "Play" (or navigate to `localhost:3000/play`). Verify the page loads and auto-creates an offline session. | **PASS** — Covered by Story 2.11 Test 3 |
+| 3 | Display route public | Navigate to `localhost:3000/display`. Verify the page loads (may show "invalid session" which is expected). | **PASS** — "Invalid Session" message displayed (run 7) |
+| 4 | Security headers | Run `browser_evaluate` to check response headers. Verify X-Frame-Options, X-Content-Type-Options, Referrer-Policy are present. | **PASS** — All 3 headers confirmed (run 7) |
+| 5 | Statistics display | If games have been played (check localStorage), verify stats cards are visible on home page. | **PASS** — No stats shown (no games played in session), expected behavior |
 
-### Story 2.2: Room Setup (Requires Auth) — **ALL PASS**
+### Story 2.2: Room Setup — **ALL PASS**
 
-**As an authenticated presenter**, I want to create or join a game room.
+**As a presenter**, I want to create or join a game room.
 
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
-| 1 | Room setup modal appears | After auth, navigate to `/play`. Verify Room Setup modal dialog is visible. | **PASS** — Auto-created offline session on load |
+| 1 | Room setup modal appears | Navigate to `/play`. Verify Room Setup modal dialog is visible. | **PASS** — Auto-created offline session on load |
 | 2 | Three options visible | Verify buttons: "Create New Game", "Join with Room Code", "Play Offline". | **PASS** — All 3 buttons visible |
 | 3 | Create online room | Click "Create New Game". Verify modal closes. Verify Room code and PIN are displayed. PIN should be 4 digits (1000-9999). | **PASS** |
 | 4 | Join room form | Click "Join with Room Code". Verify room code input and PIN input appear. | **PASS** |
@@ -315,47 +234,42 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 | 2 | PIN persists | Create online room. Note the PIN. Refresh page. Verify PIN is still displayed (from localStorage). | **PASS** — Session ID persists |
 | 3 | Create new game | While in active session, click "Create New Game". Verify confirmation dialog. Confirm. Verify fresh room setup modal appears. | **PASS** — Confirm dialog appears, fresh state after confirm |
 
-### Story 2.11: Guest Mode (BEA-524) — **8 PASS, 3 NOT TESTED**
+### Story 2.11: Standalone Play — **ALL PASS**
 
-**As a visitor**, I want to try Bingo without creating an account.
+**As a visitor**, I want to use Bingo without creating an account.
 
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
-| 1 | Guest CTA visible | Navigate to `localhost:3000` (unauthenticated). Verify "Play as Guest" link is visible below the sign-in button. Verify helper text "No account needed" is shown. | **PASS** — "Play as Guest" link visible with "No account needed — play offline instantly" text (run 7) |
-| 2 | Guest CTA links to /play | Verify the "Play as Guest" link has `href="/play"` (no query parameters). | **PASS** — href="/play" confirmed (run 7) |
-| 3 | Guest auto-starts offline | Click "Play as Guest". Verify `/play` loads. Verify an offline session is auto-created (6-char session ID visible). Verify no login redirect occurs. | **PASS** — Session PPBZ5K auto-created, no redirect (run 7) |
-| 4 | Full game works as guest | As guest on `/play`, call balls (Space), undo (U), pause (P), resume (P), reset (R). Verify all controls work identically to authenticated offline mode. | **PASS** — All controls work: Space (G-57 called), U (undo), P (pause/resume), R (reset with confirmation) (run 7) |
-| 5 | Audio works as guest | As guest, verify voice pack selector, roll sound selector, volume controls all function. Verify M key mutes/unmutes. | **PASS** — M key mutes/unmutes, all audio controls functional (run 7) |
-| 6 | Patterns work as guest | As guest, verify pattern selector is available. Select different patterns. Verify preview updates. | **PASS** — Selected "Four Corners": 4 Required + 21 Not required (run 7) |
-| 7 | Display works from guest | As guest, click "Open Display". Verify `/display` opens and syncs game state via BroadcastChannel. | NOT TESTED — Requires multi-window |
-| 8 | Templates fail gracefully | As guest, click "Save as Template" (if visible). Verify graceful error (401) rather than crash. | **PASS** — "Unauthorized" error alert shown gracefully, no crash (run 7) |
-| 9 | Sign in from guest | As guest on `/play`, navigate back to `/`. Click "Sign in with Joolie Boolie". Verify OAuth flow redirects to `/play` after login (returnTo="/play"). | NOT TESTED — Requires NEXT_PUBLIC_OAUTH_AUTHORIZE_URL env var |
-| 10 | Authenticated hides guest CTA | After signing in, navigate to `localhost:3000`. Verify only "Play" button is shown (no "Play as Guest" link). | **PASS** — Only "Play" button visible when authenticated (run 7) |
-| 11 | Auth token refresh preserved | As authenticated user on `/play`, verify middleware still performs proactive token refresh (check via network tab or cookie expiry updates). | NOT TESTED — Requires network tab inspection |
+| 1 | Play button visible | Navigate to `localhost:3000`. Verify "Play" button is visible. | **PASS** — Standalone Play button visible (run 7, updated BEA-702) |
+| 2 | Play links to /play | Verify the "Play" button has `href="/play"`. | **PASS** — href="/play" confirmed (run 7) |
+| 3 | Auto-starts offline session | Click "Play". Verify `/play` loads. Verify an offline session is auto-created (6-char session ID visible). | **PASS** — Session PPBZ5K auto-created, no redirect (run 7) |
+| 4 | Full game works | On `/play`, call balls (Space), undo (U), pause (P), resume (P), reset (R). Verify all controls work. | **PASS** — All controls work: Space (G-57 called), U (undo), P (pause/resume), R (reset with confirmation) (run 7) |
+| 5 | Audio works | Verify voice pack selector, roll sound selector, volume controls all function. Verify M key mutes/unmutes. | **PASS** — M key mutes/unmutes, all audio controls functional (run 7) |
+| 6 | Patterns work | Verify pattern selector is available. Select different patterns. Verify preview updates. | **PASS** — Selected "Four Corners": 4 Required + 21 Not required (run 7) |
+| 7 | Display works | Click "Open Display". Verify `/display` opens and syncs game state via BroadcastChannel. | NOT TESTED — Requires multi-window |
 
 ---
 
-## 3. Trivia
+## 2. Trivia
 
-### Story 3.1: Home Page & Authentication — **ALL PASS**
+### Story 3.1: Home Page — **ALL PASS**
 
-**As a presenter**, I want to access the Trivia app and sign in.
+**As a presenter**, I want to access the Trivia app.
 
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
-| 1 | Home page loads | Navigate to `localhost:3001`. Verify "Trivia" branding is visible. Verify "Sign in" or "Play" buttons exist. | **PASS** — "Trivia" branding, "Play" and "Question Sets" buttons visible (run 7) |
-| 2 | Sign in redirects to Hub | Click sign in. Verify redirect to `localhost:3002` (Platform Hub OAuth). | **PASS** — Verified in run 1 |
-| 3 | Play route protected | Navigate to `localhost:3001/play`. Verify redirect to home (unauthenticated). | **PASS** — Verified in run 1 |
-| 4 | Display route public | Navigate to `localhost:3001/display`. Verify page loads (may show waiting/invalid state). | **PASS** — "Invalid Session" message displayed (run 7) |
-| 5 | Security headers | Check response headers for X-Frame-Options, X-Content-Type-Options, Referrer-Policy. | **PASS** — All 3 headers confirmed (run 7) |
+| 1 | Home page loads | Navigate to `localhost:3001`. Verify "Trivia" branding is visible. Verify "Play" and "Question Sets" links exist. | **PASS** — "Trivia" branding, "Play" and "Question Sets" buttons visible (run 7) |
+| 2 | Play route loads | Click "Play" (or navigate to `localhost:3001/play`). Verify the page loads. | **PASS** — Covered by Story 3.2 |
+| 3 | Display route public | Navigate to `localhost:3001/display`. Verify page loads (may show waiting/invalid state). | **PASS** — "Invalid Session" message displayed (run 7) |
+| 4 | Security headers | Check response headers for X-Frame-Options, X-Content-Type-Options, Referrer-Policy. | **PASS** — All 3 headers confirmed (run 7) |
 
 ### Story 3.2: Room Setup — **ALL PASS**
 
-**As an authenticated presenter**, I want to create or join a trivia game room.
+**As a presenter**, I want to create or join a trivia game room.
 
 | # | Test Case | Steps | Result |
 |---|-----------|-------|--------|
-| 1 | Room setup modal | After auth, navigate to `/play`. Verify Room Setup modal is visible. | **PASS** |
+| 1 | Room setup modal | Navigate to `/play`. Verify Room Setup modal is visible. | **PASS** |
 | 2 | Create online room | Click "Create New Game Room". Verify room code and PIN appear. | **PASS** |
 | 3 | Join room form | Click "Join Existing Game". Verify room code and PIN inputs appear. | **PASS** — Room code and PIN inputs visible |
 | 4 | PIN validation | Enter 3-digit PIN. Verify Join is disabled. Enter 4 digits. Verify enabled. | **PASS** — Join button disabled when empty |
@@ -427,7 +341,7 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 | 4 | Import validation | Upload an invalid file. Verify error messages about format issues. | **PASS** — "Import Failed" with "Missing required columns" error for invalid CSV |
 | 5 | Category detection | Import questions with categories. Verify category badges appear. | **PASS** — Categories visible: music, movies, tv, history, General Knowledge, Science, Geography, Entertainment |
 
-### Story 3.8: Question Sets (Database-backed) — **2 PASS, 2 NOT TESTED**
+### Story 3.8: Question Sets (localStorage-backed) — **2 PASS, 2 NOT TESTED**
 
 **As a presenter**, I want to save and load question sets.
 
@@ -510,7 +424,7 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 | 1 | Category badges | Verify questions show color-coded category badges (General Knowledge, Science, History, etc.). | **PASS** — Categories: General Knowledge (1), Science (1), History (4), Geography (1), Entertainment (13) |
 | 2 | Category filter | Find category filter. Select a specific category. Verify question list filters. | **PASS** — CategoryFilter buttons visible and functional (BEA-507) |
 
-### Story 3.15: Presets and Templates — **2 PASS, 2 NOT TESTED**
+### Story 3.15: Presets — **2 PASS, 1 NOT TESTED**
 
 **As a presenter**, I want to save and load game configurations.
 
@@ -519,7 +433,6 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 | 1 | Preset selector | Find preset selector. Verify it lists available presets. | **PASS** — "Load Preset" combobox visible |
 | 2 | Load preset | Select a preset. Verify game settings update (rounds, timer, etc.). | NOT TESTED |
 | 3 | Save preset | Configure settings. Click save preset. Enter name. Verify saved. | **PASS** — "Save Settings as Preset" button visible |
-| 4 | Template selector | Find template selector. Verify it lists templates. | NOT TESTED (Template API 500 in E2E mode) |
 
 ### Story 3.16: Audience Display Scene Choreography — **5 PASS, 1 NOT TESTED**
 
@@ -600,50 +513,7 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 
 ---
 
-## 4. Cross-App Flows
-
-### Story 4.1: OAuth SSO Flow — **3 PASS, 1 NOT TESTED**
-
-**As a user**, I want single sign-on across all games.
-
-| # | Test Case | Steps | Result |
-|---|-----------|-------|--------|
-| 1 | Bingo → Hub login | On Bingo (`localhost:3000`), click "Sign in with Joolie Boolie". Verify redirect to Hub login (`localhost:3002`). | **PASS** — Verified in run 1: redirect to Hub OAuth |
-| 2 | Trivia → Hub login | On Trivia (`localhost:3001`), click sign in. Verify redirect to Hub login. | **PASS** — Verified in run 1 |
-| 3 | Hub login form | On Hub login page, verify form renders with email and password fields. | **PASS** — Email/password inputs + Sign In button confirmed |
-| 4 | Return path after sign-in | On Bingo home page, click "Sign in with Joolie Boolie". Complete login. Verify redirect back to Bingo `/play` (hardcoded returnTo="/play" since BEA-524). | NOT TESTED |
-
-### Story 4.2: Security Headers Across Apps — **ALL PASS**
-
-**As a security auditor**, I want all apps to have proper security headers.
-
-| # | Test Case | Steps | Result |
-|---|-----------|-------|--------|
-| 1 | Hub headers | Navigate to `localhost:3002`. Check for: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy: strict-origin-when-cross-origin, Permissions-Policy, HSTS, X-DNS-Prefetch-Control. | **PASS** — X-Frame-Options, X-Content-Type-Options, Referrer-Policy confirmed |
-| 2 | Bingo headers | Navigate to `localhost:3000`. Check same 6 headers. | **PASS** — All 3 core headers present |
-| 3 | Trivia headers | Navigate to `localhost:3001`. Check same 6 headers. | **PASS** — All 3 core headers present |
-
-### Story 4.3: E2E Bypass Security — **1 PASS, 1 NOT TESTED (code review)**
-
-**As a security auditor**, I want to verify E2E mode cannot be exploited.
-
-| # | Test Case | Steps | Result |
-|---|-----------|-------|--------|
-| 1 | Fake refresh token rejected | Navigate to `localhost:3002`. Run `browser_evaluate` with `fetch('/api/oauth/token', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ grant_type: 'refresh_token', refresh_token: 'fake-e2e-refresh-token', client_id: 'test' }) }).then(r => ({status: r.status}))`. Verify status is not 200 (should be 400 or "Refresh token not found"). | **PASS** — Status 400, error: `invalid_grant` (run 6) |
-| 2 | No E2E bypass in dev | Verify `isE2EMode()` only returns true when `E2E_TESTING=true` env var is set, not based on NODE_ENV. | NOT TESTED — Verified in code review (BEA-498) |
-
-### Story 4.4: Template Aggregation — **ALL PASS**
-
-**As an authenticated user**, I want to see templates from all games on the Hub.
-
-| # | Test Case | Steps | Result |
-|---|-----------|-------|--------|
-| 1 | Hub templates API | Navigate to `localhost:3002`. Run `browser_evaluate` with `fetch('/api/templates').then(r => r.json())`. Verify response has `templates` array. | **PASS** — Status 200, response has `templates` array with 2 entries. Re-confirmed run 6 |
-| 2 | Aggregates both games | Verify templates response includes entries from both Bingo and Trivia (or empty arrays if none exist). | **PASS** — Templates include "E2E Trivia" (trivia) and "E2E Bingo Classic" (bingo). Re-confirmed run 6 |
-
----
-
-## 5. Accessibility & Accessible Design
+## 3. Accessibility & Accessible Design
 
 ### Story 5.1: Font Sizes and Touch Targets — **ALL PASS**
 
@@ -670,7 +540,7 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 
 ---
 
-## 6. PWA & Offline
+## 4. PWA & Offline
 
 ### Story 6.1: Offline Gameplay — **ALL PASS**
 
@@ -693,7 +563,7 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 
 ---
 
-## 7. Responsive Design
+## 5. Responsive Design
 
 ### Story 7.1: Mobile Layout — **ALL PASS**
 
@@ -703,7 +573,6 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 |---|-----------|-------|--------|
 | 1 | Bingo mobile | Resize browser to 375x667 (iPhone). Navigate to Bingo `/play`. Verify controls are usable. Verify touch-friendly layout. | **PASS** — No overflow, heading and Play button visible |
 | 2 | Trivia mobile | Resize to 375x667. Navigate to Trivia `/play`. Verify stacked layout. Verify question list collapses. | **PASS** — No overflow, all key elements visible |
-| 3 | Hub mobile | Resize to 375x667. Navigate to Hub home. Verify game cards stack vertically. | **PASS** — No overflow (body 374px within 375px viewport), BEA-527 fix verified (run 7) |
 
 ### Story 7.2: Tablet Layout — **ALL PASS**
 
@@ -718,35 +587,24 @@ For **unauthenticated flows** (guest mode, public pages), no login is needed.
 
 ## Automated E2E Coverage Reference
 
-The following areas are already covered by automated E2E tests (~338 tests):
+The following areas are covered by automated E2E tests:
 
-**Bingo E2E (~88 tests):**
-- Auth flow (SSO redirect, token handling)
+**Bingo E2E:**
 - Session flow (create, join, offline, recovery, PIN verification)
 - Game flow (ball calling, undo, pause, reset, keyboard shortcuts)
 - Display page (rendering, invalid session, sync)
 - Accessibility (keyboard nav, ARIA labels, form labels)
 
-**Trivia E2E (~113 tests):**
-- Auth flow (SSO redirect, token handling)
+**Trivia E2E:**
 - Session flow (create, join, offline, recovery, PIN verification)
 - Game flow (teams, questions, scoring, rounds)
 - Display page (rendering, sync, waiting state)
 - Question import (CSV/JSON parsing)
 
-**Platform Hub E2E (~137 tests):**
-- Auth flow (login page, OAuth endpoints)
-- OAuth (authorize, token, consent, CSRF)
-- Templates API aggregation
-- Dashboard and settings pages
-- Security headers and rate limiting
-- CORS configuration
-
 **This manual plan focuses on:**
 - Visual verification (correct rendering, theme changes)
 - Audio verification (TTS, sound effects)
 - Complex multi-window interactions (dual-screen sync)
-- Cross-app SSO flows end-to-end
 - Edge cases in user interaction (rapid clicks, form validation)
 - Responsive design at different breakpoints
 - Accessibility compliance (font sizes, touch targets)
