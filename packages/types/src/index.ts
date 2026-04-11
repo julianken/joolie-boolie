@@ -4,64 +4,19 @@
  * Shared TypeScript types for the Joolie Boolie.
  *
  * This package provides common types used across the monorepo, including:
- * - Game types (GameStatus, GameType, GameSession)
- * - User types (User, UserProfile, AuthResponse)
- * - API types (ApiResponse, PaginatedResponse)
+ * - Theme types (ThemeMode)
  * - Sync types (SyncRole, SyncMessage)
+ * - Branded types (TeamId, QuestionId, BallNumber)
  *
  * @example
- * import type { GameStatus, ApiResponse, User } from '@joolie-boolie/types';
- *
- * // Or import from specific modules:
- * import type { GameSession } from '@joolie-boolie/types/game';
- * import type { PaginatedResponse } from '@joolie-boolie/types/api';
+ * import type { ThemeMode, SyncMessage, TeamId } from '@joolie-boolie/types';
  */
 
 // =============================================================================
-// GAME TYPES
+// THEME TYPES
 // =============================================================================
 
-export type {
-  GameStatus,
-  TriviaGameStatus,
-  GameType,
-  GameSession,
-  ThemeMode,
-  ColorTheme,
-  Timestamps,
-} from './game';
-
-export { GAME_TYPE_NAMES } from './game';
-
-// =============================================================================
-// USER TYPES
-// =============================================================================
-
-export type {
-  User,
-  UserProfile,
-  LoginRequest,
-  RegisterRequest,
-  AuthResponse,
-  UpdateProfileRequest,
-  Session,
-} from './user';
-
-// =============================================================================
-// API TYPES
-// =============================================================================
-
-export type {
-  ApiResponse,
-  PaginatedResponse,
-  PaginationParams,
-  SortDirection,
-  SortParams,
-  ListParams,
-  ApiError,
-  ApiErrorCode,
-  RequestMetadata,
-} from './api';
+export type { ThemeMode } from './game';
 
 // =============================================================================
 // SYNC TYPES
