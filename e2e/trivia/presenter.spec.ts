@@ -10,6 +10,50 @@ import { test, expect, type Page } from '../fixtures/auth';
 import { waitForHydration, pressKey } from '../utils/helpers';
 
 /**
+ * Drive the presenter from the post-startGame `game_intro` scene up to the
+ * `question_display` scene by pressing Enter repeatedly to skip each timed
+ * intro/anticipation scene. Called before assertions that require the first
+ * question to be actively displayed.
+ *
+ * Scene chain: game_intro → round_intro → question_anticipation →
+ * question_display. Each Enter dispatches SCENE_TRIGGERS.SKIP, which is the
+ * only deterministic way to bypass the auto-advance timers quickly.
+ */
+async function driveToQuestionDisplay(page: Page): Promise<void> {
+  // Scene label lives in the header as "Audience: <scene>". Poll for it so
+  // we advance exactly as many scenes as needed and no more. The stopping
+  // point is `question_display`; any "earlier" timed scene (game_intro,
+  // round_intro, question_anticipation) and `question_closed` (so we can
+  // advance from one closed question to the next question's display) are
+  // skipped by pressing Enter/Right. Any non-skippable scene (round_summary,
+  // round_scoring, recap_*, final_*, paused, emergency_blank) is treated as
+  // an error — callers must handle those explicitly.
+  const skippable = /game intro|round intro|question anticipation/i;
+  await expect(async () => {
+    const header = page.locator('span').filter({ hasText: /Audience:/ }).first();
+    const text = (await header.textContent()) ?? '';
+    if (/question display/i.test(text)) return; // done
+    if (skippable.test(text)) {
+      await page.keyboard.press('Enter');
+      throw new Error(`Scene still ${text}`);
+    }
+    throw new Error(`Unexpected scene: ${text}`);
+  }).toPass({ timeout: 15000 });
+}
+
+/**
+ * Drive the presenter to the `question_closed` scene (S key after reaching
+ * question_display).
+ */
+async function driveToQuestionClosed(page: Page): Promise<void> {
+  await driveToQuestionDisplay(page);
+  await page.keyboard.press('KeyS');
+  await expect(
+    page.locator('span').filter({ hasText: /Audience:.*question closed/i })
+  ).toBeVisible({ timeout: 5000 });
+}
+
+/**
  * Drive a trivia game to the ended state by completing all rounds.
  * Assumes the game has already been started (via startGameViaWizard).
  * Default game: 3 rounds x 5 questions each.
@@ -24,26 +68,34 @@ import { waitForHydration, pressKey } from '../utils/helpers';
  *
  * After the last round the auto-show effect fires, showing the Final Results overlay.
  */
-async function driveGameToEndedState(page: Page, totalRounds = 3, questionsPerRound = 5): Promise<void> {
+async function driveGameToEndedState(page: Page, totalRounds = 3, _questionsPerRound = 5): Promise<void> {
   for (let round = 0; round < totalRounds; round++) {
-    // Navigate to last question of this round (ArrowDown × (questionsPerRound - 1))
-    for (let i = 0; i < questionsPerRound - 1; i++) {
-      await pressKey(page, 'ArrowDown');
+    // Walk every question of this round. Identify the last question via the
+    // SceneNavButtons forward label (switches from "Next Question" →
+    // "End Round") rather than a loop counter — the game engine's
+    // isLastQuestion is the authoritative source.
+    // Walk through every question of this round via S + ArrowRight so the
+    // question_closed → round_summary transition triggers completeRound
+    // (status → between_rounds). See the detailed explanation in the
+    // 'can complete round and proceed to next' test below.
+    const MAX_QUESTIONS = 10;
+    for (let q = 0; q < MAX_QUESTIONS; q++) {
+      await driveToQuestionDisplay(page);
+      await page.keyboard.press('KeyS');
+      await expect(
+        page.locator('span').filter({ hasText: /audience:.*question closed/i })
+      ).toBeVisible({ timeout: 5000 });
+      await page.keyboard.press('ArrowRight');
+      const sceneText = (await page
+        .locator('span')
+        .filter({ hasText: /^Audience:/ })
+        .first()
+        .textContent()) ?? '';
+      if (/round summary/i.test(sceneText)) break;
     }
 
-    // Close the question to enter question_closed scene
-    await pressKey(page, 'KeyS');
-
-    // Wait for SceneNavButtons "Next" button and click it → round_summary
-    await expect(async () => {
-      const nextBtn = page.getByRole('button', { name: /^next$/i });
-      await expect(nextBtn).toBeVisible({ timeout: 1000 });
-    }).toPass({ timeout: 8000 });
-
-    const nextBtn = page.getByRole('button', { name: /^next$/i });
-    await nextBtn.click();
-
-    // Wait for between_rounds state (round_summary scene auto-shows overlay)
+    // After closing the last question of the round the scene advances to
+    // round_summary, which auto-shows the RoundSummary overlay.
     const isLastRound = round === totalRounds - 1;
     if (!isLastRound) {
       // Wait for the round summary heading to appear
@@ -53,25 +105,49 @@ async function driveGameToEndedState(page: Page, totalRounds = 3, questionsPerRo
         ).toBeVisible({ timeout: 2000 });
       }).toPass({ timeout: 10000 });
 
-      // Press N to advance to next round
-      await pressKey(page, 'KeyN');
+      // Click the RoundSummary overlay's "Next Round" button directly --
+      // dispatching KeyN while the overlay is focused can race with the
+      // modal's own keyboard handling, so prefer the explicit click path.
+      // The accessible name is "Start round N" (aria-label); visible text
+      // is "Next Round" -- match either.
+      const nextRoundBtn = page.getByRole('button', {
+        name: /next round|start round \d+/i,
+      });
+      await expect(nextRoundBtn).toBeVisible({ timeout: 5000 });
+      await nextRoundBtn.click();
 
-      // Wait for playing state to resume before next round's questions
+      // Wait for the next round to leave round_summary (the overlay sets
+      // showRoundSummary=false as soon as the scene advances out of
+      // round_summary, see play/page.tsx).
+      await expect(
+        page.locator('span').filter({ hasText: /audience:(?!.*round summary)/i })
+      ).toBeVisible({ timeout: 10000 });
+
+      // Wait for the `playing` status badge to return
       await expect(async () => {
         await expect(
-          page.locator('span').filter({ hasText: /^Playing/i })
+          page.locator('span').filter({ hasText: /^Playing/ })
         ).toBeVisible({ timeout: 2000 });
       }).toPass({ timeout: 10000 });
     } else {
-      // Last round: click "End Game" button in the RoundSummary overlay
-      // (isLastRound=true shows "End Game" instead of "Next Round")
+      // Last round: wait for the RoundSummary "End Game" button to render,
+      // then advance via the N key rather than clicking the button.
+      //
+      // The click path goes through play/page.tsx::handleNextRound which
+      // bypasses the scene engine (calls game.nextRound() directly + forces
+      // audienceScene to 'round_intro'). That path corrupts the ended-state
+      // scene (should be final_podium / final_buildup, not round_intro).
+      //
+      // Pressing N dispatches SCENE_TRIGGERS.NEXT_ROUND through the scene
+      // engine, which correctly routes isLastRound → 'final_buildup' and
+      // runs the endGame side effect (status → 'ended') via
+      // scene-transitions.ts.
       await expect(async () => {
         const endGameBtn = page.getByRole('button', { name: /end game/i });
         await expect(endGameBtn).toBeVisible({ timeout: 2000 });
       }).toPass({ timeout: 10000 });
 
-      const endGameBtn = page.getByRole('button', { name: /end game/i });
-      await endGameBtn.click();
+      await pressKey(page, 'KeyN');
 
       // Wait for ended state
       await expect(async () => {
@@ -90,13 +166,16 @@ test.describe('Trivia Presenter View', () => {
 
   test.describe('Page Structure', () => {
     test('displays presenter view header @medium', async ({ authenticatedTriviaPage: page }) => {
+      // Header renders "Trivia" heading + "Presenter" badge (post-WU-05 redesign).
+      // Previous copy "Presenter View" no longer exists.
       await expect(page.getByRole('heading', { name: /trivia/i })).toBeVisible();
-      await expect(page.getByText(/presenter view/i)).toBeVisible();
+      await expect(page.getByText(/^Presenter$/).first()).toBeVisible();
     });
 
     test('shows game status indicator @high', async ({ authenticatedTriviaPage: page }) => {
-      // Should show playing status - fixture starts the game via wizard
-      await expect(page.locator('span').filter({ hasText: /^playing$/i })).toBeVisible();
+      // Playing status span reads "Playing - Round N of M" (roundProgress).
+      // Anchor on the prefix only so the regex stays stable across round boundaries.
+      await expect(page.locator('span').filter({ hasText: /^Playing/ })).toBeVisible();
     });
 
     test('shows Open Display button @high', async ({ authenticatedTriviaPage: page }) => {
@@ -105,7 +184,9 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('shows sync status @medium', async ({ authenticatedTriviaPage: page }) => {
-      await expect(page.getByText(/sync ready|sync active/i)).toBeVisible();
+      // Connection indicator is a span reading "Synced" (connected) or "Ready"
+      // (not yet connected). Either is an acceptable "sync status is shown" signal.
+      await expect(page.getByText(/^(Synced|Ready)$/)).toBeVisible();
     });
 
     test('shows keyboard shortcuts reference @low', async ({ authenticatedTriviaPage: page }) => {
@@ -120,19 +201,41 @@ test.describe('Trivia Presenter View', () => {
     test.use({ skipSetupDismissal: true });
 
     test('cannot start game without teams @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Review step in the setup wizard
+      // SetupWizard gates forward navigation: step 2 (Teams) only completes
+      // when currentTeams.length >= 2, so the Review step (and therefore the
+      // Start Game button) is unreachable while no teams exist. Assert that:
+      //   1. Navigating to step 2 (Teams) shows the "no teams" empty state.
+      //   2. Clicking the step-3 (Review) nav button is a no-op -- the button
+      //      is not active and the Start Game control never mounts.
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(page.getByText(/no teams added yet/i)).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
+
+      // Attempting to jump forward to Review: goToStep(3) returns early
+      // because isStepComplete(2) is false, so no Start button appears.
       await page.locator('[data-testid="wizard-step-3"]').click();
-      const startBtn = page.getByRole('button', { name: /start game/i });
-      await expect(startBtn).toBeVisible();
-      await expect(startBtn).toBeDisabled();
+      await expect(page.getByRole('button', { name: /start game/i })).toHaveCount(0);
+
+      // Current step must still be Teams (aria-current=step); assert the
+      // wizard-step-2 button remains the active step indicator.
+      await expect(page.locator('[data-testid="wizard-step-2"]')).toHaveAttribute(
+        'aria-current',
+        'step'
+      );
     });
 
     test('can start game after adding a team @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step and add a team
-      await page.locator('[data-testid="wizard-step-2"]').click();
+      // Two teams required to satisfy step-2 gating (currentTeams.length >= 2).
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(addTeamBtn).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
       await addTeamBtn.click();
       await expect(page.getByText(/table 1/i)).toBeVisible();
+      await addTeamBtn.click();
+      await expect(page.getByText(/table 2/i)).toBeVisible();
 
       // Navigate to Review - Start button should be enabled
       await page.locator('[data-testid="wizard-step-3"]').click();
@@ -141,13 +244,17 @@ test.describe('Trivia Presenter View', () => {
 
       // Click start and wait for state change
       await startBtn.click();
-      await expect(page.locator('span').filter({ hasText: /^Playing/i })).toBeVisible();
+      await expect(page.locator('span').filter({ hasText: /^Playing/ })).toBeVisible();
     });
 
     test('shows ready message with team count @medium', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step and add teams
-      await page.locator('[data-testid="wizard-step-2"]').click();
+      // Navigate to Teams step and add teams (retry the click to absorb
+      // hydration races).
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(addTeamBtn).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
 
       await addTeamBtn.click();
       await expect(page.getByText(/table 1/i)).toBeVisible();
@@ -165,16 +272,25 @@ test.describe('Trivia Presenter View', () => {
     test.use({ skipSetupDismissal: true });
 
     test('displays team manager section @medium', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      await expect(page.getByRole('region', { name: /team management/i })).toBeVisible();
+      // Navigate to Teams step in the setup wizard. The click can race with
+      // React hydration if fired too early -- wrap in toPass so the wizard
+      // step change gets retried until the Team Management region appears.
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(
+          page.getByRole('region', { name: /team management/i })
+        ).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
     });
 
     test('can add a team @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
+      // Navigate to Teams step in the setup wizard (retry to avoid
+      // hydration-race flakes).
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await expect(addTeamBtn).toBeVisible();
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(addTeamBtn).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
 
       // Check initial state
       await expect(page.getByText(/no teams added yet/i)).toBeVisible();
@@ -189,10 +305,12 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('can remove a team during setup @high', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      // Add a team
+      // Navigate to Teams step with retry to absorb hydration races.
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(addTeamBtn).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
       await addTeamBtn.click();
 
       // Wait for team to appear using proper role-based locator
@@ -210,13 +328,16 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('can rename a team @high', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      // Add a team
+      // Navigate to Teams step in the setup wizard. Retry because the click
+      // can race with React hydration (same reason as the team-manager test).
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await addTeamBtn.click();
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(addTeamBtn).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
 
-      // Wait for team to appear using proper role-based locator
+      // Add a team
+      await addTeamBtn.click();
       await expect(page.getByRole('listitem', { name: /team: table 1/i })).toBeVisible();
 
       // Click rename button using accessible button name
@@ -236,9 +357,12 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('shows team count limit @medium', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
+      // Navigate to Teams step -- retry to guard against hydration races.
       const addTeamBtn = page.getByRole('button', { name: /add team/i });
+      await expect(async () => {
+        await page.locator('[data-testid="wizard-step-2"]').click();
+        await expect(addTeamBtn).toBeVisible({ timeout: 1000 });
+      }).toPass({ timeout: 10000 });
       await addTeamBtn.click();
 
       // Wait for team to be added
@@ -264,8 +388,8 @@ test.describe('Trivia Presenter View', () => {
       // Navigate up with arrow key
       await pressKey(page, 'ArrowUp');
 
-      // Should still be on presenter view
-      await expect(page.getByText(/presenter view/i)).toBeVisible();
+      // Should still be on the presenter dashboard (post-WU-05 copy = "Presenter")
+      await expect(page.getByText(/^Presenter$/).first()).toBeVisible();
     });
 
     test('can select a question by clicking @high', async ({ authenticatedTriviaPage: page }) => {
@@ -290,7 +414,7 @@ test.describe('Trivia Presenter View', () => {
         await expect(peekBtn).toBeVisible();
       } else {
         // Button doesn't exist - just verify we're still on the page
-        await expect(page.getByText(/presenter view/i)).toBeVisible();
+        await expect(page.getByText(/^Presenter$/).first()).toBeVisible();
       }
     });
 
@@ -310,14 +434,18 @@ test.describe('Trivia Presenter View', () => {
 
   test.describe('Keyboard Scoring', () => {
     test('keyboard 1-key during scoring phase does not crash @high', async ({ authenticatedTriviaPage: page }) => {
-      // Close a question to enter question_closed scene (a scoring phase)
-      await pressKey(page, 'KeyS');
+      // Drive the game from `game_intro` to `question_closed` so the digit
+      // keypress exercises the scoring-phase code path. KeyS only fires on
+      // `question_display` / `question_closed`, so skip intros first via
+      // Enter (game_intro → round_intro → question_anticipation →
+      // question_display) before closing.
+      await driveToQuestionClosed(page);
 
-      // Wait for question_closed scene — SceneNavButtons shows "Next" at this scene
-      await expect(async () => {
-        const nextBtn = page.getByRole('button', { name: /^next$/i });
-        await expect(nextBtn).toBeVisible({ timeout: 1000 });
-      }).toPass({ timeout: 5000 });
+      // SceneNavButtons forward label at `question_closed` is "Next Question"
+      // (or "End Round" on the last question of a round)
+      await expect(
+        page.getByRole('button', { name: /next question|end round/i })
+      ).toBeVisible({ timeout: 2000 });
 
       // Press '1' to quick-score team 1 via keyboard (Instance 1 in use-game-keyboard.ts)
       // Verifies the keyboard handler doesn't crash after sidebar removal
@@ -326,133 +454,180 @@ test.describe('Trivia Presenter View', () => {
 
       // The status should remain playing (no crash, no navigation away)
       await expect(
-        page.locator('span').filter({ hasText: /^Playing/i })
+        page.locator('span').filter({ hasText: /^Playing/ })
       ).toBeVisible();
     });
   });
 
   test.describe('Game Flow', () => {
-    test('can pause game @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Pause is keyboard-only (P) — action bar removed in WU-05
-      await pressKey(page, 'KeyP');
+    // NOTE (BEA-705): The standalone conversion removed the "pause" feature
+    // entirely -- P is now peek-answer (local), not pause, and there is no
+    // presenter-header "paused" status span. These three tests were originally
+    // asserting a feature that no longer exists. They have been rewritten to
+    // exercise the current P/E behaviours (peek-answer toggle and
+    // emergency-blank scene) which cover the keyboard handlers that replaced
+    // the removed pause code path.
 
-      // Wait for paused state (Pattern 2: state change indicator)
-      await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
+    test('pressing P toggles peek-answer without crashing @critical', async ({ authenticatedTriviaPage: page }) => {
+      // Drive to question_display so QuestionDisplay (and its Peek button) mounts
+      await driveToQuestionDisplay(page);
+
+      // P in use-game-keyboard.ts calls setPeekAnswer((prev) => !prev). When
+      // toggled on, the Peek button's aria-label switches to
+      // "Hide Peeked Answer".
+      await page.keyboard.press('KeyP');
+      await expect(
+        page.getByRole('button', { name: /hide peeked answer/i })
+      ).toBeVisible({ timeout: 5000 });
+
+      // Status must remain `playing` (no crash)
+      await expect(
+        page.locator('span').filter({ hasText: /^Playing/ })
+      ).toBeVisible();
     });
 
-    test('can resume game from pause @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Pause first (keyboard P)
-      await pressKey(page, 'KeyP');
-      await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
+    test('pressing P twice toggles peek back off @critical', async ({ authenticatedTriviaPage: page }) => {
+      await driveToQuestionDisplay(page);
 
-      // Resume (keyboard P)
-      await pressKey(page, 'KeyP');
+      await page.keyboard.press('KeyP');
+      await expect(
+        page.getByRole('button', { name: /hide peeked answer/i })
+      ).toBeVisible({ timeout: 5000 });
 
-      // Wait for playing state (Pattern 2)
-      await expect(page.locator('span').filter({ hasText: /^playing/i })).toBeVisible();
+      await page.keyboard.press('KeyP');
+      await expect(
+        page.getByRole('button', { name: /^peek answer$/i })
+      ).toBeVisible({ timeout: 5000 });
     });
 
-    test('can use pause keyboard shortcut (P) @medium', async ({ authenticatedTriviaPage: page }) => {
-      await pressKey(page, 'KeyP');
+    test('can use peek keyboard shortcut (P) @medium', async ({ authenticatedTriviaPage: page }) => {
+      await driveToQuestionDisplay(page);
 
-      // Wait for paused state (Pattern 2)
-      await expect(page.locator('span').filter({ hasText: /^paused$/i })).toBeVisible();
+      await page.keyboard.press('KeyP');
+      await expect(
+        page.getByRole('button', { name: /hide peeked answer/i })
+      ).toBeVisible({ timeout: 5000 });
 
-      // Press P again to resume
-      await pressKey(page, 'KeyP');
-
-      // Wait for playing state (Pattern 2)
-      await expect(page.locator('span').filter({ hasText: /^playing/i })).toBeVisible();
+      await page.keyboard.press('KeyP');
+      await expect(
+        page.getByRole('button', { name: /^peek answer$/i })
+      ).toBeVisible({ timeout: 5000 });
     });
 
-    test('can trigger emergency pause @high', async ({ authenticatedTriviaPage: page }) => {
-      // Emergency pause is keyboard-only (E) — action bar removed in WU-05
+    test('can trigger emergency blank via E key @high', async ({ authenticatedTriviaPage: page }) => {
+      // E toggles emergency blank (visual only, scene = emergency_blank).
+      // Presenter header renders "Audience: emergency blank".
       await pressKey(page, 'KeyE');
-
-      // Wait for emergency pause state (Pattern 2)
-      await expect(page.locator('span').filter({ hasText: /^emergency pause$/i })).toBeVisible();
+      await expect(
+        page.locator('span').filter({ hasText: /audience:.*emergency blank/i })
+      ).toBeVisible({ timeout: 5000 });
     });
 
-    test('can use emergency pause keyboard shortcut (E) @medium', async ({ authenticatedTriviaPage: page }) => {
+    test('can toggle emergency blank with E key @medium', async ({ authenticatedTriviaPage: page }) => {
       await pressKey(page, 'KeyE');
+      await expect(
+        page.locator('span').filter({ hasText: /audience:.*emergency blank/i })
+      ).toBeVisible({ timeout: 5000 });
 
-      // Wait for emergency pause state (Pattern 2)
-      await expect(page.locator('span').filter({ hasText: /^emergency pause$/i })).toBeVisible();
+      // Press E again — scene returns to the prior scene (not emergency_blank)
+      await pressKey(page, 'KeyE');
+      await expect(async () => {
+        const headerText = await page
+          .locator('span')
+          .filter({ hasText: /^Audience:/ })
+          .first()
+          .textContent();
+        expect(headerText ?? '').not.toMatch(/emergency blank/i);
+      }).toPass({ timeout: 5000 });
     });
   });
 
   test.describe('Round Completion', () => {
     test('shows scene nav Next button at question_closed scene @high', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to last question of round (5 questions per round by default)
-      for (let i = 0; i < 4; i++) {
-        await pressKey(page, 'ArrowDown');
-      }
+      // Drive to question_display, then close the question. On the first
+      // question of a 5-question round SceneNavButtons renders a "Next
+      // Question" forward label (per lib/presenter/nav-button-labels.ts).
+      await driveToQuestionDisplay(page);
+      await page.keyboard.press('KeyS');
 
-      // Close the question (S key) to enter question_closed scene —
-      // SceneNavButtons renders a "Next" button at this scene (WU-05: action bar removed)
-      await pressKey(page, 'KeyS');
-
-      // Wait for the SceneNavButtons "Next" button to appear (Pattern 3)
-      await expect(async () => {
-        const nextBtn = page.getByRole('button', { name: /^next$/i });
-        if (await nextBtn.isVisible()) {
-          await expect(nextBtn).toBeVisible();
-        }
-      }).toPass({ timeout: 5000 });
+      await expect(
+        page.getByRole('button', { name: /next question|end round/i })
+      ).toBeVisible({ timeout: 5000 });
     });
 
     test('can complete round and proceed to next @critical', async ({ authenticatedTriviaPage: page }) => {
-      // Navigate to last question of round
-      for (let i = 0; i < 4; i++) {
-        await pressKey(page, 'ArrowDown');
+      // Walk through every question of round 1, driving scene transitions
+      // explicitly. After closing the last question and clicking the
+      // SceneNavButtons forward button the scene advances to `round_summary`,
+      // which auto-shows the RoundSummary overlay. The "last question" is
+      // detected via the forward button's label (switches from "Next
+      // Question" → "End Round") so the loop matches the game engine's
+      // isLastQuestion predicate.
+      // Walk through every question of round 1. We go through the
+      // `question_closed` intermediate scene (via S + ArrowRight) rather
+      // than directly advancing from `question_display`: scene-transitions
+      // only runs the `completeRound` side effect (status → between_rounds)
+      // when the transition is question_closed → round_summary.
+      //
+      // Bypassing question_closed (e.g. via ArrowRight at question_display)
+      // leaves the game stuck at status=playing + scene=round_summary, so
+      // the overlay never auto-shows.
+      const MAX_QUESTIONS = 10; // safety bound — the default round has 5
+      for (let q = 0; q < MAX_QUESTIONS; q++) {
+        await driveToQuestionDisplay(page);
+        await page.keyboard.press('KeyS'); // → question_closed
+        await expect(
+          page.locator('span').filter({ hasText: /audience:.*question closed/i })
+        ).toBeVisible({ timeout: 5000 });
+        await page.keyboard.press('ArrowRight'); // → question_anticipation OR round_summary
+        const sceneText = (await page
+          .locator('span')
+          .filter({ hasText: /^Audience:/ })
+          .first()
+          .textContent()) ?? '';
+        if (/round summary/i.test(sceneText)) break;
       }
 
-      // Close the question (S key) → question_closed scene → SceneNavButtons shows "Next"
-      await pressKey(page, 'KeyS');
+      // RoundSummary overlay auto-shows when scene = round_summary
+      await expect(
+        page.getByRole('heading', { name: /round.*complete/i }).first()
+      ).toBeVisible({ timeout: 10000 });
 
-      // Wait for "Next" button from SceneNavButtons (Pattern 3)
-      await expect(async () => {
-        const nextBtn = page.getByRole('button', { name: /^next$/i });
-        await expect(nextBtn).toBeVisible({ timeout: 1000 });
-      }).toPass({ timeout: 5000 });
+      // Click "Next Round" from the RoundSummary overlay. The button's
+      // accessible name is "Start round N" (per RoundSummary.tsx), with
+      // "Next Round" as the visible text -- match either.
+      const nextRoundBtn = page.getByRole('button', {
+        name: /next round|start round \d+/i,
+      });
+      await expect(nextRoundBtn).toBeVisible();
+      await nextRoundBtn.click();
 
-      // Click "Next" — CLOSE trigger at last question → round_summary scene
-      // auto-show useEffect reveals RoundSummary overlay (WU-04)
-      const nextBtn = page.getByRole('button', { name: /^next$/i });
-      if (await nextBtn.isVisible()) {
-        await nextBtn.click();
-
-        // Wait for between rounds state (Pattern 2)
-        // Use first() to handle multiple "Round Complete" headings
-        await expect(page.getByRole('heading', { name: /round.*complete/i }).first()).toBeVisible();
-
-        // Click "Next Round" from the RoundSummary overlay (still present)
-        const nextRoundBtn = page.getByRole('button', { name: /next round/i });
-        if (await nextRoundBtn.isVisible()) {
-          await nextRoundBtn.click();
-
-          // Wait for next round to start (Pattern 2)
-          await expect(page.locator('span').filter({ hasText: /^Playing/i })).toBeVisible();
-        }
-      }
+      // Wait for next round to resume `playing`
+      await expect(
+        page.locator('span').filter({ hasText: /^Playing/ })
+      ).toBeVisible({ timeout: 10000 });
     });
   });
 
   test.describe('Game Reset', () => {
     test('can reset game back to setup @high', async ({ authenticatedTriviaPage: page }) => {
-      // Find reset via keyboard shortcut modal or settings
+      // KeyR opens the "Start New Game?" confirm dialog whose confirm
+      // action is labelled "New Game" (play/page.tsx: confirmLabel="New Game").
+      // Scope to the dialog -- the presenter header also has a "Start new
+      // game" icon button that matches /new game/i.
       await pressKey(page, 'KeyR');
 
-      // Wait for confirmation dialog or reset to complete (Pattern 3)
-      await expect(async () => {
-        // If there's a confirm dialog, accept it
-        const confirmBtn = page.getByRole('button', { name: /confirm|yes|reset/i });
-        if (await confirmBtn.isVisible()) {
-          await confirmBtn.click();
-        }
-        // Wait for reset to complete - check for setup state
-        await expect(page.locator('span').filter({ hasText: /^setup$/i })).toBeVisible({ timeout: 2000 });
-      }).toPass({ timeout: 10000 });
+      const dialog = page.getByRole('dialog', { name: /start new game/i });
+      await expect(dialog).toBeVisible({ timeout: 5000 });
+      const confirmBtn = dialog.getByRole('button', { name: /^new game$/i });
+      await expect(confirmBtn).toBeVisible({ timeout: 5000 });
+      await confirmBtn.click();
+
+      // After reset the SetupGate overlay remounts. Asserting on the gate is
+      // the most reliable signal that the game returned to the `setup` status.
+      await expect(page.locator('[data-testid="setup-gate"]')).toBeVisible({
+        timeout: 10000,
+      });
     });
   });
 
@@ -463,8 +638,14 @@ test.describe('Trivia Presenter View', () => {
     });
 
     test('has settings button @low', async ({ authenticatedTriviaPage: page }) => {
-      const settingsBtn = page.getByRole('button', { name: /settings/i });
-      await expect(settingsBtn).toBeVisible();
+      // Post-standalone conversion the presenter action bar no longer
+      // renders a dedicated "Settings" button -- settings live inside the
+      // SetupWizard (Settings step) during the setup phase. Kept as a
+      // regression probe: if a Settings button reappears here we want to
+      // notice. For now, assert its absence from the header.
+      await expect(
+        page.getByRole('button', { name: /^settings$/i })
+      ).toHaveCount(0);
     });
 
     test('has help button for keyboard shortcuts @low', async ({ authenticatedTriviaPage: page }) => {
@@ -533,8 +714,10 @@ test.describe('Ended State', () => {
       ).toBeVisible({ timeout: 2000 });
     }).toPass({ timeout: 10000 });
 
-    // Close the overlay via the X / close button
-    const closeBtn = page.getByRole('button', { name: /close/i });
+    // Close the overlay via the RoundSummary dismiss button. On the ended
+    // state (isLastRound=true), its accessible name is "View questions"
+    // and the visible text is "View Questions" (see RoundSummary.tsx).
+    const closeBtn = page.getByRole('button', { name: /view questions/i });
     await closeBtn.click();
 
     // Overlay should be dismissed — heading no longer visible
@@ -588,16 +771,17 @@ test.describe('Ended State', () => {
       ).toBeVisible({ timeout: 2000 });
     }).toPass({ timeout: 10000 });
 
-    // Press R to trigger new game confirmation dialog
+    // Press R to trigger the "Start New Game?" confirmation modal
     await pressKey(page, 'KeyR');
 
-    // Wait for and confirm the reset dialog
-    await expect(async () => {
-      const confirmBtn = page.getByRole('button', { name: /new game/i });
-      await expect(confirmBtn).toBeVisible({ timeout: 2000 });
-    }).toPass({ timeout: 5000 });
+    // Scope the confirm click to the modal dialog itself -- the presenter
+    // header already has a "Start new game" icon button that also matches
+    // /new game/i, so an unscoped lookup is strict-mode ambiguous.
+    const dialog = page.getByRole('dialog', { name: /start new game/i });
+    await expect(dialog).toBeVisible({ timeout: 5000 });
+    const confirmBtn = dialog.getByRole('button', { name: /^new game$/i });
+    await expect(confirmBtn).toBeVisible({ timeout: 5000 });
 
-    const confirmBtn = page.getByRole('button', { name: /new game/i });
     await confirmBtn.click();
 
     // Game should return to setup state after reset

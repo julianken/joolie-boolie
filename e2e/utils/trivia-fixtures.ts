@@ -94,12 +94,55 @@ export const E2E_TRIVIA_QUESTIONS: readonly E2ETriviaQuestion[] = [
 ];
 
 /**
+ * Zustand `persist` payload (version 4) that pins the trivia settings store to
+ * deterministic defaults for E2E tests. Writing this to `localStorage` BEFORE
+ * the store rehydrates bypasses two sources of test flakiness:
+ *
+ * 1. `isByCategory` defaults to `true` in production, and SetupGate contains a
+ *    `useEffect` that clamps `roundsCount` to `min(uniqueCategoryCount, 6)`
+ *    when `isByCategory` is true. The canned seed above spans 7 unique
+ *    categories, so the effect would push `roundsCount` to 6 before
+ *    `canUseByCategory` (≤ 4 categories) can flip `isByCategory` back off.
+ *    Result: 6 rounds × 3 questions each, Round 6 empty, `canStart = false`.
+ *
+ * 2. Persisted state from a prior test run (in dev-server scenarios where a
+ *    context is reused) could leave stale values that break the Review step.
+ *
+ * Pinning `isByCategory: false, roundsCount: 3` ensures the seed's 15
+ * questions distribute evenly across 3 rounds (5 per round), every round is
+ * populated, and `validateGameSetup().canStart` evaluates to true as soon as
+ * `startGameViaWizard` adds the two default teams.
+ */
+const E2E_TRIVIA_SETTINGS_PERSIST = {
+  state: {
+    roundsCount: 3,
+    questionsPerRound: 5,
+    timerDuration: 30,
+    timerAutoStart: false,
+    timerVisible: true,
+    timerAutoReveal: true,
+    ttsEnabled: false,
+    isByCategory: false,
+    lastTeamSetup: null,
+  },
+  version: 4,
+} as const;
+
+/**
  * Builds an init script string suitable for `page.addInitScript({ content })`
- * that assigns the canned question set to `window.__triviaE2EQuestions`. The
- * array is serialised as JSON so the init script is a single self-contained
- * statement that does not depend on any module imports at runtime.
+ * that assigns the canned question set to `window.__triviaE2EQuestions` AND
+ * pre-populates the `trivia-settings` localStorage entry with deterministic
+ * defaults (see E2E_TRIVIA_SETTINGS_PERSIST above). Everything is serialised
+ * as JSON so the init script is a single self-contained statement that does
+ * not depend on any module imports at runtime.
  */
 export function buildTriviaSeedInitScript(): string {
-  const serialized = JSON.stringify(E2E_TRIVIA_QUESTIONS);
-  return `window.__triviaE2EQuestions = ${serialized};`;
+  const serializedQuestions = JSON.stringify(E2E_TRIVIA_QUESTIONS);
+  const serializedSettings = JSON.stringify(E2E_TRIVIA_SETTINGS_PERSIST);
+  return [
+    `window.__triviaE2EQuestions = ${serializedQuestions};`,
+    // Wrap in try/catch so the init script never throws on contexts where
+    // localStorage is unavailable (e.g. file:// fallbacks during diagnosis).
+    `try { window.localStorage.setItem('trivia-settings', JSON.stringify(${serializedSettings})); } catch (_e) {}`,
+  ].join('\n');
 }
