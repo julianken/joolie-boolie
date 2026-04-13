@@ -243,4 +243,39 @@ describe('SetupGate (BEA-713 — purely derived effective settings)', () => {
     // Persisted intent (6) must be untouched.
     expect(useSettingsStore.getState().roundsCount).toBe(6);
   });
+
+  it('preserves persisted user roundsCount across a by-category toggle round-trip (7 cats, rounds=3)', async () => {
+    // Start with by-category ON, user prefers 3 rounds, but the question set
+    // has 7 unique categories. effectiveIsByCategory should be false (because
+    // canUseByCategory requires ≤4), effectiveRoundsCount should equal the
+    // user's persisted 3.
+    seedSettings({ isByCategory: true, roundsCount: 3 });
+    seedQuestions(buildQuestionsWithCategories(SEVEN_CATEGORIES));
+
+    renderGate();
+
+    // Persisted intent is intact on mount.
+    expect(useSettingsStore.getState().isByCategory).toBe(true);
+    expect(useSettingsStore.getState().roundsCount).toBe(3);
+    // Effective roundsCount (synced into game-store by SetupGate) = 3.
+    expect(useGameStore.getState().settings.roundsCount).toBe(3);
+
+    // The toggle is hidden by the wizard when canUseByCategory is false (7 cats),
+    // so drive the user's "turn it off" intent directly through the settings
+    // store (this is the same mutation path updateSetting uses internally).
+    useSettingsStore.getState().updateSetting('isByCategory', false);
+
+    // Persisted roundsCount survives the toggle-off.
+    expect(useSettingsStore.getState().roundsCount).toBe(3);
+    expect(useSettingsStore.getState().isByCategory).toBe(false);
+
+    // Flip it back ON — user's original roundsCount must still be 3.
+    useSettingsStore.getState().updateSetting('isByCategory', true);
+    expect(useSettingsStore.getState().roundsCount).toBe(3);
+    expect(useSettingsStore.getState().isByCategory).toBe(true);
+
+    // And game-store's synced roundsCount remains 3 (still > canUseByCategory
+    // since 7 cats, so effective = userRoundsCount = 3).
+    expect(useGameStore.getState().settings.roundsCount).toBe(3);
+  });
 });

@@ -109,7 +109,6 @@ export default function PlayPage() {
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
   const [showSavePresetModal, setShowSavePresetModal] = useState(false);
   const {
-    roundsCount,
     questionsPerRound,
     timerDuration,
     timerAutoStart,
@@ -117,10 +116,16 @@ export default function PlayPage() {
     ttsEnabled,
   } = useSettingsStore();
 
+  // NOTE: `roundsCount` is intentionally omitted here. During the setup phase,
+  // SetupGate is the *sole writer* of `roundsCount` to game-store — it writes
+  // the *effective* value (which may be downgraded from the user's raw setting
+  // when the imported question set has fewer unique categories than requested).
+  // If we also wrote the raw `roundsCount` here, the two effects would race and
+  // `validateGameSetup`/`canStart` could observe an inconsistent value. See
+  // BEA-713 for context.
   useEffect(() => {
     if (game.status === 'setup') {
       useGameStore.getState().updateSettings({
-        roundsCount,
         questionsPerRound,
         timerDuration,
         timerAutoStart,
@@ -128,7 +133,7 @@ export default function PlayPage() {
         ttsEnabled,
       });
     }
-  }, [game.status, roundsCount, questionsPerRound, timerDuration, timerAutoStart, timerVisible, ttsEnabled]);
+  }, [game.status, questionsPerRound, timerDuration, timerAutoStart, timerVisible, ttsEnabled]);
 
   /** Handle new game with confirmation */
   const handleNewGame = useCallback(() => {
