@@ -1,5 +1,5 @@
 // packages/theme/src/fonts.ts
-// Font loading infrastructure for the Joolie Boolie design system.
+// Font loading infrastructure for Hosted Game Night design system.
 // Space Grotesk is the display/heading font; Plus Jakarta Sans is the body font.
 // Both are self-hosted and preloaded via next/font/google with display: 'swap'.
 import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';

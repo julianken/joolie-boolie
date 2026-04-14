@@ -172,10 +172,10 @@ describe('useThemeStore', () => {
   });
 
   describe('localStorage persistence', () => {
-    it('should use jb-trivia-theme as storage key', () => {
+    it('should use hgn-trivia-theme as storage key', () => {
       // Verify persist middleware is properly configured
       expect(useThemeStore.persist).toBeDefined();
-      expect(useThemeStore.persist.getOptions().name).toBe('jb-trivia-theme');
+      expect(useThemeStore.persist.getOptions().name).toBe('hgn-trivia-theme');
     });
 
     it('should persist only presenterTheme and displayTheme', () => {

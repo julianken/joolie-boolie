@@ -1,7 +1,7 @@
 /**
  * Game Statistics Types
  *
- * Shared types for tracking game statistics across all games in the Joolie Boolie.
+ * Shared types for tracking game statistics across all games in Hosted Game Night.
  */
 
 // =============================================================================
@@ -160,8 +160,8 @@ export interface TriviaStatistics extends BaseGameStatistics {
  * Storage keys for localStorage persistence.
  */
 export const STORAGE_KEYS = {
-  BINGO_STATS: 'jb:bingo-statistics',
-  TRIVIA_STATS: 'jb:trivia-statistics',
+  BINGO_STATS: 'hgn:bingo-statistics',
+  TRIVIA_STATS: 'hgn:trivia-statistics',
 } as const satisfies Record<string, string>;
 
 /**

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { BroadcastSync, createBroadcastSync, createDebugBroadcastSync, createSyncDebugger } from '../broadcast';
 import { SyncMessage } from '../types';
-import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@hosted-game-night/testing/mocks';
 
 describe('BroadcastSync', () => {
   beforeEach(() => {

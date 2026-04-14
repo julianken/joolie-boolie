@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useId, useEffect } from 'react';
 import { BingoPattern, PatternCell } from '@/types';
-import { Button } from "@joolie-boolie/ui";
+import { Button } from "@hosted-game-night/ui";
 import { Input } from '@/components/ui/Input';
 
 // Constants for the 5x5 grid

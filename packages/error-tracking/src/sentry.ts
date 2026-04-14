@@ -7,7 +7,7 @@ import type {
   ErrorUser,
   Breadcrumb,
   ErrorTrackerConfig,
-} from '@joolie-boolie/error-tracking/types';
+} from '@hosted-game-night/error-tracking/types';
 
 const SEVERITY_MAP: Record<ErrorSeverity, Sentry.SeverityLevel> = {
   low: 'info',

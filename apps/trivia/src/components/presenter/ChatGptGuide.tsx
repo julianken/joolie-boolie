@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-const STORAGE_KEY = 'jb-trivia-chatgpt-guide-expanded';
+const STORAGE_KEY = 'hgn-trivia-chatgpt-guide-expanded';
 
 const PROMPT_TEMPLATE = `Create a set of trivia questions about [YOUR TOPIC HERE] in JSON format.
 

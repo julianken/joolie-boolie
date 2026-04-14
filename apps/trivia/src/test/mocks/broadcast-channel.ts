@@ -4,4 +4,4 @@ export {
   MockBroadcastChannel,
   resetMockBroadcastChannel,
   simulateMessage,
-} from '@joolie-boolie/testing/mocks';
+} from '@hosted-game-night/testing/mocks';

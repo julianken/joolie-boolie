@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useCallback } from 'react';
-import type { ThemeMode } from '@joolie-boolie/types';
+import type { ThemeMode } from '@hosted-game-night/types';
 
 /**
  * Theme option for the selector dropdown.
@@ -44,7 +44,7 @@ export interface ThemeSelectorProps {
  *
  * @example
  * ```tsx
- * import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '@joolie-boolie/ui';
+ * import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '@hosted-game-night/ui';
  * import { useThemeStore } from '@/stores/theme-store';
  *
  * function SettingsPanel() {

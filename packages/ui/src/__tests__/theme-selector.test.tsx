@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeSelector, DEFAULT_THEME_OPTIONS } from '../theme-selector';
-import type { ThemeMode } from '@joolie-boolie/types';
+import type { ThemeMode } from '@hosted-game-night/types';
 
 describe('ThemeSelector', () => {
   const defaultProps = {

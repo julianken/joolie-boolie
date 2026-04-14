@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Button } from '@joolie-boolie/ui';
-import { Slider } from '@joolie-boolie/ui';
+import { Button } from '@hosted-game-night/ui';
+import { Slider } from '@hosted-game-night/ui';
 import { useAudioStore } from '@/stores/audio-store';
 import { BingoBall, BingoColumn, BallNumber, COLUMNS, COLUMN_RANGES } from '@/types';
 

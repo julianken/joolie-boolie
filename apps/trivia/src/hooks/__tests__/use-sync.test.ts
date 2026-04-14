@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { create } from 'zustand';
 
-// Mock @/stores/theme-store to avoid importing @joolie-boolie/theme
+// Mock @/stores/theme-store to avoid importing @hosted-game-night/theme
 // which pulls in next/font/google (unavailable in test environment)
 vi.mock('@/stores/theme-store', () => {
   type ThemeMode = 'light' | 'dark' | 'system';
@@ -30,8 +30,8 @@ vi.mock('@/stores/theme-store', () => {
 });
 
 import { useSync, createMessageRouter } from '../use-sync';
-import { useSyncStore } from '@joolie-boolie/sync';
-import { assertSyncParityCompliance } from '@joolie-boolie/testing/contracts';
+import { useSyncStore } from '@hosted-game-night/sync';
+import { assertSyncParityCompliance } from '@hosted-game-night/testing/contracts';
 import type { TriviaSyncMessage } from '@/types';
 
 // Test session ID for all tests

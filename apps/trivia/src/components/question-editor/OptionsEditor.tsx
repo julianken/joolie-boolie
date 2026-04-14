@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 import type { QuestionType } from '@/types';
-import { Button } from '@joolie-boolie/ui';
+import { Button } from '@hosted-game-night/ui';
 
 export interface OptionsEditorProps {
   questionType: QuestionType;

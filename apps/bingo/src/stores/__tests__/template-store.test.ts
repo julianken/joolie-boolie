@@ -249,7 +249,7 @@ describe('useBingoTemplateStore', () => {
         state: { items: [item] },
         version: 1,
       });
-      localStorage.setItem('jb-bingo-templates', stored);
+      localStorage.setItem('hgn-bingo-templates', stored);
 
       // Simulate store rehydration by calling persist rehydrate
       useBingoTemplateStore.persist.rehydrate();
@@ -262,7 +262,7 @@ describe('useBingoTemplateStore', () => {
     it('persists only the items field (partialize excludes methods)', () => {
       useBingoTemplateStore.getState().create(makeInput({ name: 'Check Partialize' }));
 
-      const stored = localStorage.getItem('jb-bingo-templates');
+      const stored = localStorage.getItem('hgn-bingo-templates');
       expect(stored).not.toBeNull();
 
       const parsed = JSON.parse(stored!);
@@ -287,7 +287,7 @@ describe('useBingoTemplateStore', () => {
         state: { items: [{ id: 'old-id', name: 'Old' }] },
         version: 0,
       });
-      localStorage.setItem('jb-bingo-templates', legacyStored);
+      localStorage.setItem('hgn-bingo-templates', legacyStored);
 
       // Reset and rehydrate
       useBingoTemplateStore.setState({ items: [] });

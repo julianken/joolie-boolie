@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @joolie-boolie/error-tracking - React Integration
+ * @hosted-game-night/error-tracking - React Integration
  *
  * React components and hooks for error tracking.
  * Includes ErrorBoundary, hooks, and context providers.

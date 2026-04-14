@@ -3,7 +3,7 @@ import { useGameStore, useGameSelectors } from '../game-store';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock sync module
-vi.mock('@joolie-boolie/sync', () => ({
+vi.mock('@hosted-game-night/sync', () => ({
   createGameLifecycleLogger: () => ({
     emit: vi.fn(),
   }),

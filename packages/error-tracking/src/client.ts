@@ -1,5 +1,5 @@
 /**
- * @joolie-boolie/error-tracking - Browser Client
+ * @hosted-game-night/error-tracking - Browser Client
  *
  * Browser-side error tracking with support for multiple backends.
  * Lightweight by default (console only), with optional integration points for services like Sentry.

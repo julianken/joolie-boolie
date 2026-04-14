@@ -1,4 +1,4 @@
-# @joolie-boolie/theme
+# @hosted-game-night/theme
 
 **Status:** ✅ Production Ready (100% Complete)
 
@@ -36,7 +36,7 @@ Apps copy the shared base tokens and add their own extensions. When the design s
 ```json
 {
   "dependencies": {
-    "@joolie-boolie/theme": "workspace:*"
+    "@hosted-game-night/theme": "workspace:*"
   }
 }
 ```
@@ -49,7 +49,7 @@ Import the reference CSS to see the canonical design system:
 
 ```css
 /* Reference only - apps should maintain their own globals.css */
-@import "@joolie-boolie/theme/globals.css";
+@import "@hosted-game-night/theme/globals.css";
 ```
 
 ### TypeScript Tokens
@@ -57,7 +57,7 @@ Import the reference CSS to see the canonical design system:
 Use programmatic access to design tokens:
 
 ```typescript
-import { colors, fontSizes, touchTargets } from '@joolie-boolie/theme';
+import { colors, fontSizes, touchTargets } from '@hosted-game-night/theme';
 
 // colors.primary = 'var(--primary)'
 // fontSizes.base = '1.125rem' (18px)
@@ -197,11 +197,11 @@ export type TouchTargetSize = keyof typeof touchTargets;
 |-------------|--------|-------|
 | **apps/bingo** | ✅ Integrated | Full theme system + custom ball colors |
 | **apps/trivia** | ✅ Integrated | Full theme system + custom team colors |
-| **@joolie-boolie/ui** | ✅ Required | All components use theme CSS variables |
+| **@hosted-game-night/ui** | ✅ Required | All components use theme CSS variables |
 
 ## Related Packages
 
-- [`@joolie-boolie/ui`](../ui/README.md) - UI components that consume these design tokens
+- [`@hosted-game-night/ui`](../ui/README.md) - UI components that consume these design tokens
 - All apps maintain their own `globals.css` with app-specific extensions
 
 ## Related Documentation

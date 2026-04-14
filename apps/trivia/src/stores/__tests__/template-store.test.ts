@@ -257,7 +257,7 @@ describe('useTriviaTemplateStore', () => {
         state: { items: [item] },
         version: 1,
       });
-      localStorage.setItem('jb-trivia-templates', stored);
+      localStorage.setItem('hgn-trivia-templates', stored);
 
       useTriviaTemplateStore.persist.rehydrate();
 
@@ -269,7 +269,7 @@ describe('useTriviaTemplateStore', () => {
     it('persists only the items field (partialize excludes methods)', () => {
       useTriviaTemplateStore.getState().create(makeInput({ name: 'Check Partialize' }));
 
-      const stored = localStorage.getItem('jb-trivia-templates');
+      const stored = localStorage.getItem('hgn-trivia-templates');
       expect(stored).not.toBeNull();
 
       const parsed = JSON.parse(stored!);
@@ -292,7 +292,7 @@ describe('useTriviaTemplateStore', () => {
         state: { items: [{ id: 'old-id', name: 'Old' }] },
         version: 0,
       });
-      localStorage.setItem('jb-trivia-templates', legacyStored);
+      localStorage.setItem('hgn-trivia-templates', legacyStored);
 
       useTriviaTemplateStore.setState({ items: [] });
       useTriviaTemplateStore.persist.rehydrate();

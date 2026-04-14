@@ -1,5 +1,5 @@
 {
-  "name": "@joolie-boolie/bingo",
+  "name": "@hosted-game-night/bingo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,13 +15,13 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
-    "@joolie-boolie/audio": "workspace:*",
-    "@joolie-boolie/error-tracking": "workspace:*",
-    "@joolie-boolie/game-stats": "workspace:*",
-    "@joolie-boolie/sync": "workspace:*",
-    "@joolie-boolie/theme": "workspace:*",
-    "@joolie-boolie/types": "workspace:*",
-    "@joolie-boolie/ui": "workspace:*",
+    "@hosted-game-night/audio": "workspace:*",
+    "@hosted-game-night/error-tracking": "workspace:*",
+    "@hosted-game-night/game-stats": "workspace:*",
+    "@hosted-game-night/sync": "workspace:*",
+    "@hosted-game-night/theme": "workspace:*",
+    "@hosted-game-night/types": "workspace:*",
+    "@hosted-game-night/ui": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@sentry/nextjs": "^10.39.0",
     "@vercel/analytics": "^1.6.1",
@@ -37,7 +37,7 @@
     "zustand": "^5.0.10"
   },
   "devDependencies": {
-    "@joolie-boolie/testing": "workspace:*",
+    "@hosted-game-night/testing": "workspace:*",
     "@next/bundle-analyzer": "^16.1.3",
     "@opentelemetry/sdk-trace-base": "^2.5.1",
     "@sentry/cli": "^3.2.0",

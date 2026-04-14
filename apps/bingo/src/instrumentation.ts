@@ -31,8 +31,8 @@ export async function register() {
     await import('../sentry.server.config');
 
     if (process.env.SENTRY_DSN && process.env.E2E_TESTING !== 'true') {
-      const { setServerErrorBackend } = await import('@joolie-boolie/error-tracking/server');
-      const { SentryErrorBackend } = await import('@joolie-boolie/error-tracking/sentry');
+      const { setServerErrorBackend } = await import('@hosted-game-night/error-tracking/server');
+      const { SentryErrorBackend } = await import('@hosted-game-night/error-tracking/sentry');
       setServerErrorBackend(new SentryErrorBackend());
     }
   }
@@ -61,7 +61,7 @@ export async function onRequestError(
       | undefined;
   }
 ): Promise<void> {
-  const { captureServerError } = await import('@joolie-boolie/error-tracking/server');
+  const { captureServerError } = await import('@hosted-game-night/error-tracking/server');
 
   captureServerError(error, {
     component: context.routePath,

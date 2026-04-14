@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import type { ImportResult } from '@/lib/questions/types';
 import { parseJsonQuestions, readFileContent } from '@/lib/questions/parser';
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from '@joolie-boolie/ui';
+import { useToast } from '@hosted-game-night/ui';
 import { getCategoryBadgeClasses } from '@/lib/categories';
 import { ChatGptGuide } from './ChatGptGuide';
 

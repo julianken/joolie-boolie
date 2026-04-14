@@ -1,4 +1,4 @@
-# @joolie-boolie/sync
+# @hosted-game-night/sync
 
 **Status:** ✅ Production Ready (100% Complete)
 
@@ -22,7 +22,7 @@ Already included in the monorepo. Add to your app's dependencies:
 ```json
 {
   "dependencies": {
-    "@joolie-boolie/sync": "workspace:*"
+    "@hosted-game-night/sync": "workspace:*"
   }
 }
 ```
@@ -32,7 +32,7 @@ Already included in the monorepo. Add to your app's dependencies:
 ### Basic Setup (Generic)
 
 ```typescript
-import { BroadcastSync, createSyncStore } from '@joolie-boolie/sync';
+import { BroadcastSync, createSyncStore } from '@hosted-game-night/sync';
 
 // Create a typed broadcast sync instance
 interface MyGameState {
@@ -194,7 +194,7 @@ export function createMessageRouter(handlers: Partial<{
 The package provides a Zustand store factory for managing sync connection state:
 
 ```typescript
-import { createSyncStore } from '@joolie-boolie/sync';
+import { createSyncStore } from '@hosted-game-night/sync';
 
 // Create a store instance for your app
 export const useSyncStore = createSyncStore();
@@ -217,7 +217,7 @@ function SyncStatus() {
 The generic `useSync` hook handles common sync patterns:
 
 ```typescript
-import { useSync } from '@joolie-boolie/sync';
+import { useSync } from '@hosted-game-night/sync';
 
 function PresenterView() {
   const { isConnected, broadcastState } = useSync({
@@ -303,12 +303,12 @@ interface SyncState {
 |-------------|--------|-------|
 | **apps/bingo** | ✅ Integrated | Dual-screen sync for presenter/audience views |
 | **apps/trivia** | ✅ Integrated | Dual-screen sync for presenter/audience views |
-| **@joolie-boolie/testing** | ✅ Integrated | MockBroadcastChannel for tests |
+| **@hosted-game-night/testing** | ✅ Integrated | MockBroadcastChannel for tests |
 
 ## Related Packages
 
-- [`@joolie-boolie/types`](../types/README.md) - Shared type definitions including SyncMessage<T>
-- [`@joolie-boolie/testing`](../testing/README.md) - BroadcastChannel mocks for testing
+- [`@hosted-game-night/types`](../types/README.md) - Shared type definitions including SyncMessage<T>
+- [`@hosted-game-night/testing`](../testing/README.md) - BroadcastChannel mocks for testing
 
 ## Related Documentation
 

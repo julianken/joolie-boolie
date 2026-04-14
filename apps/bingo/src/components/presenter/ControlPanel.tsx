@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Modal } from "@joolie-boolie/ui";
+import { Button, Modal } from "@hosted-game-night/ui";
 import { GameStatus } from '@/types';
 import { SaveTemplateModal } from './SaveTemplateModal';
 

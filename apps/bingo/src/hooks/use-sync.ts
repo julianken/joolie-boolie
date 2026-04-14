@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useMemo, useState } from 'react';
-import { useSyncStore, useSyncHeartbeat, type SyncRole } from '@joolie-boolie/sync';
+import { useSyncStore, useSyncHeartbeat, type SyncRole } from '@hosted-game-night/sync';
 import { useGameStore } from '@/stores/game-store';
-import { BroadcastSync } from '@joolie-boolie/sync';
+import { BroadcastSync } from '@hosted-game-night/sync';
 import { getChannelName } from '@/lib/sync/session';
 import type { GameState, BingoBall, BingoPattern, ThemeMode, AudioSettingsPayload, BingoSyncMessage } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';
@@ -368,7 +368,7 @@ export function useSync({ role, sessionId, displayAudioUnlocked, onPlayBallSeque
     // while our router expects the discriminated BingoSyncMessage union.
     // This is safe because the BingoBroadcastSync class only sends valid BingoSyncMessage types.
     const unsubscribe = sync.subscribe(
-      router as unknown as (message: import('@joolie-boolie/sync').SyncMessage<BingoSyncPayload>) => void
+      router as unknown as (message: import('@hosted-game-night/sync').SyncMessage<BingoSyncPayload>) => void
     );
 
     // If audience, request initial sync with retry logic

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { ThemeMode } from '@joolie-boolie/types';
+import { ThemeMode } from '@hosted-game-night/types';
 
 /**
  * Resolves a theme mode to an actual theme (light or dark).

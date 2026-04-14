@@ -10,7 +10,7 @@ function createTeam(
   roundScores: number[] = [score],
 ): Team {
   return {
-    id: id as import('@joolie-boolie/types/branded').TeamId,
+    id: id as import('@hosted-game-night/types/branded').TeamId,
     name,
     score,
     tableNumber: parseInt(id, 10) || 1,

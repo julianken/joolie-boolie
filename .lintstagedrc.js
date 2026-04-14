@@ -2,16 +2,16 @@ export default {
   '*': (stagedFiles) => {
     // Map staged file paths to turbo package filters
     const packageMap = {
-      'apps/bingo/': '@joolie-boolie/bingo',
-      'apps/trivia/': '@joolie-boolie/trivia',
-      'packages/sync/': '@joolie-boolie/sync',
-      'packages/ui/': '@joolie-boolie/ui',
-      'packages/theme/': '@joolie-boolie/theme',
-      'packages/types/': '@joolie-boolie/types',
-      'packages/audio/': '@joolie-boolie/audio',
-      'packages/game-stats/': '@joolie-boolie/game-stats',
-      'packages/error-tracking/': '@joolie-boolie/error-tracking',
-      'packages/testing/': '@joolie-boolie/testing',
+      'apps/bingo/': '@hosted-game-night/bingo',
+      'apps/trivia/': '@hosted-game-night/trivia',
+      'packages/sync/': '@hosted-game-night/sync',
+      'packages/ui/': '@hosted-game-night/ui',
+      'packages/theme/': '@hosted-game-night/theme',
+      'packages/types/': '@hosted-game-night/types',
+      'packages/audio/': '@hosted-game-night/audio',
+      'packages/game-stats/': '@hosted-game-night/game-stats',
+      'packages/error-tracking/': '@hosted-game-night/error-tracking',
+      'packages/testing/': '@hosted-game-night/testing',
     };
 
     const packages = new Set();

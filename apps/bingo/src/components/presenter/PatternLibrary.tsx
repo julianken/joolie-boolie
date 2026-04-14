@@ -2,12 +2,12 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { BingoPattern } from '@/types';
-import { Button } from "@joolie-boolie/ui";
+import { Button } from "@hosted-game-night/ui";
 import { PatternEditor } from './PatternEditor';
 import { PatternPreviewSmall } from './PatternPreviewSmall';
 
 // localStorage key for custom patterns
-const STORAGE_KEY = 'jb-bingo-custom-patterns';
+const STORAGE_KEY = 'hgn-bingo-custom-patterns';
 
 export interface PatternLibraryProps {
   /** Called when a pattern is selected for use */

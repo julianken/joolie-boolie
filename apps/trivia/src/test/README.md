@@ -4,5 +4,5 @@ Test utilities and setup for the trivia app.
 
 ## Conventions
 
-- Use shared helpers from `@joolie-boolie/testing` when possible.
+- Use shared helpers from `@hosted-game-night/testing` when possible.
 - Keep component tests close to their components.

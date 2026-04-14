@@ -44,7 +44,7 @@ interface HeartbeatPayload {
  *   broadcastSync,
  *   () => gameStore.getState(),
  *   'presenter',
- *   'jb-bingo-session-123',
+ *   'hgn-bingo-session-123',
  *   { divergenceThresholdMs: 5000 },
  * );
  * heartbeat.start();

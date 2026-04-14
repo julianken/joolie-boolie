@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { BroadcastSync } from '../broadcast';
-import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@hosted-game-night/testing/mocks';
 
 describe('BroadcastSync timeout detection', () => {
   beforeEach(() => {

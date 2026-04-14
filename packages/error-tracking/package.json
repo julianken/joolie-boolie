@@ -1,8 +1,8 @@
 {
-  "name": "@joolie-boolie/error-tracking",
+  "name": "@hosted-game-night/error-tracking",
   "version": "0.1.0",
   "private": true,
-  "description": "Error tracking abstraction for Joolie Boolie with support for multiple backends",
+  "description": "Error tracking abstraction for Hosted Game Night with support for multiple backends",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
@@ -49,7 +49,7 @@
     }
   },
   "devDependencies": {
-    "@joolie-boolie/testing": "workspace:*",
+    "@hosted-game-night/testing": "workspace:*",
     "@sentry/nextjs": "^10.39.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
@@ -67,6 +67,6 @@
     "error-tracking",
     "error-boundary",
     "logging",
-    "joolie-boolie"
+    "hosted-game-night"
   ]
 }

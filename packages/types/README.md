@@ -1,4 +1,4 @@
-# @joolie-boolie/types
+# @hosted-game-night/types
 
 **Status:** Production Ready
 
@@ -16,7 +16,7 @@ Shared TypeScript definitions for the Joolie Boolie monorepo. Provides a small, 
 ```json
 {
   "dependencies": {
-    "@joolie-boolie/types": "workspace:*"
+    "@hosted-game-night/types": "workspace:*"
   }
 }
 ```
@@ -26,7 +26,7 @@ Shared TypeScript definitions for the Joolie Boolie monorepo. Provides a small, 
 ### 1. Theme Mode
 
 ```typescript
-import type { ThemeMode } from '@joolie-boolie/types';
+import type { ThemeMode } from '@hosted-game-night/types';
 
 const mode: ThemeMode = 'dark'; // 'light' | 'dark' | 'system'
 ```
@@ -34,7 +34,7 @@ const mode: ThemeMode = 'dark'; // 'light' | 'dark' | 'system'
 ### 2. Generic Sync Messages
 
 ```typescript
-import type { SyncMessage } from '@joolie-boolie/types';
+import type { SyncMessage } from '@hosted-game-night/types';
 
 // Define custom message types
 type BingoSyncMessage =
@@ -72,8 +72,8 @@ function handleMessage(message: BingoSyncMessage) {
 ### 3. Branded Types
 
 ```typescript
-import type { BallNumber, TeamId, QuestionId } from '@joolie-boolie/types';
-import { makeBallNumber, makeTeamId, makeQuestionId } from '@joolie-boolie/types';
+import type { BallNumber, TeamId, QuestionId } from '@hosted-game-night/types';
+import { makeBallNumber, makeTeamId, makeQuestionId } from '@hosted-game-night/types';
 
 const ball: BallNumber = makeBallNumber(42); // throws if out of 1..75 range
 const team: TeamId = makeTeamId('team-alpha');

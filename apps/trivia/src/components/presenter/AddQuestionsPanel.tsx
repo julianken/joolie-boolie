@@ -2,7 +2,7 @@
 
 import { useId, useState, useRef, useCallback, useEffect } from 'react';
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from '@joolie-boolie/ui';
+import { useToast } from '@hosted-game-night/ui';
 import { triviaQuestionsToQuestions } from '@/lib/questions/conversion';
 import { TriviaApiImporter } from './TriviaApiImporter';
 import { QuestionSetImporter } from './QuestionSetImporter';

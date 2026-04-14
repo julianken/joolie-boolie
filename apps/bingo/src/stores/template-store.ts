@@ -104,7 +104,7 @@ export const useBingoTemplateStore = create<BingoTemplateStore>()(
       },
     }),
     {
-      name: 'jb-bingo-templates',
+      name: 'hgn-bingo-templates',
       version: 1,
       partialize: (state) => ({
         items: state.items,

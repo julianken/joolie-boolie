@@ -126,7 +126,7 @@ export default defineConfig({
   webServer: isCI
     ? [
         {
-          command: 'pnpm --filter @joolie-boolie/bingo start',
+          command: 'pnpm --filter @hosted-game-night/bingo start',
           url: `http://localhost:${portConfig.bingoPort}`,
           reuseExistingServer: false,
           timeout: 120 * 1000,
@@ -135,7 +135,7 @@ export default defineConfig({
           env: { E2E_TESTING: 'true', PORT: String(portConfig.bingoPort) },
         },
         {
-          command: 'pnpm --filter @joolie-boolie/trivia start',
+          command: 'pnpm --filter @hosted-game-night/trivia start',
           url: `http://localhost:${portConfig.triviaPort}`,
           reuseExistingServer: false,
           timeout: 120 * 1000,

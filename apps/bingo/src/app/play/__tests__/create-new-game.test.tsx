@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PlayPage from '../page';
-import { ToastProvider } from "@joolie-boolie/ui";
+import { ToastProvider } from "@hosted-game-night/ui";
 
 // Create mock functions to be shared across tests
 const mockResetGame = vi.fn();
@@ -89,7 +89,7 @@ vi.mock('@/lib/sync/session', () => ({
   generateSessionId: () => 'test-session-id',
 }));
 
-vi.mock('@joolie-boolie/ui', async (importOriginal) => {
+vi.mock('@hosted-game-night/ui', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,

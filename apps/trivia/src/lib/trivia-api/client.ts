@@ -8,7 +8,7 @@
  * rather than catching exceptions.
  */
 
-import { createLogger } from '@joolie-boolie/error-tracking/server-logger';
+import { createLogger } from '@hosted-game-night/error-tracking/server-logger';
 
 const logger = createLogger({ service: 'trivia-api-client' });
 

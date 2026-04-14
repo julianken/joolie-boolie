@@ -105,14 +105,14 @@ describe('ChatGptGuide', () => {
     const trigger = screen.getByRole('button', { name: /create questions with chatgpt/i });
 
     fireEvent.click(trigger);
-    expect(localStorage.getItem('jb-trivia-chatgpt-guide-expanded')).toBe('true');
+    expect(localStorage.getItem('hgn-trivia-chatgpt-guide-expanded')).toBe('true');
 
     fireEvent.click(trigger);
-    expect(localStorage.getItem('jb-trivia-chatgpt-guide-expanded')).toBe('false');
+    expect(localStorage.getItem('hgn-trivia-chatgpt-guide-expanded')).toBe('false');
   });
 
   it('starts expanded if localStorage has "true"', () => {
-    localStorage.setItem('jb-trivia-chatgpt-guide-expanded', 'true');
+    localStorage.setItem('hgn-trivia-chatgpt-guide-expanded', 'true');
     render(<ChatGptGuide />);
 
     const trigger = screen.getByRole('button', { name: /create questions with chatgpt/i });

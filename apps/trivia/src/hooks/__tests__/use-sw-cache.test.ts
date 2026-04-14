@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { assertSwCacheParityCompliance } from '@joolie-boolie/testing/contracts';
+import { assertSwCacheParityCompliance } from '@hosted-game-night/testing/contracts';
 import { useSWCache } from '../use-sw-cache';
 
 // Mock the cache-manager module

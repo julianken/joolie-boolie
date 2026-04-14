@@ -1,5 +1,5 @@
 /**
- * Common game-related types shared across the Joolie Boolie.
+ * Common game-related types shared across Hosted Game Night.
  */
 
 // =============================================================================

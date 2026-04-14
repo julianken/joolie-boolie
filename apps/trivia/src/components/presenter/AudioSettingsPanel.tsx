@@ -1,6 +1,6 @@
 'use client';
 
-import { Toggle, Slider } from '@joolie-boolie/ui';
+import { Toggle, Slider } from '@hosted-game-night/ui';
 import { useAudioStore } from '@/stores/audio-store';
 import {
   useTTS,

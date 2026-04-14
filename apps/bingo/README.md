@@ -102,7 +102,7 @@ Uses BroadcastChannel API for same-device window communication:
 - **Presenter window** (`/play`): Game controls, pattern selector, speed control, audio toggle
 - **Audience window** (`/display`): Large ball display, full bingo board, winning pattern
 
-**Implementation:** `@joolie-boolie/sync` package + `hooks/use-sync.ts` (React hook)
+**Implementation:** `@hosted-game-night/sync` package + `hooks/use-sync.ts` (React hook)
 
 ## Environment Variables
 
@@ -144,14 +144,14 @@ pnpm test:coverage    # With coverage report
 
 This app depends on the following shared packages:
 
-- [`@joolie-boolie/sync`](../../packages/sync/README.md) - BroadcastChannel dual-screen synchronization
-- [`@joolie-boolie/ui`](../../packages/ui/README.md) - Button, Toggle, Slider, Card, Modal, Toast components
-- [`@joolie-boolie/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing)
-- [`@joolie-boolie/game-stats`](../../packages/game-stats/README.md) - Game statistics types, calculators, storage
-- [`@joolie-boolie/testing`](../../packages/testing/README.md) - BroadcastChannel and Audio mocks for tests
-- [`@joolie-boolie/types`](../../packages/types/README.md) - Shared TypeScript types
-- [`@joolie-boolie/audio`](../../packages/audio/README.md) - Shared audio utilities
-- [`@joolie-boolie/error-tracking`](../../packages/error-tracking/README.md) - Error logging and tracking
+- [`@hosted-game-night/sync`](../../packages/sync/README.md) - BroadcastChannel dual-screen synchronization
+- [`@hosted-game-night/ui`](../../packages/ui/README.md) - Button, Toggle, Slider, Card, Modal, Toast components
+- [`@hosted-game-night/theme`](../../packages/theme/README.md) - Design tokens (10+ themes, typography, spacing)
+- [`@hosted-game-night/game-stats`](../../packages/game-stats/README.md) - Game statistics types, calculators, storage
+- [`@hosted-game-night/testing`](../../packages/testing/README.md) - BroadcastChannel and Audio mocks for tests
+- [`@hosted-game-night/types`](../../packages/types/README.md) - Shared TypeScript types
+- [`@hosted-game-night/audio`](../../packages/audio/README.md) - Shared audio utilities
+- [`@hosted-game-night/error-tracking`](../../packages/error-tracking/README.md) - Error logging and tracking
 
 ## Known Issues & Limitations
 

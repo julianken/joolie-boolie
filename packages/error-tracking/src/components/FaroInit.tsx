@@ -8,7 +8,7 @@ interface FaroInitProps {
 
 export function FaroInit({ appName }: FaroInitProps) {
   useEffect(() => {
-    import('@joolie-boolie/error-tracking/faro')
+    import('@hosted-game-night/error-tracking/faro')
       .then(({ initFaro }) => {
         initFaro({ appName });
       })

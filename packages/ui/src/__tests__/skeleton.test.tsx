@@ -82,19 +82,19 @@ describe('Skeleton', () => {
     it('should apply shimmer animation by default', () => {
       render(<Skeleton data-testid="skeleton" />);
       const skeleton = screen.getByTestId('skeleton');
-      expect(skeleton.className).toContain('jb-skeleton-shimmer');
+      expect(skeleton.className).toContain('hgn-skeleton-shimmer');
     });
 
     it('should apply wave animation styles', () => {
       render(<Skeleton animation="wave" data-testid="skeleton" />);
       const skeleton = screen.getByTestId('skeleton');
-      expect(skeleton.className).toContain('jb-skeleton-shimmer');
+      expect(skeleton.className).toContain('hgn-skeleton-shimmer');
     });
 
     it('should not apply animation when animation is none', () => {
       render(<Skeleton animation="none" data-testid="skeleton" />);
       const skeleton = screen.getByTestId('skeleton');
-      expect(skeleton.className).not.toContain('jb-skeleton-shimmer');
+      expect(skeleton.className).not.toContain('hgn-skeleton-shimmer');
       expect(skeleton.className).not.toContain('animate-pulse');
     });
   });

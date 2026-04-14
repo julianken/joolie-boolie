@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonButton } from '@joolie-boolie/ui';
+import { Skeleton, SkeletonButton } from '@hosted-game-night/ui';
 
 /**
  * Loading skeleton for the Trivia presenter page.

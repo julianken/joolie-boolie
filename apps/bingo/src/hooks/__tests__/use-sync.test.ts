@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { create } from 'zustand';
 
-// Mock @/stores/theme-store to avoid importing @joolie-boolie/theme
+// Mock @/stores/theme-store to avoid importing @hosted-game-night/theme
 // which pulls in next/font/google (unavailable in test environment)
 vi.mock('@/stores/theme-store', () => {
   type ThemeMode = 'light' | 'dark' | 'system';
@@ -30,7 +30,7 @@ vi.mock('@/stores/theme-store', () => {
 });
 
 import { useSync } from '../use-sync';
-import { useSyncStore } from '@joolie-boolie/sync';
+import { useSyncStore } from '@hosted-game-night/sync';
 import { useGameStore } from '@/stores/game-store';
 import { useAudioStore } from '@/stores/audio-store';
 import { createMessageRouter } from '../use-sync';

@@ -2,8 +2,8 @@
 
 import { useId, useState, useCallback } from 'react';
 import { RollSoundType, RollDuration, ROLL_SOUND_OPTIONS } from '@/types';
-import { Button } from "@joolie-boolie/ui";
-import { Slider } from '@joolie-boolie/ui';
+import { Button } from "@hosted-game-night/ui";
+import { Slider } from '@hosted-game-night/ui';
 import { useAudioStore } from '@/stores/audio-store';
 
 export interface RollSoundSelectorProps {

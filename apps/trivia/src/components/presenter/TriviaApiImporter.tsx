@@ -2,7 +2,7 @@
 
 import { useId, useState, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from "@joolie-boolie/ui";
+import { useToast } from "@hosted-game-night/ui";
 import type { Question, QuestionCategory } from '@/types';
 import {
   DEFAULT_CATEGORIES,

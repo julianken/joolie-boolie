@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { createGameLifecycleLogger } from '@joolie-boolie/sync';
+import { createGameLifecycleLogger } from '@hosted-game-night/sync';
 import type { TriviaGameState, GameSettings } from '@/types';
 import type {
   AudienceScene,

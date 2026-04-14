@@ -1,5 +1,5 @@
 {
-  "name": "@joolie-boolie/ui",
+  "name": "@hosted-game-night/ui",
   "version": "0.2.0",
   "private": true,
   "main": "./src/index.ts",
@@ -34,9 +34,9 @@
     "vitest": "^4.0.17"
   },
   "dependencies": {
-    "@joolie-boolie/error-tracking": "workspace:*",
-    "@joolie-boolie/sync": "workspace:*",
-    "@joolie-boolie/types": "workspace:*",
+    "@hosted-game-night/error-tracking": "workspace:*",
+    "@hosted-game-night/sync": "workspace:*",
+    "@hosted-game-night/types": "workspace:*",
     "motion": "^12.34.2",
     "react-aria-components": "^1.14.0"
   }

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock the logger (matches existing codebase pattern from route.test.ts)
-vi.mock('@joolie-boolie/error-tracking/server-logger', () => ({
+vi.mock('@hosted-game-night/error-tracking/server-logger', () => ({
   createLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),

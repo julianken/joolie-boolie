@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { axe } from 'vitest-axe';
-import { ToastProvider } from "@joolie-boolie/ui";
+import { ToastProvider } from "@hosted-game-night/ui";
 
 // Presenter components
 import { BingoBoard } from '@/components/presenter/BingoBoard';

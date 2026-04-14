@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 // Mocks -- matching existing route.test.ts patterns exactly
 // ---------------------------------------------------------------------------
 
-vi.mock('@joolie-boolie/error-tracking/server-logger', () => ({
+vi.mock('@hosted-game-night/error-tracking/server-logger', () => ({
   createLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),
