@@ -6,7 +6,7 @@
   "buildCommand": "cd ../.. && pnpm turbo build --filter=@hosted-game-night/trivia...",
   "outputDirectory": ".next",
   "env": {
-    "TURBO_TEAM": "hosted-game-night",
+    "TURBO_TEAM": "jimpers-projects",
     "TURBO_REMOTE_ONLY": "true"
   },
   "headers": [
