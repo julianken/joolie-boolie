@@ -89,7 +89,7 @@ export const useTriviaTemplateStore = create<TriviaTemplateStore>()(
       },
     }),
     {
-      name: 'jb-trivia-templates',
+      name: 'hgn-trivia-templates',
       version: 1,
       partialize: (state) => ({
         items: state.items,

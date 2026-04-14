@@ -1,5 +1,5 @@
 /**
- * @joolie-boolie/error-tracking - Server Module
+ * @hosted-game-night/error-tracking - Server Module
  *
  * Server-side error tracking for Next.js API routes and Server Components.
  * Provides context-aware error capture with request information.

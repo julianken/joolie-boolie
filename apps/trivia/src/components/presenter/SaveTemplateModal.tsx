@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useId } from 'react';
-import { Modal } from "@joolie-boolie/ui";
+import { Modal } from "@hosted-game-night/ui";
 import { useGameStore } from '@/stores/game-store';
-import { useToast } from "@joolie-boolie/ui";
+import { useToast } from "@hosted-game-night/ui";
 import { useTriviaTemplateStore } from '@/stores/template-store';
 import type { Question } from '@/types';
 import type { TriviaQuestion } from '@/types/trivia-question';

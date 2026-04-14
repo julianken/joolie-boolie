@@ -4,7 +4,7 @@ Shared game statistics module and base types for the Joolie Boolie platform.
 
 ## Package Scope
 
-`@joolie-boolie/game-stats`
+`@hosted-game-night/game-stats`
 
 ## What This Package Provides
 
@@ -24,7 +24,7 @@ Provides localStorage-backed statistics tracking for both Bingo and Trivia.
 - `BaseGameStatistics` -- shared base (gamesPlayed, totalPlayTime, firstGameAt, lastGameAt)
 - `BingoSessionRecord`, `BingoPatternStats`, `BingoStatistics`
 - `TriviaSessionRecord`, `TriviaCategoryStats`, `TriviaStatistics`
-- `STORAGE_KEYS` -- localStorage key constants (`jb:bingo-statistics`, `jb:trivia-statistics`)
+- `STORAGE_KEYS` -- localStorage key constants (`hgn:bingo-statistics`, `hgn:trivia-statistics`)
 - `MAX_RECENT_SESSIONS` -- cap on stored session records (20)
 
 **Calculator** (`src/stats/calculator.ts`):

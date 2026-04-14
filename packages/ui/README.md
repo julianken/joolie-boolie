@@ -1,4 +1,4 @@
-# @joolie-boolie/ui
+# @hosted-game-night/ui
 
 **Status:** ✅ Production Ready (100% Complete)
 
@@ -9,7 +9,7 @@ Shared UI components for the Joolie Boolie. Provides 6 accessible components (Bu
 ```json
 {
   "dependencies": {
-    "@joolie-boolie/ui": "workspace:*"
+    "@hosted-game-night/ui": "workspace:*"
   }
 }
 ```
@@ -31,7 +31,7 @@ Shared UI components for the Joolie Boolie. Provides 6 accessible components (Bu
 A versatile button component with multiple variants and sizes.
 
 ```tsx
-import { Button } from '@joolie-boolie/ui';
+import { Button } from '@hosted-game-night/ui';
 
 // Primary action
 <Button variant="primary" size="lg" onClick={handleClick}>
@@ -78,7 +78,7 @@ import { Button } from '@joolie-boolie/ui';
 An accessible toggle switch for boolean settings.
 
 ```tsx
-import { Toggle } from '@joolie-boolie/ui';
+import { Toggle } from '@hosted-game-night/ui';
 
 <Toggle
   checked={audioEnabled}
@@ -109,7 +109,7 @@ import { Toggle } from '@joolie-boolie/ui';
 A range slider with label and value display.
 
 ```tsx
-import { Slider } from '@joolie-boolie/ui';
+import { Slider } from '@hosted-game-night/ui';
 
 <Slider
   value={speed}
@@ -167,7 +167,7 @@ All components follow accessibility best practices for all users:
 
 ### CSS Variables
 
-Components use CSS variables from `@joolie-boolie/theme`:
+Components use CSS variables from `@hosted-game-night/theme`:
 
 ```css
 /* Primary button uses */
@@ -214,8 +214,8 @@ export { Slider, type SliderProps } from './slider';
 
 ## Related Packages
 
-- [`@joolie-boolie/theme`](../theme/README.md) - CSS variables and design tokens used by all components
-- [`@joolie-boolie/testing`](../testing/README.md) - Test utilities for component testing
+- [`@hosted-game-night/theme`](../theme/README.md) - CSS variables and design tokens used by all components
+- [`@hosted-game-night/testing`](../testing/README.md) - Test utilities for component testing
 
 ## Related Documentation
 

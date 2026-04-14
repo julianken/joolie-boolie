@@ -12,7 +12,7 @@ export interface UseSyncHeartbeatOptions<TPayload = unknown> {
   getState: () => TPayload;
   /** The sync role of this instance ('presenter' or 'audience'). */
   role: SyncRole;
-  /** The BroadcastChannel name (e.g., 'jb-bingo-sync-<sessionId>'). */
+  /** The BroadcastChannel name (e.g., 'hgn-bingo-sync-<sessionId>'). */
   channelName: string;
   /** Optional heartbeat configuration overrides. */
   config?: SyncHeartbeatConfig;
@@ -35,7 +35,7 @@ export interface UseSyncHeartbeatReturn {
  *   broadcastSync,
  *   getState: () => useGameStore.getState(),
  *   role: 'presenter',
- *   channelName: 'jb-bingo-sync-abc123',
+ *   channelName: 'hgn-bingo-sync-abc123',
  * });
  * ```
  */

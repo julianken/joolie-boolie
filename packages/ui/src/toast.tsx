@@ -247,16 +247,16 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
       ].join(' ')}
       style={{
         animation: isExiting
-          ? 'jb-toast-out 200ms ease-out forwards'
-          : 'jb-toast-in 250ms cubic-bezier(0, 0, 0.2, 1)',
+          ? 'hgn-toast-out 200ms ease-out forwards'
+          : 'hgn-toast-in 250ms cubic-bezier(0, 0, 0.2, 1)',
       }}
     >
       <style>{`
-        @keyframes jb-toast-in {
+        @keyframes hgn-toast-in {
           from { transform: translateX(100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
-        @keyframes jb-toast-out {
+        @keyframes hgn-toast-out {
           from { transform: translateX(0); opacity: 1; }
           to { transform: translateX(100%); opacity: 0; }
         }

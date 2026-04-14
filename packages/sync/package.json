@@ -1,5 +1,5 @@
 {
-  "name": "@joolie-boolie/sync",
+  "name": "@hosted-game-night/sync",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -15,14 +15,14 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@joolie-boolie/types": "workspace:*"
+    "@hosted-game-night/types": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
-    "@joolie-boolie/testing": "workspace:*",
+    "@hosted-game-night/testing": "workspace:*",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19",

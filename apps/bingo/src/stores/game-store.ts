@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createGameLifecycleLogger } from '@joolie-boolie/sync';
+import { createGameLifecycleLogger } from '@hosted-game-night/sync';
 import { GameState, BingoPattern, BingoBall } from '@/types';
 import {
   createInitialState,

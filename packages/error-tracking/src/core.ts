@@ -1,5 +1,5 @@
 /**
- * @joolie-boolie/error-tracking - Core (shared)
+ * @hosted-game-night/error-tracking - Core (shared)
  *
  * Environment-agnostic utilities shared between client.ts and server.ts.
  * Do not import browser-only or Node-only APIs here.

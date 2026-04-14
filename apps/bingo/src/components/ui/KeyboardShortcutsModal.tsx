@@ -4,7 +4,7 @@ import {
   KeyboardShortcutsModal as SharedKeyboardShortcutsModal,
   type KeyboardShortcutsModalProps,
   type KeyboardShortcut,
-} from '@joolie-boolie/ui';
+} from '@hosted-game-night/ui';
 
 export type { KeyboardShortcutsModalProps, KeyboardShortcut };
 

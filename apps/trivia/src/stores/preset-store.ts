@@ -87,7 +87,7 @@ export const useTriviaPresetStore = create<TriviaPresetStore>()(
       },
     }),
     {
-      name: 'jb-trivia-presets',
+      name: 'hgn-trivia-presets',
       version: 1,
       partialize: (state) => ({
         items: state.items,

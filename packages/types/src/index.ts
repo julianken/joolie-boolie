@@ -1,7 +1,7 @@
 /**
- * @joolie-boolie/types
+ * @hosted-game-night/types
  *
- * Shared TypeScript types for the Joolie Boolie.
+ * Shared TypeScript types for Hosted Game Night.
  *
  * This package provides common types used across the monorepo, including:
  * - Theme types (ThemeMode)
@@ -9,7 +9,7 @@
  * - Branded types (TeamId, QuestionId, BallNumber)
  *
  * @example
- * import type { ThemeMode, SyncMessage, TeamId } from '@joolie-boolie/types';
+ * import type { ThemeMode, SyncMessage, TeamId } from '@hosted-game-night/types';
  */
 
 // =============================================================================

@@ -7,8 +7,8 @@
  *
  * @example
  * ```ts
- * import type { TeamId, QuestionId } from '@joolie-boolie/types/branded';
- * import { makeTeamId, makeQuestionId } from '@joolie-boolie/types/branded';
+ * import type { TeamId, QuestionId } from '@hosted-game-night/types/branded';
+ * import { makeTeamId, makeQuestionId } from '@hosted-game-night/types/branded';
  *
  * const tid = makeTeamId('team-1');
  * const qid = makeQuestionId('q-1');

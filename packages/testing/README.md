@@ -1,4 +1,4 @@
-# @joolie-boolie/testing
+# @hosted-game-night/testing
 
 **Status:** ✅ Production Ready (100% Complete)
 
@@ -9,7 +9,7 @@ Shared test utilities and mocks for the Joolie Boolie. Provides mock implementat
 ```json
 {
   "devDependencies": {
-    "@joolie-boolie/testing": "workspace:*"
+    "@hosted-game-night/testing": "workspace:*"
   },
   "peerDependencies": {
     "@testing-library/react": "^15.0.0",
@@ -24,16 +24,16 @@ The package provides multiple export paths for different use cases:
 
 ```typescript
 // Main export - includes mocks and helpers
-import { mockBroadcastChannel, mockAudio } from '@joolie-boolie/testing';
+import { mockBroadcastChannel, mockAudio } from '@hosted-game-night/testing';
 
 // Mocks only
-import { MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { MockBroadcastChannel } from '@hosted-game-night/testing/mocks';
 
 // Jest-dom setup (add to vitest setupFiles)
-import '@joolie-boolie/testing/setup';
+import '@hosted-game-night/testing/setup';
 
 // Helpers (for future expansion)
-import { HELPERS_PLACEHOLDER } from '@joolie-boolie/testing/helpers';
+import { HELPERS_PLACEHOLDER } from '@hosted-game-night/testing/helpers';
 ```
 
 ## Features
@@ -52,7 +52,7 @@ import { HELPERS_PLACEHOLDER } from '@joolie-boolie/testing/helpers';
 Mock for the BroadcastChannel API used in dual-screen synchronization.
 
 ```typescript
-import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@hosted-game-night/testing/mocks';
 
 // In your test setup
 beforeEach(() => {
@@ -84,7 +84,7 @@ test('syncs state between windows', () => {
 Mock for the HTML5 Audio API used in sound playback.
 
 ```typescript
-import { mockAudio, MockAudio, createMockAudio } from '@joolie-boolie/testing/mocks';
+import { mockAudio, MockAudio, createMockAudio } from '@hosted-game-night/testing/mocks';
 
 // In your test setup
 beforeEach(() => {
@@ -119,7 +119,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['@joolie-boolie/testing/setup'],
+    setupFiles: ['@hosted-game-night/testing/setup'],
   },
 });
 ```
@@ -130,7 +130,7 @@ Create app-specific test setup files if needed:
 
 ```typescript
 // apps/my-game/src/test/setup.ts
-import { mockBroadcastChannel, MockBroadcastChannel, mockAudio } from '@joolie-boolie/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel, mockAudio } from '@hosted-game-night/testing/mocks';
 
 beforeEach(() => {
   mockBroadcastChannel();
@@ -153,7 +153,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: [
-      '@joolie-boolie/testing/setup',
+      '@hosted-game-night/testing/setup',
       './src/test/setup.ts',  // Optional: app-specific setup
     ],
   },
@@ -233,7 +233,7 @@ Then export from a central location:
 
 ```typescript
 // apps/my-game/src/test/mocks/index.ts
-export * from '@joolie-boolie/testing/mocks';
+export * from '@hosted-game-night/testing/mocks';
 export { mockMyService } from './my-mock';
 ```
 
@@ -250,12 +250,12 @@ Planned utilities:
 |-------------|--------|------------|
 | **apps/bingo** | ✅ Integrated | BroadcastChannel, Audio, jest-dom |
 | **apps/trivia** | ✅ Integrated | BroadcastChannel, Audio, jest-dom |
-| **@joolie-boolie/sync** | ✅ Integrated | BroadcastChannel for testing |
-| **@joolie-boolie/ui** | ✅ Integrated | jest-dom for component tests |
+| **@hosted-game-night/sync** | ✅ Integrated | BroadcastChannel for testing |
+| **@hosted-game-night/ui** | ✅ Integrated | jest-dom for component tests |
 
 ## Related Packages
 
-- [`@joolie-boolie/sync`](../sync/README.md) - Uses BroadcastChannel mock for sync tests
+- [`@hosted-game-night/sync`](../sync/README.md) - Uses BroadcastChannel mock for sync tests
 - All apps use these mocks for testing
 
 ## Related Documentation

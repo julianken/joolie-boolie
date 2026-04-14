@@ -3,7 +3,7 @@
 import { useId, useState, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
 import { useSettingsStore } from '@/stores/settings-store';
-import { useToast } from "@joolie-boolie/ui";
+import { useToast } from "@hosted-game-night/ui";
 import { useTriviaPresetStore } from '@/stores/preset-store';
 import type { TriviaPresetItem } from '@/stores/preset-store';
 

@@ -14,7 +14,7 @@ vi.mock('@/stores/game-store', () => ({
 }));
 
 // Mock toast
-vi.mock('@joolie-boolie/ui', () => ({
+vi.mock('@hosted-game-night/ui', () => ({
   useToast: () => ({
     success: vi.fn(),
     error: vi.fn(),

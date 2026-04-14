@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSyncHeartbeat } from '../use-sync-heartbeat';
 import { BroadcastSync } from '../broadcast';
-import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@hosted-game-night/testing/mocks';
 
 describe('useSyncHeartbeat', () => {
   beforeEach(() => {

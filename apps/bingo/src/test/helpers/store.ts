@@ -1,5 +1,5 @@
 import { useGameStore } from '@/stores/game-store';
-import { useSyncStore } from '@joolie-boolie/sync';
+import { useSyncStore } from '@hosted-game-night/sync';
 import { useAudioStore, DEFAULT_VOICE_VOLUME, DEFAULT_ROLL_SOUND_VOLUME, DEFAULT_CHIME_VOLUME, DEFAULT_VOICE_PACK } from '@/stores/audio-store';
 import { createInitialState } from '@/lib/game';
 

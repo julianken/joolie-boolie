@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { BroadcastSync } from '../broadcast';
 import { SyncHeartbeat } from '../heartbeat';
 import { HeartbeatDivergence } from '../types';
-import { mockBroadcastChannel, MockBroadcastChannel } from '@joolie-boolie/testing/mocks';
+import { mockBroadcastChannel, MockBroadcastChannel } from '@hosted-game-night/testing/mocks';
 
 describe('SyncHeartbeat', () => {
   beforeEach(() => {

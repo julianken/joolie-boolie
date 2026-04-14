@@ -10,7 +10,7 @@ import {
   getActiveAudioCount as sharedGetActiveAudioCount,
   playAudioFile,
   stopAllSpeech,
-} from '@joolie-boolie/audio';
+} from '@hosted-game-night/audio';
 
 export interface AudioStore {
   // Persisted state
@@ -431,7 +431,7 @@ export const useAudioStore = create<AudioStore>()(
       },
     }),
     {
-      name: 'jb-bingo-audio',
+      name: 'hgn-bingo-audio',
       partialize: (state) => ({
         enabled: state.enabled,
         voiceVolume: state.voiceVolume,

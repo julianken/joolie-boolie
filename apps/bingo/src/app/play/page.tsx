@@ -9,17 +9,17 @@ import { BingoBoard } from '@/components/presenter/BingoBoard';
 import { PatternSelector, PatternPreview } from '@/components/presenter/PatternSelector';
 import { ControlPanel } from '@/components/presenter/ControlPanel';
 import { Toggle } from '@/components/ui/Toggle';
-import { Slider } from '@joolie-boolie/ui';
-import { Button } from "@joolie-boolie/ui";
+import { Slider } from '@hosted-game-night/ui';
+import { Button } from "@hosted-game-night/ui";
 import { VoiceSelector } from '@/components/ui/VoiceSelector';
 import { RollSoundSelector } from '@/components/presenter/RollSoundSelector';
 import { RevealChimeSelector } from '@/components/presenter/RevealChimeSelector';
 import { VoiceVolumeControl } from '@/components/presenter/VoiceVolumeControl';
-import { ThemeSelector } from '@joolie-boolie/ui';
+import { ThemeSelector } from '@hosted-game-night/ui';
 import { useAudioPreload, useAudio } from '@/hooks/use-audio';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
-import { InstallPrompt } from '@joolie-boolie/ui';
+import { InstallPrompt } from '@hosted-game-night/ui';
 
 export default function PlayPage() {
   // Theme store selectors

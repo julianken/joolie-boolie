@@ -1,7 +1,7 @@
 import type {
   TeamId as BrandedTeamId,
   QuestionId as BrandedQuestionId,
-} from '@joolie-boolie/types/branded';
+} from '@hosted-game-night/types/branded';
 
 // =============================================================================
 // BRANDED TYPE RE-EXPORTS
@@ -98,7 +98,7 @@ export type QuestionCategory =
 /**
  * Trivia-specific game status values.
  *
- * Differs from the shared `GameStatus` in `@joolie-boolie/game-stats`
+ * Differs from the shared `GameStatus` in `@hosted-game-night/game-stats`
  * which uses `'idle'` instead of `'setup'` and lacks `'between_rounds'`.
  * Trivia needs `'setup'` for its configuration phase and `'between_rounds'`
  * for multi-round game flow.

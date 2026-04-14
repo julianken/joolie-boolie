@@ -1,4 +1,4 @@
-# @joolie-boolie/game-stats
+# @hosted-game-night/game-stats
 
 Shared game statistics types, calculators, and localStorage storage for the Joolie Boolie platform. Also exports the base `GameStatus` type used by Bingo.
 
@@ -7,7 +7,7 @@ Shared game statistics types, calculators, and localStorage storage for the Jool
 ```json
 {
   "dependencies": {
-    "@joolie-boolie/game-stats": "workspace:*"
+    "@hosted-game-night/game-stats": "workspace:*"
   }
 }
 ```
@@ -26,8 +26,8 @@ Shared game statistics types, calculators, and localStorage storage for the Jool
 ### Statistics Types
 
 ```typescript
-import type { BingoStatistics, BingoSessionRecord } from '@joolie-boolie/game-stats';
-import type { TriviaStatistics, TriviaSessionRecord } from '@joolie-boolie/game-stats';
+import type { BingoStatistics, BingoSessionRecord } from '@hosted-game-night/game-stats';
+import type { TriviaStatistics, TriviaSessionRecord } from '@hosted-game-night/game-stats';
 ```
 
 ### Calculator Functions
@@ -38,7 +38,7 @@ import {
   calculateBingoStats,
   getMostCommonPatterns,
   formatDuration,
-} from '@joolie-boolie/game-stats';
+} from '@hosted-game-night/game-stats';
 
 const stats = createEmptyBingoStats();
 const formatted = formatDuration(stats.totalPlayTime);
@@ -52,7 +52,7 @@ import {
   addBingoSession,
   clearBingoStats,
   generateSessionId,
-} from '@joolie-boolie/game-stats';
+} from '@hosted-game-night/game-stats';
 
 const stats = loadBingoStats();
 const updated = addBingoSession({ id: generateSessionId(), /* ... */ });
@@ -61,7 +61,7 @@ const updated = addBingoSession({ id: generateSessionId(), /* ... */ });
 ### Base Game Types
 
 ```typescript
-import type { GameStatus, BaseGameState } from '@joolie-boolie/game-stats';
+import type { GameStatus, BaseGameState } from '@hosted-game-night/game-stats';
 
 // GameStatus: 'idle' | 'playing' | 'paused' | 'ended'
 // BaseGameState: { status: GameStatus; audioEnabled: boolean }
@@ -74,7 +74,7 @@ import type { GameStatus, BaseGameState } from '@joolie-boolie/game-stats';
 - `BaseGameStatistics` -- shared base (gamesPlayed, totalPlayTime, firstGameAt, lastGameAt)
 - `BingoSessionRecord`, `BingoPatternStats`, `BingoStatistics`
 - `TriviaSessionRecord`, `TriviaCategoryStats`, `TriviaStatistics`
-- `STORAGE_KEYS` -- localStorage key constants (`jb:bingo-statistics`, `jb:trivia-statistics`)
+- `STORAGE_KEYS` -- localStorage key constants (`hgn:bingo-statistics`, `hgn:trivia-statistics`)
 - `MAX_RECENT_SESSIONS` -- cap on stored session records (20)
 
 ### Calculator (`./calculator`)

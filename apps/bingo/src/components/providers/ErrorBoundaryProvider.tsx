@@ -1,21 +1,21 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { ErrorBoundaryProvider as SharedErrorBoundaryProvider } from '@joolie-boolie/ui';
+import { ErrorBoundaryProvider as SharedErrorBoundaryProvider } from '@hosted-game-night/ui';
 
 interface ErrorBoundaryProviderProps {
   children: ReactNode;
 }
 
 async function loadSentryBackend() {
-  const { SentryErrorBackend } = await import('@joolie-boolie/error-tracking/sentry');
-  const { setErrorBackend } = await import('@joolie-boolie/error-tracking/client');
+  const { SentryErrorBackend } = await import('@hosted-game-night/error-tracking/sentry');
+  const { setErrorBackend } = await import('@hosted-game-night/error-tracking/client');
   setErrorBackend(new SentryErrorBackend());
 }
 
 /**
  * Error boundary provider for the Bingo app.
- * Delegates to the shared ErrorBoundaryProvider from @joolie-boolie/ui
+ * Delegates to the shared ErrorBoundaryProvider from @hosted-game-night/ui
  * with Bingo-specific configuration.
  */
 export function ErrorBoundaryProvider({ children }: ErrorBoundaryProviderProps) {

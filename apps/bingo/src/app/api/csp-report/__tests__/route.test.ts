@@ -7,7 +7,7 @@ const mockLogger = vi.hoisted(() => ({
   warn: vi.fn(),
   error: vi.fn(),
 }));
-vi.mock('@joolie-boolie/error-tracking/server-logger', () => ({
+vi.mock('@hosted-game-night/error-tracking/server-logger', () => ({
   createLogger: () => mockLogger,
 }));
 

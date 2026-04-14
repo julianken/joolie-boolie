@@ -55,9 +55,9 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
     };
 
     const animationClasses: Record<string, string> = {
-      shimmer: 'jb-skeleton-shimmer motion-reduce:animate-none',
+      shimmer: 'hgn-skeleton-shimmer motion-reduce:animate-none',
       // 'wave' is the legacy name — maps to the same shimmer sweep animation
-      wave: 'jb-skeleton-shimmer motion-reduce:animate-none',
+      wave: 'hgn-skeleton-shimmer motion-reduce:animate-none',
       pulse: 'animate-pulse motion-reduce:animate-none',
       none: '',
     };
@@ -65,11 +65,11 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
     return (
       <>
         <style>{`
-          @keyframes jb-shimmer {
+          @keyframes hgn-shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
           }
-          .jb-skeleton-shimmer {
+          .hgn-skeleton-shimmer {
             background: linear-gradient(
               90deg,
               var(--muted) 0%,
@@ -77,7 +77,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
               var(--muted) 100%
             );
             background-size: 200% 100%;
-            animation: jb-shimmer 1.8s ease-in-out infinite;
+            animation: hgn-shimmer 1.8s ease-in-out infinite;
           }
         `}</style>
         <div

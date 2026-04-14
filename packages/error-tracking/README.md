@@ -1,4 +1,4 @@
-# @joolie-boolie/error-tracking
+# @hosted-game-night/error-tracking
 
 Lightweight error tracking abstraction for Joolie Boolie. Provides console logging for development and a pluggable backend system for production (Sentry-compatible).
 
@@ -19,7 +19,7 @@ This package is included in the monorepo. Add it to your app's dependencies:
 ```json
 {
   "dependencies": {
-    "@joolie-boolie/error-tracking": "workspace:*"
+    "@hosted-game-night/error-tracking": "workspace:*"
   }
 }
 ```
@@ -33,7 +33,7 @@ import {
   initErrorTracking,
   captureError,
   AppError
-} from '@joolie-boolie/error-tracking';
+} from '@hosted-game-night/error-tracking';
 
 // Initialize at app startup
 initErrorTracking({
@@ -68,7 +68,7 @@ import {
   ErrorBoundary,
   useErrorHandler,
   ErrorTrackingProvider
-} from '@joolie-boolie/error-tracking/react';
+} from '@hosted-game-night/error-tracking/react';
 
 // Wrap your app with error boundary
 function App() {
@@ -111,7 +111,7 @@ import {
   captureServerError,
   ServerAppError,
   createErrorResponse
-} from '@joolie-boolie/error-tracking/server';
+} from '@hosted-game-night/error-tracking/server';
 
 export async function GET(request: Request) {
   try {
@@ -138,7 +138,7 @@ throw new ServerAppError('User not authorized', {
 ### Initialization
 
 ```typescript
-import { initErrorTracking } from '@joolie-boolie/error-tracking';
+import { initErrorTracking } from '@hosted-game-night/error-tracking';
 
 initErrorTracking({
   appName: 'bingo',           // App identifier
@@ -155,7 +155,7 @@ initErrorTracking({
 ### Error Capture
 
 ```typescript
-import { captureError, captureMessage, AppError } from '@joolie-boolie/error-tracking';
+import { captureError, captureMessage, AppError } from '@hosted-game-night/error-tracking';
 
 // Capture any error
 captureError(error, {
@@ -202,7 +202,7 @@ const error = new AppError('Invalid ball number', {
 ### Breadcrumbs
 
 ```typescript
-import { addBreadcrumb } from '@joolie-boolie/error-tracking';
+import { addBreadcrumb } from '@hosted-game-night/error-tracking';
 
 // Track user actions for debugging
 addBreadcrumb({
@@ -220,7 +220,7 @@ import {
   useErrorHandler,
   useAsyncError,
   useTrackInteraction,
-} from '@joolie-boolie/error-tracking/react';
+} from '@hosted-game-night/error-tracking/react';
 
 // Component error handling
 const { reportError, throwError, addBreadcrumb } = useErrorHandler('MyComponent');
@@ -239,7 +239,7 @@ track('cell_clicked', { cellId: 5 });
 ### Custom Backend
 
 ```typescript
-import { setErrorBackend, type ErrorBackend } from '@joolie-boolie/error-tracking';
+import { setErrorBackend, type ErrorBackend } from '@hosted-game-night/error-tracking';
 
 const customBackend: ErrorBackend = {
   init(config) {
@@ -269,7 +269,7 @@ setErrorBackend(customBackend);
 ```typescript
 // Note: Requires @sentry/nextjs to be installed separately
 import * as Sentry from '@sentry/nextjs';
-import { setErrorBackend } from '@joolie-boolie/error-tracking';
+import { setErrorBackend } from '@hosted-game-night/error-tracking';
 
 const sentryBackend: ErrorBackend = {
   init(config) {
@@ -304,11 +304,11 @@ setErrorBackend(sentryBackend);
 
 | Export | Description |
 |--------|-------------|
-| `@joolie-boolie/error-tracking` | Main exports (client + React) |
-| `@joolie-boolie/error-tracking/client` | Browser-only exports |
-| `@joolie-boolie/error-tracking/server` | Server-side exports |
-| `@joolie-boolie/error-tracking/react` | React components and hooks |
-| `@joolie-boolie/error-tracking/types` | TypeScript types only |
+| `@hosted-game-night/error-tracking` | Main exports (client + React) |
+| `@hosted-game-night/error-tracking/client` | Browser-only exports |
+| `@hosted-game-night/error-tracking/server` | Server-side exports |
+| `@hosted-game-night/error-tracking/react` | React components and hooks |
+| `@hosted-game-night/error-tracking/types` | TypeScript types only |
 
 ## Design Guidelines
 
@@ -332,5 +332,5 @@ pnpm test:coverage
 
 ## Related Packages
 
-- `@joolie-boolie/sync` - Dual-screen synchronization
-- `@joolie-boolie/ui` - Shared UI components
+- `@hosted-game-night/sync` - Dual-screen synchronization
+- `@hosted-game-night/ui` - Shared UI components

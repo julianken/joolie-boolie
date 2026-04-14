@@ -13,7 +13,7 @@
  *   C) isByCategory=true, no questions → toggle + Rounds slider + empty-state message
  */
 
-import { Slider, Toggle } from '@joolie-boolie/ui';
+import { Slider, Toggle } from '@hosted-game-night/ui';
 import { SETTINGS_RANGES } from '@/stores/settings-store';
 import type { SettingsState } from '@/stores/settings-store';
 import type { PerRoundBreakdown } from '@/types';

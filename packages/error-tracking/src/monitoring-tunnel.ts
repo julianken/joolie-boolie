@@ -25,7 +25,7 @@ function isAllowedHost(url: string): boolean {
  * @example
  * ```ts
  * // app/api/monitoring-tunnel/route.ts
- * import { createMonitoringTunnelHandler } from '@joolie-boolie/error-tracking/monitoring-tunnel';
+ * import { createMonitoringTunnelHandler } from '@hosted-game-night/error-tracking/monitoring-tunnel';
  * export const POST = createMonitoringTunnelHandler('api-bingo-monitoring-tunnel');
  * ```
  */

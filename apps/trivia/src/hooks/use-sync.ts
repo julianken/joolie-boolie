@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useMemo } from 'react';
-import { useSyncStore, useSyncHeartbeat, type SyncRole } from '@joolie-boolie/sync';
+import { useSyncStore, useSyncHeartbeat, type SyncRole } from '@hosted-game-night/sync';
 import { useGameStore } from '@/stores/game-store';
-import { BroadcastSync } from '@joolie-boolie/sync';
+import { BroadcastSync } from '@hosted-game-night/sync';
 import { getChannelName } from '@/lib/sync/session';
 import type { TriviaGameState, ThemeMode, TriviaSyncPayload, TriviaSyncMessage } from '@/types';
 import { useThemeStore } from '@/stores/theme-store';
@@ -226,7 +226,7 @@ export function useSync({ role, sessionId }: UseSyncOptions) {
     // while our router expects the discriminated TriviaSyncMessage union.
     // This is safe because the TriviaBroadcastSync class only sends valid TriviaSyncMessage types.
     const unsubscribe = sync.subscribe(
-      router as unknown as (message: import('@joolie-boolie/sync').SyncMessage<TriviaSyncPayload>) => void
+      router as unknown as (message: import('@hosted-game-night/sync').SyncMessage<TriviaSyncPayload>) => void
     );
 
     // If audience, request initial sync with retry logic

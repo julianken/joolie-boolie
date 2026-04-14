@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { logError } from '@joolie-boolie/error-tracking';
+import { logError } from '@hosted-game-night/error-tracking';
 
 export default function Error({
   error,

@@ -1,11 +1,11 @@
 /**
- * @joolie-boolie/error-tracking types
+ * @hosted-game-night/error-tracking types
  *
  * Centralized type definitions for the error tracking package.
  */
 
 /**
- * Error categories for the Joolie Boolie
+ * Error categories for Hosted Game Night
  */
 export type ErrorCategory =
   | 'network' // Network/API errors

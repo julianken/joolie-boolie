@@ -7,7 +7,7 @@
  * Usage:
  *   pnpm lighthouse:trivia
  *   # or from monorepo root:
- *   pnpm --filter @joolie-boolie/trivia lighthouse
+ *   pnpm --filter @hosted-game-night/trivia lighthouse
  */
 
 const path = require('path');

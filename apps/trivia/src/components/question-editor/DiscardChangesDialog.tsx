@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal } from '@joolie-boolie/ui';
+import { Modal } from '@hosted-game-night/ui';
 
 export interface DiscardChangesDialogProps {
   isOpen: boolean;

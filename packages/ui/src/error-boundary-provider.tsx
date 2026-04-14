@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useRef } from 'react';
-import { ErrorBoundary, logError, configureErrorLogger } from '@joolie-boolie/error-tracking';
+import { ErrorBoundary, logError, configureErrorLogger } from '@hosted-game-night/error-tracking';
 
 export interface ErrorBoundaryProviderProps {
   children: ReactNode;
@@ -22,7 +22,7 @@ export interface ErrorBoundaryProviderProps {
    * ```tsx
    * loadSentryBackend={async () => {
    *   const { SentryErrorBackend } = await import('@/lib/observability/sentry-backend');
-   *   const { setErrorBackend } = await import('@joolie-boolie/error-tracking/client');
+   *   const { setErrorBackend } = await import('@hosted-game-night/error-tracking/client');
    *   setErrorBackend(new SentryErrorBackend());
    * }}
    * ```
@@ -31,7 +31,7 @@ export interface ErrorBoundaryProviderProps {
 }
 
 // Note: React error boundaries require class components for componentDidCatch/getDerivedStateFromError.
-// The actual error catching is handled by the ErrorBoundary class component from @joolie-boolie/error-tracking.
+// The actual error catching is handled by the ErrorBoundary class component from @hosted-game-night/error-tracking.
 // This wrapper is a functional component that provides app-specific configuration to the shared boundary.
 
 /**

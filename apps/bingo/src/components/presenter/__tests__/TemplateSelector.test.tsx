@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TemplateSelector } from '../TemplateSelector';
-import { ToastProvider } from "@joolie-boolie/ui";
+import { ToastProvider } from "@hosted-game-night/ui";
 import type { BingoTemplateItem } from '@/stores/template-store';
 
 // Mock stores

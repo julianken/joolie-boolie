@@ -1,5 +1,5 @@
 /**
- * Error categories for the Joolie Boolie
+ * Error categories for Hosted Game Night
  */
 export type ErrorCategory =
   | 'network' // Network/API errors

@@ -1,12 +1,12 @@
 @import "tailwindcss";
-@import "@joolie-boolie/theme/globals.css";
+@import "@hosted-game-night/theme/globals.css";
 
 @source "../../../../packages/ui/src";
 
 /* ================================================================
    TRIVIA APP TOKEN OVERRIDES
    Cinematic blue-black quiz show atmosphere.
-   All shared tokens inherited from @joolie-boolie/theme/globals.css.
+   All shared tokens inherited from @hosted-game-night/theme/globals.css.
    ================================================================ */
 :root {
   /* Trivia-specific background: cool blue-black */

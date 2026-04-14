@@ -3,10 +3,10 @@
   "version": 2,
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@joolie-boolie/trivia...",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@hosted-game-night/trivia...",
   "outputDirectory": ".next",
   "env": {
-    "TURBO_TEAM": "joolie-boolie",
+    "TURBO_TEAM": "hosted-game-night",
     "TURBO_REMOTE_ONLY": "true"
   },
   "headers": [

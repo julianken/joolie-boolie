@@ -3,7 +3,7 @@
 import { useId, useState, useCallback } from 'react';
 import { useGameStore } from '@/stores/game-store';
 import { useAudioStore } from '@/stores/audio-store';
-import { useToast } from "@joolie-boolie/ui";
+import { useToast } from "@hosted-game-night/ui";
 import { patternRegistry } from '@/lib/game/patterns';
 import { useBingoTemplateStore } from '@/stores/template-store';
 import type { VoicePackId } from '@/types';

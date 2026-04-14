@@ -1,3 +1,3 @@
-// Re-export the shared ErrorBoundary from @joolie-boolie/ui
-export { ErrorBoundary, type ErrorBoundaryProps } from '@joolie-boolie/ui';
-export { ErrorBoundary as default } from '@joolie-boolie/ui';
+// Re-export the shared ErrorBoundary from @hosted-game-night/ui
+export { ErrorBoundary, type ErrorBoundaryProps } from '@hosted-game-night/ui';
+export { ErrorBoundary as default } from '@hosted-game-night/ui';

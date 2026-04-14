@@ -4,9 +4,9 @@ import {
   THEME_OPTIONS,
   type ThemeStore,
   type ThemeMode,
-} from '@joolie-boolie/theme';
+} from '@hosted-game-night/theme';
 
-export const useThemeStore = createThemeStore('jb-bingo-theme');
+export const useThemeStore = createThemeStore('hgn-bingo-theme');
 
 // Re-export types and constants for backward compatibility
 export { DEFAULT_THEME, THEME_OPTIONS };

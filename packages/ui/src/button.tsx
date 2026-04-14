@@ -34,15 +34,15 @@ function LoadingDots() {
     <span className="flex items-center gap-1.5" aria-hidden="true">
       <span
         className="inline-block w-1.5 h-1.5 rounded-full bg-current opacity-80 motion-reduce:animate-none"
-        style={{ animation: 'jb-dot-bounce 1.2s ease-in-out 0s infinite' }}
+        style={{ animation: 'hgn-dot-bounce 1.2s ease-in-out 0s infinite' }}
       />
       <span
         className="inline-block w-1.5 h-1.5 rounded-full bg-current opacity-80 motion-reduce:animate-none"
-        style={{ animation: 'jb-dot-bounce 1.2s ease-in-out 0.2s infinite' }}
+        style={{ animation: 'hgn-dot-bounce 1.2s ease-in-out 0.2s infinite' }}
       />
       <span
         className="inline-block w-1.5 h-1.5 rounded-full bg-current opacity-80 motion-reduce:animate-none"
-        style={{ animation: 'jb-dot-bounce 1.2s ease-in-out 0.4s infinite' }}
+        style={{ animation: 'hgn-dot-bounce 1.2s ease-in-out 0.4s infinite' }}
       />
     </span>
   );
@@ -74,7 +74,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {/* Keyframes injected inline once — no external CSS file needed */}
         <style>{`
-          @keyframes jb-dot-bounce {
+          @keyframes hgn-dot-bounce {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-4px); }
           }

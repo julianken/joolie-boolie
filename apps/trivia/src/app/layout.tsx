@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist_Mono } from 'next/font/google';
-import { fontDisplay, fontSans } from '@joolie-boolie/theme';
+import { fontDisplay, fontSans } from '@hosted-game-night/theme';
 import './globals.css';
-import { ServiceWorkerRegistration } from '@joolie-boolie/ui';
+import { ServiceWorkerRegistration } from '@hosted-game-night/ui';
 import { ErrorBoundaryProvider } from '@/components/providers/ErrorBoundaryProvider';
 import { SentryClientInit } from '@/components/providers/SentryClientInit';
-import { FaroInit } from '@joolie-boolie/error-tracking/components';
-import { ToastProvider } from "@joolie-boolie/ui";
+import { FaroInit } from '@hosted-game-night/error-tracking/components';
+import { ToastProvider } from "@hosted-game-night/ui";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 

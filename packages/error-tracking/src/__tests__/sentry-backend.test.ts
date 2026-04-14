@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mockSentry } from '@joolie-boolie/testing';
+import { mockSentry } from '@hosted-game-night/testing';
 import type { TrackedError, ErrorUser, Breadcrumb } from '../types';
 
 // Mock @sentry/nextjs with our testing mock

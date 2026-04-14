@@ -14,9 +14,9 @@ const nextConfig: NextConfig = {
   ],
   productionBrowserSourceMaps: false,
   transpilePackages: [
-    '@joolie-boolie/sync',
-    '@joolie-boolie/ui',
-    '@joolie-boolie/theme',
+    '@hosted-game-night/sync',
+    '@hosted-game-night/ui',
+    '@hosted-game-night/theme',
   ],
 async rewrites() {
     return [

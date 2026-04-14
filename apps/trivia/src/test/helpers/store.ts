@@ -1,5 +1,5 @@
 import { useGameStore } from '@/stores/game-store';
-import { useSyncStore } from '@joolie-boolie/sync';
+import { useSyncStore } from '@hosted-game-night/sync';
 import { createInitialState } from '@/lib/game/engine';
 
 /**

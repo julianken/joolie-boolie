@@ -1,5 +1,5 @@
 {
-  "name": "@joolie-boolie/game-stats",
+  "name": "@hosted-game-night/game-stats",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",

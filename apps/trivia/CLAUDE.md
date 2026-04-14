@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Frontend | React + Tailwind CSS |
 | Backend | Next.js API Routes (trivia-api proxy only) |
 | State Management | Zustand (localStorage persistence) |
-| Dual-Screen Sync | @joolie-boolie/sync |
+| Dual-Screen Sync | @hosted-game-night/sync |
 | PWA | Serwist (Service Worker) |
 
 ## Features
@@ -86,7 +86,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Dual-Screen Sync
 - Presenter view (`/play`): Question list, team manager, scoring, controls
 - Audience view (`/display`): Large question display, scoreboard, waiting screen
-- BroadcastChannel API for same-device sync via `@joolie-boolie/sync`
+- BroadcastChannel API for same-device sync via `@hosted-game-night/sync`
 - Emergency blank (blanks audience display, visual only)
 
 ### PWA Support
@@ -100,13 +100,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Shared Packages
 
-- `@joolie-boolie/sync` - Dual-screen synchronization
-- `@joolie-boolie/ui` - Shared UI components
-- `@joolie-boolie/theme` - Accessible design tokens
-- `@joolie-boolie/audio` - Shared audio utilities
-- `@joolie-boolie/game-stats` - Game statistics types and calculators
-- `@joolie-boolie/types` - Shared TypeScript types
-- `@joolie-boolie/error-tracking` - Error logging
+- `@hosted-game-night/sync` - Dual-screen synchronization
+- `@hosted-game-night/ui` - Shared UI components
+- `@hosted-game-night/theme` - Accessible design tokens
+- `@hosted-game-night/audio` - Shared audio utilities
+- `@hosted-game-night/game-stats` - Game statistics types and calculators
+- `@hosted-game-night/types` - Shared TypeScript types
+- `@hosted-game-night/error-tracking` - Error logging
 
 ## Commands
 
@@ -167,13 +167,13 @@ pnpm test:coverage     # Run tests with coverage
 
 - **Standalone:** No backend or auth. All data stored in localStorage.
 - **localStorage Stores:**
-  - `useTriviaTemplateStore` (key: `jb-trivia-templates`) -- saved game templates
-  - `useTriviaPresetStore` (key: `jb-trivia-presets`) -- game configuration presets
+  - `useTriviaTemplateStore` (key: `hgn-trivia-templates`) -- saved game templates
+  - `useTriviaPresetStore` (key: `hgn-trivia-presets`) -- game configuration presets
 - **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration. Engine logic is split across multiple modules in `lib/game/` (engine.ts, scene.ts, etc.) re-exported via barrel pattern.
 - **Timer:** `hooks/use-timer-auto-reveal.ts` manages countdown and auto-reveal behavior
 - **Questions:** `lib/questions/` contains parser, validator, converter, exporter, and types for question import/export
 - **Trivia API Proxy:** `/api/trivia-api/*` routes proxy requests to The Trivia API, keeping the API key server-side.
-- **Sync:** Session sync wrapper in `lib/sync/session.ts`, built on `@joolie-boolie/sync`
+- **Sync:** Session sync wrapper in `lib/sync/session.ts`, built on `@hosted-game-night/sync`
 
 ### Scene Engine (AudienceScene)
 

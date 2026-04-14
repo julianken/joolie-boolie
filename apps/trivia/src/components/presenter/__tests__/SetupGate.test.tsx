@@ -16,7 +16,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, type RenderResult } from '@testing-library/react';
-import { ToastProvider } from '@joolie-boolie/ui';
+import { ToastProvider } from '@hosted-game-night/ui';
 import { SetupGate } from '../SetupGate';
 import { useSettingsStore, SETTINGS_DEFAULTS } from '@/stores/settings-store';
 import { useGameStore } from '@/stores/game-store';

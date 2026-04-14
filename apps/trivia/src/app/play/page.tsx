@@ -17,11 +17,11 @@ import { useGameEventSounds } from '@/hooks/use-sounds';
 import { useRevealSequence } from '@/hooks/use-reveal-sequence';
 import { RoundSummary } from '@/components/presenter/RoundSummary';
 import { RoundScoringView } from '@/components/presenter/RoundScoringView';
-import { ThemeSelector } from '@joolie-boolie/ui';
+import { ThemeSelector } from '@hosted-game-night/ui';
 import { KeyboardShortcutsModal } from '@/components/ui/KeyboardShortcutsModal';
 import { SaveTemplateModal } from '@/components/presenter/SaveTemplateModal';
 import { SavePresetModal } from '@/components/presenter/SavePresetModal';
-import { Button, Modal } from '@joolie-boolie/ui';
+import { Button, Modal } from '@hosted-game-night/ui';
 import { SetupGate } from '@/components/presenter/SetupGate';
 
 export default function PlayPage() {

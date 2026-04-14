@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TemplateSelector } from '../TemplateSelector';
-import { ToastProvider } from "@joolie-boolie/ui";
+import { ToastProvider } from "@hosted-game-night/ui";
 import type { TriviaTemplateItem } from '@/stores/template-store';
 
 // Mock settings-store

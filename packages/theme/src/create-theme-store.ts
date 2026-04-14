@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 /**
  * Theme mode for the application.
- * Matches the ThemeMode type from @joolie-boolie/types.
+ * Matches the ThemeMode type from @hosted-game-night/types.
  */
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -39,18 +39,18 @@ export const THEME_OPTIONS = [
  * Creates a theme store with the given storage key.
  * Each app should use a unique storage key to persist theme preferences separately.
  *
- * @param storageKey - The localStorage key for persisting theme state (e.g., 'jb-bingo-theme')
+ * @param storageKey - The localStorage key for persisting theme state (e.g., 'hgn-bingo-theme')
  * @returns A Zustand hook for the theme store
  *
  * @example
  * // apps/bingo/src/stores/theme-store.ts
- * import { createThemeStore } from '@joolie-boolie/theme';
- * export const useThemeStore = createThemeStore('jb-bingo-theme');
+ * import { createThemeStore } from '@hosted-game-night/theme';
+ * export const useThemeStore = createThemeStore('hgn-bingo-theme');
  *
  * @example
  * // apps/trivia/src/stores/theme-store.ts
- * import { createThemeStore } from '@joolie-boolie/theme';
- * export const useThemeStore = createThemeStore('jb-trivia-theme');
+ * import { createThemeStore } from '@hosted-game-night/theme';
+ * export const useThemeStore = createThemeStore('hgn-trivia-theme');
  */
 export function createThemeStore(storageKey: string) {
   return create<ThemeStore>()(

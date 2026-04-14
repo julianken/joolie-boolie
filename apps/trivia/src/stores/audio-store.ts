@@ -9,7 +9,7 @@ import {
   pauseAllActiveAudio,
   getActiveAudioCount as sharedGetActiveAudioCount,
   stopAllSpeech,
-} from '@joolie-boolie/audio';
+} from '@hosted-game-night/audio';
 
 // =============================================================================
 // TYPES

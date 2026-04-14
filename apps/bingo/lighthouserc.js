@@ -7,7 +7,7 @@
  * Usage:
  *   pnpm lighthouse:bingo
  *   # or from monorepo root:
- *   pnpm --filter @joolie-boolie/bingo lighthouse
+ *   pnpm --filter @hosted-game-night/bingo lighthouse
  */
 
 const path = require('path');

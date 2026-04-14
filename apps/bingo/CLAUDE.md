@@ -61,7 +61,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Dual-Screen Sync
 - Presenter view (`/play`): Game controls, pattern selector, audio settings
 - Audience view (`/display`): Large ball display, bingo board, pattern visualization
-- BroadcastChannel API for same-device sync via `@joolie-boolie/sync`
+- BroadcastChannel API for same-device sync via `@hosted-game-night/sync`
 - Message types: `GAME_STATE_UPDATE`, `BALL_CALLED`, `GAME_RESET`, `PATTERN_CHANGED`, `REQUEST_SYNC`
 
 ### PWA Support
@@ -73,13 +73,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Shared Packages
 
-- `@joolie-boolie/sync` - Dual-screen synchronization
-- `@joolie-boolie/ui` - Shared UI components
-- `@joolie-boolie/theme` - Accessible design tokens
-- `@joolie-boolie/audio` - Shared audio utilities
-- `@joolie-boolie/game-stats` - Game statistics types and calculators
-- `@joolie-boolie/types` - Shared TypeScript types
-- `@joolie-boolie/error-tracking` - Error logging
+- `@hosted-game-night/sync` - Dual-screen synchronization
+- `@hosted-game-night/ui` - Shared UI components
+- `@hosted-game-night/theme` - Accessible design tokens
+- `@hosted-game-night/audio` - Shared audio utilities
+- `@hosted-game-night/game-stats` - Game statistics types and calculators
+- `@hosted-game-night/types` - Shared TypeScript types
+- `@hosted-game-night/error-tracking` - Error logging
 
 ## Commands
 
@@ -124,10 +124,10 @@ pnpm test:coverage    # Run tests with coverage
 ## Architecture Notes
 
 - **Standalone:** No backend or auth. All data (templates, settings) stored in localStorage.
-- **Templates:** Stored in localStorage via `useBingoTemplateStore` (key: `jb-bingo-templates`).
+- **Templates:** Stored in localStorage via `useBingoTemplateStore` (key: `hgn-bingo-templates`).
 - **Game Engine:** Pure functions in `lib/game/engine.ts` transform `GameState`. Zustand store wraps these for React integration.
 - **Audio:** Audio logic lives in `hooks/use-audio.ts` and `stores/audio-store.ts`. The `lib/audio/` directory is a placeholder (`.gitkeep` only).
-- **Sync:** Session ID generation and BroadcastChannel naming in `lib/sync/session.ts`, built on `@joolie-boolie/sync`
+- **Sync:** Session ID generation and BroadcastChannel naming in `lib/sync/session.ts`, built on `@hosted-game-night/sync`
 - **Patterns:** 29 patterns defined in `lib/game/patterns/` across 7 category files using `createPattern()`
 
 ## Design Requirements

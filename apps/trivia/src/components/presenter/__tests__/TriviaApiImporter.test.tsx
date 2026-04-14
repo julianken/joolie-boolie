@@ -22,7 +22,7 @@ vi.mock('@/stores/game-store', () => ({
 const mockToastSuccess = vi.fn();
 const mockToastError = vi.fn();
 
-vi.mock('@joolie-boolie/ui', () => ({
+vi.mock('@hosted-game-night/ui', () => ({
   useToast: () => ({
     success: mockToastSuccess,
     error: mockToastError,

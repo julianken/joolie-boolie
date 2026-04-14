@@ -1,5 +1,5 @@
 // packages/ui/src/motion/presets.ts
-// Shared spring presets for the Joolie Boolie design system.
+// Shared spring presets for Hosted Game Night design system.
 // See FINAL-DESIGN-PLAN.md Part 1 section 1.14.
 
 /** Smooth, no bounce -- UI panels, modals, drawers */
