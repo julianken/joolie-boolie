@@ -189,15 +189,50 @@ describe('useGameStore', () => {
   });
 
   describe('_hydrate', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     it('should merge partial state', () => {
       useGameStore.getState()._hydrate({
         status: 'playing',
         currentRound: 2,
       });
+      vi.runAllTimers();
 
       const newState = useGameStore.getState();
       expect(newState.status).toBe('playing');
       expect(newState.currentRound).toBe(2);
+    });
+
+    it('sets _isHydrating flag during hydration then clears it (BEA-722)', () => {
+      // Capture whether _isHydrating was true during the synchronous merge
+      let capturedDuringMerge = false;
+      const unsubscribe = useGameStore.subscribe((state) => {
+        if (state.status === 'playing' && state._isHydrating) {
+          capturedDuringMerge = true;
+        }
+      });
+
+      useGameStore.getState()._hydrate({ status: 'playing' });
+
+      // Flag is raised synchronously during the state merge
+      expect(capturedDuringMerge).toBe(true);
+      expect(useGameStore.getState()._isHydrating).toBe(true);
+
+      // After running all timers (setTimeout(0)), the flag is cleared
+      vi.runAllTimers();
+      expect(useGameStore.getState()._isHydrating).toBe(false);
+
+      unsubscribe();
+    });
+
+    it('has _isHydrating false initially', () => {
+      expect(useGameStore.getState()._isHydrating).toBe(false);
     });
   });
 
@@ -391,39 +426,44 @@ describe('useGameStore', () => {
         }
       });
 
-      await seedAndRehydrate({
-        status: 'playing',
-        questions: [],
-        teams: [],
-        teamAnswers: [],
-        selectedQuestionIndex: 0,
-        displayQuestionIndex: null,
-        currentRound: 0,
-        totalRounds: 3,
-        settings: {
-          roundsCount: 3,
-          questionsPerRound: 5,
-          timerDuration: 30,
-          timerAutoStart: false,
-          timerVisible: true,
+      vi.useFakeTimers();
+      try {
+        await seedAndRehydrate({
+          status: 'playing',
+          questions: [],
+          teams: [],
+          teamAnswers: [],
+          selectedQuestionIndex: 0,
+          displayQuestionIndex: null,
+          currentRound: 0,
+          totalRounds: 3,
+          settings: {
+            roundsCount: 3,
+            questionsPerRound: 5,
+            timerDuration: 30,
+            timerAutoStart: false,
+            timerVisible: true,
+            ttsEnabled: false,
+          },
+          showScoreboard: false,
           ttsEnabled: false,
-        },
-        showScoreboard: false,
-        ttsEnabled: false,
-        questionStartScores: {},
-        roundScoringEntries: {},
-        roundScoringSubmitted: false,
-        recapShowingAnswer: null,
-      });
+          questionStartScores: {},
+          roundScoringEntries: {},
+          roundScoringSubmitted: false,
+          recapShowingAnswer: null,
+        });
 
-      unsubscribe();
+        unsubscribe();
 
-      // _isHydrating should have been true during merge to block sync broadcast
-      expect(capturedDuringMerge).toBe(true);
+        // _isHydrating should have been true during merge to block sync broadcast
+        expect(capturedDuringMerge).toBe(true);
 
-      // After the setTimeout(0) in onRehydrateStorage it should be cleared
-      await new Promise((resolve) => setTimeout(resolve, 10));
-      expect(useGameStore.getState()._isHydrating).toBe(false);
+        // After running all timers (setTimeout(0) in onRehydrateStorage) it should be cleared
+        vi.runAllTimers();
+        expect(useGameStore.getState()._isHydrating).toBe(false);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useGameStore, useGameSelectors } from '../game-store';
 import { renderHook } from '@testing-library/react';
 import { BingoPattern } from '@/types';
@@ -249,14 +249,24 @@ describe('game-store', () => {
   });
 
   describe('_hydrate', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     it('merges partial state', () => {
       useGameStore.getState()._hydrate({ status: 'playing' });
+      vi.runAllTimers();
       expect(useGameStore.getState().status).toBe('playing');
     });
 
     it('preserves unaffected state', () => {
       const originalSpeed = useGameStore.getState().autoCallSpeed;
       useGameStore.getState()._hydrate({ status: 'playing' });
+      vi.runAllTimers();
       expect(useGameStore.getState().autoCallSpeed).toBe(originalSpeed);
     });
 
@@ -271,17 +281,20 @@ describe('game-store', () => {
 
       useGameStore.getState()._hydrate({ status: 'playing' });
 
-      // During hydration, the flag should have been true
+      // During hydration (before timers run), the flag should have been true
       expect(capturedHydrating).toBe(true);
 
       unsubscribe();
     });
 
-    it('clears _isHydrating flag after hydration completes', async () => {
+    it('clears _isHydrating flag after hydration completes', () => {
       useGameStore.getState()._hydrate({ status: 'playing' });
 
-      // After setTimeout(0), the flag should be cleared
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      // Flag is still true before the setTimeout(0) fires
+      expect(useGameStore.getState()._isHydrating).toBe(true);
+
+      // After running all timers, the flag should be cleared
+      vi.runAllTimers();
       expect(useGameStore.getState()._isHydrating).toBe(false);
     });
 
@@ -423,21 +436,26 @@ describe('game-store', () => {
     });
 
     it('rehydrate: _isHydrating is false after rehydration completes', async () => {
-      await seedAndRehydrate({
-        status: 'playing',
-        calledBalls: [],
-        currentBall: null,
-        previousBall: null,
-        remainingBalls: [],
-        patternId: null,
-        autoCallEnabled: false,
-        autoCallSpeed: 10,
-        audioEnabled: true,
-      });
+      vi.useFakeTimers();
+      try {
+        await seedAndRehydrate({
+          status: 'playing',
+          calledBalls: [],
+          currentBall: null,
+          previousBall: null,
+          remainingBalls: [],
+          patternId: null,
+          autoCallEnabled: false,
+          autoCallSpeed: 10,
+          audioEnabled: true,
+        });
 
-      // After the setTimeout(0) in onRehydrateStorage the flag should clear
-      await new Promise((resolve) => setTimeout(resolve, 10));
-      expect(useGameStore.getState()._isHydrating).toBe(false);
+        // After the setTimeout(0) in onRehydrateStorage the flag should clear
+        vi.runAllTimers();
+        expect(useGameStore.getState()._isHydrating).toBe(false);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

@@ -324,11 +324,13 @@ export const useGameStore = create<GameStore>()(
   },
 
   _hydrate: (newState: Partial<TriviaGameState>) => {
+    // Raise _isHydrating so the use-sync.ts broadcast guard is active during
+    // the state merge, symmetric with bingo's _hydrate implementation (BEA-722).
     set((state) => {
       const updatedState: GameStore = {
         ...state,
         ...newState,
-        _isHydrating: false,
+        _isHydrating: true,
       };
 
       // -- Existing array reconstructions (unchanged) -----------------------
@@ -351,6 +353,10 @@ export const useGameStore = create<GameStore>()(
 
       return updatedState;
     });
+    // Clear the flag after the current synchronous execution, symmetric with bingo.
+    setTimeout(() => {
+      set({ _isHydrating: false });
+    }, 0);
   },
 
   // Settings actions
