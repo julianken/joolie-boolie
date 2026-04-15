@@ -18,9 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Bingo",
   description: "A modern, browser-based bingo system for groups and communities",
-  icons: {
-    apple: "/icons/icon-192.svg",
-  },
+  icons: [
+    { rel: "icon", url: "/favicon.ico", media: "(prefers-color-scheme: dark)" },
+    { rel: "icon", url: "/favicon-light.ico", media: "(prefers-color-scheme: light)" },
+    { rel: "apple-touch-icon", url: "/apple-icon.png", sizes: "180x180" },
+  ],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -33,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#3B82F6",
+  themeColor: "#7E52E4",
   width: "device-width",
   initialScale: 1,
 };

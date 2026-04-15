@@ -53,6 +53,8 @@ pnpm-debug.log*
 *.png
 # …but allow README screenshots
 !assets/screenshots/*.png
+# …and allow favicons/icons in deployable app public/ directories
+!apps/*/public/**/*.png
 
 # Env backups
 *.backup-pre-manual-test
