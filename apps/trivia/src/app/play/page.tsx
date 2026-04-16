@@ -27,25 +27,73 @@ import { SetupGate } from '@/components/presenter/SetupGate';
 export default function PlayPage() {
   const [showNewGameConfirm, setShowNewGameConfirm] = useState(false);
 
-  // BEA-715: Hydration-ready gate.
-  // The SetupGate wizard reads from useSettingsStore (zustand persist). Under
-  // React 19 + AnimatePresence, wizard step buttons exist in the DOM before
-  // their click handlers attach (or before the persisted settings have
-  // hydrated), causing E2E clicks to land but do nothing. Set a data-attribute
-  // once persist has finished hydrating + the component has mounted, so the
-  // E2E helper (e2e/utils/helpers.ts::startGameViaWizard) can gate on it.
-  const [settingsHydrated, setSettingsHydrated] = useState(false);
+  // BEA-715 + BEA-729: Structural hydration gate.
+  //
+  // PlayPage reads from TWO persisted zustand stores:
+  //   - useSettingsStore (settings: questionsPerRound, timerDuration, etc.)
+  //   - useGameStore (game state: status, teams, questions, scene)
+  //
+  // Both rehydrate asynchronously on mount. SetupGate + SetupWizard render
+  // interactive children (Add Team, step buttons) that read from these stores.
+  // If E2E clicks land BEFORE rehydration finishes, the merge can replace the
+  // store mid-click and detach the button from the DOM ("element was detached"
+  // retry loops).
+  //
+  // The structural fix: don't render interactive children at all until all
+  // persisted stores report `hasHydrated()` AND `_isHydrating` has been cleared
+  // (it flips false via setTimeout(0) in onRehydrateStorage, one tick AFTER
+  // onFinishHydration fires — so we subscribe to the slice directly).
+  //
+  // E2E contract: `<div id="main" data-play-hydrated="true">` is the gate the
+  // helper waits on. While hydrating, we return a skeleton (no wizard, no
+  // buttons), so no interactive target exists until the gate is true.
+  const [playHydrated, setPlayHydrated] = useState<boolean>(
+    () =>
+      (useSettingsStore.persist?.hasHydrated?.() ?? true) &&
+      (useGameStore.persist?.hasHydrated?.() ?? true) &&
+      !useGameStore.getState()._isHydrating,
+  );
   useEffect(() => {
+    let active = true;
     const check = () => {
-      const hydrated = useSettingsStore.persist?.hasHydrated?.() ?? true;
-      if (hydrated) setSettingsHydrated(true);
+      if (!active) return;
+      const settingsOk = useSettingsStore.persist?.hasHydrated?.() ?? true;
+      const gameOk = useGameStore.persist?.hasHydrated?.() ?? true;
+      const settled = !useGameStore.getState()._isHydrating;
+      if (settingsOk && gameOk && settled) {
+        setPlayHydrated(true);
+        active = false;
+      }
     };
     check();
-    const unsub = useSettingsStore.persist?.onFinishHydration?.(() => {
-      setSettingsHydrated(true);
-    });
+    if (!active) return; // already done
+
+    const unsubs: Array<(() => void) | undefined> = [
+      useSettingsStore.persist?.onFinishHydration?.(check),
+      useGameStore.persist?.onFinishHydration?.(check),
+      // Subscribe to ALL game-store changes — under CI parallel load, the
+      // _isHydrating setTimeout(0) may have already fired by the time this
+      // effect mounts, in which case the targeted (prev._isHydrating &&
+      // !state._isHydrating) listener would never see a transition. The
+      // unconditional subscription guarantees we re-check on the next state
+      // change. check() is idempotent once playHydrated is true.
+      useGameStore.subscribe(() => check()),
+    ];
+
+    // Belt-and-suspenders poll: catches the case where every onFinishHydration
+    // and subscription callback registered AFTER hydration completed (CI race).
+    // Stops once playHydrated flips. ~30ms cadence is fast enough that the
+    // skeleton flash is imperceptible but slow enough that the poll burns no
+    // measurable CPU.
+    const pollId = window.setInterval(() => {
+      check();
+      if (!active) window.clearInterval(pollId);
+    }, 30);
+
     return () => {
-      unsub?.();
+      active = false;
+      window.clearInterval(pollId);
+      unsubs.forEach((u) => u?.());
     };
   }, []);
 
@@ -279,7 +327,7 @@ export default function PlayPage() {
       */}
       <div
         id="main"
-        data-settings-hydrated={settingsHydrated ? 'true' : undefined}
+        data-play-hydrated={playHydrated ? 'true' : undefined}
         className="h-screen flex flex-col overflow-hidden bg-background"
         style={{ fontFamily: 'var(--font-sans)' }}
       >

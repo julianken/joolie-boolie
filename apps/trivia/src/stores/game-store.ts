@@ -490,16 +490,20 @@ export const useGameStore = create<GameStore>()(
       //     skips any broadcast triggered by this state change.
       //  3. Reset transient scene/reveal state to clean defaults.
       merge: (persisted, current) => {
-        const p = persisted as Record<string, unknown>;
+        // BEA-729/730: Zustand calls `merge(undefined, current)` when localStorage
+        // is empty (fresh browser or test context). All property reads on `p` must
+        // tolerate undefined — use optional chaining plus a nullish default spread.
+        const p = persisted as Record<string, unknown> | undefined;
         return {
           ...current,
-          ...p,
+          ...(p ?? {}),
           // Restore timer duration/remaining but never resume the countdown.
-          // Use optional chaining defensively: Zustand may call merge with
-          // undefined `current` during store init in test environments.
+          // Optional chaining on `current` mirrors the defensive stance: Zustand
+          // has historically called merge with undefined `current` during store
+          // init in test environments.
           timer: {
             ...((current as GameStore | undefined)?.timer ?? { duration: 0, remaining: 0 }),
-            ...((p.timer as object | undefined) ?? {}),
+            ...((p?.timer as object | undefined) ?? {}),
             isRunning: false,
           },
           // Reset scene-layer to safe defaults — scene state is ephemeral

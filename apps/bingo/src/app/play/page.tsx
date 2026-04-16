@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
 import { useSync } from '@/hooks/use-sync';
 import { generateSessionId } from '@/lib/sync/session';
@@ -19,9 +19,74 @@ import { ThemeSelector } from '@hosted-game-night/ui';
 import { useAudioPreload, useAudio } from '@/hooks/use-audio';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
+import { useGameStore } from '@/stores/game-store';
+import { useAudioStore } from '@/stores/audio-store';
 import { InstallPrompt } from '@hosted-game-night/ui';
 
 export default function PlayPage() {
+  // BEA-729: Structural hydration gate.
+  //
+  // PlayPage reads from two persisted zustand stores:
+  //   - useGameStore (game state: calledBalls, pattern, autoCallEnabled, etc.)
+  //   - useAudioStore (audio settings: voice pack, volumes, roll sound, chime)
+  //
+  // Both rehydrate asynchronously from localStorage on mount. The game loop
+  // and keyboard handlers read/mutate these stores — if E2E keypresses land
+  // before rehydration finishes, the merge can replace state mid-action and
+  // silently clobber the work (e.g., "Space key calls a ball" sees count=0
+  // because persist merge re-hydrated with calledBalls=[] after callBall ran).
+  //
+  // The structural fix: return a non-interactive skeleton until all persisted
+  // stores report `hasHydrated()` AND game-store's `_isHydrating` flag has
+  // cleared (it flips false via setTimeout(0) in onRehydrateStorage, one tick
+  // AFTER onFinishHydration). The wizard's interactive children don't exist
+  // in the DOM until `data-play-hydrated="true"` is set.
+  const [playHydrated, setPlayHydrated] = useState<boolean>(
+    () =>
+      (useGameStore.persist?.hasHydrated?.() ?? true) &&
+      (useAudioStore.persist?.hasHydrated?.() ?? true) &&
+      !useGameStore.getState()._isHydrating,
+  );
+  useEffect(() => {
+    let active = true;
+    const check = () => {
+      if (!active) return;
+      const gameOk = useGameStore.persist?.hasHydrated?.() ?? true;
+      const audioOk = useAudioStore.persist?.hasHydrated?.() ?? true;
+      const settled = !useGameStore.getState()._isHydrating;
+      if (gameOk && audioOk && settled) {
+        setPlayHydrated(true);
+        active = false;
+      }
+    };
+    check();
+    if (!active) return;
+
+    const unsubs: Array<(() => void) | undefined> = [
+      useGameStore.persist?.onFinishHydration?.(check),
+      useAudioStore.persist?.onFinishHydration?.(check),
+      // Subscribe to ALL game-store changes — under parallel test load, the
+      // _isHydrating setTimeout(0) may have fired before this effect mounts,
+      // in which case a targeted transition listener would never trigger.
+      // The unconditional subscription re-checks on the next state change.
+      // check() is idempotent once playHydrated flips.
+      useGameStore.subscribe(() => check()),
+    ];
+
+    // Poll fallback: catches the case where all callbacks registered after
+    // hydration completed (CI race). Stops once playHydrated flips.
+    const pollId = window.setInterval(() => {
+      check();
+      if (!active) window.clearInterval(pollId);
+    }, 30);
+
+    return () => {
+      active = false;
+      window.clearInterval(pollId);
+      unsubs.forEach((u) => u?.());
+    };
+  }, []);
+
   // Theme store selectors
   const presenterTheme = useThemeStore((state) => state.presenterTheme);
   const displayTheme = useThemeStore((state) => state.displayTheme);
@@ -112,7 +177,7 @@ export default function PlayPage() {
         Skip to main content
       </a>
 
-      <main id="main" className="min-h-screen bg-background p-3 md:p-4">
+      <main id="main" data-play-hydrated={playHydrated ? 'true' : undefined} className="min-h-screen bg-background p-3 md:p-4">
         <div className="max-w-[1600px] mx-auto">
 
           {/* Compact single-line header */}
