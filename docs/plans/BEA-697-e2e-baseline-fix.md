@@ -1,6 +1,17 @@
 # BEA-697: E2E Baseline Restoration Plan
 
-> **Status:** Planning only — no code changes in this PR.
+> **Status (2026-04-15): SHIPPED — all three clusters executed.**
+> Cluster 1 (`waitForHydration` drift) was fixed under BEA-697 itself.
+> Cluster 2 (`/api/health` endpoint) was resolved by **BEA-698** (Option B:
+> restore the endpoint, not Option A: delete the spec — the recommendation
+> below is stale). Cluster 3 (`startGameViaWizard` rot) landed under
+> **BEA-715** (seed + hydration gate). Today's E2E failures are **not**
+> from BEA-697 rot — they are from BEA-722 (zustand persist on
+> `useGameStore` without an extended hydration gate), diagnosed in
+> [`docs/superpowers/plans/2026-04-15-e2e-baseline-triage.md`](../superpowers/plans/2026-04-15-e2e-baseline-triage.md)
+> and fixed in the `fix/e2e-baseline-post-BEA-722` branch. The body of this
+> doc is left as a historical record; do **not** re-execute.
+>
 > **Linear:** https://linear.app/beak-gaming/issue/BEA-697
 > **Branch:** `chore/BEA-697-e2e-baseline-plan`
 > **Follow-up implementation issue:** TBD (description drafted at the bottom of this doc)
