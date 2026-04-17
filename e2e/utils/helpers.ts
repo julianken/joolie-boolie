@@ -56,23 +56,32 @@ export async function waitForSyncConnection(page: Page): Promise<void> {
 }
 
 /**
- * Open the display window from the presenter view.
- * Returns a promise that resolves to the new page.
+ * Open the audience display popup from a presenter page.
+ *
+ * Consolidates the popup-open + hydrate + dismiss-audio-unlock sequence that
+ * previously appeared inline in ~60 tests across bingo/display.spec.ts,
+ * bingo/dual-screen.spec.ts, trivia/display.spec.ts, trivia/dual-screen.spec.ts.
+ *
+ * Tests that additionally need a confirmed dual-screen sync connection should
+ * call `waitForDualScreenSync(displayPage)` themselves — it is not always
+ * required (e.g., tests that only assert display-page rendering) and making
+ * it unconditional here would add cost to every caller.
+ *
+ * @param presenterPage - The presenter (/play) page that owns the Open Display
+ *   button. Must already be past hydration.
+ * @returns The display popup page, hydrated, with any bingo audio-unlock
+ *   overlay dismissed.
  */
-export async function openDisplayWindow(page: Page): Promise<Page> {
-  const [displayPage] = await Promise.all([
-    page.context().waitForEvent('page'),
-    page.getByRole('button', { name: /open display/i }).click(),
-  ]);
+export async function openDisplayPopup(presenterPage: Page): Promise<Page> {
+  const popupPromise = presenterPage.waitForEvent('popup');
+  await presenterPage
+    .getByRole('button', { name: /open display/i })
+    .click();
+  const displayPage = await popupPromise;
 
-  await displayPage.waitForLoadState('domcontentloaded');
-  // Wait for display page to hydrate with interactive content
-  await expect(async () => {
-    const hasContent = await displayPage.locator('body').evaluate(
-      (body) => body.children.length > 0
-    );
-    expect(hasContent).toBe(true);
-  }).toPass({ timeout: 5000 });
+  await waitForHydration(displayPage);
+  await dismissAudioUnlockOverlay(displayPage);
+
   return displayPage;
 }
 

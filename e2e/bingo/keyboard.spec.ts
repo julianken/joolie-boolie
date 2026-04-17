@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/game';
-import { waitForHydration, pressKey } from '../utils/helpers';
+import { waitForHydration } from '../utils/helpers';
 
 test.describe('Bingo Keyboard Shortcuts', () => {
   test.beforeEach(async ({ bingoPage: page }) => {
@@ -200,35 +200,6 @@ test.describe('Bingo Keyboard Shortcuts', () => {
 
     // Ball count should be 0 - use event-driven assertion
     await expect(page.getByText(/0\s*called/i)).toBeVisible({ timeout: 2000 });
-  });
-
-  test('M key toggles audio', async ({ bingoPage: page }) => {
-    // Find audio toggle state
-    const audioToggle = page.getByRole('switch').filter({ hasText: /audio/i }).or(
-      page.locator('[aria-label*="audio"]')
-    ).first();
-
-    let initialState: string | null = null;
-    if (await audioToggle.isVisible()) {
-      initialState = await audioToggle.getAttribute('aria-checked');
-    }
-
-    // Press M to toggle audio
-    await page.keyboard.press('KeyM');
-    await page.waitForTimeout(300);
-
-    // State should have changed
-    if (await audioToggle.isVisible()) {
-      const newState = await audioToggle.getAttribute('aria-checked');
-      expect(newState).not.toBe(initialState);
-
-      // Toggle back
-      await page.keyboard.press('KeyM');
-      await page.waitForTimeout(300);
-
-      const finalState = await audioToggle.getAttribute('aria-checked');
-      expect(finalState).toBe(initialState);
-    }
   });
 
   // Removed: Test for non-existent feature

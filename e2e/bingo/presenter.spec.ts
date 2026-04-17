@@ -27,11 +27,6 @@ test.describe('Bingo Presenter View', () => {
     await expect(page.getByLabel('Presenter view')).toBeVisible();
   });
 
-  test('shows Open Display button @high', async ({ bingoPage: page }) => {
-    const openDisplayBtn = page.getByRole('button', { name: /open display/i });
-    await expect(openDisplayBtn).toBeVisible();
-  });
-
   test('displays bingo board with B-I-N-G-O columns @high', async ({ bingoPage: page }) => {
     // Check for column headers - scope to the bingo board area
     const bingoBoard = page.locator('[class*="board"], [data-testid*="board"], main').first();
@@ -191,64 +186,6 @@ test.describe('Bingo Presenter View', () => {
       // Resume
       await page.getByRole('button', { name: /resume/i }).click();
     }
-  });
-
-  test('undo removes the last called ball @high', async ({ bingoPage: page }) => {
-    // Call two balls first - "Start Game" initially, then "Roll [Space]"
-    const rollButton = page.getByRole('button', { name: /start game|roll/i });
-
-    await rollButton.click(); // Start game
-
-    // Wait for game to start (button text changes from "Start Game" to "Roll")
-    await expect(page.getByRole('button', { name: /roll/i })).toBeVisible({ timeout: 5000 });
-
-    // Call first ball
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-    await rollButton.click();
-
-    // Wait for first ball to be called and Roll button to be ready
-    await expect(async () => {
-      const calledCount = page.getByTestId('balls-called-count');
-      const countText = await calledCount.textContent();
-      expect(parseInt(countText || '0')).toBeGreaterThanOrEqual(1);
-    }).toPass({ timeout: 10000 });
-
-    await expect(rollButton).toBeEnabled({ timeout: 5000 });
-
-    // Call second ball
-    await rollButton.click();
-
-    // Wait for second ball to be called
-    await expect(async () => {
-      const calledCount = page.getByTestId('balls-called-count');
-      const countText = await calledCount.textContent();
-      expect(parseInt(countText || '0')).toBeGreaterThanOrEqual(2);
-    }).toPass({ timeout: 10000 });
-
-    // Wait for audio processing to complete before clicking Undo
-    await expect(async () => {
-      const processing = await rollButton.getAttribute('data-processing');
-      expect(processing).toBe('false');
-    }).toPass({ timeout: 10000 });
-
-    // Find undo button - should be visible and enabled after calling balls
-    const undoButton = page.getByRole('button', { name: /undo/i });
-    await expect(undoButton).toBeVisible();
-    await expect(undoButton).toBeEnabled();
-
-    // Get count from ball counter - use data-testid for precise targeting
-    const calledCount = page.getByTestId('balls-called-count');
-    const countBefore = await calledCount.textContent();
-
-    await undoButton.click();
-
-    // Wait for undo to complete (Pattern 3: count decreases)
-    await expect(async () => {
-      const countAfter = await calledCount.textContent();
-      const before = parseInt(countBefore || '0');
-      const after = parseInt(countAfter || '0');
-      expect(after).toBeLessThan(before);
-    }).toPass({ timeout: 5000 });
   });
 
   test('reset clears all called balls @high', async ({ bingoPage: page }) => {

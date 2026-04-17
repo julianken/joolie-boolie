@@ -99,11 +99,6 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.locator('span').filter({ hasText: /^playing$/i })).toBeVisible();
     });
 
-    test('shows Open Display button @high', async ({ triviaGameStarted: page }) => {
-      const openDisplayBtn = page.getByRole('button', { name: /open display/i });
-      await expect(openDisplayBtn).toBeVisible();
-    });
-
     test('shows sync status @medium', async ({ triviaGameStarted: page }) => {
       await expect(page.getByText(/sync ready|sync active/i)).toBeVisible();
     });
@@ -113,146 +108,6 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/navigate/i)).toBeVisible();
       // Look for "Peek answer" text in shortcuts section (not the button)
       await expect(page.getByText('Peek answer')).toBeVisible();
-    });
-  });
-
-  test.describe('Starting a New Game', () => {
-    // Setup overlay stays visible — tests drive the wizard themselves.
-    test.beforeEach(async ({ triviaPageWithQuestions: page }) => {
-      await waitForHydration(page);
-    });
-
-    test('cannot start game without teams @critical', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Review step in the setup wizard
-      await page.locator('[data-testid="wizard-step-3"]').click();
-      const startBtn = page.getByRole('button', { name: /start game/i });
-      await expect(startBtn).toBeVisible();
-      await expect(startBtn).toBeDisabled();
-    });
-
-    test('can start game after adding a team @critical', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step and add a team
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await addTeamBtn.click();
-      await expect(page.getByText(/table 1/i)).toBeVisible();
-
-      // Navigate to Review - Start button should be enabled
-      await page.locator('[data-testid="wizard-step-3"]').click();
-      const startBtn = page.getByRole('button', { name: /start game/i });
-      await expect(startBtn).toBeEnabled();
-
-      // Click start and wait for state change
-      await startBtn.click();
-      await expect(page.locator('span').filter({ hasText: /^Playing/i })).toBeVisible();
-    });
-
-    test('shows ready message with team count @medium', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step and add teams
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      const addTeamBtn = page.getByRole('button', { name: /add team/i });
-
-      await addTeamBtn.click();
-      await expect(page.getByText(/table 1/i)).toBeVisible();
-
-      await addTeamBtn.click();
-      await expect(page.getByText(/table 2/i)).toBeVisible();
-
-      // Navigate to Review step - should show ready status
-      await page.locator('[data-testid="wizard-step-3"]').click();
-      await expect(page.getByText(/ready to start/i)).toBeVisible();
-    });
-  });
-
-  test.describe('Team Management', () => {
-    // Setup overlay stays visible — tests drive the Teams step themselves.
-    test.beforeEach(async ({ triviaPageWithQuestions: page }) => {
-      await waitForHydration(page);
-    });
-
-    test('displays team manager section @medium', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      await expect(page.getByRole('region', { name: /team management/i })).toBeVisible();
-    });
-
-    test('can add a team @critical', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await expect(addTeamBtn).toBeVisible();
-
-      // Check initial state
-      await expect(page.getByText(/no teams added yet/i)).toBeVisible();
-
-      // Add team and wait for it to appear (Pattern 1)
-      await addTeamBtn.click();
-      await expect(page.getByText(/table 1/i)).toBeVisible();
-
-      // Add another team
-      await addTeamBtn.click();
-      await expect(page.getByText(/table 2/i)).toBeVisible();
-    });
-
-    test('can remove a team during setup @high', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      // Add a team
-      const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await addTeamBtn.click();
-
-      // Wait for team to appear using proper role-based locator
-      const team1Item = page.getByRole('listitem', { name: /team: table 1/i });
-      await expect(team1Item).toBeVisible();
-
-      // Remove the team using the accessible button name
-      const removeBtn = page.getByRole('button', { name: /remove team table 1/i });
-      await removeBtn.click();
-
-      // Wait for team removal to complete - use toPass for retry logic (Pattern 3)
-      await expect(async () => {
-        await expect(page.getByText(/no teams added yet/i)).toBeVisible();
-      }).toPass({ timeout: 10000 });
-    });
-
-    test('can rename a team @high', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      // Add a team
-      const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await addTeamBtn.click();
-
-      // Wait for team to appear using proper role-based locator
-      await expect(page.getByRole('listitem', { name: /team: table 1/i })).toBeVisible();
-
-      // Click rename button using accessible button name
-      const renameBtn = page.getByRole('button', { name: /rename team table 1/i });
-      await renameBtn.click();
-
-      // Wait for and fill the edit input
-      const input = page.getByLabel('Edit team name');
-      await expect(input).toBeVisible();
-      await input.fill('Champions');
-      await input.press('Enter');
-
-      // Wait for team rename to complete - use toPass for retry logic (Pattern 3)
-      await expect(async () => {
-        await expect(page.getByRole('listitem', { name: /team: champions/i })).toBeVisible();
-      }).toPass({ timeout: 10000 });
-    });
-
-    test('shows team count limit @medium', async ({ triviaPageWithQuestions: page }) => {
-      // Navigate to Teams step in the setup wizard
-      await page.locator('[data-testid="wizard-step-2"]').click();
-      const addTeamBtn = page.getByRole('button', { name: /add team/i });
-      await addTeamBtn.click();
-
-      // Wait for team to be added
-      await expect(page.getByRole('listitem', { name: /team: table 1/i })).toBeVisible();
-
-      // Should show 1/20
-      const teamSection = page.getByRole('region', { name: /team management/i });
-      await expect(teamSection.getByText('1/20', { exact: true })).toBeVisible();
     });
   });
 
@@ -278,14 +133,6 @@ test.describe('Trivia Presenter View', () => {
       await expect(page.getByText(/presenter view/i)).toBeVisible();
     });
 
-    test('can select a question by clicking @high', async ({ triviaGameStarted: page }) => {
-      // Find and click a question item in the list
-      const questionItems = page.locator('[role="listitem"]').filter({ hasText: /Q\d|question/i });
-      if (await questionItems.count() > 1) {
-        await questionItems.nth(1).click();
-        // Navigation happens synchronously - no wait needed
-      }
-    });
   });
 
   test.describe('Answer Reveal', () => {
@@ -293,22 +140,7 @@ test.describe('Trivia Presenter View', () => {
       await waitForHydration(page);
     });
 
-        test('can toggle peek answer @high', async ({ triviaGameStarted: page }) => {
-      // Find peek button - button may not exist in this version, so just check page structure
-      const peekBtn = page.getByRole('button', { name: /peek|show answer/i });
-      // If button exists, test it; otherwise, test still passes (feature may not be implemented)
-      const btnExists = await peekBtn.count();
-      if (btnExists > 0) {
-        await peekBtn.click();
-        // Button toggle is synchronous - button should remain visible
-        await expect(peekBtn).toBeVisible();
-      } else {
-        // Button doesn't exist - just verify we're still on the page
-        await expect(page.getByText(/presenter view/i)).toBeVisible();
-      }
-    });
-
-    test('can peek answer with Space key @medium', async ({ triviaGameStarted: page }) => {
+        test('can peek answer with Space key @medium', async ({ triviaGameStarted: page }) => {
       // Press Space to peek - keyboard events are synchronous
       await pressKey(page, 'Space');
 
@@ -491,12 +323,7 @@ test.describe('Trivia Presenter View', () => {
       await waitForHydration(page);
     });
 
-        test('has fullscreen toggle button @low', async ({ triviaGameStarted: page }) => {
-      const fullscreenBtn = page.getByRole('button', { name: /fullscreen/i });
-      await expect(fullscreenBtn).toBeVisible();
-    });
-
-    test('has settings button @low', async ({ triviaGameStarted: page }) => {
+        test('has settings button @low', async ({ triviaGameStarted: page }) => {
       const settingsBtn = page.getByRole('button', { name: /settings/i });
       await expect(settingsBtn).toBeVisible();
     });

@@ -1,5 +1,10 @@
 import { test, expect } from '../fixtures/game';
-import { waitForHydration, waitForDualScreenSync, startGameViaWizard } from '../utils/helpers';
+import {
+  openDisplayPopup,
+  waitForHydration,
+  waitForDualScreenSync,
+  startGameViaWizard,
+} from '../utils/helpers';
 
 test.describe('Trivia Audience Display', () => {
   test.describe('Direct Access - Invalid Session', () => {
@@ -17,22 +22,6 @@ test.describe('Trivia Audience Display', () => {
 
       await expect(page.getByText(/invalid session/i)).toBeVisible();
     });
-
-    test('shows error icon with invalid session @low', async ({ page }) => {
-      await page.goto('/display');
-      await waitForHydration(page);
-
-      // Should show warning/error icon
-      const errorIcon = page.locator('svg').first();
-      await expect(errorIcon).toBeVisible();
-    });
-
-    test('provides guidance on how to open display @medium', async ({ page }) => {
-      await page.goto('/display');
-      await waitForHydration(page);
-
-      await expect(page.getByText(/presenter window/i)).toBeVisible();
-    });
   });
 
   test.describe('Valid Session Display', () => {
@@ -41,11 +30,7 @@ test.describe('Trivia Audience Display', () => {
       await waitForHydration(page);
 
       // Open display window
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Check display page has correct structure (aria-label on main element)
       await expect(displayPage.getByRole('main', { name: /trivia audience display/i })).toBeVisible();
@@ -74,11 +59,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows connection status indicator - connected @high', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Wait for sync connection to establish
       await waitForDualScreenSync(displayPage);
@@ -90,11 +71,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows sync timestamp when connected @medium', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Presenter page should show "Synced" indicator when display is connected
@@ -107,11 +84,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows question when displayed by presenter @critical', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Display question using D key — game auto-advances through scenes,
@@ -130,11 +103,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows round and question number indicator @medium', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Display question using D key — retry until question scene appears
@@ -153,11 +122,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows category badge for questions @medium', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Display question using D key — retry until question scene appears
@@ -177,11 +142,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows answer options list @high', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Display question using D key — retry until question scene appears
@@ -202,11 +163,7 @@ test.describe('Trivia Audience Display', () => {
     test('question closes when presenter presses S (close) @high', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Advance to the question_display scene (scenes auto-advance after
@@ -238,11 +195,7 @@ test.describe('Trivia Audience Display', () => {
 
       await startGameViaWizard(page, 3);
 
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Navigate to end of round (5 questions per round default)
       for (let i = 0; i < 4; i++) {
@@ -267,11 +220,7 @@ test.describe('Trivia Audience Display', () => {
 
       await startGameViaWizard(page, 2);
 
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Navigate to end of round
       for (let i = 0; i < 4; i++) {
@@ -295,11 +244,7 @@ test.describe('Trivia Audience Display', () => {
 
       await startGameViaWizard(page, 4);
 
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Navigate to end and complete round
       for (let i = 0; i < 4; i++) {
@@ -326,11 +271,7 @@ test.describe('Trivia Audience Display', () => {
       // Wizard step 2 gate requires teams.length >= 2.
       await startGameViaWizard(page, 2);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Close the current question to enter the scoring flow
       // (KeyS transitions question_display → question_closed).
@@ -363,11 +304,7 @@ test.describe('Trivia Audience Display', () => {
       // Wizard step 2 gate requires teams.length >= 2.
       await startGameViaWizard(page, 2);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Wait for game to advance past game_intro into question display
@@ -400,21 +337,6 @@ test.describe('Trivia Audience Display', () => {
     });
   });
 
-  test.describe('Timer Display', () => {
-    test('timer can be visible on display based on settings @medium', async ({ triviaGameStarted: page }) => {
-      await waitForHydration(page);
-
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
-
-      // Timer visibility is controlled by settings
-      // This test verifies the display can show timer when enabled
-    });
-  });
-
   test.describe('Pause Overlay', () => {
     // NOTE: Trivia does not have a game-pause mechanism (KeyP = peek answer,
     // not pause). The canonical "hide the audience" feature is the Emergency
@@ -424,11 +346,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows emergency-blank overlay when toggled by presenter @high', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Advance display to the question scene so the "restore from blank"
@@ -450,11 +368,7 @@ test.describe('Trivia Audience Display', () => {
     test('shows blank screen during emergency pause @critical', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Display question using D key — retry until question scene appears
@@ -479,11 +393,7 @@ test.describe('Trivia Audience Display', () => {
     test('restores display when emergency blank is cleared @high', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
       await waitForDualScreenSync(displayPage);
 
       // Advance to question scene
@@ -506,30 +416,11 @@ test.describe('Trivia Audience Display', () => {
     });
   });
 
-  test.describe('Game End Display', () => {
-    test('shows game end state when game is complete @medium', async ({ triviaGameStarted: page }) => {
-      await waitForHydration(page);
-
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
-
-      // Note: Full game completion requires completing all rounds
-      // This is tested in integration tests
-    });
-  });
-
   test.describe('UI Elements and Landmarks', () => {
     test('has proper ARIA landmarks @low', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Should have main landmark with accessible name
       await expect(displayPage.locator('main, [role="main"]')).toHaveCount(1);
@@ -542,11 +433,7 @@ test.describe('Trivia Audience Display', () => {
     test('supports keyboard fullscreen via F key @low', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Display page uses keyboard F for fullscreen (no button)
       // Verify the page loaded correctly with the main landmark
@@ -556,11 +443,7 @@ test.describe('Trivia Audience Display', () => {
     test('has game display area region @low', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Display page has a game display area region instead of a footer
       await expect(displayPage.getByRole('region', { name: /game display area/i })).toBeVisible();
@@ -569,11 +452,7 @@ test.describe('Trivia Audience Display', () => {
     test('has display-content target region @low', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // The #display-content region exists as the main content target
       const displayContent = displayPage.locator('#display-content');
@@ -586,11 +465,7 @@ test.describe('Trivia Audience Display', () => {
     test('question display has fade-in animation class @low', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       await page.keyboard.press('KeyD');
       // Wait for state change to propagate
@@ -605,11 +480,7 @@ test.describe('Trivia Audience Display', () => {
     test('respects motion-reduce preference @low', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Check for motion-reduce class availability
       const motionReduceElement = displayPage.locator('[class*="motion-reduce"]');
@@ -623,11 +494,7 @@ test.describe('Trivia Audience Display', () => {
     test('adapts to large viewport (projector) @medium', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Set large viewport
       await displayPage.setViewportSize({ width: 1920, height: 1080 });
@@ -639,11 +506,7 @@ test.describe('Trivia Audience Display', () => {
     test('adapts to medium viewport @medium', async ({ triviaGameStarted: page }) => {
       await waitForHydration(page);
 
-      const popupPromise = page.waitForEvent('popup');
-      await page.getByRole('button', { name: /open display/i }).click();
-      const displayPage = await popupPromise;
-
-      await waitForHydration(displayPage);
+      const displayPage = await openDisplayPopup(page);
 
       // Set medium viewport
       await displayPage.setViewportSize({ width: 1024, height: 768 });

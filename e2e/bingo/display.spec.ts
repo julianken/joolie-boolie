@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/game';
-import { dismissAudioUnlockOverlay, waitForHydration } from '../utils/helpers';
+import { openDisplayPopup, waitForHydration } from '../utils/helpers';
 
 test.describe('Bingo Display Page', () => {
   test('shows invalid session error when accessed directly', async ({ page }) => {
@@ -22,12 +22,7 @@ test.describe('Bingo Display Page', () => {
     await waitForHydration(page);
 
     // Open display window
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Display page uses <main role="main"> as its single landmark. The inner
     // `#main-display` region carries the aria-label "Audience display".
@@ -38,12 +33,7 @@ test.describe('Bingo Display Page', () => {
   test('shows pre-game state when no game started', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Once the display connects to the presenter, the waiting screen is
     // replaced by the game layout -- but no balls have been called yet.
@@ -56,12 +46,7 @@ test.describe('Bingo Display Page', () => {
   test('displays current ball when game is active', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Call a ball from presenter
     await page.getByRole('button', { name: /roll|call|start/i }).first().click();
@@ -76,12 +61,7 @@ test.describe('Bingo Display Page', () => {
   test('shows bingo board with called numbers', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Call a few balls
     const rollButton = page.getByRole('button', { name: /roll|call|start/i }).first();
@@ -95,12 +75,8 @@ test.describe('Bingo Display Page', () => {
   test('shows connection status indicator', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    // Opening the display establishes the sync; we don't use the popup handle.
+    await openDisplayPopup(page);
 
     // Display broadcasts connection state back to presenter. The presenter's
     // sync indicator (data-testid="sync-indicator") contains a bg-success dot
@@ -114,12 +90,7 @@ test.describe('Bingo Display Page', () => {
   test('displays winning pattern', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Start game so the pattern region renders (audience only shows pattern
     // grid when `hasContent` is true — i.e., connected, or a ball called).
@@ -136,12 +107,7 @@ test.describe('Bingo Display Page', () => {
     // landmark and accepts the F keypress without error.
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     await expect(displayPage.getByRole('main')).toBeVisible();
 
@@ -156,12 +122,7 @@ test.describe('Bingo Display Page', () => {
   test('help modal opens via "?" keyboard shortcut', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Display has no visible "help" button — the shortcut is "?".
     await displayPage.keyboard.press('?');
@@ -177,12 +138,7 @@ test.describe('Bingo Display Page', () => {
     // content inside <main> + the inner #main-display region.
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     await expect(displayPage.locator('main')).toHaveCount(1);
     await expect(displayPage.locator('#main-display')).toHaveCount(1);

@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/game';
 import {
-  dismissAudioUnlockOverlay,
+  openDisplayPopup,
   waitForHydration,
   waitForDualScreenSync,
   waitForDisplayBallCount,
@@ -28,12 +28,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await expect(syncIndicator).toBeVisible();
 
     // Open display from presenter
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Once sync is established, the presenter's indicator contains a
     // bg-success dot and the visible label text switches to "Synced".
@@ -47,12 +42,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await waitForHydration(page);
 
     // Open display
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
 
     // Wait for sync to establish
     await waitForDualScreenSync(displayPage);
@@ -79,12 +69,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await waitForHydration(page);
 
     // Modal already dismissed by bingoPage fixture
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
     await waitForDualScreenSync(displayPage);
 
     // Start game and call 3 balls
@@ -177,12 +162,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await waitForHydration(page);
 
     // Modal already dismissed by bingoPage fixture
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
     await waitForDualScreenSync(displayPage);
 
     // Select a pattern on presenter (if dropdown exists)
@@ -205,12 +185,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
   test('game reset syncs to display', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
     await waitForDualScreenSync(displayPage);
 
     // Start the game and call two balls.
@@ -244,12 +219,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
   test('undo syncs to display', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
     await waitForDualScreenSync(displayPage);
 
     // Start the game and call two balls.
@@ -283,12 +253,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
   test('display reconnects after visibility change', async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
     await waitForDualScreenSync(displayPage);
 
     // Start the game and call a ball.
@@ -312,12 +277,7 @@ test.describe('Bingo Dual-Screen Synchronization', () => {
     await waitForHydration(page);
 
     // Modal already dismissed by bingoPage fixture
-    const popupPromise = page.waitForEvent('popup');
-    await page.getByRole('button', { name: /open display/i }).click();
-    const displayPage = await popupPromise;
-
-    await waitForHydration(displayPage);
-    await dismissAudioUnlockOverlay(displayPage);
+    const displayPage = await openDisplayPopup(page);
     await waitForDualScreenSync(displayPage);
 
     // Start game then call a ball
