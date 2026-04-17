@@ -5,9 +5,12 @@ test.describe('Bingo Keyboard Shortcuts', () => {
   test.beforeEach(async ({ bingoPage: page }) => {
     await waitForHydration(page);
 
-    // `waitForHydration` already asserts a visible element under <main>, so
-    // by the time it returns the useGameKeyboard hook's useEffect has run
-    // and the key listeners are attached — no additional wait needed.
+    // Wait for keyboard event handlers to be registered. `waitForHydration`
+    // asserts mount, but useGameKeyboard's useEffect attaches window listeners
+    // in a separate microtask chain; without this wait the first keypress in
+    // a test can race the listener attachment. The app does not currently
+    // expose a deterministic "keyboard ready" signal — revisit if added.
+    await page.waitForTimeout(500);
 
     // Ensure page is focused (not any specific element)
     // This allows keyboard shortcuts to work properly
