@@ -204,23 +204,25 @@ test.describe('Bingo Keyboard Shortcuts', () => {
       page.locator('[aria-label*="audio"]')
     ).first();
 
-    let initialState: string | null = null;
-    if (await audioToggle.isVisible()) {
-      initialState = await audioToggle.getAttribute('aria-checked');
-    }
+    // Gate the entire test on toggle presence BEFORE pressing KeyM — the
+    // bingo KeyM handler (apps/bingo/src/hooks/use-game.ts) toggles
+    // audioEnabled in the persisted store unconditionally, so pressing
+    // first + gating the assertions after it leaks state across tests when
+    // the toggle isn't rendered.
+    const initialState = (await audioToggle.isVisible())
+      ? await audioToggle.getAttribute('aria-checked')
+      : null;
+    test.skip(initialState === null, 'audio toggle not present in this build');
 
     // Press M to toggle audio — wait for aria-checked to flip rather than a fixed 300ms.
     await page.keyboard.press('KeyM');
 
-    if (await audioToggle.isVisible() && initialState !== null) {
-      // Flipped state should differ from initial
-      const inverted = initialState === 'true' ? 'false' : 'true';
-      await expect(audioToggle).toHaveAttribute('aria-checked', inverted, { timeout: 2000 });
+    const inverted = initialState === 'true' ? 'false' : 'true';
+    await expect(audioToggle).toHaveAttribute('aria-checked', inverted, { timeout: 2000 });
 
-      // Toggle back — wait for aria-checked to return to initial value.
-      await page.keyboard.press('KeyM');
-      await expect(audioToggle).toHaveAttribute('aria-checked', initialState, { timeout: 2000 });
-    }
+    // Toggle back — wait for aria-checked to return to initial value.
+    await page.keyboard.press('KeyM');
+    await expect(audioToggle).toHaveAttribute('aria-checked', initialState!, { timeout: 2000 });
   });
 
   // Removed: Test for non-existent feature

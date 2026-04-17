@@ -47,8 +47,14 @@ export interface UseAudienceSceneReturn {
  * round_intro → question_anticipation chain before it can assert anything
  * game-related.
  *
- * Mirrors the __E2E_TESTING__ pattern in `apps/bingo/src/app/display/page.tsx`
- * (audio-unlock overlay bypass, BEA-731).
+ * Uses the same `__E2E_TESTING__` flag as BEA-731's audio-unlock bypass in
+ * `apps/bingo/src/app/display/page.tsx`. The shape differs: BEA-731 reads the
+ * flag via `useState(() => ...)` at component mount; this file evaluates at
+ * module load. Both are correct today because Playwright's `addInitScript`
+ * runs before any page script and `'use client'` gates this module to the
+ * browser. If a future consumer ever imports this module from a non-client
+ * boundary (or during streaming SSR), revisit and defer evaluation via
+ * `useMemo` or similar.
  */
 const E2E = typeof window !== 'undefined'
   && (window as Window & { __E2E_TESTING__?: boolean }).__E2E_TESTING__ === true;
