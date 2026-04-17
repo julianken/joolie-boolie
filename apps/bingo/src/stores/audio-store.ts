@@ -444,7 +444,9 @@ export const useAudioStore = create<AudioStore>()(
         revealChime: state.revealChime,
       }),
       merge: (persistedState, currentState) => {
-        const persisted = persistedState as Record<string, unknown>;
+        // BEA-729/730: Zustand calls `merge(undefined, current)` when localStorage
+        // is empty (fresh browser or test context). Guard against undefined persisted.
+        const persisted = (persistedState ?? {}) as Record<string, unknown>;
         const merged = { ...currentState, ...persisted } as Record<string, unknown>;
 
         // Migration: Convert old single volume to new dual volumes

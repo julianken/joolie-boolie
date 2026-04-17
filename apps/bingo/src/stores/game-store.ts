@@ -170,13 +170,16 @@ export const useGameStore = create<GameStore>()(
       //  3. Keep _isHydrating true during merge so the sync subscriber doesn't broadcast
       //     a stale-state clobber to a live /display peer.
       merge: (persisted, current) => {
-        const p = persisted as Record<string, unknown>;
+        // BEA-729/730: Zustand calls `merge(undefined, current)` when localStorage
+        // is empty (fresh browser or test context). All property reads on `p` must
+        // tolerate undefined — use optional chaining plus a nullish default spread.
+        const p = persisted as Record<string, unknown> | undefined;
         return {
           ...current,
-          ...p,
+          ...(p ?? {}),
           // Restore the full BingoPattern object from the registry using the persisted id.
           // Falls back to null if the id no longer exists (e.g., pattern was removed).
-          pattern: p.patternId
+          pattern: p?.patternId
             ? (patternRegistry.get(String(p.patternId)) ?? null)
             : null,
           // Safety: never resume auto-call on page load

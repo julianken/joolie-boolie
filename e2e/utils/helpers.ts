@@ -25,6 +25,17 @@ export async function waitForHydration(page: Page): Promise<void> {
     const mainContent = page.locator('main').locator(':visible').first();
     await expect(mainContent).toBeVisible({ timeout: 1000 });
   }).toPass({ timeout: 5000 });
+
+  // BEA-729: /play routes render a skeleton <main> until their persisted
+  // zustand stores have rehydrated. The full page (with wizard + interactive
+  // children) is only mounted once `data-play-hydrated="true"` is on the root.
+  // Use `attached` because the attribute may be on an element that Playwright
+  // reports as "hidden" behind the setup-gate overlay. No-op on non-/play routes.
+  if (page.url().includes('/play')) {
+    await page
+      .locator('[data-play-hydrated="true"]')
+      .waitFor({ state: 'attached', timeout: 10_000 });
+  }
 }
 
 /**
@@ -350,17 +361,20 @@ export async function dismissAudioUnlockOverlay(displayPage: Page): Promise<void
  * @param timeout - Maximum time to wait for transitions (default: 15000ms)
  */
 export async function startGameViaWizard(page: Page, teamCount = 2, timeout = 15000): Promise<void> {
-  // BEA-715: Hydration-ready gate.
+  // BEA-715 + BEA-729: Hydration-ready gate.
   // page.goto(..., { waitUntil: 'load' }) only guarantees the JS bundle loaded —
   // not that React has hydrated and not that zustand persist has finished
-  // rehydrating from localStorage. Under React 19 + AnimatePresence, the wizard
-  // step buttons exist in the DOM before their event handlers are wired up.
-  // PlayPage sets data-settings-hydrated="true" once useSettingsStore.persist
-  // has finished hydrating AND the component has mounted, so we gate on that
-  // attribute before any wizard interaction.
-  await expect(
-    page.locator('[data-settings-hydrated="true"]')
-  ).toBeVisible({ timeout: 10_000 });
+  // rehydrating from localStorage. With the structural gate from BEA-729,
+  // PlayPage renders a skeleton <main> until all persisted stores (settings +
+  // game) report hasHydrated() AND the `_isHydrating` flag has cleared. Only
+  // then does the full tree — including the wizard and its Add Team button —
+  // mount, and `data-play-hydrated="true"` appears on the root.
+  //
+  // Use `attached` (not `visible`) because the element hosting the attribute
+  // sits behind the setup-gate overlay that Playwright can report as hidden.
+  await page
+    .locator('[data-play-hydrated="true"]')
+    .waitFor({ state: 'attached', timeout: 10_000 });
 
   const gate = page.locator('[data-testid="setup-gate"]');
 

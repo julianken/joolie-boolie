@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useGameKeyboard } from '@/hooks/use-game';
 import { useSync } from '@/hooks/use-sync';
 import { generateSessionId } from '@/lib/sync/session';
@@ -19,9 +19,78 @@ import { ThemeSelector } from '@hosted-game-night/ui';
 import { useAudioPreload, useAudio } from '@/hooks/use-audio';
 import { useApplyTheme } from '@/hooks/use-theme';
 import { useThemeStore } from '@/stores/theme-store';
+import { useGameStore } from '@/stores/game-store';
+import { useAudioStore } from '@/stores/audio-store';
 import { InstallPrompt } from '@hosted-game-night/ui';
 
 export default function PlayPage() {
+  // BEA-729: Hydration-ready signal.
+  //
+  // PlayPage reads from two persisted zustand stores:
+  //   - useGameStore (game state: calledBalls, pattern, autoCallEnabled, etc.)
+  //   - useAudioStore (audio settings: voice pack, volumes, roll sound, chime)
+  //
+  // Both rehydrate asynchronously from localStorage on mount. If E2E keypresses
+  // land before rehydration finishes, the merge can replace state mid-action
+  // and silently clobber the work (e.g., "Space key calls a ball" sees count=0
+  // because persist merge re-hydrated with calledBalls=[] after callBall ran).
+  //
+  // We gate on ALL THREE signals: both stores' `hasHydrated()` AND the
+  // `_isHydrating` flag (which flips false via setTimeout(0) in
+  // onRehydrateStorage, one microtask AFTER onFinishHydration fires — so
+  // watching only onFinishHydration misses the settle).
+  //
+  // E2E contract: `<main id="main" data-play-hydrated="true">` appears once
+  // all three signals are true; the E2E helper (e2e/utils/helpers.ts)
+  // blocks on this attribute before any interaction.
+  const [playHydrated, setPlayHydrated] = useState<boolean>(
+    () =>
+      (useGameStore.persist?.hasHydrated?.() ?? true) &&
+      (useAudioStore.persist?.hasHydrated?.() ?? true) &&
+      !useGameStore.getState()._isHydrating,
+  );
+  useEffect(() => {
+    let active = true;
+    let cleanups: Array<() => void> = [];
+    const teardown = () => {
+      cleanups.forEach((fn) => fn());
+      cleanups = [];
+    };
+    const check = () => {
+      if (!active) return;
+      const gameOk = useGameStore.persist?.hasHydrated?.() ?? true;
+      const audioOk = useAudioStore.persist?.hasHydrated?.() ?? true;
+      const settled = !useGameStore.getState()._isHydrating;
+      if (gameOk && audioOk && settled) {
+        setPlayHydrated(true);
+        active = false;
+        // Stop listening as soon as the gate flips — no need to keep
+        // running `check()` on every game-store mutation for the rest of
+        // the page's lifetime.
+        teardown();
+      }
+    };
+    check();
+    if (!active) return;
+
+    // Register every signal and collect its cleanup callback. Under CI
+    // parallel load, any subset of these may fire AFTER this effect mounts,
+    // so we register all three and poll as a belt-and-suspenders; the first
+    // one to complete triggers teardown() of the rest.
+    const gameUnsub = useGameStore.persist?.onFinishHydration?.(check);
+    if (gameUnsub) cleanups.push(gameUnsub);
+    const audioUnsub = useAudioStore.persist?.onFinishHydration?.(check);
+    if (audioUnsub) cleanups.push(audioUnsub);
+    cleanups.push(useGameStore.subscribe(() => check()));
+    const pollId = window.setInterval(check, 30);
+    cleanups.push(() => window.clearInterval(pollId));
+
+    return () => {
+      active = false;
+      teardown();
+    };
+  }, []);
+
   // Theme store selectors
   const presenterTheme = useThemeStore((state) => state.presenterTheme);
   const displayTheme = useThemeStore((state) => state.displayTheme);
@@ -112,7 +181,7 @@ export default function PlayPage() {
         Skip to main content
       </a>
 
-      <main id="main" className="min-h-screen bg-background p-3 md:p-4">
+      <main id="main" data-play-hydrated={playHydrated ? 'true' : undefined} className="min-h-screen bg-background p-3 md:p-4">
         <div className="max-w-[1600px] mx-auto">
 
           {/* Compact single-line header */}

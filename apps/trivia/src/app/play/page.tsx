@@ -27,25 +27,71 @@ import { SetupGate } from '@/components/presenter/SetupGate';
 export default function PlayPage() {
   const [showNewGameConfirm, setShowNewGameConfirm] = useState(false);
 
-  // BEA-715: Hydration-ready gate.
-  // The SetupGate wizard reads from useSettingsStore (zustand persist). Under
-  // React 19 + AnimatePresence, wizard step buttons exist in the DOM before
-  // their click handlers attach (or before the persisted settings have
-  // hydrated), causing E2E clicks to land but do nothing. Set a data-attribute
-  // once persist has finished hydrating + the component has mounted, so the
-  // E2E helper (e2e/utils/helpers.ts::startGameViaWizard) can gate on it.
-  const [settingsHydrated, setSettingsHydrated] = useState(false);
+  // BEA-715 + BEA-729: Hydration-ready signal.
+  //
+  // PlayPage reads from TWO persisted zustand stores:
+  //   - useSettingsStore (settings: questionsPerRound, timerDuration, etc.)
+  //   - useGameStore (game state: status, teams, questions, scene)
+  //
+  // Both rehydrate asynchronously on mount. Before hydration completes, the
+  // store returns its default state; a mid-interaction persist merge can
+  // re-render the wizard and detach buttons from the DOM ("element was
+  // detached" retry loops in Playwright).
+  //
+  // We gate on ALL THREE signals: both stores' `hasHydrated()` AND the
+  // `_isHydrating` flag (which flips false via setTimeout(0) in
+  // onRehydrateStorage, one microtask AFTER onFinishHydration fires — so
+  // watching only onFinishHydration misses the settle).
+  //
+  // E2E contract: `<div id="main" data-play-hydrated="true">` appears on
+  // the main container once all three signals are true; the E2E helper
+  // (e2e/utils/helpers.ts::waitForHydration) blocks on this attribute
+  // before any interaction.
+  const [playHydrated, setPlayHydrated] = useState<boolean>(
+    () =>
+      (useSettingsStore.persist?.hasHydrated?.() ?? true) &&
+      (useGameStore.persist?.hasHydrated?.() ?? true) &&
+      !useGameStore.getState()._isHydrating,
+  );
   useEffect(() => {
+    let active = true;
+    let cleanups: Array<() => void> = [];
+    const teardown = () => {
+      cleanups.forEach((fn) => fn());
+      cleanups = [];
+    };
     const check = () => {
-      const hydrated = useSettingsStore.persist?.hasHydrated?.() ?? true;
-      if (hydrated) setSettingsHydrated(true);
+      if (!active) return;
+      const settingsOk = useSettingsStore.persist?.hasHydrated?.() ?? true;
+      const gameOk = useGameStore.persist?.hasHydrated?.() ?? true;
+      const settled = !useGameStore.getState()._isHydrating;
+      if (settingsOk && gameOk && settled) {
+        setPlayHydrated(true);
+        active = false;
+        // Stop listening as soon as the gate flips — no need to keep
+        // running `check()` on every game-store mutation for the rest of
+        // the page's lifetime.
+        teardown();
+      }
     };
     check();
-    const unsub = useSettingsStore.persist?.onFinishHydration?.(() => {
-      setSettingsHydrated(true);
-    });
+    if (!active) return;
+
+    // Register every signal and collect its cleanup callback. Under CI
+    // parallel load, any subset of these may fire AFTER this effect mounts,
+    // so we register all three and poll as a belt-and-suspenders; the first
+    // one to complete triggers teardown() of the rest.
+    const settingsUnsub = useSettingsStore.persist?.onFinishHydration?.(check);
+    if (settingsUnsub) cleanups.push(settingsUnsub);
+    const gameUnsub = useGameStore.persist?.onFinishHydration?.(check);
+    if (gameUnsub) cleanups.push(gameUnsub);
+    cleanups.push(useGameStore.subscribe(() => check()));
+    const pollId = window.setInterval(check, 30);
+    cleanups.push(() => window.clearInterval(pollId));
+
     return () => {
-      unsub?.();
+      active = false;
+      teardown();
     };
   }, []);
 
@@ -279,7 +325,7 @@ export default function PlayPage() {
       */}
       <div
         id="main"
-        data-settings-hydrated={settingsHydrated ? 'true' : undefined}
+        data-play-hydrated={playHydrated ? 'true' : undefined}
         className="h-screen flex flex-col overflow-hidden bg-background"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
