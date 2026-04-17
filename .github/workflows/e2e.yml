@@ -4,10 +4,13 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 concurrency:
-  group: e2e-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: e2e-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -31,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'pnpm'
 
       - name: Get pnpm store directory
@@ -95,7 +98,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'pnpm'
 
       - name: Get pnpm store directory
@@ -188,3 +191,60 @@ jobs:
             exit 1
           fi
           echo "All E2E shards passed."
+
+  deploy:
+    name: Deploy ${{ matrix.app }} to Vercel Production
+    runs-on: ubuntu-latest
+    needs: e2e-summary
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 15
+
+    # Serialize deploys per app so back-to-back merges to main always land
+    # in commit order. Without this, run B's E2E could finish before run A's
+    # and race the deploy, leaving prod on an older SHA.
+    concurrency:
+      group: vercel-deploy-${{ matrix.app }}
+      cancel-in-progress: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: bingo
+            project_id_secret: VERCEL_BINGO_PROJECT_ID
+          - app: trivia
+            project_id_secret: VERCEL_TRIVIA_PROJECT_ID
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets[matrix.project_id_secret] }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Pull Vercel environment
+        run: npx vercel@51.4.0 pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: apps/${{ matrix.app }}
+
+      - name: Build with Vercel
+        run: npx vercel@51.4.0 build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: apps/${{ matrix.app }}
+
+      - name: Deploy prebuilt output to production
+        run: npx vercel@51.4.0 deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: apps/${{ matrix.app }}
