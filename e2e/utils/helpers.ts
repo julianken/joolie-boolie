@@ -341,15 +341,18 @@ export async function waitForDisplayBallCount(
  * failure.
  */
 export async function dismissAudioUnlockOverlay(displayPage: Page): Promise<void> {
+  const overlay = displayPage.getByTestId('audio-unlock-overlay');
   await expect(async () => {
-    const overlay = displayPage.getByTestId('audio-unlock-overlay');
-    const visible = await overlay.isVisible().catch(() => false);
-    if (!visible) return; // already gone — success
-    // Short per-attempt click timeout plus .catch(): if the overlay unmounts
-    // between isVisible() and click(), the click throws a detached-element
-    // error which we swallow. The outer toPass retries until the locator is
-    // absent.
-    await overlay.click({ timeout: 500 }).catch(() => {});
+    // Best-effort click, swallowing detach errors from a concurrent unmount
+    // (e.g., the presenter's UNLOCK_AUDIO postMessage). Skip if already gone.
+    if (await overlay.isVisible().catch(() => false)) {
+      await overlay.click({ timeout: 500 }).catch(() => {});
+    }
+    // Terminal assertion: `toPass` retries until this passes. If the overlay
+    // is still visible, `toBeHidden` throws and triggers the next iteration;
+    // that is what turns this helper into a genuine race-tolerant loop rather
+    // than a one-shot swallow.
+    await expect(overlay).toBeHidden({ timeout: 100 });
   }).toPass({ timeout: 3000 });
 }
 
