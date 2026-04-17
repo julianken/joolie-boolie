@@ -325,24 +325,35 @@ export async function waitForDisplayBallCount(
 /**
  * Dismiss the bingo display's audio-unlock overlay if present.
  *
- * The `/display` page for bingo renders a full-screen click-to-activate
- * overlay (data-testid="audio-unlock-overlay") that blocks pointer events
- * until the user interacts. In E2E we click it so subsequent assertions
- * against the underlying display UI are not obstructed.
+ * The `/display` page for bingo normally renders a full-screen
+ * click-to-activate overlay (data-testid="audio-unlock-overlay") that blocks
+ * pointer events until the user interacts. Under E2E (detected via the
+ * `window.__E2E_TESTING__` global applied by `e2e/utils/e2e-flags.ts` from
+ * each fixture), the display page skips rendering that overlay entirely
+ * (see apps/bingo/src/app/display/page.tsx) and starts with
+ * `audioUnlocked=true`, so this helper is effectively a no-op in automated
+ * runs.
  *
- * No-op if the overlay isn't visible (e.g., invalid-session display).
+ * Kept for backward compatibility with existing callers. Now genuinely
+ * race-tolerant: polls visibility and swallows the click's "detached
+ * element" error so a lingering overlay that unmounts mid-click (e.g., from
+ * the presenter's UNLOCK_AUDIO postMessage) doesn't bubble as a test
+ * failure.
  */
 export async function dismissAudioUnlockOverlay(displayPage: Page): Promise<void> {
   const overlay = displayPage.getByTestId('audio-unlock-overlay');
-  try {
-    await overlay.waitFor({ state: 'visible', timeout: 2000 });
-  } catch {
-    return;
-  }
-  await overlay.click();
-  await overlay.waitFor({ state: 'detached', timeout: 5000 }).catch(() => {
-    // Some browsers may keep the node around briefly; best-effort dismissal.
-  });
+  await expect(async () => {
+    // Best-effort click, swallowing detach errors from a concurrent unmount
+    // (e.g., the presenter's UNLOCK_AUDIO postMessage). Skip if already gone.
+    if (await overlay.isVisible().catch(() => false)) {
+      await overlay.click({ timeout: 500 }).catch(() => {});
+    }
+    // Terminal assertion: `toPass` retries until this passes. If the overlay
+    // is still visible, `toBeHidden` throws and triggers the next iteration;
+    // that is what turns this helper into a genuine race-tolerant loop rather
+    // than a one-shot swallow.
+    await expect(overlay).toBeHidden({ timeout: 100 });
+  }).toPass({ timeout: 3000 });
 }
 
 /**
