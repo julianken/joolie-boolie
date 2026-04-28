@@ -13,7 +13,7 @@ When completing a task, ensure the following before committing:
 - [ ] E2E tests pass locally: `pnpm test:e2e`
 - [ ] Check E2E summary: `pnpm test:e2e:summary`
 
-**Note**: GitHub Actions are disabled. All tests MUST pass locally before committing.
+**Note**: CI runs lint, typecheck, tests, and E2E on every PR (`.github/workflows/e2e.yml`). Run them locally first to catch issues before pushing.
 
 ## 3. Pre-Commit Hooks
 Husky + lint-staged automatically runs:

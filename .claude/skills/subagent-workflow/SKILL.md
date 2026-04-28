@@ -12,7 +12,7 @@ description: MANDATORY for all multi-step tasks - parallel task execution with s
 1. **One Linear issue = one worktree = one PR** — never split an issue across multiple PRs
 2. **Always query Linear before starting** — Linear is the source of truth
 3. **Both spec + quality reviews required** — no exceptions, no shortcuts
-4. **E2E tests must pass before PR** — GitHub Actions are disabled; local validation is mandatory
+4. **E2E tests must pass before merge** — CI runs them on every PR; iterate locally with `pnpm test:e2e` before pushing
 5. **All work via dispatched agents** — lead agent orchestrates, never edits code directly
 6. **Fixes stay in the same worktree/PR** — never create a new PR for review fixes
 7. **Update Linear at every state transition** — full audit trail required
